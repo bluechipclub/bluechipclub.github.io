@@ -1141,8 +1141,6 @@ textarea { min-height: 150px; resize: vertical; }
     ta.onfocus = () => ta.select();
     box.querySelector('.fbcopy').onclick = async () => { try { await navigator.clipboard.writeText(txt); box.querySelector('.fbcopy').textContent = 'Kopiert ✓'; } catch (err) { ta.focus(); ta.select(); try { document.execCommand('copy'); box.querySelector('.fbcopy').textContent = 'Kopiert ✓'; } catch (e2) {} } };
   }
-  const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
-  const b64d = t => JSON.parse(decodeURIComponent(escape(atob(t))));
   function readSubmit() {
     const kind = (document.querySelector('input[name=sKind]:checked') || {}).value || 'badbeat';
     const v = { kind, player: $('#sP').value, opponent: $('#sO').value, tid: $('#sT').value, cards: $('#sC').value.trim(), text: $('#sX').value.trim() };
@@ -1151,7 +1149,7 @@ textarea { min-height: 150px; resize: vertical; }
     if (!v.text) { st.textContent = 'Bitte beschreib kurz, was passiert ist.'; return null; }
     st.className = 'status'; st.textContent = '';
     const t = tById(v.tid);
-    const txt = '♠ Blue Chip Club · Hand-Einreichung\n\nArt: ' + KINDS[kind] + '\nSpieler: ' + v.player + (v.opponent ? '\n' + (kind === 'badbeat' ? 'Verloren gegen' : 'Gegen') + ': ' + v.opponent : '') + '\nTurnier: ' + (t ? tName(t) : 'unbekannt') + (v.cards ? '\nKarten: ' + v.cards : '') + '\n\n' + v.text + '\n\nBCC:' + b64e(v);
+    const txt = '♠ Blue Chip Club · Hand-Einreichung\n\nArt: ' + KINDS[kind] + '\nSpieler: ' + v.player + (v.opponent ? '\n' + (kind === 'badbeat' ? 'Verloren gegen' : 'Gegen') + ': ' + v.opponent : '') + '\nTurnier: ' + (t ? tName(t) : 'unbekannt') + (v.cards ? '\nKarten: ' + v.cards : '') + '\n\n' + v.text;
     return txt;
   }
   document.addEventListener('change', e => { if (e.target.name === 'sKind') { const k = e.target.value; $('#sOppL').textContent = k === 'badbeat' ? 'Verloren gegen' : 'Gegen (optional)'; } });
@@ -1291,6 +1289,8 @@ textarea { min-height: 150px; resize: vertical; }
       (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Interessenliste · Tisch 2</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
       '<p class="sub" style="font-size:13px">' + seatTxt(n) + '. Ab ' + (seatsOf(n) + 1) + ' Leuten gilt die Interessenliste: Kommen genug zusammen, machen wir einen zweiten Tisch auf.</p>' +
       '<div class="row"><label class="field"><span>Dein Name</span><select id="rP">' + playerOpts('') + '<option value="__g">Gast / neu …</option></select></label><label class="field" id="rGW" hidden><span>Name des Gasts</span><input id="rG" placeholder="Vorname"></label></div>' +
+      '<label class="field"><span>Anmerkung (optional)</span><input id="rN" placeholder="z. B. komme erst gegen 19 Uhr, bringe einen Gast mit …"></label>' +
+      '<p class="sub" style="font-size:13px">Kommst du später oder gibt es sonst etwas zu beachten? Schreib es hier rein oder direkt mit in die WhatsApp-Nachricht.</p>' +
       '<div class="acts"><a class="btn wa" id="rWa" href="https://wa.me/" target="_blank" rel="noopener noreferrer">' + (isFull(n) ? 'Auf die Interessenliste' : 'Per WhatsApp reservieren') + '</a><button class="btn" id="rCopy">Text kopieren</button><span class="status" id="rStatus"></span></div><div class="fb" id="rFb" hidden></div>' +
       '<p class="sub" style="font-size:13px">Nach der Bestätigung stehst du hier in der Liste. Bargeld für deine Entries mitbringen.</p></div>' +
       (prog.length ? '<div>' + head('Ablauf', 'Der Abend') + '<ol class="tline">' + prog.map(x => '<li><time>' + esc(x.t) + '</time><i></i><span>' + esc(x.l) + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</span></li>').join('') + '</ol></div>' : '') +
@@ -1303,7 +1303,7 @@ textarea { min-height: 150px; resize: vertical; }
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
       if (!nm) { st.className = 'status err'; st.textContent = 'Bitte wähl deinen Namen.'; return null; }
       st.className = 'status'; st.textContent = '';
-      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + wd + ', ' + hhmm(d) + ' Uhr\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Interessenliste für Tisch 2.' : 'Ich bin dabei!') + '\n\nBCC:' + b64e({ kind: 'seat', player: nm, date: n.date });
+      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + wd + ', ' + hhmm(d) + ' Uhr\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Interessenliste für Tisch 2.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
@@ -1563,8 +1563,16 @@ textarea { min-height: 150px; resize: vertical; }
     const sync = () => { const k = $('#hKind').value; $('#hRankRow').hidden = k !== 'hand'; $('#hTitleRow').hidden = k === 'hand'; $('#hOppL').textContent = k === 'badbeat' ? 'Verloren gegen' : 'Gegen (optional)'; };
     sync(); $('#hKind').onchange = sync;
     $('#hImp').onclick = () => {
-      const m = $('#hTicket').value.match(/BCC:([A-Za-z0-9+/=]+)/), st = $('#hImpS');
-      let v = null; try { v = m && b64d(m[1]); } catch (e) {}
+      const raw = $('#hTicket').value, st = $('#hImpS');
+      const get = k => { const m = raw.match(new RegExp('^' + k + ':\\s*(.+)$', 'mi')); return m ? m[1].trim() : ''; };
+      let v = null;
+      if (/Platz-Reservierung/i.test(raw)) v = { kind: 'seat', player: get('Name') };
+      else if (/Hand-Einreichung/i.test(raw)) {
+        const art = get('Art'), kind = Object.keys(KINDS).find(k => KINDS[k] === art) || 'badbeat';
+        const tn = get('Turnier'), t = DATA.tournaments.find(x => tName(x) === tn);
+        v = { kind, player: get('Spieler'), opponent: get('Verloren gegen') || get('Gegen'), tid: t ? t.id : '', cards: get('Karten'), text: raw.split(/\n\s*\n/).slice(2).join('\n\n').trim() };
+      }
+      if (v && !v.player) v = null;
       if (!v) { st.className = 'status err'; st.textContent = 'Keine Einreichung erkannt. Bitte die ganze Nachricht einfügen.'; return; }
       if (v.kind === 'seat') {
         const n = DATA.settings.next || {}; n.signups = signups(n);
