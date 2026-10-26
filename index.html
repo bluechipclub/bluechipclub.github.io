@@ -520,6 +520,8 @@ textarea { min-height: 150px; resize: vertical; }
   #brandName { font-size: 15px; }
   .icon-btn .lbl { display: none; }
 }
+.tbd{margin:14px 0 4px;padding:10px 14px;border:1px solid var(--gold);border-radius:12px;color:var(--gold);font-weight:600;font-size:15px;letter-spacing:.01em;text-align:center}
+.cdi:not([data-cdi]){color:var(--gold)}
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
@@ -571,7 +573,7 @@ textarea { min-height: 150px; resize: vertical; }
   "next": {
    "date": "2026-10-30T17:30",
    "title": "Dead Man's Hand",
-   "sub": "Halloween Special · erstmals mit Wanderpokal",
+   "sub": "Halloween Special · erstmals mit Wanderpokal · Freitag fällt aus",
    "buyin": 25,
    "rebuy": 20,
    "cards": "A♠ A♣ 8♠ 8♣ 9♦",
@@ -619,7 +621,8 @@ textarea { min-height: 150px; resize: vertical; }
    "fee": 5,
    "signups": [
     "Magg"
-   ]
+   ],
+   "tbd": "Abstimmung läuft in der Gruppe: Mo, Di oder Mi"
   },
   "extraRecords": [
    {
@@ -1230,8 +1233,8 @@ textarea { min-height: 150px; resize: vertical; }
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>Anmeldung offen</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void' + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
-      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button><span class="cdi" data-cdi="' + esc(n.date) + '">–</span></div></div>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
   function openSplash() {
@@ -1243,10 +1246,10 @@ textarea { min-height: 150px; resize: vertical; }
     let chips = '';
     for (let i = 0; i < 22; i++) chips += '<span class="chipf' + (i % 3 ? '' : ' g') + '" style="left:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (2.2 + Math.random() * 2).toFixed(2) + 's;--w:' + (0.3 + Math.random() * 2.2).toFixed(2) + 's;--r:' + ((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540)).toFixed(0) + 'deg;width:' + (24 + Math.random() * 20).toFixed(0) + 'px;height:auto;aspect-ratio:1"></span>';
     el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + chips +
-      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (isFull(n) ? 'Tisch voll · Interessenliste offen' : 'Anmeldung offen') + '</span>' +
+      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin wird verschoben' : isFull(n) ? 'Tisch voll · Interessenliste offen' : 'Anmeldung offen') + '</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void' + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
-      '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>' +
+      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
+      (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
       '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Interessenliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const tick = () => { const s = Math.max(0, (d - Date.now()) / 1000), v = [s / 86400, s % 86400 / 3600, s % 3600 / 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')); el.querySelectorAll('.cdx b').forEach((b, i) => { b.textContent = v[i]; }); };
@@ -1263,9 +1266,10 @@ textarea { min-height: 150px; resize: vertical; }
     setTimeout(() => { const x = el.querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 50);
   }
   const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.fee ? ' (inkl. ' + eur(n.fee) + ' Veranstalter)' : '') + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
-  function nextOk() { const n = DATA.settings.next; return n && n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3) ? n : null; }
+  function nextOk() { const n = DATA.settings.next; return n && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
   const hhmm = d => d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  const cdHtml = n => '<div class="cd" data-cd="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div></div>';
+  const tbdHtml = n => '<p class="tbd">' + esc(n.tbd) + '</p>';
+  const cdHtml = n => n.tbd ? tbdHtml(n) : '<div class="cd" data-cd="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div></div>';
   function nextCard() {
     const n = nextOk();
     if (!n) return cx('c4 next', '<span class="eyebrow">Nächstes Turnier</span><p class="empty">Termin folgt.</p>');
@@ -1285,7 +1289,7 @@ textarea { min-height: 150px; resize: vertical; }
     const facts = [[hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Veranstalter' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + esc(wd) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
+      '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Neuer Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
       '<div class="body"><div class="facts">' + facts.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
       '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + ' / ' + seatsOf(n) + ' zugesagt</span></div>' + seatbar(n) +
       (signups(n).length ? '<div class="who">' + signups(n).slice(0, seatsOf(n)).map(x => '<span>' + esc(x) + '</span>').join('') + '</div>' : '<p class="sub" style="font-size:14px">Noch keine Zusagen. Sei der Erste.</p>') +
@@ -1306,7 +1310,7 @@ textarea { min-height: 150px; resize: vertical; }
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
       if (!nm) { st.className = 'status err'; st.textContent = 'Bitte wähl deinen Namen.'; return null; }
       st.className = 'status'; st.textContent = '';
-      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + wd + ', ' + hhmm(d) + ' Uhr\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Interessenliste für Tisch 2.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
+      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + ', ' + hhmm(d) + ' Uhr') + '\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Interessenliste für Tisch 2.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
@@ -1671,6 +1675,7 @@ textarea { min-height: 150px; resize: vertical; }
   function nextForm() {
     const n = DATA.settings.next || {};
     return '<div class="box"><span class="label">Nächstes Turnier</span><div class="row"><label class="field"><span>Datum &amp; Treffpunkt</span><input id="nDate" type="datetime-local" value="' + esc(n.date || '') + '"></label><label class="field"><span>Name</span><input id="nTitle" value="' + esc(n.title || '') + '"></label></div>' +
+      '<label class="field"><span>Termin verschoben (Hinweistext, leer = Termin gilt)</span><input id="nTbd" value="' + esc(n.tbd || '') + '"></label>' +
       '<label class="field"><span>Untertitel</span><input id="nSub" value="' + esc(n.sub || '') + '"></label>' +
       '<div class="row"><label class="field"><span>Buy-in (P)</span><input id="nBuy" type="number" min="0" value="' + esc(n.buyin || '') + '"></label><label class="field"><span>vom Buy-in an Veranstalter (P)</span><input id="nFee" type="number" min="0" value="' + esc(n.fee || '') + '"></label><label class="field"><span>Rebuy (P)</span><input id="nReb" type="number" min="0" value="' + esc(n.rebuy || '') + '"></label><label class="field"><span>Karten-Deko</span><input id="nCards" value="' + esc(n.cards || '') + '" placeholder="A♠ A♣ 8♠ 8♣ 9♦"></label></div>' +
       '<label class="field"><span>Weitere Fakten (eine pro Zeile: Wert | Bezeichnung)</span><textarea id="nFacts">' + esc((n.facts || []).map(f => f.v + ' | ' + f.l).join('\n')) + '</textarea></label>' +
@@ -1683,7 +1688,7 @@ textarea { min-height: 150px; resize: vertical; }
   function bindEinst() {
     $('#sSave').onclick = async () => {
       const lines = id => $(id).value.split('\n').map(l => l.split('|').map(x => x.trim())).filter(a => a.join(''));
-      DATA.settings.next = Object.assign(DATA.settings.next || {}, { date: $('#nDate').value, title: $('#nTitle').value.trim(), sub: $('#nSub').value.trim(), buyin: Number($('#nBuy').value) || '', rebuy: Number($('#nReb').value) || '', fee: Number($('#nFee').value) || '', cards: $('#nCards').value.trim(),
+      DATA.settings.next = Object.assign(DATA.settings.next || {}, { date: $('#nDate').value, tbd: $('#nTbd').value.trim(), title: $('#nTitle').value.trim(), sub: $('#nSub').value.trim(), buyin: Number($('#nBuy').value) || '', rebuy: Number($('#nReb').value) || '', fee: Number($('#nFee').value) || '', cards: $('#nCards').value.trim(),
         facts: lines('#nFacts').map(a => ({ v: a[0] || '', l: a[1] || '' })), program: lines('#nProg').map(a => ({ t: a[0] || '', l: a[1] || '', s: a[2] || '' })), trophy: $('#nTrophy').value.trim(), info: $('#nInfo').value.trim(), seats: Number($('#nSeats').value) || 10,
         signups: [...document.querySelectorAll('.nSign:checked')].map(x => x.value).concat($('#nGuests').value.split(',').map(x => x.trim()).filter(Boolean)) });
       DATA.settings.name = $('#sName').value.trim() || DATA.settings.name;
