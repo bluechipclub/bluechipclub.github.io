@@ -1237,7 +1237,7 @@ textarea { min-height: 150px; resize: vertical; }
   const signups = n => (n.signups || []).filter(Boolean);
   const seatbar = n => { const k = signups(n).length, m = seatsOf(n); return '<div class="seatbar" aria-hidden="true">' + Array.from({ length: Math.max(m, k) }, (_, i) => '<i class="' + (i < k ? (i < m ? 'on' : 'on ex') : '') + '"></i>').join('') + '</div>'; };
   const isFull = n => signups(n).length >= seatsOf(n);
-  const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Interessenliste für Tisch 2' : 'Interessenliste für Tisch 2 offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
+  const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Warteliste' : 'Warteliste offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
   function promoCard() {
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
@@ -1255,11 +1255,11 @@ textarea { min-height: 150px; resize: vertical; }
     let chips = '';
     for (let i = 0; i < 22; i++) chips += '<span class="chipf' + (i % 3 ? '' : ' g') + '" style="left:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (2.2 + Math.random() * 2).toFixed(2) + 's;--w:' + (0.3 + Math.random() * 2.2).toFixed(2) + 's;--r:' + ((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540)).toFixed(0) + 'deg;width:' + (24 + Math.random() * 20).toFixed(0) + 'px;height:auto;aspect-ratio:1"></span>';
     el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + chips +
-      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin wird verschoben' : isFull(n) ? 'Tisch voll · Interessenliste offen' : 'Anmeldung offen') + '</span>' +
+      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin wird verschoben' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
-      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Interessenliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
+      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const tick = () => { const s = Math.max(0, (d - Date.now()) / 1000), v = [s / 86400, s % 86400 / 3600, s % 3600 / 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')); el.querySelectorAll('.cdx b').forEach((b, i) => { b.textContent = v[i]; }); };
     tick(); const iv = setInterval(tick, 1000);
@@ -1302,12 +1302,12 @@ textarea { min-height: 150px; resize: vertical; }
       '<div class="body"><div class="facts">' + facts.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
       '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + ' / ' + seatsOf(n) + ' zugesagt</span></div>' + seatbar(n) +
       (signups(n).length ? '<div class="who">' + signups(n).slice(0, seatsOf(n)).map(x => '<span>' + esc(x) + '</span>').join('') + '</div>' : '<p class="sub" style="font-size:14px">Noch keine Zusagen. Sei der Erste.</p>') +
-      (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Interessenliste · Tisch 2</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
-      '<p class="sub" style="font-size:13px">' + seatTxt(n) + '. Ab ' + (seatsOf(n) + 1) + ' Leuten gilt die Interessenliste: Kommen genug zusammen, machen wir einen zweiten Tisch auf.</p>' +
+      (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Warteliste</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
+      '<p class="sub" style="font-size:13px">' + seatTxt(n) + (isFull(n) ? '. Du kannst dich trotzdem auf die Warteliste setzen: Wer später kommt oder früher geht, macht Platz, und je nach Andrang spielen wir auch zu 11 oder 12. Wer nachrückt, wird per WhatsApp informiert.' : '. Ab ' + (seatsOf(n) + 1) + ' Leuten gibt es eine Warteliste.') + '</p>' +
       '<div class="row"><label class="field"><span>Dein Name</span><select id="rP">' + playerOpts('') + '<option value="__g">Gast / neu …</option></select></label><label class="field" id="rGW" hidden><span>Name des Gasts</span><input id="rG" placeholder="Vorname"></label></div>' +
       '<label class="field"><span>Anmerkung (optional)</span><input id="rN" placeholder="z. B. komme erst gegen 19 Uhr, bringe einen Gast mit …"></label>' +
       '<p class="sub" style="font-size:13px">Kommst du später oder gibt es sonst etwas zu beachten? Schreib es hier rein oder direkt mit in die WhatsApp-Nachricht.</p>' +
-      '<div class="acts"><a class="btn wa" id="rWa" href="https://wa.me/" target="_blank" rel="noopener noreferrer">' + (isFull(n) ? 'Auf die Interessenliste' : 'Per WhatsApp reservieren') + '</a><button class="btn" id="rCopy">Text kopieren</button><span class="status" id="rStatus"></span></div><div class="fb" id="rFb" hidden></div>' +
+      '<div class="acts"><a class="btn wa" id="rWa" href="https://wa.me/" target="_blank" rel="noopener noreferrer">' + (isFull(n) ? 'Auf die Warteliste' : 'Per WhatsApp reservieren') + '</a><button class="btn" id="rCopy">Text kopieren</button><span class="status" id="rStatus"></span></div><div class="fb" id="rFb" hidden></div>' +
       '<p class="sub" style="font-size:13px">Nach der Bestätigung stehst du hier in der Liste. Bargeld für deine Entries mitbringen.</p></div>' +
       (prog.length ? '<div>' + head('Ablauf', 'Der Abend') + '<ol class="tline">' + prog.map(x => '<li><time>' + esc(x.t) + '</time><i></i><span>' + esc(x.l) + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</span></li>').join('') + '</ol></div>' : '') +
       (n.trophy ? '<div class="trophy">' + TROPHY + '<div><h3>' + esc(n.trophyTitle || 'Wanderpokal') + '</h3>' + paras(n.trophy) + '</div></div>' : '') +
@@ -1319,7 +1319,7 @@ textarea { min-height: 150px; resize: vertical; }
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
       if (!nm) { st.className = 'status err'; st.textContent = 'Bitte wähl deinen Namen.'; return null; }
       st.className = 'status'; st.textContent = '';
-      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + ', ' + hhmm(d) + ' Uhr') + '\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Interessenliste für Tisch 2.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
+      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + ', ' + hhmm(d) + ' Uhr') + '\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
