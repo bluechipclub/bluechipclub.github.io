@@ -399,6 +399,12 @@
 {
 "id": 39,
 "op": "reload"
+},
+{
+"id": 40,
+"op": "rebuy",
+"name": "Nico",
+"paid": "bar"
 }
 ]
 }
