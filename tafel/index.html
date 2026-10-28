@@ -801,7 +801,7 @@ Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).fo
 function cardHtml(c){
   if(!c)return null;const o=typeof c==="string"?{img:c}:c;
   const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
-  const V=/^karten\//.test(o.img)?"?v=6":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
+  const V=/^karten\//.test(o.img)?"?v=7":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
 function introShow(list,done){
