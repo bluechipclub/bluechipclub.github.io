@@ -684,7 +684,11 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 /* ---------- seat draw ---------- */
 function drawSeats(){
   closeAll();
-  const a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  // Tim (organiser) always sits at the dealer spot = place 1, Manu directly left or right of him
+  const rule=S.seatRule||{anchor:"Tim",next:"Manu"},anc=a.find(p=>p.name.toLowerCase()===String(rule.anchor).toLowerCase());
+  if(anc){a=[anc,...a.filter(p=>p!==anc)];const nb=rule.next&&a.find(p=>p.name.toLowerCase()===String(rule.next).toLowerCase());
+    if(nb&&a.length>2){a=a.filter(p=>p!==nb);if(Math.random()<.5)a.splice(1,0,nb);else a.push(nb);}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
   introShow(a,()=>drawOverview(a));
 }
@@ -705,7 +709,7 @@ function introShow(list,done){
     if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4];
     box.innerHTML='<div class="inC">'+(img?'<img src="'+img+'" alt="">':'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
-      '<div class="inT"><div class="eyebrow">Platz '+(k+1)+' von '+list.length+'</div><h3>'+esc(p.name)+'</h3>'+(k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
+      '<div class="inT"><div class="eyebrow">'+(k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
       '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");
