@@ -376,7 +376,7 @@ const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Deepstack",i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
-  buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
+  buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -397,6 +397,8 @@ const rebuyOpen=()=>S.reLvl==null||playNum(S.i)<=S.reLvl;
 const curBB=()=>{const L=LEVELS[S.i];return L.brk?((LEVELS[S.i+1]||LEVELS[S.i-1]||{}).bb||0):L.bb;};
 function payouts(){
   const pot=potOf(),c=S.pay,r=c.round||1;
+  // percentage split, e.g. pcts [50,30,20]; rounding remainder goes to 1st
+  if(Array.isArray(c.pcts)&&c.pcts.length&&S.players.length>=5){const a=c.pcts.map(x=>Math.floor(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;}
   if(c.places<3||S.players.length<5){const a=Math.round(pot*c.split/100/r)*r;return [a,pot-a];}
   const third=Math.min(c.third,pot),rest=pot-third,a=Math.round(rest*c.split/100/r)*r;
   return [a,rest-a,third];
