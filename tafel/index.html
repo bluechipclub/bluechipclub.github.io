@@ -464,8 +464,6 @@ function render(){
 function renderTicker(){
   const parts=[];
   S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
-  const g=S.games.filter(e=>e.lvl>playNum(S.i)||(e.lvl===playNum(S.i)&&!S.fired[gkey(e)])).slice(0,2);
-  if(g.length)parts.push("Als Nächstes: "+g.map(e=>e.g+" in Level "+e.lvl).join(" · "));
   if(rebuyOpen())parts.push("Rebuy "+P(S.rebuy)+" bis Ende Level "+(S.reLvl??"∞"));
   const pays=payouts();parts.push("Preise: "+pays.map((v,k)=>(k+1)+". "+P(v)).join(" · "));
   parts.push("Ein Abend, zehn Plätze, ein Name auf dem Wanderpokal");
@@ -773,7 +771,7 @@ $("bFull").onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();
 $("bGame").onclick=()=>{
   closeAll();const L=$("gList");L.innerHTML="";
   Object.keys(GAMES).forEach(g=>{const b=document.createElement("button");b.type="button";b.innerHTML="<b></b><span></span>";b.querySelector("b").textContent=g;b.querySelector("span").textContent=GAMES[g].short;b.onclick=()=>showGame(g,false);L.appendChild(b);});
-  $("gPlan").textContent="Geplant: "+(S.games.map(e=>"L"+e.lvl+" "+e.g).join(" · ")||"nichts");
+  $("gPlan").textContent="Startet sofort auf dem Bildschirm.";
   $("mGames").hidden=false;
 };
 $("gClose").onclick=()=>$("mGames").hidden=true;
