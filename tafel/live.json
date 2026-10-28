@@ -20,6 +20,35 @@
 {
 "id": 3,
 "op": "reload"
+},
+{
+"id": 4,
+"op": "set",
+"v": {
+"stack": 5000,
+"min1": 25,
+"min": 25,
+"minLate": 20,
+"reLvl": 9
+}
+},
+{
+"id": 5,
+"op": "blinds",
+"text": "25/50\n25/75\n50/100\nPause 10 Rebuys an der Kasse\n50/150\n75/150\n100/200\nPause 5 Kurze Pause\n150/300\n200/400\n250/500\n300/600\n400/800\n500/1000\n600/1200\n800/1600\n1000/2000\n1500/3000\n2000/4000\n3000/6000\n4000/8000"
+},
+{
+"id": 6,
+"op": "level",
+"n": 1
+},
+{
+"id": 7,
+"op": "msg",
+"eyebrow": "Neue Struktur",
+"title": "Rebuy bis Level 9",
+"text": "5.000 Chips · 25 Minuten pro Level · Pausen nach Level 3 (10 Min) und Level 6 (5 Min) · ab 22:00 Freezeout mit 20-Minuten-Levels.",
+"sec": 20
 }
 ]
 }
