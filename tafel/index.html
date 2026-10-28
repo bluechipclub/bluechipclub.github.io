@@ -356,7 +356,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
+ {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:700,bb:1400},{sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000},{sb:10000,bb:20000}
 ];
 const NAMES=["Tim","Oli","Philipp","Niklas","Domi M","Nico","Jonas","Benno","Domi C","Manu"];
 // minigames: bb = stake in big blinds of the current level
@@ -372,10 +372,10 @@ const GAMES={
  "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 3 Karten · 1 nach links schieben · 1 abwerfen",rules:"1. Jeder bekommt 3 Karten.  2. Alle schieben gleichzeitig eine Karte verdeckt zum linken Nachbarn.  3. Jeder wirft eine Karte weg und spielt mit 2 Karten ganz normal weiter."},
  "Omaha-Hand":{bb:0,pay:"",short:"Eine Hand · 4 Karten · genau 2 benutzen · Pot-Limit",rules:"Die nächste Hand ist Pot-Limit Omaha: Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
 };
-const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
+const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Deepstack",i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:15,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
@@ -540,7 +540,7 @@ function checkGames(){
   S.fireAt=S.fireAt||{};
   S.games.forEach(e=>{const k=gkey(e);if(e.lvl!==n||S.fired[k])return;
     if(S.fireAt[k]==null){S.fireAt[k]=.15+Math.random()*.65;save();}
-    if(d-l>=d*S.fireAt[k]&&l>15){S.fired[k]=1;save();showGame(e.g,true);}});
+    if((e.at!=null?d-l>=e.at:d-l>=d*S.fireAt[k])&&l>15){S.fired[k]=1;save();showGame(e.g,true);}});
 }
 
 /* ---------- announcements ---------- */

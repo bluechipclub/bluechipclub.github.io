@@ -245,6 +245,45 @@
 "id": 21,
 "op": "level",
 "n": 1
+},
+{
+"id": 22,
+"op": "schedule",
+"games": [
+{
+"lvl": 1,
+"g": "Omaha-Hand",
+"at": 150
+},
+{
+"lvl": 2,
+"g": "Crazy Pineapple"
+},
+{
+"lvl": 3,
+"g": "Pass the Trash"
+},
+{
+"lvl": 4,
+"g": "Irish Poker"
+}
+]
+},
+{
+"id": 24,
+"op": "set",
+"v": {
+"minLate": 15
+}
+},
+{
+"id": 25,
+"op": "blinds",
+"text": "25/50\n50/100\n75/150\nPause 10 Rebuys an der Kasse\n100/200\n150/300\n200/400\nPause 5 Kurze Pause\n250/500\n300/600\n400/800\n500/1000\n700/1400\n1000/2000\n1500/3000\n2000/4000\n3000/6000\n4000/8000\n5000/10000\n6000/12000\n8000/16000\n10000/20000"
+},
+{
+"id": 26,
+"op": "reload"
 }
 ]
 }
