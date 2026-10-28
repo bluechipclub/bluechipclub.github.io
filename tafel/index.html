@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Dead Man's Hand · Tafel</title>
+<link rel="icon" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&display=swap">
+<style>
+:root{
+  --bg:#070707;--surface:#111111;--surface2:#171717;--line:#242424;--line2:#333;
+  --fg:#f4f4f2;--grey:#8c8c88;--grey2:#5c5c59;
+  --gold:#e2b857;--gold2:#f3d68f;--gold3:#9c7a2f;
+  --red:#e5675c;--blood:#8f1d1d;--blue:#2f6bff;--blue2:#8fb0ff;--blue3:#173a99;
+  --sans:"Geist","Helvetica Neue",Arial,sans-serif;--mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vign{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(ellipse 70% 55% at 50% 45%,transparent 40%,rgba(0,0,0,.75) 100%),
+  radial-gradient(ellipse 50% 40% at 15% 100%,rgba(143,29,29,.22),transparent 70%),
+  radial-gradient(ellipse 50% 40% at 85% 0%,rgba(226,184,87,.08),transparent 70%)}
+.app{position:relative;z-index:1;height:100vh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;padding:1.6vh 2vw 1.4vh;gap:1.4vh}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:2vw}
+.brand{display:flex;align-items:center;gap:1.1vw}
+.chip{width:3.6vw;height:3.6vw;min-width:34px;min-height:34px;filter:drop-shadow(0 .4vw 1vw rgba(47,107,255,.35));animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.eyebrow{font-family:var(--mono);font-size:max(10px,.72vw);letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.title{font-size:max(22px,2.5vw);font-weight:780;letter-spacing:-.02em;line-height:1;background:linear-gradient(180deg,#fff 0%,#f3d68f 55%,#b8913c 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hand{display:flex;gap:.35vw;margin-left:1.2vw}
+.card{width:2.2vw;height:3.1vw;min-width:22px;min-height:31px;border-radius:.3vw;background:#fff;color:#111;display:grid;place-items:center;font-weight:800;font-size:max(11px,1.05vw);line-height:.95;text-align:center;box-shadow:0 .3vw .9vw rgba(0,0,0,.6);transform:rotate(var(--r,0deg)) translateY(var(--y,0));animation:deal .9s var(--ease) both;animation-delay:calc(var(--k)*.12s)}
+.card.red{color:#c8202a}
+.card.dim{opacity:.55}
+@keyframes deal{from{opacity:0;transform:translateY(-3vw) rotate(-30deg)}}
+.right{display:flex;align-items:center;gap:1.6vw}
+.live{display:flex;align-items:center;gap:.5vw;font-family:var(--mono);font-size:max(10px,.75vw);color:var(--grey);letter-spacing:.12em;text-transform:uppercase}
+.live i{width:.6vw;height:.6vw;min-width:7px;min-height:7px;border-radius:50%;background:var(--grey2)}
+.live.on i{background:#4d82ff;box-shadow:0 0 .8vw #4d82ff}
+.live.off i{background:var(--red)}
+.now{font-family:var(--mono);font-size:max(16px,1.8vw);font-weight:600;color:var(--fg)}
+
+/* main */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 27vw;gap:1.6vw;min-height:0}
+.stage{position:relative;min-height:0}
+.felt{position:absolute;left:7%;right:7%;top:9%;bottom:9%;border-radius:50%/50%;
+  background:radial-gradient(ellipse at 50% 35%,#1d1d1f 0%,#111 55%,#080808 100%);
+  box-shadow:0 0 0 .5vw #1a1a1a,0 0 0 .7vw var(--gold3),0 0 0 .85vw #0b0b0b,0 2vw 5vw rgba(0,0,0,.8),inset 0 0 6vw rgba(0,0,0,.9),0 0 7vw rgba(226,184,87,.08)}
+.felt::before{content:"";position:absolute;inset:6%;border-radius:50%;border:1px dashed rgba(226,184,87,.18)}
+.felt::after{content:"BLUE CHIP CLUB";position:absolute;left:0;right:0;top:13%;text-align:center;font-family:var(--mono);font-size:max(9px,.75vw);letter-spacing:.6em;color:rgba(226,184,87,.28)}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6vh;text-align:center}
+.lvl{font-family:var(--mono);font-size:max(12px,1.15vw);letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.clock{font-family:var(--mono);font-weight:700;font-size:max(70px,11.5vw);line-height:.92;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 3vw rgba(255,255,255,.12)}
+.clock.paused{color:var(--grey)}
+.clock.warn{color:var(--gold2);animation:pulse 1s ease-in-out infinite}
+.clock.crit{color:var(--red);animation:pulse .5s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.blinds{font-size:max(28px,4.3vw);font-weight:780;letter-spacing:-.02em;line-height:1}
+.blinds small{display:block;font-family:var(--mono);font-size:max(10px,.8vw);font-weight:500;letter-spacing:.3em;color:var(--grey);margin-top:.6vh;text-transform:uppercase}
+.state{font-family:var(--mono);font-size:max(10px,.85vw);letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
+.state.go{color:var(--blue2)}
+.bar{width:32%;height:.45vh;min-height:3px;background:#222;border-radius:9px;overflow:hidden;margin-top:.6vh}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold3),var(--gold2));transition:width .9s linear}
+
+.seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.35vh;transition:opacity .5s,filter .5s,transform .8s var(--ease)}
+.seat .nm{padding:.75vh 1.15vw;border-radius:999px;background:linear-gradient(180deg,#1f1f1f,#121212);border:1px solid var(--line2);font-weight:650;font-size:max(13px,1.3vw);white-space:nowrap;box-shadow:0 .6vh 1.6vh rgba(0,0,0,.6);cursor:pointer;position:relative}
+.seat .nm:hover{border-color:var(--gold3)}
+.seat .meta{display:flex;gap:.4vw;font-family:var(--mono);font-size:max(9px,.72vw);color:var(--grey);letter-spacing:.08em}
+.seat .re{color:var(--gold)}
+.seat .open{color:var(--red)}
+.seat.out{opacity:.38;filter:grayscale(1)}
+.seat.out .nm{text-decoration:line-through;text-decoration-color:rgba(229,103,92,.7)}
+.seat .place{position:absolute;top:-1.1vh;right:-.8vw;background:var(--blood);color:#fff;font-family:var(--mono);font-size:max(9px,.7vw);padding:.15vh .45vw;border-radius:6px;text-decoration:none}
+.seat.flash .nm{animation:flash 1.2s var(--ease)}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(226,184,87,.9)}100%{box-shadow:0 0 0 2vw rgba(226,184,87,0)}}
+.dbtn{position:absolute;width:2.3vw;height:2.3vw;min-width:22px;min-height:22px;border-radius:50%;background:#fff;color:#111;font-weight:800;font-size:max(10px,1vw);display:grid;place-items:center;box-shadow:0 .4vh 1.2vh rgba(0,0,0,.7),inset 0 -2px 0 #bbb;transform:translate(-50%,-50%);transition:left .8s var(--ease),top .8s var(--ease);z-index:3}
+
+/* side */
+.side{display:flex;flex-direction:column;gap:1.2vh;min-height:0}
+.box{background:linear-gradient(180deg,rgba(24,24,24,.92),rgba(14,14,14,.92));border:1px solid var(--line);border-radius:1vw;padding:1.6vh 1.3vw;position:relative;overflow:hidden}
+.box .cap{font-family:var(--mono);font-size:max(9px,.68vw);letter-spacing:.26em;text-transform:uppercase;color:var(--grey);margin-bottom:.6vh}
+.nextB{font-size:max(18px,2.2vw);font-weight:720;letter-spacing:-.01em}
+.nextB small{font-family:var(--mono);font-size:max(10px,.8vw);color:var(--grey);font-weight:500;margin-left:.5vw}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2vh 1vw}
+.stat .v{font-size:max(18px,2vw);font-weight:720;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:.55em;color:var(--grey);font-weight:500}
+.pot{border-color:rgba(226,184,87,.35);background:linear-gradient(160deg,rgba(60,46,16,.55),rgba(14,14,14,.95) 60%)}
+.pot .big{font-size:max(28px,3.4vw);font-weight:800;letter-spacing:-.02em;line-height:1;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pot .big small{font-size:.45em}
+.pays{display:grid;gap:.7vh;margin-top:1.2vh}
+.pay{display:flex;justify-content:space-between;align-items:baseline;font-size:max(13px,1.25vw);font-weight:600}
+.pay span{font-family:var(--mono);font-size:.75em;color:var(--grey);letter-spacing:.1em}
+.pay b{font-variant-numeric:tabular-nums}
+.pay:first-child b{color:var(--gold2)}
+.rebuy{font-family:var(--mono);font-size:max(10px,.8vw);letter-spacing:.1em;color:var(--blue2)}
+.rebuy.closed{color:var(--grey2)}
+.game{border-color:rgba(229,103,92,.4);background:linear-gradient(160deg,rgba(90,20,20,.45),rgba(14,14,14,.95) 65%)}
+.game .gt{font-size:max(16px,1.7vw);font-weight:760}
+.game .gs{font-size:max(11px,.95vw);color:#d9d9d5;margin-top:.4vh;line-height:1.35}
+.game button{margin-top:1vh;background:none;border:1px solid var(--line2);border-radius:999px;padding:.4vh .9vw;font-size:max(10px,.75vw);color:var(--grey)}
+.spacer{flex:1}
+
+/* footer ticker */
+.foot{display:flex;align-items:center;gap:1.2vw;font-family:var(--mono);font-size:max(10px,.82vw);color:var(--grey);letter-spacing:.06em;min-height:3vh}
+.foot b{color:var(--gold);font-weight:600}
+.tick{flex:1;min-width:0;overflow:hidden;white-space:nowrap;mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.tick span{display:inline-block;padding-left:100%;animation:marq 38s linear infinite}
+@keyframes marq{to{transform:translateX(-100%)}}
+
+/* controls */
+.ctrl{position:fixed;left:50%;bottom:1.4vh;transform:translate(-50%,0);z-index:20;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:94vw;padding:8px;border-radius:14px;background:rgba(12,12,12,.92);border:1px solid var(--line2);backdrop-filter:blur(10px);transition:opacity .35s,transform .35s var(--ease)}
+.ctrl.hide{opacity:0;transform:translate(-50%,120%);pointer-events:none}
+.b{background:#1b1b1b;border:1px solid var(--line2);border-radius:9px;padding:7px 12px;font-size:13px;font-weight:550;color:var(--fg);white-space:nowrap}
+.b:hover{border-color:var(--gold3)}
+.b.pri{background:linear-gradient(180deg,#f3d68f,#c49a41);color:#111;border-color:#c49a41}
+.b.red{border-color:rgba(229,103,92,.5);color:var(--red)}
+.b.sm{padding:4px 9px;font-size:12px}
+.b.on{background:var(--blue3);border-color:var(--blue)}
+
+/* overlays */
+.modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(0,0,0,.72);backdrop-filter:blur(6px)}
+.modal[hidden]{display:none}
+.sheet{width:min(980px,94vw);max-height:90vh;overflow:auto;background:#111;border:1px solid var(--line2);border-radius:18px;padding:22px 24px;box-shadow:0 30px 80px rgba(0,0,0,.8)}
+.sheet h2{font-size:22px;font-weight:750;margin-bottom:4px}
+.sheet p.sub{color:var(--grey);font-size:14px;margin-bottom:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line2);font-weight:500}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pos{color:#8fb0ff}.neg{color:var(--red)}
+.pl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.pcard{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;background:#161616}
+.pcard.out{opacity:.6}
+.pcard .h{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:16px}
+.pcard .e{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.ent{font-family:var(--mono);font-size:11px;border-radius:6px;padding:3px 7px;border:1px solid var(--line2);background:#1d1d1d}
+.ent.p-bar{border-color:#2d4d99;color:#8fb0ff}
+.ent.p-dig{border-color:#7a6125;color:var(--gold2)}
+.ent.p-offen{border-color:#7a2a26;color:var(--red)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--grey);font-family:var(--mono);letter-spacing:.06em}
+label.f input,label.f textarea,label.f select{font:14px var(--sans);background:#1a1a1a;color:var(--fg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px}
+label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.full{grid-column:1/-1}
+.err{color:var(--red);font-size:13px;min-height:1em;margin-top:8px}
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.gl button{text-align:left;background:#181818;border:1px solid var(--line2);border-radius:12px;padding:12px}
+.gl button b{display:block;font-size:15px}
+.gl button span{font-size:12px;color:var(--grey)}
+
+/* big announcement */
+.ann{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(0,0,0,.62);backdrop-filter:blur(8px)}
+.ann[hidden]{display:none}
+.annBox{pointer-events:auto;text-align:center;max-width:78vw;padding:5vh 5vw;border-radius:2vw;background:radial-gradient(ellipse at 50% 0%,rgba(143,29,29,.55),rgba(10,10,10,.96) 70%);border:1px solid rgba(226,184,87,.45);box-shadow:0 0 0 1px #000,0 4vh 12vh rgba(0,0,0,.9),0 0 10vw rgba(143,29,29,.35);animation:pop .7s var(--ease) both}
+@keyframes pop{from{opacity:0;transform:scale(.85) translateY(4vh)}}
+.annBox .eyebrow{font-size:max(11px,1vw)}
+.annBox h3{font-size:max(34px,5.2vw);font-weight:800;letter-spacing:-.03em;line-height:1;margin:1.4vh 0;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
+.annBox p{font-size:max(15px,1.6vw);line-height:1.4;color:#e8e8e4;max-width:60vw;margin:0 auto}
+.annBox .stake{font-size:max(20px,2.6vw);font-weight:760;color:var(--gold2);margin-top:2.2vh}
+.annBox .stakesub{font-family:var(--mono);font-size:max(11px,.9vw);color:var(--grey);margin-top:.5vh;letter-spacing:.1em}
+.annBox .b{margin-top:3vh;font-size:max(13px,1vw);padding:1vh 1.6vw}
+.count{position:fixed;inset:0;z-index:35;display:grid;place-items:center;pointer-events:none;font-family:var(--mono);font-weight:800;font-size:38vw;color:rgba(229,103,92,.85);text-shadow:0 0 6vw rgba(229,103,92,.6)}
+.count[hidden]{display:none}
+.count.t{animation:cnt .95s ease-out both}
+@keyframes cnt{from{transform:scale(1.4);opacity:1}to{transform:scale(.8);opacity:0}}
+.toast{position:fixed;left:50%;top:2vh;transform:translateX(-50%);z-index:45;background:#151515;border:1px solid var(--gold3);border-radius:12px;padding:10px 18px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:pop .4s var(--ease)}
+.toast[hidden]{display:none}
+.draw{display:grid;grid-template-columns:repeat(5,1fr);gap:1.4vw;margin-top:3vh}
+.dcard{aspect-ratio:5/7;border-radius:1vw;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1.4vh 3vh rgba(0,0,0,.7);animation:deal .8s var(--ease) both;animation-delay:calc(var(--k)*.18s);padding:1vh}
+.dcard .s{font-family:var(--mono);font-size:max(10px,.9vw);color:#c8202a}
+.dcard .n{font-size:max(14px,1.6vw);margin-top:.5vh;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="vign" aria-hidden="true"></div>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="chip" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cg" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#4d82ff"/><stop offset=".55" stop-color="#1f55e0"/><stop offset="1" stop-color="#12379c"/></radialGradient></defs><circle cx="32" cy="32" r="31" fill="url(#cg)" stroke="#0f2f86" stroke-width="2"/><g fill="#f5f7ff"><path d="M32 2a30 30 0 0 1 7 1l-2 8a22 22 0 0 0-10 0l-2-8a30 30 0 0 1 7-1z"/><path d="M32 62a30 30 0 0 1-7-1l2-8a22 22 0 0 0 10 0l2 8a30 30 0 0 1-7 1z"/><path d="M2 32a30 30 0 0 1 1-7l8 2a22 22 0 0 0 0 10l-8 2a30 30 0 0 1-1-7z"/><path d="M62 32a30 30 0 0 1-1 7l-8-2a22 22 0 0 0 0-10l8-2a30 30 0 0 1 1 7z"/><path d="M11 11a30 30 0 0 1 5-5l5 6a22 22 0 0 0-7 7l-6-5a30 30 0 0 1 3-3z"/><path d="M53 53a30 30 0 0 1-5 5l-5-6a22 22 0 0 0 7-7l6 5a30 30 0 0 1-3 3z"/><path d="M53 11a30 30 0 0 1 5 5l-6 5a22 22 0 0 0-7-7l5-6a30 30 0 0 1 3 3z"/><path d="M11 53a30 30 0 0 1-5-5l6-5a22 22 0 0 0 7 7l-5 6a30 30 0 0 1-3-3z"/></g><circle cx="32" cy="32" r="18" fill="#2459e6" stroke="#fff" stroke-width="1.5"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/></svg>
+      <div>
+        <div class="eyebrow" id="sub">Blue Chip Club · Halloween Special</div>
+        <div class="title" id="ttl">Dead Man's Hand</div>
+      </div>
+      <div class="hand" aria-label="A♠ A♣ 8♠ 8♣ 9♦">
+        <div class="card" style="--k:0;--r:-8deg">A<br>♠</div>
+        <div class="card" style="--k:1;--r:-3deg;--y:-.2vw">A<br>♣</div>
+        <div class="card" style="--k:2;--r:2deg;--y:-.25vw">8<br>♠</div>
+        <div class="card" style="--k:3;--r:6deg">8<br>♣</div>
+        <div class="card red dim" style="--k:4;--r:11deg;--y:.3vw">9<br>♦</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="live" id="live" title="Live-Verbindung"><i></i><span>Verbinde…</span></div>
+      <div class="now" id="now">--:--</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="stage" id="stage">
+      <div class="felt" id="felt">
+        <div class="center">
+          <div class="lvl" id="lvl">Level 1</div>
+          <div class="clock paused" id="clock">25:00</div>
+          <div class="blinds" id="cur">25 / 50<small>Small / Big Blind</small></div>
+          <div class="bar"><i id="bar"></i></div>
+          <div class="state" id="state">Pausiert</div>
+        </div>
+      </div>
+      <div class="dbtn" id="dbtn">D</div>
+    </section>
+    <aside class="side">
+      <div class="box">
+        <div class="cap">Als Nächstes</div>
+        <div class="nextB" id="nxt">25 / 75</div>
+        <div class="cap" style="margin-top:1.2vh" id="brkCap">Nächste Pause</div>
+        <div class="nextB" id="brk" style="font-size:max(14px,1.4vw)">–</div>
+      </div>
+      <div class="box pot">
+        <div class="cap">Preisgeld</div>
+        <div class="big" id="pot">0 <small>P</small></div>
+        <div class="pays" id="pays"></div>
+      </div>
+      <div class="box grid2">
+        <div class="stat"><div class="cap">Spieler</div><div class="v" id="plc">10 <small>/ 10</small></div></div>
+        <div class="stat"><div class="cap">Entries</div><div class="v" id="ent">10</div></div>
+        <div class="stat"><div class="cap">Ø Stack</div><div class="v" id="avg">5.000</div></div>
+        <div class="stat"><div class="cap">Ø in BB</div><div class="v" id="avgbb">100</div></div>
+        <div class="full rebuy" id="reb" style="grid-column:1/-1">Rebuy offen</div>
+      </div>
+      <div class="box game" id="gameBox" hidden>
+        <div class="cap" style="color:#e5a29c">Läuft gerade</div>
+        <div class="gt" id="gameT"></div>
+        <div class="gs" id="gameS"></div>
+        <button type="button" id="gameDone">✓ Vorbei</button>
+      </div>
+      <div class="spacer"></div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <b id="footL">BLUE CHIP CLUB</b>
+    <div class="tick"><span id="tick"></span></div>
+  </footer>
+</div>
+
+<nav class="ctrl hide" id="ctrl">
+  <button class="b pri" id="bPlay">▶ Start</button>
+  <button class="b" id="bPrev">◀ Level</button>
+  <button class="b" id="bNext">Level ▶</button>
+  <button class="b" id="bMinus">−1 Min</button>
+  <button class="b" id="bPlus">+1 Min</button>
+  <button class="b" id="bPlayers">Spieler & Rebuys</button>
+  <button class="b" id="bDealer">Dealer ▶</button>
+  <button class="b" id="bDraw">Plätze auslosen</button>
+  <button class="b" id="bGame">Minigame</button>
+  <button class="b" id="bResult">Abrechnung</button>
+  <button class="b" id="bExport">⬇ Export</button>
+  <button class="b" id="bSet">⚙</button>
+  <button class="b" id="bSnd">Test-Sound</button>
+  <button class="b" id="bFull">⛶ Vollbild</button>
+</nav>
+
+<!-- players -->
+<div class="modal" id="mPlayers" hidden><div class="sheet">
+  <h2>Spieler & Rebuys</h2>
+  <p class="sub" id="pSub">Pro Entry antippen = Zahlart wechseln (bar → überwiesen → offen). „Raus“ setzt die Platzierung automatisch.</p>
+  <div class="pl" id="pList"></div>
+  <div class="row">
+    <input id="pNew" placeholder="Neuer Spieler (Warteliste)" style="font:14px var(--sans);background:#1a1a1a;color:var(--fg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px">
+    <button class="b" id="pAdd">+ Hinzufügen</button>
+    <span class="spacer" style="flex:1"></span>
+    <button class="b pri" id="pClose">Fertig</button>
+  </div>
+</div></div>
+
+<!-- games -->
+<div class="modal" id="mGames" hidden><div class="sheet">
+  <h2>Minigame starten</h2>
+  <p class="sub" id="gPlan"></p>
+  <div class="gl" id="gList"></div>
+  <div class="row"><button class="b" id="gClose">Abbrechen</button></div>
+</div></div>
+
+<!-- result -->
+<div class="modal" id="mResult" hidden><div class="sheet">
+  <h2>Abrechnung</h2>
+  <p class="sub" id="rSub"></p>
+  <table id="rTable"></table>
+  <h2 style="font-size:17px;margin-top:20px">Wer zahlt wem</h2>
+  <p class="sub" id="sSub" style="margin-bottom:6px"></p>
+  <table id="sTable"></table>
+  <div class="row">
+    <button class="b pri" id="rExport">⬇ Datei für Claude speichern</button>
+    <button class="b" id="rCopy">Text kopieren</button>
+    <span style="flex:1"></span>
+    <button class="b" id="rClose">Schließen</button>
+  </div>
+</div></div>
+
+<!-- settings -->
+<div class="modal" id="mSet" hidden><div class="sheet">
+  <h2>Einstellungen</h2>
+  <div class="fg" style="margin-top:12px">
+    <label class="f">Turniername <input id="sTitle"></label>
+    <label class="f">Startstack <input id="sStack" type="number" step="100"></label>
+    <label class="f">Minuten Level 1 <input id="sMin1" type="number"></label>
+    <label class="f">Minuten (Rebuy-Phase) <input id="sMin" type="number"></label>
+    <label class="f">Minuten danach <input id="sMinLate" type="number"></label>
+    <label class="f">Rebuys bis Level <input id="sReLvl" type="number" placeholder="immer"></label>
+    <label class="f">Max. Rebuys pro Spieler <input id="sMaxRe" type="number" placeholder="unbegrenzt"></label>
+    <label class="f">Buy-in (P) <input id="sBuyin" type="number"></label>
+    <label class="f">davon Kasse (P) <input id="sFee" type="number"></label>
+    <label class="f">Rebuy (P) <input id="sRebuy" type="number"></label>
+    <label class="f">Bezahlte Plätze <select id="sPlaces"><option value="2">Top 2</option><option value="3">Top 3</option></select></label>
+    <label class="f">Platz 3 bekommt (P) <input id="sThird" type="number"></label>
+    <label class="f">Platz 1 % vom Rest <input id="sSplit" type="number"></label>
+    <label class="f">Kasse hält <input id="sBank"></label>
+    <label class="f full">Blindstruktur (eine Zeile pro Level: „25/50“, Pause als „Pause 10“)<textarea id="sBlinds" spellcheck="false"></textarea></label>
+    <label class="f full">Minigames (eine Zeile: Level und Name, z. B. „2 Blind Pot“, startet zur Level-Hälfte)<textarea id="sGames" spellcheck="false" style="min-height:110px"></textarea></label>
+    <label class="f full">Code von Claude einfügen (falls die Live-Verbindung hängt)<textarea id="sCode" spellcheck="false" style="min-height:60px" placeholder='{"op":"msg","text":"…"}'></textarea></label>
+  </div>
+  <p class="err" id="sErr"></p>
+  <div class="row">
+    <button class="b pri" id="sOk">Übernehmen</button>
+    <button class="b" id="sCancel">Abbrechen</button>
+    <span style="flex:1"></span>
+    <button class="b red" id="sReset">Turnier komplett zurücksetzen</button>
+  </div>
+</div></div>
+
+<div class="ann" id="ann" hidden><div class="annBox" id="annBox"></div></div>
+<div class="count" id="count" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+const KEY="bcc-tafel-dmh-2026-10-28";
+const APPLIED_KEY=KEY+"-applied";
+const LIVE_URL="live.json";
+const POLL_MS=15000;
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString("de-DE");
+const P=n=>fmt(n)+" P";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const DEFAULT_LEVELS=[
+ {sb:25,bb:50},{sb:25,bb:75},{sb:50,bb:100},{sb:50,bb:150},
+ {sb:75,bb:150},{sb:100,bb:200},{brk:10,note:"Pause · letzte Chance für Rebuys"},
+ {sb:150,bb:300},{sb:250,bb:500},{sb:400,bb:800},{sb:600,bb:1200},
+ {sb:800,bb:1600},{sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},
+ {sb:3000,bb:6000},{sb:4000,bb:8000}
+];
+const NAMES=["Tim","Oli","Philipp","Niklas","Domi M","Nico","Jonas","Benno","Domi C","Manu"];
+// minigames: bb = stake in big blinds of the current level
+const GAMES={
+ "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
+ "7-2 Bonus":{bb:1,pay:"Jeder zahlt dem 7-2-Gewinner #",short:"Mit 7-2 gewinnen und zeigen · 5 Runden",rules:"Die nächsten 5 Runden, bis der Dealer-Button 5-mal rum ist: Wer mit 7-2 einen Pot gewinnt und die Karten zeigt, bekommt den Einsatz von jedem Spieler am Tisch."},
+ "Dead Man's Hand":{bb:1,pay:"Jeder zahlt dem A-8-Gewinner #",short:"Pot mit A-8 auf der Hand gewinnen und zeigen · bis Level-Ende",rules:"Wild Bill Hickoks letzte Hand. Bis zum Ende des Levels gilt: Wer mit A-8 auf der Hand (Farbe egal) einen Pot gewinnt und die Karten zeigt, bekommt den Einsatz von jedem Spieler am Tisch."},
+ "Bomb Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Kein Preflop · Flop kommt sofort",rules:"Nächste Hand ist ein Bomb Pot. Jeder legt den Einsatz in die Mitte, es gibt kein Preflop und der Flop kommt sofort. Ab dem Flop wird ganz normal gesetzt."},
+ "Straddle-Runde":{bb:2,pay:"UTG legt # blind",short:"Eine Runde Pflicht-Straddle · UTG spricht zuletzt preflop",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist: Der Spieler links vom Big Blind legt blind den doppelten Big Blind (Straddle). Preflop spricht er als Letzter. Wer callen will, zahlt den Straddle."},
+ "Run it Twice":{bb:0,pay:"",short:"All-in? Board wird zweimal ausgespielt · bis Level-Ende",rules:"Bis zum Ende des Levels: Ist jemand all-in und alle Karten sind offen, wird der Rest des Boards zweimal ausgeteilt. Jedes Board gewinnt die Hälfte des Pots. Weniger Bad Beats, mehr Drama."},
+ "Omaha-Runde":{bb:0,pay:"",short:"4 Karten · genau 2 benutzen · Pot-Limit · 1 Runde",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist, spielen wir Pot-Limit Omaha. Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
+};
+const DEFAULT_GAMES=[{lvl:2,g:"Blind Pot"},{lvl:3,g:"7-2 Bonus"},{lvl:4,g:"Dead Man's Hand"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Straddle-Runde"},{lvl:7,g:"Run it Twice"}];
+
+const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.slice(),min1:25,min:30,minLate:20,stack:5000,reLvl:6,maxRe:null,
+  buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
+  players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
+  outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
+let S=fresh();
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1)S=Object.assign(fresh(),s);}catch(e){}
+let LEVELS=S.levels;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+function log(type,data){S.log.push(Object.assign({t:new Date().toISOString(),lvl:playNum(S.i),type},data||{}));if(S.log.length>2000)S.log.shift();}
+
+const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
+const dur=i=>{const L=LEVELS[i];if(!L)return 0;if(L.brk)return L.brk*60;const n=playNum(i);return (n===1?S.min1:(S.reLvl!=null&&n>S.reLvl?S.minLate:S.min))*60;};
+const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-Date.now())/1000):(S.left==null?dur(S.i):S.left);
+const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim());
+const alive=()=>S.players.filter(p=>!p.out);
+const totalEntries=()=>S.players.reduce((a,p)=>a+p.entries.length,0);
+const costOf=p=>p.entries.length?S.buyin+(p.entries.length-1)*S.rebuy:0;
+const potOf=()=>S.players.reduce((a,p)=>a+(p.entries.length?S.buyin-S.fee+(p.entries.length-1)*S.rebuy:0),0);
+const rebuyOpen=()=>S.reLvl==null||playNum(S.i)<=S.reLvl;
+const curBB=()=>{const L=LEVELS[S.i];return L.brk?((LEVELS[S.i+1]||LEVELS[S.i-1]||{}).bb||0):L.bb;};
+function payouts(){
+  const pot=potOf(),c=S.pay,r=c.round||1;
+  if(c.places<3||S.players.length<5){const a=Math.round(pot*c.split/100/r)*r;return [a,pot-a];}
+  const third=Math.min(c.third,pot),rest=pot-third,a=Math.round(rest*c.split/100/r)*r;
+  return [a,rest-a,third];
+}
+// places: out order reversed; survivors share the top
+function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().length===1?1:null):S.players.length-k;}
+
+/* ---------- render ---------- */
+const mmss=s=>{s=Math.ceil(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");};
+function seatPos(k,n){const a=Math.PI/2+k*2*Math.PI/n;return [50+44*Math.cos(a),50+43*Math.sin(a)];}
+function buildSeats(){
+  document.querySelectorAll(".seat").forEach(e=>e.remove());
+  const st=$("stage"),n=S.players.length;
+  S.players.forEach((p,k)=>{
+    const [x,y]=seatPos(k,n),d=document.createElement("div");
+    d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;
+    d.innerHTML='<div class="nm"></div><div class="meta"></div>';
+    d.querySelector(".nm").onclick=()=>openPlayers(p.name);
+    st.appendChild(d);
+  });
+}
+function renderSeats(){
+  const seats=[...document.querySelectorAll(".seat")];
+  if(seats.length!==S.players.length){buildSeats();return renderSeats();}
+  S.players.forEach((p,k)=>{
+    const d=seats[k],pl_=placeOf(p),open=p.entries.filter(e=>e.paid==="offen").length;
+    d.classList.toggle("out",!!p.out);
+    d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
+    const re=p.entries.length-1;
+    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"")+(open?'<span class="open">● offen</span>':"");
+  });
+  const n=S.players.length;if(!n)return;
+  S.dealer=((S.dealer%n)+n)%n;
+  const [x,y]=seatPos(S.dealer,n),dx=50+(x-50)*.78,dy=50+(y-50)*.7;
+  $("dbtn").style.left=dx+"%";$("dbtn").style.top=dy+"%";
+}
+function render(){
+  const L=LEVELS[S.i],left=leftNow(),d=dur(S.i);
+  $("ttl").textContent=S.title;$("sub").textContent=S.sub;
+  $("lvl").textContent=L.brk?"Pause":"Level "+playNum(S.i);
+  const c=$("clock");c.textContent=mmss(left);
+  c.className="clock"+(!S.running?" paused":left<=10?" crit":left<=60?" warn":"");
+  $("cur").innerHTML=L.brk?esc(L.note||"Pause")+"<small>"+L.brk+" Minuten</small>":fmt(L.sb)+" / "+fmt(L.bb)+"<small>Small / Big Blind</small>";
+  $("bar").style.width=(d?100*(1-left/d):0)+"%";
+  const st=$("state");st.textContent=S.running?(L.brk?"Pause läuft":"Läuft"):(S.started?"Pausiert":"Bereit · Shuffle up and deal");st.className="state"+(S.running?" go":"");
+  const N=LEVELS[S.i+1];$("nxt").innerHTML=N?(N.brk?"Pause <small>"+N.brk+" Min</small>":fmt(N.sb)+" / "+fmt(N.bb)+" <small>Level "+playNum(S.i+1)+"</small>"):"Letztes Level";
+  // next break
+  let t=left,j=S.i+1,found=null;if(L.brk)found=0;
+  while(found===null&&j<LEVELS.length){if(LEVELS[j].brk){found=t;break;}t+=dur(j);j++;}
+  $("brkCap").textContent=L.brk?"Weiter in":"Nächste Pause";
+  $("brk").textContent=L.brk?mmss(left):found===null?"keine mehr":"in "+Math.round(found/60)+" Min";
+  const pot=potOf(),pays=payouts();
+  $("pot").innerHTML=fmt(pot)+" <small>P</small>";
+  $("pays").innerHTML=pays.map((v,k)=>'<div class="pay"><span>'+(k+1)+'. PLATZ</span><b>'+P(v)+'</b></div>').join("");
+  const a=alive().length,te=totalEntries();
+  $("plc").innerHTML=a+" <small>/ "+S.players.length+"</small>";
+  $("ent").textContent=te;
+  const avg=a?te*S.stack/a:0;$("avg").textContent=fmt(avg);$("avgbb").textContent=curBB()?fmt(avg/curBB()):"–";
+  const rb=$("reb");
+  if(rebuyOpen()){const n=S.reLvl;rb.textContent=n==null?"Rebuy offen":"Rebuy offen bis Ende Level "+n+" · "+P(S.rebuy);rb.className="full rebuy";}
+  else{rb.textContent="Rebuy-Phase vorbei · Freezeout";rb.className="full rebuy closed";}
+  const g=S.active&&GAMES[S.active];
+  $("gameBox").hidden=!g;if(g){$("gameT").textContent=S.active;$("gameS").textContent=g.short+(g.bb?" · "+stakeTxt(S.active):"");}
+  $("bPlay").textContent=S.running?"❚❚ Pause":"▶ Start";
+  renderSeats();renderTicker();
+}
+function renderTicker(){
+  const parts=[];
+  S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
+  const g=S.games.filter(e=>e.lvl>playNum(S.i)||(e.lvl===playNum(S.i)&&!S.fired[gkey(e)])).slice(0,2);
+  if(g.length)parts.push("Als Nächstes: "+g.map(e=>e.g+" in Level "+e.lvl).join(" · "));
+  if(rebuyOpen())parts.push("Rebuy "+P(S.rebuy)+" bis Ende Level "+(S.reLvl??"∞"));
+  const pays=payouts();parts.push("Preise: "+pays.map((v,k)=>(k+1)+". "+P(v)).join(" · "));
+  parts.push("Ein Abend, zehn Plätze, ein Name auf dem Wanderpokal");
+  const txt=parts.join("      ◆      ");
+  const sp=$("tick");if(sp.textContent!==txt)sp.textContent=txt;
+}
+
+/* ---------- sound ---------- */
+let actx=null;
+const ac=()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();}catch(e){}return actx;};
+function tone(f,t0,len,vol,type){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type||"sine";o.frequency.value=f;o.connect(g);g.connect(a.destination);const t=a.currentTime+t0;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+len);o.start(t);o.stop(t+len+.05);}
+const minuteBeep=()=>{tone(988,0,1.1,.8,"square");tone(494,0,1.1,.45,"sine");};
+const countBeep=n=>tone(n<=3?1320:880,0,.18,.7,"square");
+const levelSound=()=>{[0,.45,.9].forEach(t=>{tone(1046,t,.35,.7,"square");tone(523,t,.35,.4,"sine");});};
+const fanfare=()=>[523,659,784,1047].forEach((f,k)=>tone(f,k*.14,.4,.55,"triangle"));
+const gong=()=>{tone(110,0,2.5,.6,"sine");tone(220,0,2,.3,"triangle");tone(55,0,3,.4,"sine");};
+function countdown(n){const c=$("count");c.hidden=false;c.textContent=n;c.classList.remove("t");void c.offsetWidth;c.classList.add("t");countBeep(n);clearTimeout(countdown.t);countdown.t=setTimeout(()=>c.hidden=true,950);}
+
+/* ---------- clock ---------- */
+let lastSec=null;
+function go(i,silent){
+  const was=S.running;S.i=Math.max(0,Math.min(LEVELS.length-1,i));
+  S.left=dur(S.i);if(was)S.endAt=Date.now()+S.left*1000;
+  lastSec=null;save();render();
+}
+function advance(){
+  if(S.i>=LEVELS.length-1){S.running=false;S.left=0;S.endAt=null;save();render();return;}
+  const carry=S.endAt;S.i++;S.endAt=carry+dur(S.i)*1000;S.left=dur(S.i);
+  log("level",{to:LEVELS[S.i].brk?"Pause":"Level "+playNum(S.i)});
+  if(S.active&&S.active!=="7-2 Bonus")S.active=null;
+  levelSound();save();
+  const L=LEVELS[S.i];
+  announce({eyebrow:L.brk?"Pause":"Neues Level",title:L.brk?(L.note||"Pause"):"Level "+playNum(S.i),text:L.brk?L.brk+" Minuten. Rebuys jetzt an der Kasse.":"Blinds jetzt "+fmt(L.sb)+" / "+fmt(L.bb)+".",sec:8});
+}
+function tick(){
+  const d=new Date();$("now").textContent=d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  if(S.running&&S.endAt){
+    let guard=0;while(S.running&&Date.now()>=S.endAt&&guard++<40)advance();
+    const s=Math.ceil(leftNow());
+    if(s!==lastSec){
+      if(lastSec!==null){if(s===60)minuteBeep();if(s<=10&&s>=1)countdown(s);}
+      lastSec=s;checkGames();
+    }
+  }
+  render();
+}
+function toggle(){
+  ac();
+  if(S.running){S.left=leftNow();S.running=false;S.endAt=null;log("pause");}
+  else{if(S.left==null||S.left<=0)S.left=dur(S.i);S.running=true;S.endAt=Date.now()+S.left*1000;if(!S.started){S.started=new Date().toISOString();log("start");}else log("weiter");lock();}
+  lastSec=null;save();render();
+}
+function addTime(sec){const l=Math.max(1,leftNow()+sec);S.left=l;if(S.running)S.endAt=Date.now()+l*1000;save();render();}
+let wl=null;async function lock(){try{if(!wl&&navigator.wakeLock){wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>wl=null);}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.running)lock();});
+
+/* ---------- minigames ---------- */
+const gkey=e=>e.lvl+":"+e.g;
+const stakeChips=g=>Math.round(curBB()*(GAMES[g].bb||0));
+const stakeTxt=g=>GAMES[g].bb?GAMES[g].pay.replace("#",fmt(stakeChips(g))+" Chips"):"Kein Extra-Einsatz";
+function showGame(g,auto){
+  if(!GAMES[g])return;
+  closeAll();S.active=g;log("minigame",{game:g});save();
+  const x=GAMES[g];fanfare();
+  announce({eyebrow:auto?"Special in Level "+playNum(S.i):"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's"});
+}
+function checkGames(){
+  const L=LEVELS[S.i];if(L.brk)return;
+  const n=playNum(S.i),half=dur(S.i)/2,l=leftNow();
+  S.games.forEach(e=>{if(e.lvl===n&&!S.fired[gkey(e)]&&l<=half&&l>15){S.fired[gkey(e)]=1;save();showGame(e.g,true);}});
+}
+
+/* ---------- announcements ---------- */
+function announce(o){
+  const b=$("annBox");
+  b.innerHTML='<div class="eyebrow">'+esc(o.eyebrow||"")+'</div><h3>'+esc(o.title||"")+'</h3>'+(o.text?'<p>'+esc(o.text)+'</p>':"")+(o.stake?'<div class="stake">'+esc(o.stake)+'</div>':"")+(o.stakesub?'<div class="stakesub">'+esc(o.stakesub)+'</div>':"")+(o.html||"")+'<div><button class="b pri" type="button" id="annOk">'+esc(o.btn||"OK")+'</button></div>';
+  $("ann").hidden=false;$("annOk").onclick=()=>{$("ann").hidden=true;};
+  clearTimeout(announce.t);if(o.sec)announce.t=setTimeout(()=>$("ann").hidden=true,o.sec*1000);
+}
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,3500);}
+
+/* ---------- players ---------- */
+const PAY_NEXT={bar:"dig",dig:"offen",offen:"bar"};
+const PAY_TXT={bar:"bar",dig:"überwiesen",offen:"offen"};
+function doRebuy(name,paid){
+  const p=pl(name);if(!p)return false;
+  p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar"});
+  if(p.out){p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
+  log("rebuy",{name:p.name,entry:p.entries.length,paid:paid||"bar"});
+  save();render();flashSeat(p);return true;
+}
+function doOut(name){
+  const p=pl(name);if(!p||p.out)return;
+  p.out={t:new Date().toISOString(),lvl:playNum(S.i)};S.outOrder.push(p.name);
+  const place=placeOf(p);log("out",{name:p.name,place});
+  const rest=alive();
+  if(rest.length===1){S.ended=new Date().toISOString();if(S.running){S.left=leftNow();S.running=false;S.endAt=null;}log("winner",{name:rest[0].name});save();render();winner(rest[0]);return;}
+  save();render();
+  if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
+  else toast(p.name+" ist raus · Platz "+place);
+}
+function doBack(name){const p=pl(name);if(!p||!p.out)return;p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.ended=null;log("back",{name:p.name});save();render();}
+function flashSeat(p){const k=S.players.indexOf(p),d=document.querySelectorAll(".seat")[k];if(d){d.classList.remove("flash");void d.offsetWidth;d.classList.add("flash");}}
+function winner(p){
+  gong();setTimeout(fanfare,600);
+  const pays=payouts();
+  announce({eyebrow:"Champion · "+S.title,title:p.name,text:"Gewinnt "+S.title+" und den Wanderpokal.",stake:P(pays[0]),stakesub:pays.slice(1).map((v,k)=>(k+2)+". "+(S.players.find(x=>placeOf(x)===k+2)||{name:"?"}).name+" "+P(v)).join(" · "),btn:"Zur Abrechnung"});
+  $("annOk").onclick=()=>{$("ann").hidden=true;openResult();};
+  burst();
+}
+function openPlayers(focus){
+  const L=$("pList");L.innerHTML="";
+  S.players.forEach((p,k)=>{
+    const d=document.createElement("div");d.className="pcard"+(p.out?" out":"");
+    const place=placeOf(p);
+    d.innerHTML='<div class="h"><span></span><span style="font-family:var(--mono);font-size:12px;color:var(--grey)">'+(p.out?"raus · Platz "+place:"im Spiel")+'</span></div><div class="e"></div><div class="row" style="margin-top:4px"></div>';
+    d.querySelector(".h span").textContent=p.name;
+    const E=d.querySelector(".e");
+    p.entries.forEach((e,j)=>{const b=document.createElement("button");b.className="ent p-"+e.paid;b.textContent=(j?"Rebuy "+j:"Buy-in")+" · "+PAY_TXT[e.paid];b.title="Antippen: Zahlart wechseln";b.onclick=()=>{e.paid=PAY_NEXT[e.paid];log("paid",{name:p.name,entry:j+1,paid:e.paid});save();render();openPlayers();};E.appendChild(b);});
+    const R=d.querySelector(".row");
+    const add=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;R.appendChild(b);};
+    const canRe=S.maxRe==null||p.entries.length-1<S.maxRe;
+    add("+1 Rebuy",rebuyOpen()&&canRe?"":"",()=>{if(!rebuyOpen()&&!confirm("Rebuy-Phase ist vorbei. Trotzdem eintragen?"))return;if(!canRe&&!confirm("Rebuy-Limit erreicht. Trotzdem?"))return;doRebuy(p.name);openPlayers();});
+    if(p.entries.length>1)add("−1","",()=>{p.entries.pop();log("rebuy-undo",{name:p.name});save();render();openPlayers();});
+    if(!p.out)add("Raus","red",()=>{doOut(p.name);if(!$("ann").hidden)return;openPlayers();});
+    else add("Zurück ins Spiel","",()=>{doBack(p.name);openPlayers();});
+    L.appendChild(d);
+  });
+  $("pSub").textContent="Pot "+P(potOf())+" · "+totalEntries()+" Entries · Zahlart pro Entry antippen (bar → überwiesen → offen). „Raus“ setzt die Platzierung automatisch.";
+  $("mPlayers").hidden=false;
+}
+$("pAdd").onclick=()=>{const n=$("pNew").value.trim();if(!n||pl(n))return;S.players.push({name:n,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:"bar"}],out:null});log("add",{name:n});$("pNew").value="";save();render();openPlayers();};
+$("pClose").onclick=()=>$("mPlayers").hidden=true;
+
+/* ---------- settlement ---------- */
+function settlement(){
+  const pays=payouts(),rows=S.players.map(p=>{
+    const place=placeOf(p),cost=costOf(p);
+    const paidCash=p.entries.reduce((a,e,j)=>a+(e.paid!=="offen"?(j?S.rebuy:S.buyin):0),0);
+    const open=cost-paidCash,win=place&&place<=pays.length?pays[place-1]:0;
+    return {name:p.name,place,entries:p.entries.length,rebuys:p.entries.length-1,cost,paid:paidCash,open,win,net:win-cost,bal:win-open,
+      paidBar:p.entries.reduce((a,e,j)=>a+(e.paid==="bar"?(j?S.rebuy:S.buyin):0),0),paidDig:p.entries.reduce((a,e,j)=>a+(e.paid==="dig"?(j?S.rebuy:S.buyin):0),0)};
+  });
+  const feeTotal=S.players.filter(p=>p.entries.length).length*S.fee;
+  const received=rows.reduce((a,r)=>a+r.paid,0);
+  // debtors pay winners directly, the bank covers the rest from collected money
+  const cred=rows.filter(r=>r.bal>0).map(r=>({n:r.name,v:r.bal})).sort((a,b)=>b.v-a.v);
+  const debt=rows.filter(r=>r.bal<0).map(r=>({n:r.name,v:-r.bal})).sort((a,b)=>b.v-a.v);
+  const tx=[];
+  for(const d of debt){for(const c of cred){if(d.v<=0)break;if(c.v<=0||c.n===d.n)continue;const m=Math.min(d.v,c.v);tx.push({from:d.n,to:c.n,amount:m});d.v-=m;c.v-=m;}}
+  for(const d of debt)if(d.v>0)tx.push({from:d.n,to:S.bank+" (Kasse)",amount:d.v});
+  for(const c of cred)if(c.v>0)tx.push({from:S.bank+" (Kasse)",to:c.n,amount:c.v});
+  const bankName=S.bank.toLowerCase();
+  const fixed=tx.filter(t=>!(t.from.toLowerCase()===bankName+" (kasse)"&&t.to.toLowerCase()===bankName)&&!(t.to.toLowerCase()===bankName+" (kasse)"&&t.from.toLowerCase()===bankName));
+  return {rows,pays,pot:potOf(),feeTotal,received,tx:fixed};
+}
+function openResult(){
+  closeAll();
+  const s=settlement(),done=alive().length===1;
+  const order=s.rows.slice().sort((a,b)=>(a.place||0)-(b.place||0));
+  let h='<thead><tr><th>Platz</th><th>Spieler</th><th class="num">Entries</th><th class="num">Eingesetzt</th><th class="num">Bezahlt</th><th class="num">Offen</th><th class="num">Gewinn</th><th class="num">+/−</th></tr></thead><tbody>';
+  order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
+  h+='</tbody>';$("rTable").innerHTML=h;
+  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries · Kasse "+P(s.feeTotal)+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ");
+  $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. Claude prüft das nach dem Export noch mal.";
+  $("sTable").innerHTML=s.tx.length?'<tbody>'+s.tx.map(t=>'<tr><td>'+esc(t.from)+'</td><td>→</td><td>'+esc(t.to)+'</td><td class="num"><b>'+P(t.amount)+'</b></td></tr>').join("")+'</tbody>':'<tbody><tr><td>Noch nichts zu verteilen.</td></tr></tbody>';
+  $("mResult").hidden=false;
+}
+function exportData(){
+  const s=settlement();
+  return {event:S.title,date:new Date().toISOString().slice(0,10),exported:new Date().toISOString(),started:S.started,ended:S.ended,
+    rules:{stack:S.stack,buyin:S.buyin,fee:S.fee,rebuy:S.rebuy,reLvl:S.reLvl,maxRe:S.maxRe,pay:S.pay,bank:S.bank,unit:"P"},
+    level:{now:LEVELS[S.i].brk?"Pause":playNum(S.i),blinds:LEVELS[S.i]},pot:s.pot,kasse:s.feeTotal,received:s.received,payouts:s.pays,
+    players:S.players.map((p,k)=>Object.assign({seat:k+1},s.rows[k],{out:p.out,entryLog:p.entries})),
+    settlementDraft:s.tx,levels:LEVELS,games:S.games,log:S.log};
+}
+function download(){
+  const d=exportData(),b=new Blob([JSON.stringify(d,null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="dead-mans-hand-"+d.date+"-"+new Date().toTimeString().slice(0,5).replace(":","")+".json";
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  log("export");save();toast("Datei gespeichert (Downloads). Schick sie Claude in den Chat.");
+}
+function summaryText(){
+  const s=settlement();
+  const order=s.rows.slice().sort((a,b)=>(a.place||99)-(b.place||99));
+  return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries · Kasse "+s.feeTotal+" P\n\n"+
+    order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win:"")).join("\n")+
+    "\n\nZahlungen:\n"+(s.tx.map(t=>t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine");
+}
+$("bExport").onclick=download;$("rExport").onclick=download;
+$("rCopy").onclick=async()=>{const t=summaryText();try{await navigator.clipboard.writeText(t);toast("Text kopiert");}catch(e){prompt("Kopieren:",t);}};
+$("rClose").onclick=()=>$("mResult").hidden=true;
+
+/* ---------- seat draw ---------- */
+function drawSeats(){
+  closeAll();
+  const a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
+  const suits=["♠","♥","♣","♦"];
+  announce({eyebrow:"Plätze ausgelost · im Uhrzeigersinn",title:"Sitzordnung",html:'<div class="draw">'+a.map((p,k)=>'<div class="dcard" style="--k:'+k+'"><div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div><p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});
+  fanfare();
+}
+
+/* ---------- settings ---------- */
+function levelsText(){return LEVELS.map(l=>l.brk?"Pause "+l.brk+(l.note?" "+l.note:""):l.sb+"/"+l.bb).join("\n");}
+function parseLevels(t){
+  const out=[];for(const raw of t.split("\n")){const s=raw.trim();if(!s)continue;
+    let m=s.match(/^pause\s+(\d+)\s*(.*)$/i);if(m){out.push({brk:+m[1],note:m[2]||"Pause"});continue;}
+    m=s.match(/^(\d+)\s*\/\s*(\d+)$/);if(m){out.push({sb:+m[1],bb:+m[2]});continue;}
+    throw new Error("Zeile nicht verstanden: „"+s+"“");}
+  if(!out.some(l=>!l.brk))throw new Error("Mindestens ein Level nötig");return out;
+}
+function parseGames(t){const out=[];for(const raw of t.split("\n")){const s=raw.trim();if(!s)continue;const m=s.match(/^(\d+)\s+(.+)$/);if(!m||!GAMES[m[2].trim()])throw new Error("Minigame nicht erkannt: „"+s+"“ (bekannt: "+Object.keys(GAMES).join(", ")+")");out.push({lvl:+m[1],g:m[2].trim()});}return out;}
+function openSettings(){
+  closeAll();
+  $("sTitle").value=S.title;$("sStack").value=S.stack;$("sMin1").value=S.min1;$("sMin").value=S.min;$("sMinLate").value=S.minLate;
+  $("sReLvl").value=S.reLvl??"";$("sMaxRe").value=S.maxRe??"";$("sBuyin").value=S.buyin;$("sFee").value=S.fee;$("sRebuy").value=S.rebuy;
+  $("sPlaces").value=String(S.pay.places);$("sThird").value=S.pay.third;$("sSplit").value=S.pay.split;$("sBank").value=S.bank;
+  $("sBlinds").value=levelsText();$("sGames").value=S.games.map(e=>e.lvl+" "+e.g).join("\n");$("sCode").value="";$("sErr").textContent="";
+  $("mSet").hidden=false;
+}
+function applySettings(){
+  try{
+    const lv=parseLevels($("sBlinds").value),gm=parseGames($("sGames").value);
+    const num=(id,min)=>{const v=$(id).value.trim();if(v==="")return null;const n=+v;if(!(n>=min))throw new Error("Ungültige Zahl: "+id);return n;};
+    const code=$("sCode").value.trim();
+    S.title=$("sTitle").value.trim()||S.title;S.stack=num("sStack",1)||S.stack;S.min1=num("sMin1",1)||S.min1;S.min=num("sMin",1)||S.min;S.minLate=num("sMinLate",1)||S.minLate;
+    S.reLvl=num("sReLvl",0);S.maxRe=num("sMaxRe",0);S.buyin=num("sBuyin",0)??S.buyin;S.fee=num("sFee",0)??S.fee;S.rebuy=num("sRebuy",0)??S.rebuy;
+    S.pay.places=+$("sPlaces").value;S.pay.third=num("sThird",0)??S.pay.third;S.pay.split=num("sSplit",1)||S.pay.split;S.bank=$("sBank").value.trim()||S.bank;
+    const keepLeft=leftNow(),sameLen=lv.length===LEVELS.length;
+    S.levels=lv;LEVELS=S.levels;S.i=Math.min(S.i,LEVELS.length-1);S.games=gm;
+    if(!sameLen){S.left=dur(S.i);if(S.running)S.endAt=Date.now()+S.left*1000;}else{S.left=keepLeft;}
+    log("settings");save();render();
+    if(code){const c=JSON.parse(code);(Array.isArray(c)?c:(c.cmds||[c])).forEach(x=>runCmd(x));}
+    $("mSet").hidden=true;
+  }catch(e){$("sErr").textContent=e.message;}
+}
+$("sOk").onclick=applySettings;$("sCancel").onclick=()=>$("mSet").hidden=true;
+$("sReset").onclick=()=>{if(!confirm("Wirklich alles zurücksetzen? Rebuys, Platzierungen und Zeit sind dann weg. Vorher Export machen!"))return;download();S=fresh();LEVELS=S.levels;save();buildSeats();render();$("mSet").hidden=true;};
+
+/* ---------- live commands from Claude ---------- */
+// live.json: {"cmds":[{"id":1,"op":"msg","text":"…"}]} — each id runs once on this laptop
+let applied=null;try{const a=localStorage.getItem(APPLIED_KEY);applied=a==null?null:+a;}catch(e){}
+function runCmd(c){
+  const op=c.op;
+  try{switch(op){
+    case "msg":S.msgs.push({text:c.text,until:c.min?Date.now()+c.min*60000:null});S.msgs=S.msgs.slice(-6);if(c.big!==false)announce({eyebrow:c.eyebrow||"Durchsage",title:c.title||"",text:c.text,sec:c.sec||20});break;
+    case "clearmsg":S.msgs=[];break;
+    case "play":if(!S.running)toggle();break;
+    case "pause":if(S.running)toggle();break;
+    case "level":{let idx=-1;if(c.i!=null)idx=c.i;else for(let k=0;k<LEVELS.length;k++)if(!LEVELS[k].brk&&playNum(k)===c.n){idx=k;break;}if(idx>=0)go(idx);break;}
+    case "next":go(S.i+1);break;
+    case "prev":go(S.i-1);break;
+    case "time":if(c.set!=null){S.left=c.set;if(S.running)S.endAt=Date.now()+c.set*1000;save();}else addTime(c.add||0);break;
+    case "blinds":S.levels=parseLevels(c.text);LEVELS=S.levels;S.i=Math.min(S.i,LEVELS.length-1);break;
+    case "setlevel":{const L=LEVELS[c.i];if(L)Object.assign(L,c.v);break;}
+    case "set":for(const k of Object.keys(c.v||{}))if(k in S&&!["players","log","levels"].includes(k))S[k]=c.v[k];break;
+    case "rebuy":doRebuy(c.name,c.paid);break;
+    case "out":doOut(c.name);break;
+    case "back":doBack(c.name);break;
+    case "paid":{const p=pl(c.name);if(p){const e=p.entries[(c.entry||1)-1];if(e)e.paid=c.paid;}break;}
+    case "add":if(!pl(c.name))S.players.push({name:c.name,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:c.paid||"bar"}],out:null});buildSeats();break;
+    case "remove":{const p=pl(c.name);if(p){S.players=S.players.filter(x=>x!==p);S.outOrder=S.outOrder.filter(n=>n!==p.name);buildSeats();}break;}
+    case "rename":{const p=pl(c.from);if(p){S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);p.name=c.to;}break;}
+    case "seats":{const m=c.names.map(pl).filter(Boolean);if(m.length===S.players.length){S.players=m;buildSeats();}break;}
+    case "dealer":{const p=pl(c.name);if(p)S.dealer=S.players.indexOf(p);break;}
+    case "game":if(c.def)GAMES[c.name]=c.def;showGame(c.name,false);break;
+    case "gamedef":GAMES[c.name]=c.def;break;
+    case "schedule":S.games=c.games;break;
+    case "endgame":S.active=null;break;
+    case "draw":drawSeats();break;
+    case "result":openResult();break;
+    case "export":download();break;
+    case "reload":save();setTimeout(()=>location.reload(),300);break;
+    default:return;
+  }}catch(e){console.warn("cmd",c,e);}
+  log("claude",{op,cmd:c});save();render();
+}
+async function poll(){
+  const lv=$("live");
+  try{
+    const r=await fetch(LIVE_URL+"?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error(r.status);
+    const j=await r.json(),cmds=(j.cmds||[]).filter(c=>typeof c.id==="number").sort((a,b)=>a.id-b.id);
+    const max=cmds.reduce((m,c)=>Math.max(m,c.id),0);
+    if(applied==null){applied=max;}               // first visit: ignore old commands
+    else for(const c of cmds)if(c.id>applied){applied=c.id;runCmd(c);}
+    try{localStorage.setItem(APPLIED_KEY,String(applied));}catch(e){}
+    lv.className="live on";lv.querySelector("span").textContent="Live · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  }catch(e){lv.className="live off";lv.querySelector("span").textContent="Offline · läuft lokal";}
+}
+
+/* ---------- controls ---------- */
+function closeAll(){["mPlayers","mGames","mResult","mSet"].forEach(id=>$(id).hidden=true);}
+$("bPlay").onclick=toggle;
+$("bPrev").onclick=()=>go(S.i-1);$("bNext").onclick=()=>go(S.i+1);
+$("bMinus").onclick=()=>addTime(-60);$("bPlus").onclick=()=>addTime(60);
+$("bPlayers").onclick=()=>openPlayers();
+$("bDealer").onclick=()=>{let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++){k=(k+1)%n;if(!S.players[k].out)break;}S.dealer=k;save();render();};
+$("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawSeats();};
+$("bResult").onclick=openResult;
+$("bSet").onclick=openSettings;
+$("bSnd").onclick=()=>{ac();minuteBeep();[3,2,1].forEach((n,k)=>setTimeout(()=>countdown(n),1500+k*1000));setTimeout(levelSound,4500);};
+$("bFull").onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
+$("bGame").onclick=()=>{
+  closeAll();const L=$("gList");L.innerHTML="";
+  Object.keys(GAMES).forEach(g=>{const b=document.createElement("button");b.type="button";b.innerHTML="<b></b><span></span>";b.querySelector("b").textContent=g;b.querySelector("span").textContent=GAMES[g].short;b.onclick=()=>showGame(g,false);L.appendChild(b);});
+  $("gPlan").textContent="Geplant: "+(S.games.map(e=>"L"+e.lvl+" "+e.g).join(" · ")||"nichts");
+  $("mGames").hidden=false;
+};
+$("gClose").onclick=()=>$("mGames").hidden=true;
+$("gameDone").onclick=()=>{S.active=null;save();render();};
+let hideT;
+function showCtrl(){$("ctrl").classList.remove("hide");document.body.style.cursor="";clearTimeout(hideT);hideT=setTimeout(()=>{if(!$("ctrl").matches(":hover")){$("ctrl").classList.add("hide");document.body.style.cursor="none";}},4000);}
+addEventListener("mousemove",showCtrl);addEventListener("touchstart",showCtrl,{passive:true});
+addEventListener("keydown",e=>{
+  if(e.target.matches("input,textarea,select"))return;
+  const anyOpen=[...document.querySelectorAll(".modal")].some(m=>!m.hidden)||!$("ann").hidden;
+  if(e.key==="Escape"){closeAll();$("ann").hidden=true;return;}
+  if(anyOpen)return;
+  if(e.code==="Space"){e.preventDefault();toggle();}
+  else if(e.key==="ArrowRight")go(S.i+1);else if(e.key==="ArrowLeft")go(S.i-1);
+  else if(e.key==="ArrowUp")addTime(60);else if(e.key==="ArrowDown")addTime(-60);
+  else if(e.key==="d"||e.key==="D")$("bDealer").click();
+  else if(e.key==="f"||e.key==="F")$("bFull").click();
+  else if(e.key==="r"||e.key==="R")openPlayers();
+});
+addEventListener("beforeunload",()=>{if(S.running)S.left=leftNow();save();});
+
+/* ---------- background: smoke, gold dust, embers ---------- */
+let burstP=[];
+function burst(){for(let k=0;k<160;k++)burstP.push({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*14-2,l:1,c:Math.random()<.6?"226,184,87":Math.random()<.5?"79,130,255":"255,255,255",s:2+Math.random()*4});}
+(function(){
+  const c=$("fx"),x=c.getContext("2d");let W,H;
+  function size(){const r=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;c.width=W*r;c.height=H*r;x.setTransform(r,0,0,r,0,0);}
+  size();addEventListener("resize",()=>{size();});
+  const dust=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),s:.5+Math.random()*1.8,v:.00004+Math.random()*.00012,p:Math.random()*6.28,red:Math.random()<.18}));
+  const smoke=Array.from({length:7},(_,k)=>({x:Math.random(),y:.6+Math.random()*.5,r:.25+Math.random()*.25,v:.000012+Math.random()*.00002,p:k}));
+  const suits=["♠","♣","♥","♦"],fl=Array.from({length:9},(_,k)=>({x:Math.random(),y:Math.random(),v:.000015+Math.random()*.00002,s:18+Math.random()*30,ch:suits[k%4],p:Math.random()*6}));
+  let last=performance.now();
+  function frame(t){
+    const dt=Math.min(60,t-last);last=t;x.clearRect(0,0,W,H);
+    for(const s of smoke){s.x+=s.v*dt*.6;s.y-=s.v*dt*.3;if(s.y<-.3){s.y=1.2;s.x=Math.random();}if(s.x>1.3)s.x=-.3;
+      const g=x.createRadialGradient(s.x*W,s.y*H,0,s.x*W,s.y*H,s.r*W);g.addColorStop(0,"rgba(120,120,130,.05)");g.addColorStop(1,"rgba(120,120,130,0)");x.fillStyle=g;x.fillRect(0,0,W,H);}
+    x.font="600 24px Geist, Arial";
+    for(const f of fl){f.y-=f.v*dt;if(f.y<-.05){f.y=1.05;f.x=Math.random();}x.globalAlpha=.035+.02*Math.sin(t/1800+f.p);x.fillStyle=(f.ch==="♥"||f.ch==="♦")?"#e5675c":"#e2b857";x.font="600 "+f.s+"px Geist, Arial";x.fillText(f.ch,f.x*W,f.y*H);}
+    x.globalAlpha=1;
+    for(const d of dust){d.y-=d.v*dt;d.x+=Math.sin(t/3000+d.p)*.00005*dt;if(d.y<-.02){d.y=1.02;d.x=Math.random();}
+      const a=.25+.35*Math.sin(t/900+d.p*3);x.fillStyle=d.red?"rgba(229,103,92,"+a*.8+")":"rgba(243,214,143,"+a+")";x.beginPath();x.arc(d.x*W,d.y*H,d.s,0,6.283);x.fill();}
+    for(const b of burstP){b.x+=b.vx;b.y+=b.vy;b.vy+=.35;b.l-=.008;x.fillStyle="rgba("+b.c+","+Math.max(0,b.l)+")";x.fillRect(b.x,b.y,b.s,b.s*1.6);}
+    burstP=burstP.filter(b=>b.l>0&&b.y<H+20);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+buildSeats();render();setInterval(tick,250);tick();
+poll();setInterval(poll,POLL_MS);
+showCtrl();
+</script>
+</body>
+</html>
