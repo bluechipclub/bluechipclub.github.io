@@ -1245,7 +1245,7 @@ textarea { min-height: 150px; resize: vertical; }
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
     return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
-      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
+      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
   function openSplash() {
@@ -1261,7 +1261,7 @@ textarea { min-height: 150px; resize: vertical; }
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
-      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
+      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const tick = () => { const s = Math.max(0, (d - Date.now()) / 1000), v = [s / 86400, s % 86400 / 3600, s % 3600 / 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')); el.querySelectorAll('.cdx b').forEach((b, i) => { b.textContent = v[i]; }); };
     tick(); const iv = setInterval(tick, 1000);
@@ -1732,7 +1732,7 @@ textarea { min-height: 150px; resize: vertical; }
   })();
 })();
 </script>
-<div id="codeOv" hidden style="position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px">
+<div id="codeOv" hidden style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px">
 <div style="width:min(340px,100%);background:#121212;border:1px solid #2e2e2e;border-radius:20px;padding:26px 22px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.8)">
 <div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase">Live-Tafel</div>
 <div style="font-size:22px;font-weight:650;margin:6px 0 16px">Code eingeben</div>
@@ -1744,7 +1744,7 @@ textarea { min-height: 150px; resize: vertical; }
 (function(){const ov=document.getElementById('codeOv'),inp=document.getElementById('codeIn'),err=document.getElementById('codeErr');
 const open=()=>{ov.hidden=false;inp.value='';err.textContent='';setTimeout(()=>inp.focus(),50);};
 const go=()=>{if(inp.value.trim()==='007'){location.href='tafel/';}else{err.textContent='Falscher Code';inp.value='';inp.focus();}};
-document.getElementById('liveBtn').onclick=open;document.getElementById('codeNo').onclick=()=>ov.hidden=true;
+document.getElementById('liveBtn').onclick=open;window.openLive=open;document.getElementById('codeNo').onclick=()=>ov.hidden=true;
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 </script>
