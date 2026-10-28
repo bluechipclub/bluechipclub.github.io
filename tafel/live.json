@@ -419,6 +419,12 @@
 "sub": "Hat immer ein Ass",
 "sec1": 6,
 "sec": 40
+},
+{
+"id": 43,
+"op": "rebuy",
+"name": "Benno",
+"paid": "bar"
 }
 ]
 }
