@@ -95,6 +95,48 @@
 {
 "id": 10,
 "op": "reload"
+},
+{
+"id": 11,
+"op": "schedule",
+"games": [
+{
+"lvl": 2,
+"g": "Crazy Pineapple"
+},
+{
+"lvl": 3,
+"g": "Blind Pot"
+},
+{
+"lvl": 4,
+"g": "Irish Poker"
+},
+{
+"lvl": 5,
+"g": "Bomb Pot"
+},
+{
+"lvl": 6,
+"g": "Straddle-Hand"
+},
+{
+"lvl": 7,
+"g": "7-2 Bonus"
+},
+{
+"lvl": 8,
+"g": "Dead Man's Hand"
+},
+{
+"lvl": 9,
+"g": "Run it Twice"
+}
+]
+},
+{
+"id": 12,
+"op": "reload"
 }
 ]
 }

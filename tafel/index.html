@@ -369,14 +369,14 @@ const GAMES={
  "7-2 Bonus":{bb:1,pay:"Jeder zahlt dem 7-2-Gewinner #",short:"Mit 7-2 gewinnen und zeigen · 5 Runden",rules:"Die nächsten 5 Runden, bis der Dealer-Button 5-mal rum ist: Wer mit 7-2 einen Pot gewinnt und die Karten zeigt, bekommt den Einsatz von jedem Spieler am Tisch."},
  "Dead Man's Hand":{bb:1,pay:"Jeder zahlt dem A-8-Gewinner #",short:"Pot mit A-8 auf der Hand gewinnen und zeigen · bis Level-Ende",rules:"Wild Bill Hickoks letzte Hand. Bis zum Ende des Levels gilt: Wer mit A-8 auf der Hand (Farbe egal) einen Pot gewinnt und die Karten zeigt, bekommt den Einsatz von jedem Spieler am Tisch."},
  "Bomb Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Kein Preflop · Flop kommt sofort",rules:"Nächste Hand ist ein Bomb Pot. Jeder legt den Einsatz in die Mitte, es gibt kein Preflop und der Flop kommt sofort. Ab dem Flop wird ganz normal gesetzt."},
- "Straddle-Runde":{bb:2,pay:"UTG legt # blind",short:"Eine Runde Pflicht-Straddle · UTG spricht zuletzt preflop",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist: Der Spieler links vom Big Blind legt blind den doppelten Big Blind (Straddle). Preflop spricht er als Letzter. Wer callen will, zahlt den Straddle."},
+ "Straddle-Hand":{bb:2,pay:"UTG legt # blind",short:"Eine Hand · Pflicht-Straddle · UTG spricht zuletzt preflop",rules:"Die nächste Hand wird gestraddelt: Der Spieler links vom Big Blind legt blind den doppelten Big Blind. Preflop spricht er als Letzter. Wer mitspielen will, zahlt mindestens den Straddle."},
  "Run it Twice":{bb:0,pay:"",short:"All-in? Board wird zweimal ausgespielt · bis Level-Ende",rules:"Bis zum Ende des Levels: Ist jemand all-in und alle Karten sind offen, wird der Rest des Boards zweimal ausgeteilt. Jedes Board gewinnt die Hälfte des Pots. Weniger Bad Beats, mehr Drama."},
- "Crazy Pineapple":{bb:0,pay:"",short:"3 Karten · nach dem Flop eine abwerfen · 1 Runde",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist: Jeder bekommt 3 Karten statt 2. Preflop wird normal gesetzt. Sobald der Flop liegt, wirft jeder noch Aktive eine Karte verdeckt ab. Danach ganz normales Hold'em."},
- "Irish Poker":{bb:0,pay:"",short:"4 Karten · nach der Flop-Setzrunde 2 abwerfen · 1 Runde",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist: Jeder bekommt 4 Karten. Preflop und am Flop wird normal gesetzt. Nach der Setzrunde am Flop wirft jeder 2 Karten ab und spielt mit den restlichen 2 ganz normales Hold'em weiter."},
- "Pass the Trash":{bb:0,pay:"",short:"3 Karten · eine nach links weitergeben · eine abwerfen · 1 Runde",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist: Jeder bekommt 3 Karten. Vor der ersten Setzrunde gibt jeder gleichzeitig eine Karte verdeckt an den linken Nachbarn weiter. Dann wirft jeder eine Karte ab und spielt mit 2 Karten normales Hold'em. Aus Müll wird Gold, oder auch nicht."},
- "Omaha-Runde":{bb:0,pay:"",short:"4 Karten · genau 2 benutzen · Pot-Limit · 1 Runde",rules:"Eine Runde lang, bis der Dealer-Button einmal rum ist, spielen wir Pot-Limit Omaha. Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
+ "Crazy Pineapple":{bb:0,pay:"",short:"Eine Hand · 3 Karten · nach dem Flop eine abwerfen",rules:"Die nächste Hand ist Crazy Pineapple: Jeder bekommt 3 Karten statt 2. Preflop wird normal gesetzt. Sobald der Flop liegt, wirft jeder noch Aktive eine Karte verdeckt ab. Danach ganz normales Hold'em."},
+ "Irish Poker":{bb:0,pay:"",short:"Eine Hand · 4 Karten · nach der Flop-Setzrunde 2 abwerfen",rules:"Die nächste Hand ist Irish Poker: Jeder bekommt 4 Karten. Preflop und am Flop wird normal gesetzt. Nach der Setzrunde am Flop wirft jeder 2 Karten ab und spielt mit den restlichen 2 ganz normales Hold'em weiter."},
+ "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 3 Karten · eine nach links · eine abwerfen",rules:"Die nächste Hand ist Pass the Trash: Jeder bekommt 3 Karten. Vor der ersten Setzrunde gibt jeder gleichzeitig eine Karte verdeckt an den linken Nachbarn weiter. Dann wirft jeder eine Karte ab und spielt mit 2 Karten normales Hold'em."},
+ "Omaha-Hand":{bb:0,pay:"",short:"Eine Hand · 4 Karten · genau 2 benutzen · Pot-Limit",rules:"Die nächste Hand ist Pot-Limit Omaha: Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
 };
-const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Blind Pot"},{lvl:4,g:"Irish Poker"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Straddle-Runde"},{lvl:7,g:"7-2 Bonus"},{lvl:8,g:"Dead Man's Hand"},{lvl:9,g:"Run it Twice"}];
+const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Blind Pot"},{lvl:4,g:"Irish Poker"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Straddle-Hand"},{lvl:7,g:"7-2 Bonus"},{lvl:8,g:"Dead Man's Hand"},{lvl:9,g:"Run it Twice"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:5000,reLvl:9,maxRe:null,
@@ -468,6 +468,7 @@ function render(){
   renderSeats();renderTicker();
 }
 function renderTicker(){
+  if(S.active&&S.activeUntil&&Date.now()>S.activeUntil){S.active=null;S.activeUntil=null;save();}
   const parts=[];
   S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
   if(rebuyOpen())parts.push("Rebuy "+P(S.rebuy)+" bis Ende Level "+(S.reLvl??"∞"));
@@ -532,7 +533,7 @@ const stakeChips=g=>Math.round(curBB()*(GAMES[g].bb||0));
 const stakeTxt=g=>GAMES[g].bb?GAMES[g].pay.replace("#",fmt(stakeChips(g))+" Chips"):"Kein Extra-Einsatz";
 function showGame(g,auto){
   if(!GAMES[g])return;
-  closeAll();S.active=g;log("minigame",{game:g});save();
+  closeAll();S.active=g;S.activeUntil=["7-2 Bonus","Dead Man's Hand","Run it Twice"].includes(g)?null:Date.now()+6*60000;log("minigame",{game:g});save();
   const x=GAMES[g];fanfare();
   announce({eyebrow:auto?"Special in Level "+playNum(S.i):"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's",sec:45});
 }
