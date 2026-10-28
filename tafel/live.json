@@ -360,6 +360,13 @@
 "name": "Manu",
 "entry": 0,
 "paid": "dig"
+},
+{
+"id": 34,
+"op": "paid",
+"name": "Manu",
+"entry": 1,
+"paid": "offen"
 }
 ]
 }
