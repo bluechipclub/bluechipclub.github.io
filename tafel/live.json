@@ -1,4 +1,25 @@
-{"note":"Live-Befehle für die Tafel. Jede id läuft genau einmal.","cmds":[
-{"id":1,"op":"set","v":{"stack":20000}},
-{"id":2,"op":"msg","eyebrow":"Live-Test von Claude","title":"Startstack 20.000","text":"Ab jetzt startet jeder mit 20.000 Chips. Schau rechts bei Ø Stack.","sec":25,"min":5}
-]}
+{
+"note": "Live-Befehle für die Tafel. Jede id läuft genau einmal.",
+"cmds": [
+{
+"id": 1,
+"op": "set",
+"v": {
+"stack": 20000
+}
+},
+{
+"id": 2,
+"op": "msg",
+"eyebrow": "Live-Test von Claude",
+"title": "Startstack 20.000",
+"text": "Ab jetzt startet jeder mit 20.000 Chips. Schau rechts bei Ø Stack.",
+"sec": 25,
+"min": 5
+},
+{
+"id": 3,
+"op": "reload"
+}
+]
+}
