@@ -457,6 +457,11 @@
 "op": "cards",
 "all": true,
 "sec": 6
+},
+{
+"id": 50,
+"op": "out",
+"name": "Oli"
 }
 ]
 }
