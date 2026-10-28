@@ -1,0 +1,74 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0a0a0a">
+<title>Spieler · Blue Chip Club</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
+<style>
+:root{--bg:#0a0a0a;--surface:#121212;--line:#232323;--line2:#2e2e2e;--fg:#f4f4f2;--grey:#8c8c88;--gold:#e2b857;--gold2:#f3d68f;--gold3:#9c7a2f;--ease:cubic-bezier(.23,1,.32,1);color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(226,184,87,.12),transparent 60%),var(--bg);color:var(--fg);font-family:Geist,"Helvetica Neue",Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+header{position:sticky;top:0;z-index:5;background:rgba(10,10,10,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.back{color:var(--grey);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px}
+.back:hover{color:var(--fg);border-color:var(--line2)}
+.logo{font-weight:650;letter-spacing:.01em}
+h1{font-size:clamp(34px,6vw,64px);margin:44px 0 6px;letter-spacing:-.02em;background:linear-gradient(180deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--grey);font-family:"Geist Mono",monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:22px;padding-bottom:60px}
+.c{position:relative;aspect-ratio:378/1024;border-radius:16px;overflow:hidden;cursor:pointer;border:0;padding:0;background:#111;box-shadow:0 0 0 1px var(--gold3),0 18px 40px rgba(0,0,0,.7);transition:transform .5s var(--ease),box-shadow .5s var(--ease);animation:deal .8s var(--ease) both;animation-delay:calc(var(--k)*.08s)}
+.c:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:0 0 0 1px var(--gold),0 26px 60px rgba(0,0,0,.8),0 0 40px rgba(226,184,87,.18)}
+@keyframes deal{from{opacity:0;transform:translateY(30px) scale(.96)}}
+.c img,.big img{width:100%;height:100%;object-fit:cover;display:block}
+.c .anim,.c .fg,.big .anim,.big .fg{position:absolute;left:0;top:0;width:100%;height:62.5%}
+.fg{object-fit:fill!important;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 98%);mask-image:linear-gradient(180deg,#000 72%,transparent 98%)}
+.anim{overflow:hidden;mix-blend-mode:screen;pointer-events:none}
+.anim i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,rgba(255,200,120,.9),rgba(255,160,60,.35) 45%,transparent 70%);animation:bok var(--d) ease-in-out var(--w) infinite alternate}
+@keyframes bok{0%{opacity:.15;transform:translate(0,0) scale(.8)}50%{opacity:.9}100%{opacity:.3;transform:translate(12px,-18px) scale(1.15)}}
+.smk{position:absolute;left:-30%;top:10%;width:160%;height:70%;background:radial-gradient(ellipse 40% 30% at 30% 50%,rgba(200,200,210,.14),transparent 70%),radial-gradient(ellipse 35% 25% at 70% 40%,rgba(200,200,210,.1),transparent 70%);animation:smk 9s ease-in-out infinite alternate;filter:blur(6px)}
+@keyframes smk{to{transform:translateX(18%) translateY(-8%)}}
+.shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,240,200,.18) 48%,transparent 60%);transform:translateX(-120%);animation:shn 4s 1s ease-in-out infinite;pointer-events:none}
+@keyframes shn{60%,100%{transform:translateX(120%)}}
+.soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:linear-gradient(160deg,#171717,#0d0d0d);color:var(--grey);cursor:default}
+.soon b{font-size:64px;color:#2a2a2a}.soon span{font-size:22px;color:var(--fg);font-weight:650}.soon small{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.soon:hover{transform:none}
+.ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px}
+.big{position:relative;height:min(92vh,calc((100vw - 32px)*1024/378));aspect-ratio:378/1024;border-radius:18px;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 0 0 6px #0b0b0b,0 0 0 7px rgba(226,184,87,.4),0 30px 90px rgba(0,0,0,.9);animation:pop .6s var(--ease) both}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(20px)}}
+.x{position:fixed;top:14px;right:16px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line2);background:#151515;color:var(--fg);font-size:20px;cursor:pointer}
+.nav{position:fixed;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid var(--line2);background:#151515;color:var(--fg);font-size:20px;cursor:pointer}
+.nav.l{left:14px}.nav.r{right:14px}
+@media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}.c{border-radius:10px}.nav{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<header><div class="wrap"><span class="logo">♠ Blue Chip Club</span><a class="back" href="../">← Zur Lobby</a></div></header>
+<main class="wrap">
+<h1>Spielerprofile</h1>
+<p class="sub">Die Stammspieler · tippen zum Vergrößern</p>
+<div class="grid" id="g"></div>
+</main>
+<div class="ov" id="ov" hidden><button class="x" id="x" aria-label="Schließen">✕</button><button class="nav l" id="pl" aria-label="Zurück">‹</button><div id="bigw"></div><button class="nav r" id="nr" aria-label="Weiter">›</button></div>
+<script>
+const K="../tafel/karten/";
+const P=[
+ {n:"Tim",img:"tim.jpg"},{n:"Niklas",img:"niklas.jpg"},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu.jpg"},
+ {n:"Magg",img:"magg.jpg"},{n:"Oli",img:"oli.jpg",fg:"oli-fg.png"},{n:"Domi C",img:"domi-c.jpg",fg:"domi-c-fg.png"},{n:"Philipp",img:"philipp.jpg",fg:"philipp-fg.png"},
+ {n:"Jonny"},{n:"Benno"}
+];
+const R=(a,b)=>(a+Math.random()*(b-a));
+function inner(p){
+  const bok=Array.from({length:14},()=>'<i style="--x:'+R(0,100).toFixed(0)+'%;--y:'+R(0,95).toFixed(0)+'%;--s:'+R(6,30).toFixed(0)+'px;--d:'+R(3,8).toFixed(1)+'s;--w:'+R(-6,0).toFixed(1)+'s"></i>').join("");
+  return '<img src="'+K+p.img+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(p.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+p.fg+'" alt="">':'')+'<span class="shine"></span>';
+}
+const real=P.filter(p=>p.img);let cur=-1;
+document.getElementById("g").innerHTML=P.map((p,k)=>p.img?'<button class="c" style="--k:'+k+'" data-i="'+real.indexOf(p)+'">'+inner(p)+'</button>':'<div class="c soon" style="--k:'+k+'"><b>?</b><span>'+p.n+'</span><small>Karte folgt</small></div>').join("");
+const ov=document.getElementById("ov"),bw=document.getElementById("bigw");
+function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">'+inner(real[cur])+'</div>';ov.hidden=false;}
+document.querySelectorAll(".c[data-i]").forEach(b=>b.onclick=()=>show(+b.dataset.i));
+document.getElementById("x").onclick=()=>{ov.hidden=true;};
+ov.onclick=e=>{if(e.target===ov)ov.hidden=true;};
+document.getElementById("pl").onclick=e=>{e.stopPropagation();show(cur-1);};
+document.getElementById("nr").onclick=e=>{e.stopPropagation();show(cur+1);};
+addEventListener("keydown",e=>{if(ov.hidden)return;if(e.key==="Escape")ov.hidden=true;if(e.key==="ArrowLeft")show(cur-1);if(e.key==="ArrowRight")show(cur+1);});
+let tx=0;ov.addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});ov.addEventListener("touchend",e=>{const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(cur+(d<0?1:-1));});
+</script></body></html>
