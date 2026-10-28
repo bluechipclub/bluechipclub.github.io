@@ -804,17 +804,17 @@ function cardHtml(c){
   const V=/^karten\//.test(o.img)?"?v=8":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
-function introShow(list,done){
+function introShow(list,done,o){o=o||{};
   const box=$("intro");let k=0;intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
     if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4];
     box.innerHTML='<div class="inC">'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
-      '<div class="inT"><div class="eyebrow">'+(k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
+      '<div class="inT"><div class="eyebrow">'+(o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
       '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
-    tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");
-    intro.t=setTimeout(()=>{k++;step();},7000);
+    if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
+    intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000);
   }
   step();
 }
@@ -922,6 +922,7 @@ function runCmd(c){
     case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
     case "spotlight":spotlight(c);break;
+    case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
     case "restart":restartTournament();break;
     case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
     default:return;
