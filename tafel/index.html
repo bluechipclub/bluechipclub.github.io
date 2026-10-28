@@ -375,7 +375,7 @@ const GAMES={
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Deepstack",i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:15,stack:10000,reLvl:9,maxRe:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
