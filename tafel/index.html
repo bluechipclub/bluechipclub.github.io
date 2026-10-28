@@ -412,7 +412,7 @@ const fresh=()=>({v:1,title:"Dead Man's Hand Deepstack",sub:"Blue Chip Club · H
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
-  outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
+  outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1)S=Object.assign(fresh(),s);}catch(e){}
 let LEVELS=S.levels;
@@ -442,7 +442,7 @@ function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().lengt
 
 /* ---------- render ---------- */
 const mmss=s=>{s=Math.ceil(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");};
-function seatPos(k,n){const a=Math.PI/2+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
+function seatPos(k,n){const a=Math.PI/2+(S.rot||0)*Math.PI+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
 function buildSeats(){
   document.querySelectorAll(".seat").forEach(e=>e.remove());
   const st=$("stage"),n=S.players.length;
