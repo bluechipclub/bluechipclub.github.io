@@ -463,7 +463,7 @@ function renderSeats(){
     const aw=d.querySelector(".avw");if(aw.dataset.n!==p.name){aw.dataset.n=p.name;aw.innerHTML=avHtml(p.name);}
     d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
     const re=p.entries.length-1;
-    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"")+(open?'<span class="open">● offen</span>':"");
+    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"");
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
