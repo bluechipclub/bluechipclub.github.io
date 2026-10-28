@@ -170,7 +170,17 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .intro{position:fixed;inset:0;z-index:33;display:flex;align-items:center;justify-content:center;gap:5vw;background:radial-gradient(ellipse at 35% 50%,rgba(143,29,29,.45),rgba(0,0,0,.94) 60%);backdrop-filter:blur(10px)}
 .intro[hidden]{display:none}
 .inC{height:84vh;aspect-ratio:378/1024;border-radius:1.2vw;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 0 0 6px #0b0b0b,0 0 0 7px rgba(226,184,87,.4),0 4vh 10vh rgba(0,0,0,.9),0 0 8vw rgba(226,184,87,.18)}
+.inC{position:relative}
 .inC img{width:100%;height:100%;object-fit:cover;display:block}
+.inC .anim,.inC .fg{position:absolute;left:0;top:0;width:100%;height:62.5%}
+.inC .fg{object-fit:fill;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 98%);mask-image:linear-gradient(180deg,#000 72%,transparent 98%)}
+.inC .anim{overflow:hidden;mix-blend-mode:screen}
+.inC .anim i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,rgba(255,200,120,.9),rgba(255,160,60,.35) 45%,transparent 70%);animation:bok var(--d) ease-in-out var(--w) infinite alternate}
+@keyframes bok{0%{opacity:.15;transform:translate(0,0) scale(.8)}50%{opacity:.9}100%{opacity:.3;transform:translate(1.2vw,-2vh) scale(1.15)}}
+.inC .smk{position:absolute;left:-30%;top:10%;width:160%;height:70%;background:radial-gradient(ellipse 40% 30% at 30% 50%,rgba(200,200,210,.14),transparent 70%),radial-gradient(ellipse 35% 25% at 70% 40%,rgba(200,200,210,.1),transparent 70%);animation:smk 9s ease-in-out infinite alternate;filter:blur(6px)}
+@keyframes smk{to{transform:translateX(18%) translateY(-8%)}}
+.inC .shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,240,200,.18) 48%,transparent 60%);transform:translateX(-120%);animation:shn 3.2s 1s ease-in-out infinite}
+@keyframes shn{60%,100%{transform:translateX(120%)}}
 .inPh{width:100%;height:100%;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh}
 .inPh b{font-size:14vh;color:#c8202a}.inPh span{font-size:5vh;font-weight:800}
 .inT{max-width:40vw}
@@ -699,16 +709,21 @@ function drawOverview(a){
 }
 
 /* ---------- player cards: one by one after the seat draw ---------- */
-const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","domi c":"karten/domi-c.jpg","magg":"karten/magg.jpg"};
+const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","domi c":{img:"karten/domi-c.jpg",fg:"karten/domi-c-fg.png"},"oli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"olli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"magg":"karten/magg.jpg"};
 const cardOf=n=>(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;
-Object.values(CARDS).forEach(u=>{const i=new Image();i.src=u;});
+Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).forEach(x=>{const i=new Image();i.src=x;}));
+function cardHtml(c){
+  if(!c)return null;const o=typeof c==="string"?{img:c}:c;
+  const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
+  return '<img src="'+o.img+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+'" alt="">':'')+'<span class="shine"></span>';
+}
 let intro=null;
 function introShow(list,done){
   const box=$("intro");let k=0;intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
     if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4];
-    box.innerHTML='<div class="inC">'+(img?'<img src="'+img+'" alt="">':'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
+    box.innerHTML='<div class="inC">'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
       '<div class="inT"><div class="eyebrow">'+(k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
       '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
