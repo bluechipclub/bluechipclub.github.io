@@ -373,10 +373,10 @@ const GAMES={
  "Run it Twice":{bb:0,pay:"",short:"All-in? Board wird zweimal ausgespielt · bis Level-Ende",rules:"Bis zum Ende des Levels: Ist jemand all-in und alle Karten sind offen, wird der Rest des Boards zweimal ausgeteilt. Jedes Board gewinnt die Hälfte des Pots. Weniger Bad Beats, mehr Drama."},
  "Crazy Pineapple":{bb:0,pay:"",short:"Eine Hand · 3 Karten · nach dem Flop eine abwerfen",rules:"Die nächste Hand ist Crazy Pineapple: Jeder bekommt 3 Karten statt 2. Preflop wird normal gesetzt. Sobald der Flop liegt, wirft jeder noch Aktive eine Karte verdeckt ab. Danach ganz normales Hold'em."},
  "Irish Poker":{bb:0,pay:"",short:"Eine Hand · 4 Karten · nach der Flop-Setzrunde 2 abwerfen",rules:"Die nächste Hand ist Irish Poker: Jeder bekommt 4 Karten. Preflop und am Flop wird normal gesetzt. Nach der Setzrunde am Flop wirft jeder 2 Karten ab und spielt mit den restlichen 2 ganz normales Hold'em weiter."},
- "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 3 Karten · eine nach links · eine abwerfen",rules:"Die nächste Hand ist Pass the Trash: Jeder bekommt 3 Karten. Vor der ersten Setzrunde gibt jeder gleichzeitig eine Karte verdeckt an den linken Nachbarn weiter. Dann wirft jeder eine Karte ab und spielt mit 2 Karten normales Hold'em."},
+ "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 1 Karte verdeckt nach links schieben · dann normal spielen",rules:"1. Jeder bekommt ganz normal 2 Karten.  2. Alle schieben gleichzeitig eine Karte verdeckt zum linken Nachbarn.  3. Normal weiterspielen. Behalte deine beste Karte, gib den Müll weiter."},
  "Omaha-Hand":{bb:0,pay:"",short:"Eine Hand · 4 Karten · genau 2 benutzen · Pot-Limit",rules:"Die nächste Hand ist Pot-Limit Omaha: Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
 };
-const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Blind Pot"},{lvl:4,g:"Irish Poker"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Straddle-Hand"},{lvl:7,g:"7-2 Bonus"},{lvl:8,g:"Dead Man's Hand"},{lvl:9,g:"Run it Twice"}];
+const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Blind Pot"},{lvl:4,g:"Irish Poker"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Pass the Trash"},{lvl:7,g:"7-2 Bonus"},{lvl:8,g:"Dead Man's Hand"},{lvl:9,g:"Run it Twice"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:5000,reLvl:9,maxRe:null,
