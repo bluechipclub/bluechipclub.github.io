@@ -409,6 +409,16 @@
 {
 "id": 41,
 "op": "reload"
+},
+{
+"id": 42,
+"op": "spotlight",
+"name": "Domi C",
+"head": "Neuer Name erarbeitet",
+"nick": "The Ace Factory",
+"sub": "Hat immer ein Ass",
+"sec1": 6,
+"sec": 40
 }
 ]
 }
