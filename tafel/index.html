@@ -373,10 +373,10 @@ const GAMES={
  "Run it Twice":{bb:0,pay:"",short:"Das nächste All-in wird zweimal ausgespielt",rules:"Das nächste All-in mit Showdown wird zweimal ausgespielt: Alle Karten offen, dann wird der Rest des Boards zweimal ausgeteilt. Jedes Board gewinnt die Hälfte des Pots. Danach wieder normal."},
  "Crazy Pineapple":{bb:0,pay:"",short:"Eine Hand · 3 Karten · nach dem Flop eine abwerfen",rules:"Die nächste Hand ist Crazy Pineapple: Jeder bekommt 3 Karten statt 2. Preflop wird normal gesetzt. Sobald der Flop liegt, wirft jeder noch Aktive eine Karte verdeckt ab. Danach ganz normales Hold'em."},
  "Irish Poker":{bb:0,pay:"",short:"Eine Hand · 4 Karten · nach der Flop-Setzrunde 2 abwerfen",rules:"Die nächste Hand ist Irish Poker: Jeder bekommt 4 Karten. Preflop und am Flop wird normal gesetzt. Nach der Setzrunde am Flop wirft jeder 2 Karten ab und spielt mit den restlichen 2 ganz normales Hold'em weiter."},
- "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 1 Karte verdeckt nach links schieben · dann normal spielen",rules:"1. Jeder bekommt ganz normal 2 Karten.  2. Alle schieben gleichzeitig eine Karte verdeckt zum linken Nachbarn.  3. Normal weiterspielen. Behalte deine beste Karte, gib den Müll weiter."},
+ "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 3 Karten · 1 nach links schieben · 1 abwerfen",rules:"1. Jeder bekommt 3 Karten.  2. Alle schieben gleichzeitig eine Karte verdeckt zum linken Nachbarn.  3. Jeder wirft eine Karte weg und spielt mit 2 Karten ganz normal weiter."},
  "Omaha-Hand":{bb:0,pay:"",short:"Eine Hand · 4 Karten · genau 2 benutzen · Pot-Limit",rules:"Die nächste Hand ist Pot-Limit Omaha: Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
 };
-const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"},{lvl:6,g:"Run it Twice"}];
+const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:5000,reLvl:9,maxRe:null,
@@ -535,12 +535,16 @@ function showGame(g,auto){
   if(!GAMES[g])return;
   closeAll();S.active=g;S.activeUntil=["7-2 Bonus","Dead Man's Hand","Run it Twice"].includes(g)?null:Date.now()+6*60000;log("minigame",{game:g});save();
   const x=GAMES[g];fanfare();
-  announce({eyebrow:auto?"Special in Level "+playNum(S.i):"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's",sec:45});
+  announce({eyebrow:"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's",sec:45});
 }
 function checkGames(){
   const L=LEVELS[S.i];if(L.brk)return;
-  const n=playNum(S.i),half=dur(S.i)/2,l=leftNow();
-  S.games.forEach(e=>{if(e.lvl===n&&!S.fired[gkey(e)]&&l<=half&&l>15){S.fired[gkey(e)]=1;save();showGame(e.g,true);}});
+  const n=playNum(S.i),d=dur(S.i),l=leftNow();
+  // random moment between 15 % and 80 % of the level, drawn once per game
+  S.fireAt=S.fireAt||{};
+  S.games.forEach(e=>{const k=gkey(e);if(e.lvl!==n||S.fired[k])return;
+    if(S.fireAt[k]==null){S.fireAt[k]=.15+Math.random()*.65;save();}
+    if(d-l>=d*S.fireAt[k]&&l>15){S.fired[k]=1;save();showGame(e.g,true);}});
 }
 
 /* ---------- announcements ---------- */

@@ -205,6 +205,28 @@
 {
 "id": 16,
 "op": "reload"
+},
+{
+"id": 17,
+"op": "schedule",
+"games": [
+{
+"lvl": 2,
+"g": "Crazy Pineapple"
+},
+{
+"lvl": 3,
+"g": "Pass the Trash"
+},
+{
+"lvl": 4,
+"g": "Irish Poker"
+}
+]
+},
+{
+"id": 18,
+"op": "reload"
 }
 ]
 }
