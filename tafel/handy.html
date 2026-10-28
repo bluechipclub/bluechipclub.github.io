@@ -119,7 +119,11 @@ async function send(c,label){
   catch(e){toast("✕ Nicht gesendet. Netz prüfen oder Claude im Chat schreiben.");}
 }
 document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>send(JSON.parse(b.dataset.c),b.textContent.trim()));
-$("play").onclick=()=>send({op:st&&st.running?"pause":"play"},st&&st.running?"Pause":"Start");
+$("play").onclick=()=>{
+  const run=st&&st.running;send({op:run?"pause":"play"},run?"Pause":"Start");
+  if(st){if(run){st.left=Math.max(0,(st.localEnd-Date.now())/1000);st.running=false;st.localEnd=null;}else{st.running=true;st.localEnd=Date.now()+st.left*1000;}
+    $("play").textContent=st.running?"❚❚ Pause":"▶ Start";tick();}
+};
 $("close").onclick=()=>send({op:"close"},"Einblendung zu");
 $("drawBtn").onclick=()=>{if(confirm("Plätze jetzt neu auslosen?"))send({op:"draw"},"Plätze auslosen");};
 $("endGame").onclick=()=>send({op:"endgame"},"Minigame vorbei");
@@ -159,10 +163,12 @@ function tick(){
   const d=$("dot"),fresh=Date.now()-lastAt<90000;
   d.className="dot"+(fresh?" on":"");d.querySelector("span").textContent=fresh?"Tafel verbunden":"keine Antwort von der Tafel";
   if(!st)return;
-  const left=st.running&&st.endAt?(st.endAt-Date.now())/1000:st.left;
+  const left=st.running&&st.localEnd?(st.localEnd-Date.now())/1000:st.left;
   $("t").textContent=mmss(left);$("t").className="t"+(st.running?"":" p");
 }
 function apply(s){
+  if(st&&s.at&&st.at&&s.at<st.at)return;          // ignore older snapshots
+  s.localEnd=s.running?Date.now()+s.left*1000:null;
   st=s;lastAt=Date.now();
   $("lvl").textContent=s.lvl;$("bl").textContent=s.blinds;
   $("meta").textContent="Pot "+s.pot+" P · "+s.entries+" Entries · "+(s.reOpen?"Rebuy offen":"Freezeout")+(s.active?" · läuft: "+s.active:"");
@@ -170,14 +176,19 @@ function apply(s){
   renderPlayers();renderGames();tick();
 }
 // latest state: read recent cache once, then stream
-async function load(){
-  try{const r=await fetch(RELAY+TOPIC+"-state/json?poll=1&since=12h");const t=await r.text();const lines=t.trim().split("\n").filter(Boolean);
-    for(let k=lines.length-1;k>=0;k--){const m=JSON.parse(lines[k]);if(m.event==="message"){apply(JSON.parse(m.message));lastAt=m.time*1000;break;}}}catch(e){}
-  const es=new EventSource(RELAY+TOPIC+"-state/sse");
-  es.onmessage=ev=>{try{const m=JSON.parse(ev.data);if(m.event==="message")apply(JSON.parse(m.message));}catch(e){}};
-  send({op:"sync"},"Verbinde mit Tafel");
+async function pollState(since){
+  try{const r=await fetch(RELAY+TOPIC+"-state/json?poll=1&since="+since+"&t="+Date.now(),{cache:"no-store"});const t=await r.text();const lines=t.trim().split("\n").filter(Boolean);
+    for(let k=lines.length-1;k>=0;k--){const m=JSON.parse(lines[k]);if(m.event==="message"){const s=JSON.parse(m.message);
+      // snapshot age: shift the clock by the time since it was sent
+      const age=Math.max(0,(Date.now()-s.at)/1000);if(s.running&&age<60)s.left=Math.max(0,s.left-age);apply(s);break;}}}catch(e){}
 }
+let es=null;
+function stream(){try{if(es)es.close();}catch(e){}es=new EventSource(RELAY+TOPIC+"-state/sse");
+  es.onmessage=ev=>{try{const m=JSON.parse(ev.data);if(m.event==="message")apply(JSON.parse(m.message));}catch(e){}};}
+async function load(){await pollState("12h");stream();send({op:"sync"},"Verbinde mit Tafel");}
 load();setInterval(tick,500);
+setInterval(()=>pollState("3m"),8000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){pollState("3m");stream();}});
 </script>
 </body>
 </html>
