@@ -471,6 +471,11 @@
 "id": 52,
 "op": "entries",
 "sec": 30
+},
+{
+"id": 53,
+"op": "out",
+"name": "Jonas"
 }
 ]
 }
