@@ -49,16 +49,16 @@ h1{font-size:clamp(34px,6vw,64px);margin:44px 0 6px;letter-spacing:-.02em;backgr
 </main>
 <div class="ov" id="ov" hidden><button class="x" id="x" aria-label="Schließen">✕</button><button class="nav l" id="pl" aria-label="Zurück">‹</button><div id="bigw"></div><button class="nav r" id="nr" aria-label="Weiter">›</button></div>
 <script>
-const K="../tafel/karten/";
+const K="../tafel/karten/",V="?v=3";
 const P=[
  {n:"Tim",img:"tim.jpg"},{n:"Niklas",img:"niklas.jpg"},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu.jpg"},
  {n:"Magg",img:"magg.jpg"},{n:"Oli",img:"oli.jpg",fg:"oli-fg.png"},{n:"Domi C",img:"domi-c.jpg",fg:"domi-c-fg.png"},{n:"Philipp",img:"philipp.jpg",fg:"philipp-fg.png"},
- {n:"Jonny",img:"jonny.jpg",fg:"jonny-fg.png"},{n:"Benno"}
+ {n:"Jonny",img:"jonny.jpg",fg:"jonny-fg.png"},{n:"Benno",img:"benno.jpg"}
 ];
 const R=(a,b)=>(a+Math.random()*(b-a));
 function inner(p){
   const bok=Array.from({length:14},()=>'<i style="--x:'+R(0,100).toFixed(0)+'%;--y:'+R(0,95).toFixed(0)+'%;--s:'+R(6,30).toFixed(0)+'px;--d:'+R(3,8).toFixed(1)+'s;--w:'+R(-6,0).toFixed(1)+'s"></i>').join("");
-  return '<img src="'+K+p.img+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(p.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+p.fg+'" alt="">':'')+'<span class="shine"></span>';
+  return '<img src="'+K+p.img+V+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(p.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+p.fg+'" alt="">':'')+'<span class="shine"></span>';
 }
 const real=P.filter(p=>p.img);let cur=-1;
 document.getElementById("g").innerHTML=P.map((p,k)=>p.img?'<button class="c" style="--k:'+k+'" data-i="'+real.indexOf(p)+'">'+inner(p)+'</button>':'<div class="c soon" style="--k:'+k+'"><b>?</b><span>'+p.n+'</span><small>Karte folgt</small></div>').join("");

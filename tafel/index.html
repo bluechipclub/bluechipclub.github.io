@@ -442,7 +442,7 @@ function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().lengt
 
 /* ---------- render ---------- */
 const mmss=s=>{s=Math.ceil(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");};
-function seatPos(k,n){const a=Math.PI/2+k*2*Math.PI/n;return [50+44*Math.cos(a),50+43*Math.sin(a)];}
+function seatPos(k,n){const a=Math.PI/2+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
 function buildSeats(){
   document.querySelectorAll(".seat").forEach(e=>e.remove());
   const st=$("stage"),n=S.players.length;
@@ -467,7 +467,7 @@ function renderSeats(){
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
-  const [x,y]=seatPos(S.dealer,n),dx=50+(x-50)*.78,dy=50+(y-50)*.7;
+  const [x,y]=seatPos(S.dealer,n),dx=50+(x-50)*.7,dy=50+(y-50)*.62;
   $("dbtn").style.left=dx+"%";$("dbtn").style.top=dy+"%";
 }
 function render(){
@@ -791,9 +791,9 @@ function drawOverview(a){
 }
 
 /* ---------- player cards: one by one after the seat draw ---------- */
-const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","domi c":{img:"karten/domi-c.jpg",fg:"karten/domi-c-fg.png"},"oli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"olli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"magg":"karten/magg.jpg","philipp":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phillip":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phil":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"jonny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"jonas":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"johnny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"}};
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny"};
-function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=2";const c=cardOf(n);return null;}
+const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","domi c":{img:"karten/domi-c.jpg",fg:"karten/domi-c-fg.png"},"oli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"olli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"magg":"karten/magg.jpg","philipp":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phillip":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phil":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"jonny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"jonas":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"johnny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"benno":"karten/benno.jpg"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno"};
+function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=3";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
 const cardOf=n=>(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;
@@ -801,7 +801,7 @@ Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).fo
 function cardHtml(c){
   if(!c)return null;const o=typeof c==="string"?{img:c}:c;
   const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
-  return '<img src="'+o.img+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+'" alt="">':'')+'<span class="shine"></span>';
+  const V=/^karten\//.test(o.img)?"?v=3":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
 function introShow(list,done){
