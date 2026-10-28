@@ -97,6 +97,7 @@ input{font:16px var(--sans);background:var(--s2);color:var(--fg);border:1px soli
 <h2>Ende</h2>
 <div class="g g2">
   <button data-c='{"op":"result"}'>Abrechnung zeigen</button>
+  <button id="restartBtn" style="border-color:rgba(229,103,92,.5);color:#e5675c">Turnier neu starten</button>
   <button data-c='{"op":"export"}'>⬇ Export am Laptop</button>
 </div>
 <p class="note">Befehle kommen in 1–2 Sekunden auf der Tafel an. Klappt das mal nicht, schreib Claude im Chat, das geht immer.</p>
@@ -119,6 +120,7 @@ async function send(c,label){
   catch(e){toast("✕ Nicht gesendet. Netz prüfen oder Claude im Chat schreiben.");}
 }
 document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>send(JSON.parse(b.dataset.c),b.textContent.trim()));
+document.getElementById("restartBtn").onclick=()=>{if(confirm("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben."))send({op:"restart"},"Neustart");};
 $("play").onclick=()=>{
   const run=st&&st.running;send({op:run?"pause":"play"},run?"Pause":"Start");
   if(st){if(run){st.left=Math.max(0,(st.localEnd-Date.now())/1000);st.running=false;st.localEnd=null;}else{st.running=true;st.localEnd=Date.now()+st.left*1000;}

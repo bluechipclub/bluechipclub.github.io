@@ -368,7 +368,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
     <button class="b pri" id="sOk">Übernehmen</button>
     <button class="b" id="sCancel">Abbrechen</button>
     <span style="flex:1"></span>
-    <button class="b red" id="sReset">Turnier komplett zurücksetzen</button>
+    <button class="b" id="sRestart">Turnier neu starten (Spieler bleiben)</button> <button class="b red" id="sReset">Turnier komplett zurücksetzen</button>
   </div>
 </div></div>
 
@@ -467,7 +467,7 @@ function renderSeats(){
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
-  const [x,y]=seatPos(S.dealer,n),dx=50+(x-50)*.7,dy=50+(y-50)*.62;
+  const [x,y]=seatPos(S.dealer,n),dx=50+(x-50)*.72,dy=50+(y-50)*.8;
   $("dbtn").style.left=dx+"%";$("dbtn").style.top=dy+"%";
 }
 function render(){
@@ -801,7 +801,7 @@ Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).fo
 function cardHtml(c){
   if(!c)return null;const o=typeof c==="string"?{img:c}:c;
   const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
-  const V=/^karten\//.test(o.img)?"?v=3":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
+  const V=/^karten\//.test(o.img)?"?v=4":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
 function introShow(list,done){
@@ -854,6 +854,15 @@ function applySettings(){
   }catch(e){$("sErr").textContent=e.message;}
 }
 $("sOk").onclick=applySettings;$("sCancel").onclick=()=>$("mSet").hidden=true;
+function restartTournament(){
+  // same players, seats and settings; clock, rebuys, eliminations and minigames back to start
+  closeAll();if(intro)intro.stop();
+  S.i=0;S.running=false;S.endAt=null;S.left=null;S.started=null;S.ended=null;
+  S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;});
+  S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
+  save();buildSeats();render();toast("Turnier neu gestartet · Level 1 bereit");
+}
+$("sRestart").onclick=()=>{if(!confirm("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben."))return;restartTournament();$("mSet").hidden=true;};
 $("sReset").onclick=()=>{if(!confirm("Wirklich alles zurücksetzen? Rebuys, Platzierungen und Zeit sind dann weg. Vorher Export machen!"))return;download();S=fresh();LEVELS=S.levels;save();buildSeats();render();$("mSet").hidden=true;};
 
 /* ---------- live commands from Claude ---------- */
@@ -895,6 +904,7 @@ function runCmd(c){
     case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
+    case "restart":restartTournament();break;
     case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
     default:return;
   }}catch(e){console.warn("cmd",c,e);}
