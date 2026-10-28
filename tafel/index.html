@@ -923,6 +923,7 @@ function runCmd(c){
     case "players":openPlayers();break;
     case "spotlight":spotlight(c);break;
     case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
+    case "entries":{const te=totalEntries(),re=te-S.players.length;announce({eyebrow:"Heute Abend",title:te+" Entries",text:S.players.length+" Buy-ins + "+re+(re===1?" Rebuy":" Rebuys")+" · Preisgeld "+P(potOf()),sec:c.sec||25});break;}
     case "restart":restartTournament();break;
     case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
     default:return;
