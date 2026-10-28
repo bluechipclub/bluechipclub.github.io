@@ -429,6 +429,15 @@
 {
 "id": 44,
 "op": "reload"
+},
+{
+"id": 45,
+"op": "spotlight",
+"name": "Domi M",
+"head": "Neuer Name erarbeitet",
+"nick": "Scheidenmeister",
+"sec1": 6,
+"sec": 40
 }
 ]
 }
