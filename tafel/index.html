@@ -189,7 +189,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
     <div class="brand">
       <svg class="chip" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cg" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#4d82ff"/><stop offset=".55" stop-color="#1f55e0"/><stop offset="1" stop-color="#12379c"/></radialGradient></defs><circle cx="32" cy="32" r="31" fill="url(#cg)" stroke="#0f2f86" stroke-width="2"/><g fill="#f5f7ff"><path d="M32 2a30 30 0 0 1 7 1l-2 8a22 22 0 0 0-10 0l-2-8a30 30 0 0 1 7-1z"/><path d="M32 62a30 30 0 0 1-7-1l2-8a22 22 0 0 0 10 0l2 8a30 30 0 0 1-7 1z"/><path d="M2 32a30 30 0 0 1 1-7l8 2a22 22 0 0 0 0 10l-8 2a30 30 0 0 1-1-7z"/><path d="M62 32a30 30 0 0 1-1 7l-8-2a22 22 0 0 0 0-10l8-2a30 30 0 0 1 1 7z"/><path d="M11 11a30 30 0 0 1 5-5l5 6a22 22 0 0 0-7 7l-6-5a30 30 0 0 1 3-3z"/><path d="M53 53a30 30 0 0 1-5 5l-5-6a22 22 0 0 0 7-7l6 5a30 30 0 0 1-3 3z"/><path d="M53 11a30 30 0 0 1 5 5l-6 5a22 22 0 0 0-7-7l5-6a30 30 0 0 1 3 3z"/><path d="M11 53a30 30 0 0 1-5-5l6-5a22 22 0 0 0 7 7l-5 6a30 30 0 0 1-3-3z"/></g><circle cx="32" cy="32" r="18" fill="#2459e6" stroke="#fff" stroke-width="1.5"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/></svg>
       <div>
-        <div class="eyebrow" id="sub">Blue Chip Club · Halloween Special</div>
+        <div class="eyebrow" id="sub">Blue Chip Club · Halloween Deepstack</div>
         <div class="title" id="ttl">Dead Man's Hand</div>
       </div>
       <div class="hand" aria-label="A♠ A♣ 8♠ 8♣ 9♦">
@@ -356,11 +356,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:25,bb:50},{sb:25,bb:75},{sb:50,bb:100},{brk:10,note:"Rebuys an der Kasse"},
- {sb:50,bb:150},{sb:75,bb:150},{sb:100,bb:200},{brk:5,note:"Kurze Pause"},
- {sb:150,bb:300},{sb:200,bb:400},{sb:250,bb:500},
- {sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},
- {sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:3000,bb:6000},{sb:4000,bb:8000}
+ {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
 ];
 const NAMES=["Tim","Oli","Philipp","Niklas","Domi M","Nico","Jonas","Benno","Domi C","Manu"];
 // minigames: bb = stake in big blinds of the current level
@@ -378,8 +374,8 @@ const GAMES={
 };
 const DEFAULT_GAMES=[{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:5000,reLvl:9,maxRe:null,
+const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Deepstack",i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});

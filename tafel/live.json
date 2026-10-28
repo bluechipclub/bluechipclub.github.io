@@ -227,6 +227,24 @@
 {
 "id": 18,
 "op": "reload"
+},
+{
+"id": 19,
+"op": "set",
+"v": {
+"stack": 10000,
+"sub": "Blue Chip Club · Halloween Deepstack"
+}
+},
+{
+"id": 20,
+"op": "blinds",
+"text": "25/50\n50/100\n75/150\nPause 10 Rebuys an der Kasse\n100/200\n150/300\n200/400\nPause 5 Kurze Pause\n250/500\n300/600\n400/800\n500/1000\n600/1200\n800/1600\n1000/2000\n1500/3000\n2000/4000\n3000/6000\n4000/8000\n5000/10000\n6000/12000\n8000/16000"
+},
+{
+"id": 21,
+"op": "level",
+"n": 1
 }
 ]
 }
