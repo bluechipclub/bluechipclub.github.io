@@ -167,6 +167,20 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .annBox .stake{font-size:max(20px,2.6vw);font-weight:760;color:var(--gold2);margin-top:2.2vh}
 .annBox .stakesub{font-family:var(--mono);font-size:max(11px,.9vw);color:var(--grey);margin-top:.5vh;letter-spacing:.1em}
 .annBox .b{margin-top:3vh;font-size:max(13px,1vw);padding:1vh 1.6vw}
+.intro{position:fixed;inset:0;z-index:33;display:flex;align-items:center;justify-content:center;gap:5vw;background:radial-gradient(ellipse at 35% 50%,rgba(143,29,29,.45),rgba(0,0,0,.94) 60%);backdrop-filter:blur(10px)}
+.intro[hidden]{display:none}
+.inC{height:84vh;aspect-ratio:378/1024;border-radius:1.2vw;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 0 0 6px #0b0b0b,0 0 0 7px rgba(226,184,87,.4),0 4vh 10vh rgba(0,0,0,.9),0 0 8vw rgba(226,184,87,.18)}
+.inC img{width:100%;height:100%;object-fit:cover;display:block}
+.inPh{width:100%;height:100%;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh}
+.inPh b{font-size:14vh;color:#c8202a}.inPh span{font-size:5vh;font-weight:800}
+.inT{max-width:40vw}
+.inT .eyebrow{font-size:max(12px,1.2vw)}
+.inT h3{font-size:max(40px,7vw);font-weight:800;letter-spacing:-.03em;line-height:1;margin:1.5vh 0;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
+.inD{font-family:var(--mono);font-size:max(12px,1vw);color:var(--blue2);letter-spacing:.12em;text-transform:uppercase}
+.dots{display:flex;gap:.6vw;margin-top:4vh}.dots i{width:.8vw;height:.8vw;border-radius:50%;background:#333}.dots i.d{background:var(--gold3)}.dots i.on{background:var(--gold2);box-shadow:0 0 1vw var(--gold)}
+.intro.go .inC{animation:inCard .9s var(--ease) both}.intro.go .inT{animation:inTxt .9s .25s var(--ease) both}
+@keyframes inCard{from{opacity:0;transform:translateX(-8vw) rotate(-8deg) scale(.9)}}
+@keyframes inTxt{from{opacity:0;transform:translateX(5vw)}}
 .count{position:fixed;inset:0;z-index:35;display:grid;place-items:center;pointer-events:none;font-family:var(--mono);font-weight:800;font-size:38vw;color:rgba(229,103,92,.85);text-shadow:0 0 6vw rgba(229,103,92,.6)}
 .count[hidden]{display:none}
 .count.t{animation:cnt .95s ease-out both}
@@ -340,6 +354,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 </div></div>
 
 <div class="ann" id="ann" hidden><div class="annBox" id="annBox"></div></div>
+<div class="intro" id="intro" hidden></div>
 <div class="count" id="count" hidden></div>
 <div class="toast" id="toast" hidden></div>
 <button class="snd" id="snd" type="button" hidden>🔇 Einmal klicken für Ton</button>
@@ -671,9 +686,32 @@ function drawSeats(){
   closeAll();
   const a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
+  introShow(a,()=>drawOverview(a));
+}
+function drawOverview(a){
   const suits=["♠","♥","♣","♦"];
   announce({eyebrow:"Plätze ausgelost · im Uhrzeigersinn",title:"Sitzordnung",html:'<div class="draw">'+a.map((p,k)=>'<div class="dcard" style="--k:'+k+'"><div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div><p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});
   fanfare();
+}
+
+/* ---------- player cards: one by one after the seat draw ---------- */
+const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","magg":"karten/magg.jpg"};
+const cardOf=n=>(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;
+Object.values(CARDS).forEach(u=>{const i=new Image();i.src=u;});
+let intro=null;
+function introShow(list,done){
+  const box=$("intro");let k=0;intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
+  function step(){
+    if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
+    const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4];
+    box.innerHTML='<div class="inC">'+(img?'<img src="'+img+'" alt="">':'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
+      '<div class="inT"><div class="eyebrow">Platz '+(k+1)+' von '+list.length+'</div><h3>'+esc(p.name)+'</h3>'+(k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
+      '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
+    box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+    tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");
+    intro.t=setTimeout(()=>{k++;step();},7000);
+  }
+  step();
 }
 
 /* ---------- settings ---------- */
@@ -748,7 +786,8 @@ function runCmd(c){
     case "export":download();break;
     case "reload":save();setTimeout(()=>location.reload(),300);break;
     case "sync":break;
-    case "close":closeAll();$("ann").hidden=true;break;
+    case "close":if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
+    case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
     case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
@@ -829,6 +868,7 @@ addEventListener("mousemove",showCtrl);addEventListener("touchstart",showCtrl,{p
 addEventListener("keydown",e=>{
   if(e.target.matches("input,textarea,select"))return;
   const anyOpen=[...document.querySelectorAll(".modal")].some(m=>!m.hidden)||!$("ann").hidden;
+  if(intro){if(e.key==="Escape")intro.stop();else intro.next();e.preventDefault();return;}
   if(e.key==="Escape"){closeAll();$("ann").hidden=true;return;}
   if(anyOpen)return;
   if(e.code==="Space"){e.preventDefault();toggle();}
