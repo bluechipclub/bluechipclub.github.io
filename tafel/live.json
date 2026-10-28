@@ -325,6 +325,34 @@
 {
 "id": 31,
 "op": "reload"
+},
+{
+"id": 32,
+"op": "schedule",
+"games": [
+{
+"lvl": 1,
+"g": "Omaha-Hand",
+"at": 150
+},
+{
+"lvl": 2,
+"g": "Crazy Pineapple"
+},
+{
+"lvl": 2,
+"g": "Omaha-Hand",
+"at": 1290
+},
+{
+"lvl": 3,
+"g": "Pass the Trash"
+},
+{
+"lvl": 4,
+"g": "Irish Poker"
+}
+]
 }
 ]
 }
