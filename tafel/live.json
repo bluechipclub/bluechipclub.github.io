@@ -353,6 +353,13 @@
 "g": "Irish Poker"
 }
 ]
+},
+{
+"id": 33,
+"op": "paid",
+"name": "Manu",
+"entry": 0,
+"paid": "dig"
 }
 ]
 }
