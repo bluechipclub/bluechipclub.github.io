@@ -260,6 +260,9 @@ article.post.noimg { grid-template-columns: 1fr; }
 .hand.nopos { grid-template-columns: auto 1fr auto; }
 .hand .pos { font-family: var(--mono); color: var(--grey2); font-size: 14px; }
 .hand.top .pos { color: var(--gold); }
+  .hpics { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.hpics img { height: 150px; width: auto; max-width: 100%; border-radius: 10px; object-fit: cover; border: 1px solid var(--line2); display: block; }
+.feature .hpics img { height: 200px; }
 .hand .t { font-weight: 600; font-size: 17px; letter-spacing: -.02em; }
 .hand .w { color: var(--grey); font-size: 13px; margin-top: 2px; }
 .hand .x { color: rgb(244 244 242 / .8); font-size: 14px; margin-top: 6px; max-width: 66ch; }
@@ -889,7 +892,21 @@ textarea { min-height: 150px; resize: vertical; }
    "rank": "7",
    "title": "",
    "cards": "",
-   "text": "Preflop All-in mit rund 11 Big Blinds, zwei Caller mit A J und K Q. Set auf dem Flop, und der River bringt die vierte 7. Die beste Hand, die je im Club gespielt wurde."
+   "text": "Preflop All-in mit rund 11 Big Blinds, zwei Caller mit A J und K Q. Set auf dem Flop, und der River bringt die vierte 7. Lange die beste Hand, die je im Club gespielt wurde."
+  },
+  {
+   "id": "h5",
+   "kind": "hand",
+   "tid": null,
+   "event": "Dead Man's Hand Deepstack, 28. Okt.",
+   "player": "Oli",
+   "opponent": "",
+   "cat": 7,
+   "rank": "K",
+   "title": "",
+   "cards": "",
+   "text": "Oli hält K♦ K♠. Flop 5♠ 9♣ K♥ bringt das Set, der Turn den K♣, River 7♠. Vier Könige, die neue beste Hand der Clubgeschichte.",
+   "pics": ["dmh-oli-quad-kings-board", "dmh-oli-quad-kings-jubel"]
   },
   {
    "id": "h2",
@@ -955,7 +972,8 @@ textarea { min-height: 150px; resize: vertical; }
   const named = r => r && r.name && r.name.trim();
   const winnerOf = t => { const r = t.results.find(x => x.place === 1); return named(r) ? r.name.trim() : ''; };
   const handScore = h => (Number(h.cat) || 0) * 100 + (RANKS.indexOf(h.rank) + 2);
-  const handTitle = h => h.kind === 'hand' && h.cat ? CATS[h.cat] + (h.rank ? ' ' + h.rank + (Number(h.cat) === 7 ? 'er' : '') : '') : (h.title || KINDS[h.kind]);
+  const FACES = { J: 'Buben', Q: 'Damen', K: 'Könige', A: 'Asse' };
+  const handTitle = h => h.kind === 'hand' && h.cat ? (Number(h.cat) === 7 && FACES[h.rank] ? 'Vier ' + FACES[h.rank] : CATS[h.cat] + (h.rank ? ' ' + h.rank + (Number(h.cat) === 7 ? 'er' : '') : '')) : (h.title || KINDS[h.kind]);
   const paras = txt => String(txt || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => '<p>' + esc(p).replace(/\n/g, '<br>') + '</p>').join('');
 
   /* ---------- Rechnen ---------- */
@@ -1101,13 +1119,14 @@ textarea { min-height: 150px; resize: vertical; }
     }).join('') + '</div>';
   }
 
+  const pics = x => (x.pics || []).length ? '<div class="hpics">' + x.pics.map(id => '<a href="' + imgSrc(esc(id)) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(id)) + '" alt="Foto zur Hand" loading="lazy"></a>').join('') + '</div>' : '';
   function handHtml(x, pos) {
     const t = tById(x.tid);
-    const where = (x.player ? esc(x.player) : '') + (x.opponent ? (x.kind === 'badbeat' ? ' verliert gegen ' : ' gegen ') + esc(x.opponent) : '') + ' · ' + (t ? esc(tName(t)) + ', ' + fmtDate(t.date) : 'Turnier offen');
+    const where = (x.player ? esc(x.player) : '') + (x.opponent ? (x.kind === 'badbeat' ? ' verliert gegen ' : ' gegen ') + esc(x.opponent) : '') + ' · ' + (t ? esc(tName(t)) + ', ' + fmtDate(t.date) : x.event ? esc(x.event) : 'Turnier offen');
     return '<div class="hand' + (pos === 1 ? ' top' : '') + (pos === null ? ' nopos' : '') + '">' + (pos !== null ? '<span class="pos">' + String(pos).padStart(2, '0') + '</span>' : '') +
       (fan(x, false) || '<span></span>') +
       '<div style="min-width:0"><div class="t">' + esc(handTitle(x)) + '</div><div class="w">' + where + '</div>' +
-      (x.cards && !handCards(x).length ? '<div class="cards">' + esc(x.cards) + '</div>' : '') + (x.text ? '<div class="x">' + esc(x.text) + '</div>' : '') + '</div>' +
+      (x.cards && !handCards(x).length ? '<div class="cards">' + esc(x.cards) + '</div>' : '') + (x.text ? '<div class="x">' + esc(x.text) + '</div>' : '') + pics(x) + '</div>' +
       '<span class="kind-badge kb-' + x.kind + '">' + KINDS[x.kind] + '</span></div>';
   }
 
@@ -1121,7 +1140,7 @@ textarea { min-height: 150px; resize: vertical; }
     let h = '<div class="bento">';
     if (bs[0]) {
       const b = bs[0], t = tById(b.tid);
-      h += cx('c12 feature', fan(b, true) + '<div><span class="eyebrow gold">Beste Hand aller Zeiten</span><h2 class="silvertext">' + esc(handTitle(b)) + '</h2><p class="sub">' + esc(b.player) + (t ? ' · ' + esc(tName(t)) + ', ' + fmtDate(t.date) : '') + '</p>' + (b.text ? '<p class="x">' + esc(b.text) + '</p>' : '') + '</div>');
+      h += cx('c12 feature', fan(b, true) + '<div><span class="eyebrow gold">Beste Hand aller Zeiten</span><h2 class="silvertext">' + esc(handTitle(b)) + '</h2><p class="sub">' + esc(b.player) + (t ? ' · ' + esc(tName(t)) + ', ' + fmtDate(t.date) : b.event ? ' · ' + esc(b.event) : '') + '</p>' + (b.text ? '<p class="x">' + esc(b.text) + '</p>' : '') + pics(b) + '</div>');
     }
     const stat = (l, v, s) => cx('c3 stat', '<span class="eyebrow">' + l + '</span><span class="v">' + v + '</span><span class="s">' + s + '</span>');
     const mw = st.slice().sort((a, b) => b.p1 - a.p1)[0];
