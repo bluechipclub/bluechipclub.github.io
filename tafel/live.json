@@ -451,6 +451,12 @@
 {
 "id": 48,
 "op": "reload"
+},
+{
+"id": 49,
+"op": "cards",
+"all": true,
+"sec": 6
 }
 ]
 }
