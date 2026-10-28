@@ -49,6 +49,10 @@
 "title": "Rebuy bis Level 9",
 "text": "5.000 Chips · 25 Minuten pro Level · Pausen nach Level 3 (10 Min) und Level 6 (5 Min) · ab 22:00 Freezeout mit 20-Minuten-Levels.",
 "sec": 20
+},
+{
+"id": 8,
+"op": "reload"
 }
 ]
 }

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Tafel-Fernbedienung</title>
+<link rel="icon" href="../favicon.svg">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&display=swap">
+<style>
+:root{--bg:#0a0a0a;--s1:#141414;--s2:#1c1c1c;--line:#2a2a2a;--fg:#f4f4f2;--grey:#8c8c88;--gold:#e2b857;--gold2:#f3d68f;--gold3:#9c7a2f;--red:#e5675c;--blue:#4d82ff;--blue2:#8fb0ff;--sans:"Geist","Helvetica Neue",Arial,sans-serif;--mono:"Geist Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--fg);font-family:var(--sans)}
+body{padding:calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
+button{font:inherit;color:inherit;border:1px solid var(--line);background:var(--s2);border-radius:12px;padding:12px 10px;font-weight:600;font-size:15px;cursor:pointer;touch-action:manipulation}
+button:active{transform:scale(.97);background:#262626}
+button.pri{background:linear-gradient(180deg,#f3d68f,#c49a41);color:#111;border-color:#c49a41}
+button.red{color:var(--red);border-color:rgba(229,103,92,.45)}
+button.sm{padding:8px 10px;font-size:13px;border-radius:9px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.top h1{font-size:18px;font-weight:750;color:var(--gold2)}
+.dot{font-family:var(--mono);font-size:11px;color:var(--grey);display:flex;gap:6px;align-items:center;letter-spacing:.06em}
+.dot i{width:9px;height:9px;border-radius:50%;background:var(--red)}
+.dot.on i{background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.clock{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;margin-bottom:10px}
+.clock .l{font-family:var(--mono);font-size:12px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase}
+.clock .t{font-family:var(--mono);font-size:56px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums}
+.clock .t.p{color:var(--grey)}
+.clock .b{font-size:22px;font-weight:720}
+.clock .m{font-family:var(--mono);font-size:12px;color:var(--grey);margin-top:6px}
+.g{display:grid;gap:8px;margin-bottom:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}
+h2{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);margin:18px 0 8px;font-weight:500}
+.pl{display:grid;gap:6px}
+.pr{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 12px}
+.pr.out{opacity:.5}
+.pr .n{font-weight:700;font-size:16px}
+.pr .n small{display:block;font-family:var(--mono);font-size:11px;color:var(--grey);font-weight:500;margin-top:2px}
+.pr .n small b{color:var(--red);font-weight:500}
+input{font:16px var(--sans);background:var(--s2);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%}
+.row{display:flex;gap:8px}
+.row input{flex:1}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d1d1d;border:1px solid var(--gold3);border-radius:12px;padding:10px 16px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:9;max-width:90vw}
+.toast[hidden]{display:none}
+.note{font-size:12px;color:var(--grey);line-height:1.45;margin-top:6px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;z-index:8}
+.sheet[hidden]{display:none}
+.sheet>div{background:#121212;border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:560px;margin:0 auto}
+.sheet h3{font-size:20px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="top"><h1>Fernbedienung</h1><div class="dot" id="dot"><i></i><span>verbinde…</span></div></div>
+
+<div class="clock">
+  <div class="l" id="lvl">–</div>
+  <div class="t p" id="t">--:--</div>
+  <div class="b" id="bl">–</div>
+  <div class="m" id="meta">Warte auf die Tafel…</div>
+</div>
+
+<div class="g g2">
+  <button class="pri" id="play">▶ Start / Pause</button>
+  <button id="close">✕ Einblendung zu</button>
+</div>
+<div class="g g4">
+  <button data-c='{"op":"prev"}'>◀ Level</button>
+  <button data-c='{"op":"next"}'>Level ▶</button>
+  <button data-c='{"op":"time","add":-60}'>−1 Min</button>
+  <button data-c='{"op":"time","add":60}'>+1 Min</button>
+</div>
+<div class="g g2">
+  <button data-c='{"op":"dealernext"}'>Dealer ▶</button>
+  <button id="drawBtn">Plätze auslosen</button>
+</div>
+
+<h2>Spieler</h2>
+<div class="pl" id="pl"></div>
+<div class="row" style="margin-top:8px"><input id="newP" placeholder="Neuer Spieler"><button id="addP">+ Dazu</button></div>
+
+<h2>Minigame</h2>
+<div class="g g2" id="games"></div>
+<button id="endGame" style="width:100%">✓ Minigame vorbei</button>
+
+<h2>Durchsage</h2>
+<div class="row"><input id="msg" placeholder="z. B. Pizza ist da!"><button class="pri" id="sendMsg">Senden</button></div>
+<div class="g g2" style="margin-top:8px">
+  <button data-c='{"op":"clearmsg"}'>Laufschrift leeren</button>
+  <button data-c='{"op":"players"}'>Spielerliste zeigen</button>
+</div>
+
+<h2>Ende</h2>
+<div class="g g2">
+  <button data-c='{"op":"result"}'>Abrechnung zeigen</button>
+  <button data-c='{"op":"export"}'>⬇ Export am Laptop</button>
+</div>
+<p class="note">Befehle kommen in 1–2 Sekunden auf der Tafel an. Klappt das mal nicht, schreib Claude im Chat, das geht immer.</p>
+
+<div class="sheet" id="sheet" hidden><div>
+  <h3 id="shT"></h3>
+  <div class="g" id="shB"></div>
+  <button style="width:100%;margin-top:6px" id="shX">Abbrechen</button>
+</div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+const RELAY="https://ntfy.sh/",TOPIC="bcc-8db9b61c4d84441f";
+const $=id=>document.getElementById(id);
+let st=null,lastAt=0;
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1800);}
+async function send(c,label){
+  try{const r=await fetch(RELAY+TOPIC+"-cmd",{method:"POST",body:JSON.stringify(c)});if(!r.ok)throw 0;toast("✓ "+(label||"gesendet"));if(navigator.vibrate)navigator.vibrate(25);}
+  catch(e){toast("✕ Nicht gesendet. Netz prüfen oder Claude im Chat schreiben.");}
+}
+document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>send(JSON.parse(b.dataset.c),b.textContent.trim()));
+$("play").onclick=()=>send({op:st&&st.running?"pause":"play"},st&&st.running?"Pause":"Start");
+$("close").onclick=()=>send({op:"close"},"Einblendung zu");
+$("drawBtn").onclick=()=>{if(confirm("Plätze jetzt neu auslosen?"))send({op:"draw"},"Plätze auslosen");};
+$("endGame").onclick=()=>send({op:"endgame"},"Minigame vorbei");
+$("sendMsg").onclick=()=>{const t=$("msg").value.trim();if(!t)return;send({op:"msg",text:t,min:20},"Durchsage");$("msg").value="";};
+$("addP").onclick=()=>{const n=$("newP").value.trim();if(!n)return;send({op:"add",name:n},n+" dazu");$("newP").value="";};
+$("shX").onclick=()=>$("sheet").hidden=true;
+function sheet(title,btns){
+  $("shT").textContent=title;const B=$("shB");B.innerHTML="";
+  btns.forEach(([t,cls,fn])=>{const b=document.createElement("button");b.textContent=t;if(cls)b.className=cls;b.onclick=()=>{$("sheet").hidden=true;fn();};B.appendChild(b);});
+  $("sheet").hidden=false;
+}
+function renderPlayers(){
+  const L=$("pl");L.innerHTML="";if(!st)return;
+  st.p.forEach(([name,entries,out,place,open])=>{
+    const r=document.createElement("div");r.className="pr"+(out?" out":"");
+    r.innerHTML='<div class="n"></div>';
+    r.querySelector(".n").innerHTML='<span></span><small>'+(entries>1?"+"+(entries-1)+" Rebuy":"Buy-in")+(open?' · <b>'+open+' offen</b>':"")+(out?" · Platz "+place:"")+'</small>';
+    r.querySelector(".n span").textContent=name;
+    const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className="sm "+(cls||"");b.textContent=t;b.onclick=fn;r.appendChild(b);};
+    mk("+ Rebuy","",()=>sheet(name+": Rebuy",[["Bar bezahlt","pri",()=>send({op:"rebuy",name,paid:"bar"},name+" Rebuy bar")],["Überwiesen","",()=>send({op:"rebuy",name,paid:"dig"},name+" Rebuy überwiesen")],["Offen (zahlt später)","red",()=>send({op:"rebuy",name,paid:"offen"},name+" Rebuy offen")]]));
+    if(!out)mk("Raus","red",()=>{if(confirm(name+" ist raus?"))send({op:"out",name},name+" raus");});
+    else mk("Zurück","",()=>send({op:"back",name},name+" zurück"));
+    mk("⋯","",()=>sheet(name,[
+      ["Buy-in offen (nicht bezahlt)","",()=>send({op:"paid",name,entry:1,paid:"offen"},"Buy-in offen")],
+      ["Buy-in bar bezahlt","",()=>send({op:"paid",name,entry:1,paid:"bar"},"Buy-in bar")],
+      ["Letzten Rebuy zurücknehmen","red",()=>send({op:"undo",name},"Rebuy zurück")],
+      ["Dealer-Button zu "+name,"",()=>send({op:"dealer",name},"Dealer "+name)]]));
+    L.appendChild(r);
+  });
+}
+function renderGames(){
+  const G=$("games");if(G.dataset.k===String(st&&st.games))return;G.dataset.k=String(st&&st.games);G.innerHTML="";
+  (st?st.games:[]).forEach(g=>{const b=document.createElement("button");b.textContent=g;b.onclick=()=>send({op:"game",name:g},g);G.appendChild(b);});
+}
+const mmss=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");};
+function tick(){
+  const d=$("dot"),fresh=Date.now()-lastAt<90000;
+  d.className="dot"+(fresh?" on":"");d.querySelector("span").textContent=fresh?"Tafel verbunden":"keine Antwort von der Tafel";
+  if(!st)return;
+  const left=st.running&&st.endAt?(st.endAt-Date.now())/1000:st.left;
+  $("t").textContent=mmss(left);$("t").className="t"+(st.running?"":" p");
+}
+function apply(s){
+  st=s;lastAt=Date.now();
+  $("lvl").textContent=s.lvl;$("bl").textContent=s.blinds;
+  $("meta").textContent="Pot "+s.pot+" P · "+s.entries+" Entries · "+(s.reOpen?"Rebuy offen":"Freezeout")+(s.active?" · läuft: "+s.active:"");
+  $("play").textContent=s.running?"❚❚ Pause":"▶ Start";
+  renderPlayers();renderGames();tick();
+}
+// latest state: read recent cache once, then stream
+async function load(){
+  try{const r=await fetch(RELAY+TOPIC+"-state/json?poll=1&since=12h");const t=await r.text();const lines=t.trim().split("\n").filter(Boolean);
+    for(let k=lines.length-1;k>=0;k--){const m=JSON.parse(lines[k]);if(m.event==="message"){apply(JSON.parse(m.message));lastAt=m.time*1000;break;}}}catch(e){}
+  const es=new EventSource(RELAY+TOPIC+"-state/sse");
+  es.onmessage=ev=>{try{const m=JSON.parse(ev.data);if(m.event==="message")apply(JSON.parse(m.message));}catch(e){}};
+  send({op:"sync"},"Verbinde mit Tafel");
+}
+load();setInterval(tick,500);
+</script>
+</body>
+</html>

@@ -173,6 +173,8 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 @keyframes cnt{from{transform:scale(1.4);opacity:1}to{transform:scale(.8);opacity:0}}
 .toast{position:fixed;left:50%;top:2vh;transform:translateX(-50%);z-index:45;background:#151515;border:1px solid var(--gold3);border-radius:12px;padding:10px 18px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:pop .4s var(--ease)}
 .toast[hidden]{display:none}
+.snd{position:fixed;right:1.2vw;bottom:5vh;z-index:25;background:#1b1b1b;border:1px solid var(--gold3);color:var(--gold2);border-radius:999px;padding:6px 14px;font-size:13px}
+.snd[hidden]{display:none}
 .draw{display:grid;grid-template-columns:repeat(5,1fr);gap:1.4vw;margin-top:3vh}
 .dcard{aspect-ratio:5/7;border-radius:1vw;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1.4vh 3vh rgba(0,0,0,.7);animation:deal .8s var(--ease) both;animation-delay:calc(var(--k)*.18s);padding:1vh}
 .dcard .s{font-family:var(--mono);font-size:max(10px,.9vw);color:#c8202a}
@@ -340,6 +342,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 <div class="ann" id="ann" hidden><div class="annBox" id="annBox"></div></div>
 <div class="count" id="count" hidden></div>
 <div class="toast" id="toast" hidden></div>
+<button class="snd" id="snd" type="button" hidden>🔇 Einmal klicken für Ton</button>
 
 <script>
 "use strict";
@@ -353,11 +356,11 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:25,bb:50},{sb:25,bb:75},{sb:50,bb:100},{sb:50,bb:150},
- {sb:75,bb:150},{sb:100,bb:200},{brk:10,note:"Pause · letzte Chance für Rebuys"},
- {sb:150,bb:300},{sb:250,bb:500},{sb:400,bb:800},{sb:600,bb:1200},
- {sb:800,bb:1600},{sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},
- {sb:3000,bb:6000},{sb:4000,bb:8000}
+ {sb:25,bb:50},{sb:25,bb:75},{sb:50,bb:100},{brk:10,note:"Rebuys an der Kasse"},
+ {sb:50,bb:150},{sb:75,bb:150},{sb:100,bb:200},{brk:5,note:"Kurze Pause"},
+ {sb:150,bb:300},{sb:200,bb:400},{sb:250,bb:500},
+ {sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},
+ {sb:1000,bb:2000},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:3000,bb:6000},{sb:4000,bb:8000}
 ];
 const NAMES=["Tim","Oli","Philipp","Niklas","Domi M","Nico","Jonas","Benno","Domi C","Manu"];
 // minigames: bb = stake in big blinds of the current level
@@ -373,14 +376,14 @@ const GAMES={
 const DEFAULT_GAMES=[{lvl:2,g:"Blind Pot"},{lvl:3,g:"7-2 Bonus"},{lvl:4,g:"Dead Man's Hand"},{lvl:5,g:"Bomb Pot"},{lvl:6,g:"Straddle-Runde"},{lvl:7,g:"Run it Twice"}];
 
 const fresh=()=>({v:1,title:"Dead Man's Hand",sub:"Blue Chip Club · Halloween Special",i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.slice(),min1:25,min:30,minLate:20,stack:5000,reLvl:6,maxRe:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:5000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1)S=Object.assign(fresh(),s);}catch(e){}
 let LEVELS=S.levels;
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushState==="function")pushState();};
 function log(type,data){S.log.push(Object.assign({t:new Date().toISOString(),lvl:playNum(S.i),type},data||{}));if(S.log.length>2000)S.log.shift();}
 
 const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
@@ -528,7 +531,7 @@ function showGame(g,auto){
   if(!GAMES[g])return;
   closeAll();S.active=g;log("minigame",{game:g});save();
   const x=GAMES[g];fanfare();
-  announce({eyebrow:auto?"Special in Level "+playNum(S.i):"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's"});
+  announce({eyebrow:auto?"Special in Level "+playNum(S.i):"Minigame",title:g,text:x.rules,stake:x.bb?stakeTxt(g):"",stakesub:x.bb?"= "+(x.bb===1?"1 Big Blind":x.bb+" Big Blinds")+" in Level "+playNum(S.i):"",btn:"Los geht's",sec:45});
 }
 function checkGames(){
   const L=LEVELS[S.i];if(L.brk)return;
@@ -710,7 +713,7 @@ let applied=null;try{const a=localStorage.getItem(APPLIED_KEY);applied=a==null?n
 function runCmd(c){
   const op=c.op;
   try{switch(op){
-    case "msg":S.msgs.push({text:c.text,until:c.min?Date.now()+c.min*60000:null});S.msgs=S.msgs.slice(-6);if(c.big!==false)announce({eyebrow:c.eyebrow||"Durchsage",title:c.title||"",text:c.text,sec:c.sec||20});break;
+    case "msg":S.msgs.push({text:c.text,until:c.min?Date.now()+c.min*60000:null});S.msgs=S.msgs.slice(-6);if(c.big!==false)announce({eyebrow:c.eyebrow||"Durchsage",title:c.title||c.text,text:c.title?c.text:"",sec:c.sec||20});break;
     case "clearmsg":S.msgs=[];break;
     case "play":if(!S.running)toggle();break;
     case "pause":if(S.running)toggle();break;
@@ -738,9 +741,14 @@ function runCmd(c){
     case "result":openResult();break;
     case "export":download();break;
     case "reload":save();setTimeout(()=>location.reload(),300);break;
+    case "sync":break;
+    case "close":closeAll();$("ann").hidden=true;break;
+    case "dealernext":$("bDealer").click();break;
+    case "players":openPlayers();break;
+    case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
     default:return;
   }}catch(e){console.warn("cmd",c,e);}
-  log("claude",{op,cmd:c});save();render();
+  log(c.src||"claude",{op,cmd:c});save();render();pushState();
 }
 async function poll(){
   const lv=$("live");
@@ -752,9 +760,42 @@ async function poll(){
     if(applied==null){applied=max;}               // first visit: ignore old commands
     else for(const c of cmds)if(c.id>applied){applied=c.id;runCmd(c);}
     try{localStorage.setItem(APPLIED_KEY,String(applied));}catch(e){}
-    lv.className="live on";lv.querySelector("span").textContent="Live · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+    lv.className="live on";lv.querySelector("span").textContent=(remoteOk?"Handy + ":"")+"Live · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
   }catch(e){lv.className="live off";lv.querySelector("span").textContent="Offline · läuft lokal";}
 }
+
+/* ---------- phone remote (ntfy.sh relay, ~1 s) ---------- */
+const RELAY="https://ntfy.sh/",TOPIC="bcc-8db9b61c4d84441f";
+let lastRemote=null;try{lastRemote=localStorage.getItem(KEY+"-ntfy");}catch(e){}
+const seenRemote=new Set();
+function stateSnap(){
+  const L=LEVELS[S.i];
+  return {v:1,at:Date.now(),title:S.title,lvl:L.brk?"Pause":"Level "+playNum(S.i),blinds:L.brk?(L.note||"Pause"):L.sb+" / "+L.bb,
+    running:S.running,endAt:S.endAt,left:Math.round(leftNow()),pot:potOf(),entries:totalEntries(),reOpen:rebuyOpen(),active:S.active,
+    games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length])};
+}
+function pushState(){clearTimeout(pushState.t);pushState.t=setTimeout(()=>{fetch(RELAY+TOPIC+"-state",{method:"POST",body:JSON.stringify(stateSnap())}).catch(()=>{});},800);}
+let es=null,remoteOk=false;
+function openRemote(){
+  try{if(es)es.close();}catch(e){}
+  es=new EventSource(RELAY+TOPIC+"-cmd/sse"+(lastRemote?"?since="+encodeURIComponent(lastRemote):""));
+  es.onopen=()=>{remoteOk=true;};
+  es.onmessage=ev=>{
+    let m;try{m=JSON.parse(ev.data);}catch(e){return;}
+    if(m.event!=="message"||seenRemote.has(m.id))return;
+    seenRemote.add(m.id);lastRemote=m.id;try{localStorage.setItem(KEY+"-ntfy",m.id);}catch(e){}
+    if(Date.now()/1000-m.time>600)return;          // ignore stale commands after a long outage
+    let c;try{c=JSON.parse(m.message);}catch(e){return;}
+    (Array.isArray(c)?c:[c]).forEach(x=>runCmd(Object.assign({src:"handy"},x)));
+  };
+  es.onerror=()=>{remoteOk=false;};
+}
+openRemote();setInterval(()=>{if(es&&es.readyState===2)openRemote();},10000);
+setInterval(()=>{if(S.running)pushState();},60000);
+// sound only works after one click/key on this laptop (browser rule)
+function soundHint(){const a=actx;const off=!a||a.state!=="running";$("snd").hidden=!off;}
+addEventListener("pointerdown",()=>{ac();setTimeout(soundHint,200);});addEventListener("keydown",()=>{ac();setTimeout(soundHint,200);});
+setInterval(soundHint,3000);
 
 /* ---------- controls ---------- */
 function closeAll(){["mPlayers","mGames","mResult","mSet"].forEach(id=>$(id).hidden=true);}
@@ -820,7 +861,7 @@ function burst(){for(let k=0;k<160;k++)burstP.push({x:innerWidth/2,y:innerHeight
   requestAnimationFrame(frame);
 })();
 
-buildSeats();render();setInterval(tick,250);tick();
+buildSeats();render();setInterval(tick,250);tick();pushState();
 poll();setInterval(poll,POLL_MS);
 showCtrl();
 </script>
