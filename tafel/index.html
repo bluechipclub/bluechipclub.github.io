@@ -801,7 +801,7 @@ Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).fo
 function cardHtml(c){
   if(!c)return null;const o=typeof c==="string"?{img:c}:c;
   const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
-  const V=/^karten\//.test(o.img)?"?v=5":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
+  const V=/^karten\//.test(o.img)?"?v=6":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
 function introShow(list,done){
@@ -815,6 +815,23 @@ function introShow(list,done){
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");
     intro.t=setTimeout(()=>{k++;step();},7000);
+  }
+  step();
+}
+
+function spotlight(c){
+  // two steps: big headline, then the player's card with the new nickname
+  if(intro)intro.stop();closeAll();$("ann").hidden=true;
+  const box=$("intro"),img=cardOf(c.name);let k=0;
+  const steps=[
+    ()=>'<div class="inT" style="max-width:80vw;text-align:center"><div class="eyebrow">'+esc(c.eyebrow||"Blue Chip Club")+'</div><h3 style="font-size:max(56px,9vw)">'+esc(c.head||"Neuer Name erarbeitet")+'</h3></div>',
+    ()=>'<div class="inC">'+(img?cardHtml(img):'')+'</div><div class="inT"><div class="eyebrow">'+esc(c.name)+'</div><h3>'+esc(c.nick||"")+'</h3>'+(c.sub?'<div class="inD">'+esc(c.sub)+'</div>':'')+'</div>'];
+  intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;}};
+  function step(){
+    if(k>=steps.length){box.hidden=true;intro=null;return;}
+    box.innerHTML=steps[k]();box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+    tone(392,0,.25,.5,"triangle");tone(523,.12,.3,.5,"triangle");tone(784,.3,.6,.5,"triangle");
+    intro.t=setTimeout(()=>{k++;step();},k===0?(c.sec1||6)*1000:(c.sec||40)*1000);
   }
   step();
 }
@@ -904,6 +921,7 @@ function runCmd(c){
     case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
+    case "spotlight":spotlight(c);break;
     case "restart":restartTournament();break;
     case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
     default:return;
