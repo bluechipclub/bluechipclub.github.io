@@ -745,7 +745,8 @@ textarea { min-height: 150px; resize: vertical; }
    "Kein Beleg, Galgen: Wer bis dahin nicht bezahlt hat, hängt hier, für alle sichtbar, bis alles beglichen ist.",
    "Bann bis bezahlt: Mit offenen Schulden gibt es keinen neuen Entry und keinen Platz beim nächsten Turnier."
   ],
-  "wa": "491733185745"
+  "wa": "491733185745",
+  "api": ""
  },
  "players": [
   "Tim",
@@ -1619,8 +1620,9 @@ textarea { min-height: 150px; resize: vertical; }
       st.className = 'status'; st.textContent = '';
       return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + (vTimes(n).length ? '' : ', ' + hhmm(d) + ' Uhr')) + '\nName: ' + nm + (vTimes(n).length && $('input[name=rT]:checked') ? '\nStartzeit: ' + $('input[name=rT]:checked').value + ' Uhr' : '') + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
-    $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); };
-    $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
+    const reg = () => { const tm = $('input[name=rT]:checked'); register(n, $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value, tm ? tm.value : '', ($('#rN').value || '').trim()); };
+    $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); reg(); };
+    $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); reg(); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
     if (focus === 'resv') requestAnimationFrame(() => $('#resv').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
     else $('#evX').focus({ preventScroll: true });
   }
@@ -2013,6 +2015,22 @@ textarea { min-height: 150px; resize: vertical; }
 
   /* ---------- Start ---------- */
   render();
+  // Zusagen automatisch: Google-Sheet-Web-App (settings.api) zählt jeden Klick auf „Reservieren“ mit
+  function register(n, name, time, note) {
+    const api = DATA.settings.api; if (!api || !name) return;
+    const body = JSON.stringify({ event: n.title, name, time, note });
+    try { if (!(navigator.sendBeacon && navigator.sendBeacon(api, new Blob([body], { type: 'text/plain' })))) fetch(api, { method: 'POST', mode: 'no-cors', body, keepalive: true }); } catch (e) {}
+    merge(n, [{ name, time }]);
+  }
+  function merge(n, list) {
+    n.signups = signups(n); n.votes = n.votes || {};
+    list.forEach(x => { const nm = String(x.name || '').trim(); if (!nm) return; if (!n.signups.includes(nm)) n.signups.push(nm); if (/^\d{1,2}:\d{2}$/.test(x.time || '')) n.votes[nm] = x.time; });
+    renderRangliste();
+  }
+  (async () => {
+    const n = DATA.settings.next, api = DATA.settings.api; if (!n || !api) return;
+    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title))).json(); if (j.ok) merge(n, j.signups || []); } catch (e) {}
+  })();
   startFx();
   let start = location.hash.slice(1);
   if (!VIEWS.includes(start)) { try { start = sessionStorage.getItem('liga-view') || ''; } catch (e) {} }
