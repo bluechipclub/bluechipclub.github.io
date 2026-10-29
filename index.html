@@ -175,6 +175,10 @@ tbody tr { transition: background-color 200ms var(--ease); }
 .best { display: grid; gap: 16px; align-content: start; }
 .best h3 { font-size: 28px; letter-spacing: -.03em; }
 .best .sub { color: var(--grey); font-size: 14px; }
+.best:has(.bpic) { grid-template-rows: auto auto auto 1fr; }
+.best .bpic { display: block; min-height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line2); }
+.best .bpic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 400ms var(--ease); }
+.best .bpic:hover img { transform: scale(1.03); }
 
 /* Siegerwand */
 .wall { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
@@ -1278,7 +1282,7 @@ textarea { min-height: 150px; resize: vertical; }
     const c = st[0];
     h += cx('champ c4', '<div><span class="eyebrow">Champion of all time</span><h3>' + (c ? esc(c.name) : 'Noch offen') + '</h3><p class="sub">' + (c ? c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') : 'Der erste Sieger übernimmt den Thron') + '</p></div><div class="chip3d" aria-hidden="true"><div class="c"></div></div>');
     h += cx('c8', head('Rangliste', 'Alle Turniere') + leaderTable(st) + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>');
-    h += cx('best c4', '<span class="eyebrow">Beste Hand ever</span>' + (b ? fan(b, true) + '<div><h3>' + esc(handTitle(b)) + '</h3><p class="sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p></div>' : '<p class="empty">Noch keine Hand eingetragen.</p>'));
+    h += cx('best c4', '<span class="eyebrow">Beste Hand ever</span>' + (b ? fan(b, true) + '<div><h3>' + esc(handTitle(b)) + '</h3><p class="sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p></div>' + ((b.pics || []).length ? '<a class="bpic" href="' + imgSrc(esc(b.pics[0])) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(b.pics[0])) + '" alt="Foto der besten Hand" loading="lazy"></a>' : '') : '<p class="empty">Noch keine Hand eingetragen.</p>'));
     h += shameCard();
     h += cx('c12 wallcard', head('Siegerwand', ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere')) + (ts.length ? '<div class="wall">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); const r1 = t.results.find(x => x.place === 1) || {}; return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>'));
     $('#v-rangliste').innerHTML = h + '</div>';
