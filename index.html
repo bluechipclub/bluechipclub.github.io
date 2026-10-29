@@ -2023,17 +2023,18 @@ textarea { min-height: 150px; resize: vertical; }
   function register(n, name, time, note) {
     const api = DATA.settings.api; if (!api || !name) return;
     const body = JSON.stringify({ event: n.title, name, time, note });
-    try { if (!(navigator.sendBeacon && navigator.sendBeacon(api, new Blob([body], { type: 'text/plain' })))) fetch(api, { method: 'POST', mode: 'no-cors', body, keepalive: true }); } catch (e) {}
+    try { fetch(api, { method: 'POST', mode: 'no-cors', credentials: 'omit', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body }).catch(() => {}); } catch (e) {}
     merge(n, [{ name, time }]);
   }
   function merge(n, list) {
     n.signups = signups(n); n.votes = n.votes || {};
     list.forEach(x => { const nm = String(x.name || '').trim(); if (!nm) return; if (!n.signups.includes(nm)) n.signups.push(nm); if (/^\d{1,2}:\d{2}$/.test(x.time || '')) n.votes[nm] = x.time; });
     renderRangliste();
+    document.querySelectorAll('.splash .seats').forEach(el => { el.innerHTML = seatTxt(n); });
   }
   (async () => {
     const n = DATA.settings.next, api = DATA.settings.api; if (!n || !api) return;
-    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title))).json(); if (j.ok) merge(n, j.signups || []); } catch (e) {}
+    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title), { credentials: 'omit' })).json(); if (j.ok) merge(n, j.signups || []); } catch (e) {}
   })();
   startFx();
   let start = location.hash.slice(1);
