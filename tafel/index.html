@@ -432,8 +432,8 @@ const curBB=()=>{const L=LEVELS[S.i];return L.brk?((LEVELS[S.i+1]||LEVELS[S.i-1]
 function payouts(){
   const pot=potOf(),c=S.pay,r=c.round||1;
   // percentage split, e.g. pcts [50,30,20]; rounding remainder goes to 1st
-  if(Array.isArray(c.pcts)&&c.pcts.length&&S.players.length>=5){const a=c.pcts.map(x=>Math.floor(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;}
-  if(c.places<3||S.players.length<5){const a=Math.round(pot*c.split/100/r)*r;return [a,pot-a];}
+  if(Array.isArray(c.pcts)&&c.pcts.length&&S.players.length>=8){const a=c.pcts.map(x=>Math.floor(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;}
+  if(c.places<3||S.players.length<8){const a=Math.round(pot*c.split/100/r)*r;return [a,pot-a];}
   const third=Math.min(c.third,pot),rest=pot-third,a=Math.round(rest*c.split/100/r)*r;
   return [a,rest-a,third];
 }

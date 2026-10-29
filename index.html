@@ -1444,7 +1444,7 @@ textarea { min-height: 150px; resize: vertical; }
     }
     h += cx('c6', head('Auszahlung', 'Top 3 werden bezahlt') +
       '<div class="rg-bar big"><i style="flex:50"><span>1. · 50 %</span></i><i class="b2" style="flex:30"><span>2. · 30 %</span></i><i class="b3" style="flex:20"><span>3. · 20 %</span></i></div>' +
-      '<ol class="rg-list"><li><b>Auf 5 abgerundet.</b> Jeder Preis wird auf volle 5 ' + esc(unit()) + ' abgerundet.</li><li><b>Der Rest geht an den Sieger.</b> Was beim Runden übrig bleibt, bekommt der 1. Platz obendrauf.</li><li><b>Kleines Feld.</b> Bei weniger als 5 Spielern werden nur zwei Plätze bezahlt.</li></ol>' + pay);
+      '<ol class="rg-list"><li><b>Auf 5 abgerundet.</b> Jeder Preis wird auf volle 5 ' + esc(unit()) + ' abgerundet.</li><li><b>Der Rest geht an den Sieger.</b> Was beim Runden übrig bleibt, bekommt der 1. Platz obendrauf.</li><li><b>Kleines Feld.</b> Bei weniger als 8 Spielern werden nur zwei Plätze bezahlt.</li></ol>' + pay);
 
     const E = entryStats();
     h += cx('c6', head('Bankroll', 'Dein Profil') +
