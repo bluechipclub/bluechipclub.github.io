@@ -531,6 +531,65 @@ textarea { min-height: 150px; resize: vertical; }
 .cdi:not([data-cdi]){color:var(--gold)}
 #liveBtn,#remBtn,a.icon-btn[href="spieler/"]{white-space:nowrap}
 @media(max-width:760px){#liveBtn,#remBtn{display:none}}
+/* Regeln */
+.rg-intro h1 { font-size: clamp(30px, 5vw, 52px); margin: 10px 0 12px; }
+.rg-intro .lead { color: var(--grey); font-size: 16px; line-height: 1.6; max-width: 640px; }
+.rg-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
+.rg-facts div { background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+.rg-facts b { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--gold); white-space: nowrap; }
+.rg-facts span { font-size: 12px; color: var(--grey); }
+.rg-note { margin-top: 16px; font-size: 13px; color: var(--grey); }
+.rg-note b, .rg-note em { color: var(--fg); font-style: normal; }
+.rg-pod { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; margin-bottom: 20px; }
+.rg-step { border: 1px solid var(--line); border-radius: 14px; background: var(--surface2); padding: 16px; display: grid; justify-items: center; gap: 6px; text-align: center; }
+.rg-step.s1 { order: 2; padding-top: 30px; border-color: var(--gold3); background: linear-gradient(180deg, rgb(226 184 87 / .1), var(--surface2)); }
+.rg-step.s2 { order: 1; padding-top: 22px; } .rg-step.s3 { order: 3; }
+.rg-step b { font-family: var(--mono); font-size: 40px; font-weight: 500; line-height: 1; }
+.rg-step.s1 b { color: var(--gold); font-size: 52px; }
+.rg-step > span:last-child { font-size: 12px; color: var(--grey); }
+.rg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rg-list li { font-size: 14px; line-height: 1.55; color: var(--grey); padding-left: 16px; position: relative; }
+.rg-list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; border-radius: 50%; background: var(--gold3); }
+.rg-list b { color: var(--fg); font-weight: 600; }
+.rg .sub { color: var(--grey); font-size: 14px; line-height: 1.55; }
+.rg .sub b { color: var(--fg); }
+.rg-calc { display: grid; gap: 6px; margin: 14px 0; }
+.rg-calc > div { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--line); font-size: 13px; }
+.rg-calc .nm { color: var(--grey); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rg-calc b { font-family: var(--mono); font-weight: 500; }
+.rg-calc .sum { background: transparent; border-color: var(--gold3); }
+.rg-calc .sum b { color: var(--gold); font-size: 18px; }
+.rg-link { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--gold); text-decoration: none; }
+.rg-link:hover { text-decoration: underline; }
+.rg-entry { display: grid; gap: 10px; }
+.rg-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
+.rg-row span { font-size: 13px; color: var(--grey); text-transform: uppercase; letter-spacing: .12em; }
+.rg-row b { font-family: var(--mono); font-size: 24px; font-weight: 500; }
+.rg-bar { display: flex; gap: 3px; height: 34px; border-radius: 10px; overflow: hidden; }
+.rg-bar i { display: flex; align-items: center; padding: 0 10px; min-width: 0; font-style: normal; background: linear-gradient(90deg, var(--gold3), var(--gold)); color: #0a0a0a; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.rg-bar i span { overflow: hidden; text-overflow: ellipsis; }
+.rg-bar i.k { background: var(--surface2); color: var(--grey); border: 1px solid var(--line2); justify-content: center; padding: 0 4px; }
+.rg-bar i.b2 { background: #c9c9c6; } .rg-bar i.b3 { background: #a7774f; }
+.rg-bar.big { height: 42px; margin-bottom: 18px; }
+.rg-ex { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.rg-formula { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px; font-size: 15px; }
+.rg-formula span { padding: 8px 12px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--line); }
+.rg-formula i { font-style: normal; color: var(--grey); font-family: var(--mono); }
+.rg-formula b { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--gold3); color: var(--gold); font-weight: 600; }
+.rg-faq { display: grid; gap: 8px; }
+.rg-faq details { border: 1px solid var(--line); border-radius: 14px; background: var(--surface2); padding: 0 16px; }
+.rg-faq summary { cursor: pointer; list-style: none; padding: 14px 0; font-weight: 500; font-size: 15px; display: flex; justify-content: space-between; gap: 12px; }
+.rg-faq summary::-webkit-details-marker { display: none; }
+.rg-faq summary::after { content: "+"; color: var(--gold); font-family: var(--mono); transition: transform 250ms var(--ease); }
+.rg-faq details[open] summary::after { transform: rotate(45deg); }
+.rg-faq p { padding: 0 0 16px; color: var(--grey); font-size: 14px; line-height: 1.6; }
+.morelink { display: inline-block; margin-top: 30px; font-size: 13px; color: var(--gold); text-decoration: none; }
+.morelink:hover { text-decoration: underline; }
+@media (max-width: 760px) {
+  .rg-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rg-facts b { font-size: 16px; }
+  .rg-step b { font-size: 30px; } .rg-step.s1 b { font-size: 38px; }
+}
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
@@ -543,6 +602,7 @@ textarea { min-height: 150px; resize: vertical; }
       <button role="tab" data-view="news">News</button>
       <button role="tab" data-view="rekorde">Hände &amp; Rekorde</button>
       <button role="tab" data-view="turniere">Turniere</button>
+      <button role="tab" data-view="regeln">Regeln</button>
     </nav>
     <div class="tools">
       <a class="icon-btn" href="spieler/" style="text-decoration:none;color:var(--gold);border-color:var(--gold3)">♠ Spieler</a>
@@ -558,6 +618,7 @@ textarea { min-height: 150px; resize: vertical; }
   <section class="view" id="v-news" hidden></section>
   <section class="view" id="v-rekorde" hidden></section>
   <section class="view" id="v-turniere" hidden></section>
+  <section class="view" id="v-regeln" hidden></section>
 </div></main>
 <footer class="foot"><div class="wrap"><span id="brandSub"></span><span id="footText"></span></div></footer>
 
@@ -1161,7 +1222,7 @@ textarea { min-height: 150px; resize: vertical; }
     $('#brandSub').textContent = DATA.settings.name + (DATA.settings.tagline ? ' · ' + DATA.settings.tagline : '');
     $('#playerList').innerHTML = DATA.players.map(p => '<option value="' + esc(p) + '">').join('');
     $('#footText').textContent = 'Punkte: 1. Platz ' + pts().p1 + ' · 2. Platz ' + pts().p2 + ' · 3. Platz ' + pts().p3 + (Number(pts().teil) ? ' · Teilnahme ' + pts().teil : '');
-    renderRangliste(); renderNews(); renderRekorde(); renderTurniere();
+    renderRangliste(); renderNews(); renderRekorde(); renderTurniere(); renderRegeln();
   }
 
   function entryStats() {
@@ -1205,7 +1266,7 @@ textarea { min-height: 150px; resize: vertical; }
     }
     const c = st[0];
     h += cx('champ c4', '<div><span class="eyebrow">Champion of all time</span><h3>' + (c ? esc(c.name) : 'Noch offen') + '</h3><p class="sub">' + (c ? c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') : 'Der erste Sieger übernimmt den Thron') + '</p></div><div class="chip3d" aria-hidden="true"><div class="c"></div></div>');
-    h += cx('c8', head('Rangliste', 'Alle Turniere') + leaderTable(st));
+    h += cx('c8', head('Rangliste', 'Alle Turniere') + leaderTable(st) + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>');
     h += cx('best c4', '<span class="eyebrow">Beste Hand ever</span>' + (b ? fan(b, true) + '<div><h3>' + esc(handTitle(b)) + '</h3><p class="sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p></div>' : '<p class="empty">Noch keine Hand eingetragen.</p>'));
     h += shameCard();
     h += cx('c12 wallcard', head('Siegerwand', ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere')) + (ts.length ? '<div class="wall">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); const r1 = t.results.find(x => x.place === 1) || {}; return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>'));
@@ -1329,6 +1390,86 @@ textarea { min-height: 150px; resize: vertical; }
       h += '<tr class="click" data-open="' + esc(t.id) + '" tabindex="0"><td class="player tl">' + esc(tName(t)) + ' <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>' + eur(t.pot) + '</td></tr>';
     }
     $('#v-turniere').innerHTML = '<div class="bento">' + cx('c12', head('Alle Turniere', 'Ergebnisse') + h + '</tbody></table></div>') + entriesCard() + '</div>';
+  }
+
+  /* ---------- Regeln: So funktioniert der Club ---------- */
+  function splitPot(pot) {
+    const pc = [50, 30, 20], a = pc.map(x => Math.floor(pot * x / 100 / 5) * 5);
+    const rest = pot - a.reduce((x, y) => x + y, 0); a[0] += rest;
+    return { pc, a, raw: pc.map(x => pot * x / 100), rest };
+  }
+  function renderRegeln() {
+    ci = 0;
+    const P = pts(), N = DATA.settings.next || {}, st = standings(), ts = tourneys();
+    const buyin = Number(N.buyin) || Number(DATA.settings.buyin) || 0, fee = Number(N.fee) || 0, rebuy = Number(N.rebuy) || buyin, pool = buyin - fee;
+    const fmtD = x => String(x).replace('.', ',');
+    let h = '<div class="bento rg">';
+
+    h += cx('c12 rg-intro', '<span class="eyebrow gold">Regelwerk · So funktioniert’s</span><h1 class="silvertext">Wie der ' + esc(DATA.settings.name) + ' zählt</h1>' +
+      '<p class="lead">Punkte, Buy-ins, Auszahlung und Bankroll auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die Bankroll.</p>' +
+      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Auszahlung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
+      '<p class="rg-note"><b>Nicht verwechseln:</b> <em>Punkte</em> zählen für die Rangliste. <em>' + esc(unit()) + '</em> sind Buy-ins und Preisgeld.</p>');
+
+    h += cx('c8', head('Das Punktesystem', 'Nur das Podium punktet') +
+      '<div class="rg-pod">' + [[1, P.p1, 'Sieger'], [2, P.p2, 'Zweiter'], [3, P.p3, 'Dritter']].map(x => '<div class="rg-step s' + x[0] + '"><span class="rank r' + x[0] + '">' + x[0] + '</span><b>' + x[1] + '</b><span>Punkte · ' + x[2] + '</span></div>').join('') + '</div>' +
+      '<ol class="rg-list">' +
+      '<li><b>Nur die Top 3 punkten.</b> Ab Platz 4 gibt es ' + (Number(P.teil) ? P.teil + ' Punkte fürs Mitspielen' : 'keine Punkte') + '. Ein Sieg ist mehr wert als zwei dritte Plätze.</li>' +
+      '<li><b>Alles wird addiert.</b> Die Punkte aus allen Turnieren ergeben die ewige Rangliste in der Lobby.</li>' +
+      '<li><b>Rebuys zählen nicht.</b> Für die Punkte zählt nur die Platzierung, egal wie viele Entries du gebraucht hast.</li>' +
+      '<li><b>Gleichstand?</b> Dann entscheiden der Reihe nach: mehr Siege, mehr 2. Plätze, mehr 3. Plätze, mehr gewonnene ' + esc(unit()) + '.</li>' +
+      '</ol>');
+
+    const lead = st[0];
+    let ex = '<p class="empty">Sobald das erste Podium steht, rechnen wir es hier vor.</p>';
+    if (lead) {
+      const rows = ts.map(t => { const r = t.results.find(x => named(x) && x.name.trim() === lead.name); return r ? { t, place: r.place, p: Number(P['p' + r.place]) || 0 } : null; }).filter(Boolean);
+      ex = '<p class="sub">So kommt <b>' + esc(lead.name) + '</b> auf Platz 1 der Rangliste:</p><div class="rg-calc">' +
+        rows.map(r => '<div><span class="rank r' + r.place + '">' + r.place + '</span><span class="nm">' + esc(tName(r.t)) + '</span><b>+' + r.p + '</b></div>').join('') +
+        '<div class="sum"><span></span><span class="nm">' + rows.map(r => r.p).join(' + ') + '</span><b>' + lead.points + '</b></div></div>';
+    }
+    h += cx('c4', head('Beispiel', 'Live aus der Tabelle') + ex + '<a class="rg-link" href="#rangliste" data-go="rangliste">Zur Rangliste →</a>');
+
+    h += cx('c6', head('Buy-in & Rebuy', 'Pro Entry') +
+      '<div class="rg-entry"><div class="rg-row"><span>Buy-in</span><b>' + buyin + ' ' + esc(unit()) + '</b></div>' +
+      (fee ? '<div class="rg-bar"><i style="flex:' + pool + '"><span>' + pool + ' ' + esc(unit()) + ' Preispool</span></i><i class="k" style="flex:' + fee + '"><span>' + fee + '</span></i></div><p class="sub">' + pool + ' ' + esc(unit()) + ' gehen in den Preispool, ' + fee + ' ' + esc(unit()) + ' in die Getränke- und Snackkasse für den Abend.</p>' : '') +
+      '<div class="rg-row"><span>Rebuy</span><b>' + rebuy + ' ' + esc(unit()) + '</b></div><div class="rg-bar"><i style="flex:1"><span>' + rebuy + ' ' + esc(unit()) + ' komplett in den Preispool</span></i></div>' +
+      '<p class="sub">Rebuys sind während der Rebuy-Phase erlaubt, die vor jedem Turnier angesagt wird. Bring Bargeld für so viele Entries mit, wie du spielen willst.</p></div>');
+
+    const lt = ts.slice().reverse().find(t => Number(t.pot) > 0);
+    let pay = '';
+    if (lt) {
+      const s = splitPot(Number(lt.pot));
+      pay = '<div class="rg-ex"><span class="eyebrow">Beispiel · ' + esc(tName(lt)) + ' · ' + eur(lt.pot) + ' im Pot</span><div class="rg-calc">' +
+        s.a.map((v, k) => '<div><span class="rank r' + (k + 1) + '">' + (k + 1) + '</span><span class="nm">' + s.pc[k] + ' % = ' + fmtD(s.raw[k]) + (k === 0 && s.rest ? ' + ' + s.rest + ' Rest' : (s.raw[k] !== v ? ' → abgerundet' : '')) + '</span><b>' + eur(v) + '</b></div>').join('') + '</div></div>';
+    }
+    h += cx('c6', head('Auszahlung', 'Top 3 werden bezahlt') +
+      '<div class="rg-bar big"><i style="flex:50"><span>1. · 50 %</span></i><i class="b2" style="flex:30"><span>2. · 30 %</span></i><i class="b3" style="flex:20"><span>3. · 20 %</span></i></div>' +
+      '<ol class="rg-list"><li><b>Auf 5 abgerundet.</b> Jeder Preis wird auf volle 5 ' + esc(unit()) + ' abgerundet.</li><li><b>Der Rest geht an den Sieger.</b> Was beim Runden übrig bleibt, bekommt der 1. Platz obendrauf.</li><li><b>Kleines Feld.</b> Bei weniger als 5 Spielern werden nur zwei Plätze bezahlt.</li></ol>' + pay);
+
+    const E = entryStats();
+    h += cx('c6', head('Bankroll', 'Dein Profil') +
+      '<p class="rg-formula"><span>Gewonnen</span><i>−</i><span>Eingesetzt</span><i>=</i><b>Bankroll</b></p>' +
+      '<ol class="rg-list"><li><b>Eingesetzt</b> ist dein Buy-in plus alle Rebuys eines Abends.</li><li><b>Turnier für Turnier</b> wird fortgeschrieben, als Kurve auf deinem Spielerprofil.</li><li><b>Gezählt ab ' + esc(E.fromName || 'dem ersten erfassten Turnier') + '.</b> Seitdem werden die Entries pro Spieler erfasst.</li></ol>' +
+      '<a class="rg-link" href="spieler/">Alle Spielerprofile →</a>');
+
+    h += cx('c6', head('Champion & Pokal', 'Ehre') +
+      '<ol class="rg-list"><li><b>Amtierender Champion</b> ist immer der Sieger des letzten Turniers. Er trägt das Champion-Badge auf seiner Spielerkarte, bis ihn jemand ablöst.</li>' +
+      '<li><b>Champion of all time</b> ist, wer die ewige Rangliste anführt.</li>' +
+      '<li><b>Der Wanderpokal</b> geht seit Dead Man’s Hand an den Sieger und wandert von Turnier zu Turnier weiter.</li></ol>');
+
+    const rs = (DATA.settings.rules || []).filter(Boolean);
+    if (rs.length) h += cx('c12', head('Hausregeln', 'Bezahlen & Galgen') + '<div class="rules" style="margin:0;padding:0;border:0"><ol>' + rs.map((r, i) => { const [a, ...b] = String(r).split(':'); return '<li><span class="rn">' + String(i + 1).padStart(2, '0') + '</span><span>' + (b.length ? '<b>' + esc(a.trim()) + '</b> ' + esc(b.join(':').trim()) : esc(r)) + '</span></li>'; }).join('') + '</ol></div>');
+
+    const faq = [
+      ['Bekomme ich Punkte, wenn ich nur mitspiele?', Number(P.teil) ? 'Ja, ' + P.teil + ' Punkte pro Turnier. Dazu kommen die Punkte fürs Podium.' : 'Nein. Punkte gibt es nur für die Plätze 1 bis 3. Mitspielen zählt aber für deine Bankroll und die Entries-Statistik.'],
+      ['Zählt ein Rebuy gegen mich?', 'Nicht für die Rangliste. Für die Bankroll schon, weil jeder Rebuy zum Einsatz des Abends gehört.'],
+      ['Was passiert bei Punktgleichheit?', 'Erst zählen die Siege, dann die 2. Plätze, dann die 3. Plätze und zuletzt die gewonnenen ' + esc(unit()) + '.'],
+      ['Warum bekommt der Sieger oft etwas mehr als 50 %?', 'Weil alle Preise auf 5 abgerundet werden und der Rest an den 1. Platz geht. So bleibt nichts übrig und niemand muss Kleingeld wechseln.'],
+      ['Wann wird die Seite aktualisiert?', 'Direkt nach jedem Turnier: Ergebnisse, Rangliste, Rekorde, Bankroll und Turnierbericht.']
+    ];
+    h += cx('c12', head('Häufige Fragen', 'FAQ') + '<div class="rg-faq">' + faq.map(q => '<details><summary>' + q[0] + '</summary><p>' + q[1] + '</p></details>').join('') + '</div>');
+
+    $('#v-regeln').innerHTML = h + '</div>';
   }
 
   /* Zahlen hochzählen, Reiter-Pille, Licht folgt der Maus */
@@ -1546,7 +1687,7 @@ textarea { min-height: 150px; resize: vertical; }
   document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => { if (audio && soundOn) clack(audio.currentTime, .4); }));
 
   /* ---------- Reiter ---------- */
-  const VIEWS = ['rangliste', 'news', 'rekorde', 'turniere'];
+  const VIEWS = ['rangliste', 'news', 'rekorde', 'turniere', 'regeln'];
   function show(v) {
     if (!VIEWS.includes(v)) v = 'rangliste';
     VIEWS.forEach(x => { $('#v-' + x).hidden = x !== v; });
@@ -1555,6 +1696,8 @@ textarea { min-height: 150px; resize: vertical; }
     requestAnimationFrame(revealAll);
   }
   document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
+  document.addEventListener('click', e => { const a = e.target.closest('[data-go]'); if (!a) return; e.preventDefault(); show(a.dataset.go); try { history.replaceState(null, '', '#' + a.dataset.go); } catch (x) {} scrollTo({ top: 0, behavior: 'smooth' }); });
+  addEventListener('hashchange', () => { const v = location.hash.slice(1); if (VIEWS.includes(v)) show(v); });
 
   /* ---------- Speichern (Seite veröffentlicht sich selbst) ---------- */
   function buildDoc(data) {
