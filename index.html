@@ -373,6 +373,14 @@ article.post { scroll-margin-top: 96px; }
 .resv .who { display: flex; flex-wrap: wrap; gap: 6px; }
 .resv .who span { font-size: 13px; padding: 5px 10px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--line2); }
 .resv .who .g { color: var(--grey); }
+.resv .vote { display: grid; gap: 8px; }
+.resv .vote label { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 10px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line2); background: var(--surface2); cursor: pointer; font-size: 14px; }
+.resv .vote label:has(input:checked) { border-color: var(--gold); background: rgb(226 184 87 / .1); }
+.resv .vote input { accent-color: var(--gold); margin: 0; }
+.resv .vote b { color: var(--gold2); font-weight: 600; margin-right: 4px; }
+.resv .vote small { display: block; color: var(--grey); font-size: 12px; }
+.resv .vote em { font-style: normal; font-size: 12px; color: var(--grey); white-space: nowrap; }
+.resv .vote .vn { grid-column: 2 / -1; }
 .resv .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 /* Splash */
 .splash { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; overflow: hidden; background: radial-gradient(80% 70% at 50% 45%, rgb(60 44 12 / .92), rgb(5 5 5 / .97) 70%); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
@@ -645,66 +653,68 @@ textarea { min-height: 150px; resize: vertical; }
    "Kevin": "High Stakes"
   },
   "next": {
-   "date": "2026-10-28T17:30",
-   "title": "Dead Man's Hand Deepstack",
-   "sub": "Halloween Special · erstmals mit Wanderpokal · vorverlegt auf Mittwoch",
+   "date": "2026-11-01T17:00",
+   "title": "Midnight Birthday Deepstack",
+   "sub": "Wir spielen in Nikis Geburtstag rein · 10.000 Chips",
    "buyin": 25,
    "rebuy": 20,
-   "cards": "A♠ A♣ 8♠ 8♣ 9♦",
+   "fee": 5,
+   "cards": "A♥ K♥ Q♥ J♥ 10♥",
    "facts": [
     {
-     "v": "18:00 Uhr",
-     "l": "Erste Hand"
+     "v": "10.000 Chips",
+     "l": "Deepstack"
     },
     {
-     "v": "Level 8",
-     "l": "Spielende ca. 21:00–21:30"
+     "v": "Kein Limit",
+     "l": "Ab 11 Leuten zwei Tische"
     }
    ],
    "program": [
     {
-     "t": "17:30",
-     "l": "Treffpunkt in The Void",
-     "s": "Ankommen, Buy-in in bar, Plätze auslosen"
+     "t": "Treffpunkt",
+     "l": "Ankommen in The Void",
+     "s": "Eine halbe Stunde vor der ersten Hand: Buy-in in bar, Plätze auslosen"
     },
     {
-     "t": "18:00",
+     "t": "Start",
      "l": "Erste Hand",
-     "s": "Shuffle up and deal"
+     "s": "Shuffle up and deal, Uhrzeit laut Abstimmung"
     },
     {
-     "t": "ab 19:30",
-     "l": "Die Blinds ziehen an",
-     "s": "Länger als sonst: gespielt wird bis Level 8"
+     "t": "Abend",
+     "l": "Deepstack mit 10.000 Chips",
+     "s": "Bei mehr als 10 Leuten an zwei Tischen, am Ende ein Final Table"
     },
     {
-     "t": "ca. 21:00",
-     "l": "Level 8 · Finale",
-     "s": "Der Sieger wird ausgespielt"
-    },
-    {
-     "t": "danach",
-     "l": "Pokalübergabe & Siegerfoto",
-     "s": "Der erste Name auf dem Wanderpokal"
+     "t": "00:00",
+     "l": "Happy Birthday, Niki",
+     "s": "Um Mitternacht wird angestoßen, egal wer noch Chips hat"
     }
    ],
-   "trophyTitle": "Der Wanderpokal",
-   "trophy": "Ab Dead Man's Hand spielen wir um einen Wanderpokal. Wer ihn an diesem Abend holt, beginnt seine Journey und ist der erste Name in der Geschichte des Blue Chip Club Pokals.",
-   "info": "Halloween Special und unser bisher längster Abend: Wir spielen bis Level 8, Ende gegen 21:00 bis 21:30 Uhr.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
-   "seats": 10,
-   "fee": 5,
-   "signups": [
-    "Tim",
-    "Oli",
-    "Philipp",
-    "Niklas",
-    "Domi M",
-    "Nico",
-    "Jonas",
-    "Benno",
-    "Domi C",
-    "Manu"
+   "trophyTitle": "Nikis Geburtstag",
+   "trophy": "Am Montag hat Niki Geburtstag, und wir spielen am Sonntagabend gemeinsam rein. Um Mitternacht wird angestoßen, egal wie der Stand am Tisch ist.",
+   "info": "Wieder Deepstack mit 10.000 Chips, wie beim Dead Man's Hand.\n\nDiesmal gibt es kein Limit auf 10 Plätze. Wer kommen will, meldet sich an. Werden es mehr als 10, spielen wir an zwei Tischen und führen am Ende alle an einem Final Table zusammen.\n\nDie Startzeit stimmen wir oben ab. Den Treffpunkt gibt es jeweils eine halbe Stunde vorher.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
+   "seats": 0,
+   "times": [
+    {
+     "v": "17:00",
+     "l": "Später Nachmittag",
+     "s": "Treffpunkt 16:30"
+    },
+    {
+     "v": "18:00",
+     "l": "Abend",
+     "s": "Treffpunkt 17:30"
+    },
+    {
+     "v": "19:00",
+     "l": "Später Abend",
+     "s": "Treffpunkt 18:30"
+    }
    ],
+   "votes": {},
+   "signups": [],
    "tbd": ""
   },
   "extraRecords": [
@@ -1515,16 +1525,21 @@ textarea { min-height: 150px; resize: vertical; }
       '<div class="shame-body"><div class="gals">' + gallows(top.name, true, 0) + ds.slice(1).map((x, i) => gallows(x.name, false, i + 1)).join('') + '</div>' +
       '<div><h3>' + esc(top.name) + ' hängt.</h3><ul class="debts">' + ds.map(x => '<li>' + line(x) + '</li>').join('') + '</ul>' + txt + '</div></div>');
   }
-  const seatsOf = n => Number(n.seats) || 10;
+  const noLimit = n => Number(n.seats) === 0;
+  const seatsOf = n => noLimit(n) ? Infinity : Number(n.seats) || 10;
+  const vTimes = n => (n.times || []).filter(x => x.v);
+  const votesFor = (n, v) => Object.keys(n.votes || {}).filter(k => n.votes[k] === v);
+  const voteLead = n => { const t = vTimes(n).map(x => [x, votesFor(n, x.v).length]).sort((a, b) => b[1] - a[1]); return t.length && t[0][1] && (t.length < 2 || t[0][1] > t[1][1]) ? t[0][0] : null; };
+  const timeTxt = (n, d) => vTimes(n).length ? (voteLead(n) ? 'vorne: ' + voteLead(n).v + ' Uhr' : 'Uhrzeit per Abstimmung') : hhmm(d) + ' Uhr';
   const signups = n => (n.signups || []).filter(Boolean);
-  const seatbar = n => { const k = signups(n).length, m = seatsOf(n); return '<div class="seatbar" aria-hidden="true">' + Array.from({ length: Math.max(m, k) }, (_, i) => '<i class="' + (i < k ? (i < m ? 'on' : 'on ex') : '') + '"></i>').join('') + '</div>'; };
-  const isFull = n => signups(n).length >= seatsOf(n);
-  const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Warteliste' : 'Warteliste offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
+  const seatbar = n => { const k = signups(n).length, m = noLimit(n) ? Math.max(10, k) : seatsOf(n); return '<div class="seatbar" aria-hidden="true">' + Array.from({ length: Math.max(m, k) }, (_, i) => '<i class="' + (i < k ? (i < m ? 'on' : 'on ex') : '') + '"></i>').join('') + '</div>'; };
+  const isFull = n => !noLimit(n) && signups(n).length >= seatsOf(n);
+  const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); if (noLimit(n)) return '<b>' + k + (k === 1 ? ' Zusage' : ' Zusagen') + '</b> · kein Limit' + (k > 10 ? ' · zwei Tische' : ''); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Warteliste' : 'Warteliste offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
   function promoCard() {
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
       '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
@@ -1539,7 +1554,7 @@ textarea { min-height: 150px; resize: vertical; }
     el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + chips +
       '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin wird verschoben' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + hhmm(d) + ' Uhr · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
+      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
       '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
@@ -1566,7 +1581,7 @@ textarea { min-height: 150px; resize: vertical; }
     if (!n) return cx('c4 next', '<span class="eyebrow">Nächstes Turnier</span><p class="empty">Termin folgt.</p>');
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c4 next', '<span class="eyebrow gold">Nächstes Turnier</span><h3>' + esc(n.title) + '</h3><p class="sub">' + esc(wd) + ' · ' + hhmm(d) + ' Uhr</p>' +
+    return cx('c4 next', '<span class="eyebrow gold">Nächstes Turnier</span><h3>' + esc(n.title) + '</h3><p class="sub">' + esc(wd) + ' · ' + timeTxt(n, d) + '</p>' +
       (n.cards ? fanOf(parseCards(n.cards), false) : '') + cdHtml(n) +
       '<p class="sub">' + (n.sub ? esc(n.sub) + ' · ' : '') + priceLine(n) + '</p><span class="more">Alle Infos</span>', ' role="button" tabindex="0" data-event="1"');
   }
@@ -1577,15 +1592,16 @@ textarea { min-height: 150px; resize: vertical; }
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     const prog = (n.program || []).filter(x => x.t || x.l);
     const paras = t => String(t || '').split(/\n\s*\n/).filter(Boolean).map(x => '<p>' + esc(x).replace(/\n/g, '<br>') + '</p>').join('');
-    const facts = [[hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Veranstalter' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
+    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Veranstalter' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Neuer Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
       '<div class="body"><div class="facts">' + facts.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
-      '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + ' / ' + seatsOf(n) + ' zugesagt</span></div>' + seatbar(n) +
+      '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + (noLimit(n) ? '' : ' / ' + seatsOf(n)) + ' zugesagt</span></div>' + seatbar(n) +
       (signups(n).length ? '<div class="who">' + signups(n).slice(0, seatsOf(n)).map(x => '<span>' + esc(x) + '</span>').join('') + '</div>' : '<p class="sub" style="font-size:14px">Noch keine Zusagen. Sei der Erste.</p>') +
       (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Warteliste</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
-      '<p class="sub" style="font-size:13px">' + seatTxt(n) + (isFull(n) ? '. Du kannst dich trotzdem auf die Warteliste setzen: Wer später kommt oder früher geht, macht Platz, und je nach Andrang spielen wir auch zu 11 oder 12. Wer nachrückt, wird per WhatsApp informiert.' : '. Ab ' + (seatsOf(n) + 1) + ' Leuten gibt es eine Warteliste.') + '</p>' +
+      '<p class="sub" style="font-size:13px">' + seatTxt(n) + (isFull(n) ? '. Du kannst dich trotzdem auf die Warteliste setzen: Wer später kommt oder früher geht, macht Platz, und je nach Andrang spielen wir auch zu 11 oder 12. Wer nachrückt, wird per WhatsApp informiert.' : (noLimit(n) ? '. Diesmal ohne Platzlimit: Kommen mehr als 10, spielen wir an zwei Tischen und am Ende an einem Final Table.' : '. Ab ' + (seatsOf(n) + 1) + ' Leuten gibt es eine Warteliste.')) + '</p>' +
+      (vTimes(n).length ? '<div class="field"><span>Wann soll es losgehen? Stimm mit ab</span><div class="vote">' + vTimes(n).map((x, i) => { const w = votesFor(n, x.v); return '<label><input type="radio" name="rT" value="' + esc(x.v) + '"' + (i ? '' : ' checked') + '><span><b>' + esc(x.v) + ' Uhr</b> ' + esc(x.l) + '<small>' + esc(x.s || '') + '</small></span><em>' + w.length + (w.length === 1 ? ' Stimme' : ' Stimmen') + '</em>' + (w.length ? '<small class="vn">' + w.map(esc).join(', ') + '</small>' : '') + '</label>'; }).join('') + '</div></div>' : '') +
       '<div class="row"><label class="field"><span>Dein Name</span><select id="rP">' + playerOpts('') + '<option value="__g">Gast / neu …</option></select></label><label class="field" id="rGW" hidden><span>Name des Gasts</span><input id="rG" placeholder="Vorname"></label></div>' +
       '<label class="field"><span>Anmerkung (optional)</span><input id="rN" placeholder="z. B. komme erst gegen 19 Uhr, bringe einen Gast mit …"></label>' +
       '<p class="sub" style="font-size:13px">Kommst du später oder gibt es sonst etwas zu beachten? Schreib es hier rein oder direkt mit in die WhatsApp-Nachricht.</p>' +
@@ -1601,7 +1617,7 @@ textarea { min-height: 150px; resize: vertical; }
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
       if (!nm) { st.className = 'status err'; st.textContent = 'Bitte wähl deinen Namen.'; return null; }
       st.className = 'status'; st.textContent = '';
-      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + ', ' + hhmm(d) + ' Uhr') + '\nName: ' + nm + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
+      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + (vTimes(n).length ? '' : ', ' + hhmm(d) + ' Uhr')) + '\nName: ' + nm + (vTimes(n).length && $('input[name=rT]:checked') ? '\nStartzeit: ' + $('input[name=rT]:checked').value + ' Uhr' : '') + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
@@ -1866,7 +1882,7 @@ textarea { min-height: 150px; resize: vertical; }
       const raw = $('#hTicket').value, st = $('#hImpS');
       const get = k => { const m = raw.match(new RegExp('^' + k + ':\\s*(.+)$', 'mi')); return m ? m[1].trim() : ''; };
       let v = null;
-      if (/Platz-Reservierung/i.test(raw)) v = { kind: 'seat', player: get('Name') };
+      if (/Platz-Reservierung/i.test(raw)) v = { kind: 'seat', player: get('Name'), time: (get('Startzeit').match(/\d{1,2}:\d{2}/) || [''])[0] };
       else if (/Hand-Einreichung/i.test(raw)) {
         const art = get('Art'), kind = Object.keys(KINDS).find(k => KINDS[k] === art) || 'badbeat';
         const tn = get('Turnier'), t = DATA.tournaments.find(x => tName(x) === tn);
@@ -1876,8 +1892,9 @@ textarea { min-height: 150px; resize: vertical; }
       if (!v) { st.className = 'status err'; st.textContent = 'Keine Einreichung erkannt. Bitte die ganze Nachricht einfügen.'; return; }
       if (v.kind === 'seat') {
         const n = DATA.settings.next || {}; n.signups = signups(n);
-        if (n.signups.includes(v.player)) { st.className = 'status'; st.textContent = v.player + ' steht schon auf der Liste.'; return; }
-        n.signups.push(v.player); DATA.settings.next = n; $('#hImp').disabled = true;
+        if (v.time && vTimes(n).length) n.votes = Object.assign(n.votes || {}, { [v.player]: v.time });
+        if (n.signups.includes(v.player) && !v.time) { st.className = 'status'; st.textContent = v.player + ' steht schon auf der Liste.'; return; }
+        if (!n.signups.includes(v.player)) n.signups.push(v.player); DATA.settings.next = n; $('#hImp').disabled = true;
         save(st, v.player + ' für ' + (n.title || 'das nächste Turnier') + ' eingetragen').then(ok => { if (!ok) $('#hImp').disabled = false; });
         return;
       }
@@ -1975,14 +1992,14 @@ textarea { min-height: 150px; resize: vertical; }
       '<label class="field"><span>Ablauf (eine Zeile pro Punkt: Uhrzeit | Was | Zusatz)</span><textarea id="nProg">' + esc((n.program || []).map(x => [x.t, x.l, x.s].filter(Boolean).join(' | ')).join('\n')) + '</textarea></label>' +
       '<label class="field"><span>Wanderpokal / Highlight</span><textarea id="nTrophy">' + esc(n.trophy || '') + '</textarea></label>' +
       '<label class="field"><span>Was dich erwartet</span><textarea id="nInfo">' + esc(n.info || '') + '</textarea></label>' +
-      '<div class="row"><label class="field"><span>Plätze pro Tisch</span><input id="nSeats" type="number" min="1" value="' + esc(n.seats || 10) + '"></label><label class="field"><span>Gäste (mit Komma)</span><input id="nGuests" value="' + esc(signups(n).filter(x => !DATA.players.includes(x)).join(', ')) + '"></label></div>' +
+      '<div class="row"><label class="field"><span>Plätze pro Tisch (0 = kein Limit)</span><input id="nSeats" type="number" min="0" value="' + esc(n.seats ?? 10) + '"></label><label class="field"><span>Gäste (mit Komma)</span><input id="nGuests" value="' + esc(signups(n).filter(x => !DATA.players.includes(x)).join(', ')) + '"></label></div>' +
       '<span class="field"><span>Zusagen</span></span><div class="chips">' + DATA.players.map(p => '<label><input type="checkbox" class="nSign" value="' + esc(p) + '"' + (signups(n).includes(p) ? ' checked' : '') + '>' + esc(p) + '</label>').join('') + '</div></div>';
   }
   function bindEinst() {
     $('#sSave').onclick = async () => {
       const lines = id => $(id).value.split('\n').map(l => l.split('|').map(x => x.trim())).filter(a => a.join(''));
       DATA.settings.next = Object.assign(DATA.settings.next || {}, { date: $('#nDate').value, tbd: $('#nTbd').value.trim(), title: $('#nTitle').value.trim(), sub: $('#nSub').value.trim(), buyin: Number($('#nBuy').value) || '', rebuy: Number($('#nReb').value) || '', fee: Number($('#nFee').value) || '', cards: $('#nCards').value.trim(),
-        facts: lines('#nFacts').map(a => ({ v: a[0] || '', l: a[1] || '' })), program: lines('#nProg').map(a => ({ t: a[0] || '', l: a[1] || '', s: a[2] || '' })), trophy: $('#nTrophy').value.trim(), info: $('#nInfo').value.trim(), seats: Number($('#nSeats').value) || 10,
+        facts: lines('#nFacts').map(a => ({ v: a[0] || '', l: a[1] || '' })), program: lines('#nProg').map(a => ({ t: a[0] || '', l: a[1] || '', s: a[2] || '' })), trophy: $('#nTrophy').value.trim(), info: $('#nInfo').value.trim(), seats: $('#nSeats').value === '' ? 10 : Number($('#nSeats').value),
         signups: [...document.querySelectorAll('.nSign:checked')].map(x => x.value).concat($('#nGuests').value.split(',').map(x => x.trim()).filter(Boolean)) });
       DATA.settings.name = $('#sName').value.trim() || DATA.settings.name;
       DATA.settings.tagline = $('#sTag').value.trim();
