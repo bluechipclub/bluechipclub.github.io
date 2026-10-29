@@ -38,18 +38,56 @@ h1{font-size:clamp(34px,6vw,64px);margin:44px 0 6px;letter-spacing:-.02em;backgr
 .x{position:fixed;top:14px;right:16px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line2);background:#151515;color:var(--fg);font-size:20px;cursor:pointer}
 .nav{position:fixed;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid var(--line2);background:#151515;color:var(--fg);font-size:20px;cursor:pointer}
 .nav.l{left:14px}.nav.r{right:14px}
+.champ{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:3;white-space:nowrap;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:#1a1305;background:linear-gradient(180deg,var(--gold2),var(--gold));padding:5px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 18px rgba(226,184,87,.45)}
+.c .champ{font-size:9px;padding:4px 8px}
+.prof{position:fixed;inset:0;z-index:15;background:var(--bg);overflow-y:auto;animation:fade .4s var(--ease) both}
+@keyframes fade{from{opacity:0}}
+.prof .wrap{padding-top:22px;padding-bottom:60px}
+.ptop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
+.pgrid{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:32px;align-items:start}
+.pcard{position:relative;aspect-ratio:378/1024;border-radius:16px;overflow:hidden;cursor:zoom-in;border:0;padding:0;background:#111;box-shadow:0 0 0 1px var(--gold3),0 18px 40px rgba(0,0,0,.7);width:100%}
+.pcard img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard .anim,.pcard .fg{position:absolute;left:0;top:0;width:100%;height:62.5%}
+.pname{font-size:clamp(34px,5vw,56px);font-weight:650;letter-spacing:-.02em;margin:0;background:linear-gradient(180deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pnick{color:var(--grey);font-family:"Geist Mono",monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin:6px 0 22px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.tile b{display:block;font-size:26px;font-weight:650;font-variant-numeric:tabular-nums}
+.tile span{color:var(--grey);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:22px}
+.box h3{margin:0 0 4px;font-size:18px}.box .note{color:var(--grey);font-size:12px;margin:0 0 14px}
+.hero{font-size:40px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin:2px 0 4px}
+.chart{position:relative}.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{fill:var(--grey);font-size:11px;font-family:"Geist Mono",monospace}
+.chart .gl{stroke:var(--line);stroke-width:1}.chart .zl{stroke:var(--line2);stroke-width:1.5;stroke-dasharray:4 4}
+.chart .ln{fill:none;stroke:var(--gold);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .pt{fill:var(--gold);stroke:var(--surface);stroke-width:2}
+.chart .pt.on{r:7}
+.chart .xh{stroke:var(--grey);stroke-width:1;opacity:0}
+.chart .lbl{fill:var(--fg);font-size:12px;font-weight:600;font-family:"Geist Mono",monospace}
+.tip{position:absolute;pointer-events:none;background:#1b1b1b;border:1px solid var(--line2);border-radius:10px;padding:9px 11px;font-size:12px;line-height:1.5;min-width:150px;box-shadow:0 10px 30px rgba(0,0,0,.6);transform:translate(-50%,calc(-100% - 12px));opacity:0;transition:opacity .15s}
+.tip b{display:block;font-size:13px;margin-bottom:2px}.tip i{font-style:normal;color:var(--grey)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--grey);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.n,th.n{text-align:right}
+.tw{overflow-x:auto}
+.empty{color:var(--grey);font-size:14px}
+.pgrid>div{min-width:0}
+@media(max-width:760px){.pgrid{grid-template-columns:minmax(0,1fr)}.pcard{display:block;max-width:170px;margin:0 auto}.pname{text-align:center}.pnick{text-align:center}.tiles{grid-template-columns:repeat(2,1fr)}.ptop .logo{display:none}}
 @media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}.c{border-radius:10px}.nav{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style></head><body>
 <header><div class="wrap"><span class="logo">♠ Blue Chip Club</span><a class="back" href="../">← Zur Lobby</a></div></header>
 <main class="wrap">
 <h1>Spielerprofile</h1>
-<p class="sub">Die Stammspieler · tippen zum Vergrößern</p>
+<p class="sub">Die Stammspieler · tippen fürs Profil</p>
 <div class="grid" id="g"></div>
 </main>
+<div class="prof" id="prof" hidden></div>
 <div class="ov" id="ov" hidden><button class="x" id="x" aria-label="Schließen">✕</button><button class="nav l" id="pl" aria-label="Zurück">‹</button><div id="bigw"></div><button class="nav r" id="nr" aria-label="Weiter">›</button></div>
 <script>
-const K="../tafel/karten/",V="?v=8";
+const K="../tafel/karten/",V="?v=9";
 const P=[
  {n:"Tim",img:"tim.jpg"},{n:"Niklas",img:"niklas.jpg"},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu.jpg"},
  {n:"Magg",img:"magg.jpg"},{n:"Oli",img:"oli.jpg",fg:"oli-fg.png"},{n:"Domi C",img:"domi-c.jpg",fg:"domi-c-fg.png"},{n:"Philipp",img:"philipp.jpg",fg:"philipp-fg.png"},
@@ -60,15 +98,68 @@ function inner(p){
   const bok=Array.from({length:14},()=>'<i style="--x:'+R(0,100).toFixed(0)+'%;--y:'+R(0,95).toFixed(0)+'%;--s:'+R(6,30).toFixed(0)+'px;--d:'+R(3,8).toFixed(1)+'s;--w:'+R(-6,0).toFixed(1)+'s"></i>').join("");
   return '<img src="'+K+p.img+V+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(p.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+p.fg+'" alt="">':'')+'<span class="shine"></span>';
 }
-const real=P.filter(p=>p.img);let cur=-1;
-document.getElementById("g").innerHTML=P.map((p,k)=>p.img?'<button class="c" style="--k:'+k+'" data-i="'+real.indexOf(p)+'">'+inner(p)+'</button>':'<div class="c soon" style="--k:'+k+'"><b>?</b><span>'+p.n+'</span><small>Karte folgt</small></div>').join("");
-const ov=document.getElementById("ov"),bw=document.getElementById("bigw");
-function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">'+inner(real[cur])+'</div>';ov.hidden=false;}
-document.querySelectorAll(".c[data-i]").forEach(b=>b.onclick=()=>show(+b.dataset.i));
+const real=P.filter(p=>p.img);let cur=-1,D=null,CH="";
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>(n<0?"−":n>0?"+":"")+Math.abs(n).toLocaleString("de-DE")+" P",fmtA=n=>Math.abs(n).toLocaleString("de-DE")+" P";
+const fd=d=>{const[y,m,t]=String(d).split("-");return t+"."+m+"."};
+const tN=t=>t.title||("Turnier "+t.nr);
+const champBadge=n=>n&&n===CH?'<span class="champ">♛ Amtierender Champion</span>':"";
+function grid(){document.getElementById("g").innerHTML=P.map((p,k)=>'<button class="c" style="--k:'+k+'" data-n="'+esc(p.n)+'">'+inner(p)+champBadge(p.n)+'</button>').join("");
+ document.querySelectorAll(".c[data-n]").forEach(b=>b.onclick=()=>{location.hash="p="+encodeURIComponent(b.dataset.n)});}
+grid();
+const ov=document.getElementById("ov"),bw=document.getElementById("bigw"),pr=document.getElementById("prof");
+function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">'+inner(real[cur])+champBadge(real[cur].n)+'</div>';ov.hidden=false;}
+function stats(n){
+ const T=(D?D.tournaments:[]).slice().sort((a,b)=>a.date<b.date?-1:1),pts=(D&&D.settings.points)||{};
+ const rows=[];let played=0,wins=0,pod=0,points=0,prize=0;
+ for(const t of T){const r=(t.results||[]).find(x=>x.name&&x.name.trim()===n),inP=(t.participants||[]).includes(n)||!!r;if(!inP)continue;
+  played++;const pl=r?r.place:null,pz=r?Number(r.prize)||0:0;if(pl===1)wins++;if(pl)pod++;points+=(Number(pts["p"+pl])||0)+(Number(pts.teil)||0);prize+=pz;
+  let e=null,cost=null;if(t.entriesBy&&Object.keys(t.entriesBy).length){e=Number(t.entriesBy[n])||0;if(e){const b=Number(t.buyin)||0,rp=t.rebuyPrice==null||t.rebuyPrice===""?b:Number(t.rebuyPrice)||0;cost=b+(e-1)*rp;}}
+  rows.push({t,pl,pz,e,cost,net:cost==null?null:pz-cost});}
+ let run=0;const curve=rows.filter(x=>x.net!=null).map(x=>(run+=x.net,Object.assign({run},x)));
+ return{rows,played,wins,pod,points,prize,curve,bal:run};}
+function chart(cv){
+ if(!cv.length)return'<p class="empty">Noch keine Entries erfasst. Die Kurve startet, sobald ein Turnier mit Entries pro Spieler eingetragen ist.</p>';
+ const pts=[{run:0,lab:"Start"}].concat(cv.map(x=>({run:x.run,lab:tN(x.t),x}))),W=600,H=240,L=46,R=70,Tp=16,B=34;
+ let mn=Math.min(0,...pts.map(p=>p.run)),mx=Math.max(0,...pts.map(p=>p.run));if(mn===mx){mn-=50;mx+=50}
+ const st=[10,20,25,50,100,200,250,500,1000].find(s=>(mx-mn)/s<=5)||1000;mn=Math.floor(mn/st)*st;mx=Math.ceil(mx/st)*st;
+ const X=i=>L+(pts.length===1?0:i*(W-L-R)/(pts.length-1)),Y=v=>Tp+(mx-v)*(H-Tp-B)/(mx-mn);
+ let g="";for(let v=mn;v<=mx+1e-9;v+=st)g+='<line class="'+(v===0?"zl":"gl")+'" x1="'+L+'" x2="'+(W-R+10)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="ax" x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+(v>0?"+":v<0?"−":"")+Math.abs(v)+'</text>';
+ const xl=pts.map((p,i)=>'<text class="ax" x="'+X(i)+'" y="'+(H-10)+'" text-anchor="'+(i===0?"start":i===pts.length-1&&pts.length>2?"end":"middle")+'">'+esc(p.x?fd(p.x.t.date):"Start")+'</text>').join("");
+ const d=pts.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p.run).toFixed(1)).join(" "),z=Y(0);
+ const area='M'+X(0)+' '+z+' '+pts.map((p,i)=>"L"+X(i).toFixed(1)+" "+Y(p.run).toFixed(1)).join(" ")+' L'+X(pts.length-1)+' '+z+'Z';
+ const last=pts[pts.length-1];
+ const dots=pts.map((p,i)=>'<circle class="pt" data-i="'+i+'" cx="'+X(i)+'" cy="'+Y(p.run)+'" r="5"/>').join("");
+ const hits=pts.map((p,i)=>{const w=pts.length>1?(W-L-R)/(pts.length-1):W;return'<rect data-i="'+i+'" x="'+(X(i)-w/2)+'" y="0" width="'+w+'" height="'+H+'" fill="transparent"/>'}).join("");
+ return'<div class="chart" id="ch"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Bankroll-Verlauf"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2b857" stop-opacity=".28"/><stop offset="1" stop-color="#e2b857" stop-opacity="0"/></linearGradient></defs>'+g+'<path d="'+area+'" fill="url(#ag)"/><line class="xh" id="xh" y1="'+Tp+'" y2="'+(H-B)+'"/><path class="ln" d="'+d+'"/>'+dots+'<text class="lbl" x="'+(X(pts.length-1)+10)+'" y="'+(Y(last.run)+4)+'">'+esc(fmt(last.run))+'</text>'+xl+hits+'</svg><div class="tip" id="tip"></div></div>';
+ }
+function wire(cv){const ch=document.getElementById("ch");if(!ch)return;const svg=ch.querySelector("svg"),tip=document.getElementById("tip"),xh=document.getElementById("xh");
+ const pts=[null].concat(cv);
+ const on=i=>{const c=svg.querySelector('circle[data-i="'+i+'"]');svg.querySelectorAll("circle").forEach(x=>x.classList.toggle("on",x===c));const p=pts[i];
+  const r=svg.getBoundingClientRect(),k=r.width/600,cx=+c.getAttribute("cx"),cy=+c.getAttribute("cy");xh.setAttribute("x1",cx);xh.setAttribute("x2",cx);xh.style.opacity=.5;
+  tip.innerHTML=p?'<b>'+esc(tN(p.t))+'</b><i>'+fd(p.t.date)+' · '+p.e+(p.e===1?" Entry":" Entries")+'</i><br>Eingesetzt '+fmtA(p.cost)+'<br>Gewonnen '+fmtA(p.pz)+'<br>Abend '+fmt(p.net)+'<br><b style="margin-top:4px">Stand '+fmt(p.run)+'</b>':'<b>Start</b><i>Ab hier wird gezählt</i>';
+  tip.style.left=Math.min(Math.max(cx*k,80),r.width-80)+"px";tip.style.top=(cy*k)+"px";tip.style.opacity=1;};
+ const off=()=>{tip.style.opacity=0;xh.style.opacity=0;svg.querySelectorAll("circle").forEach(x=>x.classList.remove("on"))};
+ svg.querySelectorAll("rect[data-i]").forEach(r=>{r.addEventListener("mouseenter",()=>on(+r.dataset.i));r.addEventListener("click",()=>on(+r.dataset.i))});svg.addEventListener("mouseleave",off);}
+function profile(n){
+ const p=P.find(x=>x.n===n);if(!p){pr.hidden=true;return}
+ const s=stats(n),nick=(D&&D.settings.nicknames||{})[n]||"",first=D?D.tournaments.filter(t=>t.entriesBy&&Object.keys(t.entriesBy).length).sort((a,b)=>a.date<b.date?-1:1)[0]:null;
+ const tbl=s.rows.length?'<div class="tw"><table><thead><tr><th>Turnier</th><th>Datum</th><th>Platz</th><th class="n">Entries</th><th class="n">Eingesetzt</th><th class="n">Gewonnen</th><th class="n">Abend</th></tr></thead><tbody>'+s.rows.slice().reverse().map(r=>'<tr><td>'+esc(tN(r.t))+'</td><td>'+fd(r.t.date)+'</td><td>'+(r.pl?r.pl+".":"–")+'</td><td class="n">'+(r.e??"–")+'</td><td class="n">'+(r.cost==null?"–":fmtA(r.cost))+'</td><td class="n">'+(r.pz?fmtA(r.pz):"–")+'</td><td class="n">'+(r.net==null?"–":fmt(r.net))+'</td></tr>').join("")+'</tbody></table></div>':'<p class="empty">Noch kein Turnier gespielt.</p>';
+ pr.innerHTML='<div class="wrap"><div class="ptop"><a class="back" href="#">← Alle Spieler</a><span class="logo">♠ Blue Chip Club</span></div><div class="pgrid"><div><button class="pcard" id="pc" aria-label="Karte vergrößern">'+inner(p)+champBadge(n)+'</button></div><div>'+
+  '<h1 class="pname">'+esc(n)+'</h1><p class="pnick">'+(n===CH?"♛ Amtierender Champion":"")+(n===CH&&nick?" · ":"")+esc(nick)+'</p>'+
+  '<div class="tiles"><div class="tile"><b>'+s.played+'</b><span>Turniere</span></div><div class="tile"><b>'+s.wins+'</b><span>Siege</span></div><div class="tile"><b>'+s.pod+'</b><span>Im Geld</span></div><div class="tile"><b>'+s.points+'</b><span>Liga-Punkte</span></div></div>'+
+  '<div class="box"><h3>Bankroll</h3><p class="note">Gewonnen minus eingesetzt, Turnier für Turnier'+(first?' · gezählt ab '+esc(tN(first)):"")+'</p>'+(s.curve.length?'<div class="hero">'+esc(fmt(s.bal))+'</div>':"")+chart(s.curve)+'</div>'+
+  '<div class="box"><h3>Alle Turniere</h3><p class="note">Preisgeld gesamt '+fmtA(s.prize)+'</p>'+tbl+'</div></div></div></div>';
+ pr.hidden=false;pr.scrollTop=0;wire(s.curve);
+ document.getElementById("pc").onclick=()=>show(real.indexOf(p));}
+function route(){const m=location.hash.match(/^#p=(.+)$/);if(m)profile(decodeURIComponent(m[1]));else pr.hidden=true;}
+addEventListener("hashchange",route);
+fetch("../index.html",{cache:"no-cache"}).then(r=>r.text()).then(h=>{const m=h.match(/<script[^>]*id="liga-data"[^>]*>([\s\S]*?)<\/script>/);if(m)D=JSON.parse(m[1]);
+ const T=D.tournaments.filter(t=>(t.results||[]).some(r=>r.place===1&&r.name)).sort((a,b)=>a.date<b.date?-1:1);CH=T.length?T[T.length-1].results.find(r=>r.place===1).name.trim():"";grid();}).catch(()=>{}).finally(route);
 document.getElementById("x").onclick=()=>{ov.hidden=true;};
 ov.onclick=e=>{if(e.target===ov)ov.hidden=true;};
 document.getElementById("pl").onclick=e=>{e.stopPropagation();show(cur-1);};
 document.getElementById("nr").onclick=e=>{e.stopPropagation();show(cur+1);};
-addEventListener("keydown",e=>{if(ov.hidden)return;if(e.key==="Escape")ov.hidden=true;if(e.key==="ArrowLeft")show(cur-1);if(e.key==="ArrowRight")show(cur+1);});
+addEventListener("keydown",e=>{if(!ov.hidden){if(e.key==="Escape")ov.hidden=true;if(e.key==="ArrowLeft")show(cur-1);if(e.key==="ArrowRight")show(cur+1);}else if(!pr.hidden&&e.key==="Escape")location.hash="";});
 let tx=0;ov.addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});ov.addEventListener("touchend",e=>{const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(cur+(d<0?1:-1));});
 </script></body></html>
