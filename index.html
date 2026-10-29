@@ -2032,9 +2032,17 @@ textarea { min-height: 150px; resize: vertical; }
     renderRangliste();
     document.querySelectorAll('.splash .seats').forEach(el => { el.innerHTML = seatTxt(n); });
   }
+  function refreshEvent() {
+    if ($('#evov').hidden || !$('#resv')) return;
+    const m = $('#evm'), tm = $('input[name=rT]:checked'), k = { p: $('#rP').value, g: $('#rG').value, n: $('#rN').value, t: tm && tm.value, y: m.scrollTop, a: document.activeElement && document.activeElement.id };
+    openEvent();
+    $('#rP').value = k.p; $('#rP').onchange(); $('#rG').value = k.g; $('#rN').value = k.n;
+    if (k.t) { const r = document.querySelector('input[name=rT][value="' + k.t + '"]'); if (r) r.checked = true; }
+    m.scrollTop = k.y; if (k.a && $('#' + k.a)) $('#' + k.a).focus({ preventScroll: true });
+  }
   (async () => {
     const n = DATA.settings.next, api = DATA.settings.api; if (!n || !api) return;
-    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title), { credentials: 'omit' })).json(); if (j.ok) merge(n, j.signups || []); } catch (e) {}
+    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title), { credentials: 'omit' })).json(); if (j.ok) { merge(n, j.signups || []); refreshEvent(); } } catch (e) {}
   })();
   startFx();
   let start = location.hash.slice(1);
