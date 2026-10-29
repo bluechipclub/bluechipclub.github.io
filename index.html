@@ -263,6 +263,9 @@ article.post.noimg { grid-template-columns: 1fr; }
   .hpics { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 .hpics img { height: 150px; width: auto; max-width: 100%; border-radius: 10px; object-fit: cover; border: 1px solid var(--line2); display: block; }
 .feature .hpics img { height: 200px; }
+.hvids { display: grid; gap: 10px; margin-top: 12px; }
+.hvids video, .hvids iframe { width: 100%; max-width: 560px; aspect-ratio: 16 / 9; border-radius: 10px; border: 1px solid var(--line2); background: #000; display: block; }
+.hvids video { aspect-ratio: auto; max-height: 70vh; }
 .hand .t { font-weight: 600; font-size: 17px; letter-spacing: -.02em; }
 .hand .w { color: var(--grey); font-size: 13px; margin-top: 2px; }
 .hand .x { color: rgb(244 244 242 / .8); font-size: 14px; margin-top: 6px; max-width: 66ch; }
@@ -575,6 +578,7 @@ textarea { min-height: 150px; resize: vertical; }
   },
   "nicknames": {
    "Oli": "Two Pair",
+   "Domi C": "The Ace Factory",
    "Manu": "Neverfold",
    "Kevin": "High Stakes"
   },
@@ -688,7 +692,8 @@ textarea { min-height: 150px; resize: vertical; }
   "Philipp",
   "Max",
   "Marco",
-  "Vici"
+  "Vici",
+  "Domi C"
  ],
  "tournaments": [
   {
@@ -879,6 +884,51 @@ textarea { min-height: 150px; resize: vertical; }
     "Max": 4,
     "Zeno": 1
    }
+  },
+  {
+   "id": "t5",
+   "nr": 5,
+   "date": "2026-10-28",
+   "title": "Dead Man's Hand Deepstack",
+   "buyin": 25,
+   "rebuyPrice": 20,
+   "entries": 10,
+   "rebuys": 9,
+   "pot": 380,
+   "results": [
+    {
+     "place": 1,
+     "name": "Niklas",
+     "prize": 195
+    },
+    {
+     "place": 2,
+     "name": "Manu",
+     "prize": 110
+    },
+    {
+     "place": 3,
+     "name": "Benno",
+     "prize": 75
+    }
+   ],
+   "participants": [
+    "Tim",
+    "Oli",
+    "Philipp",
+    "Niklas",
+    "Magg",
+    "Nico",
+    "Jonny",
+    "Benno",
+    "Domi C",
+    "Manu"
+   ],
+   "headline": "Niklas bezwingt Manu im Heads-up und schreibt sich als Erster auf den Wanderpokal",
+   "report": "Halloween in The Void: zehn Spieler, 10.000 Chips Deepstack und zum ersten Mal ein Wanderpokal auf dem Tisch. Am Ende standen 19 Entries auf der Tafel, und es war die Nacht der Vierlinge.\n\nManu legte früh los. Mit Q♥ 9♥ gegen J♥ J♠ fiel auf dem Flop 9♣ K♥ 9♦ die Trips, Turn 10♦ und River 8♥ änderten nichts mehr. Double-up, und Neverfold machte seinem Namen von da an alle Ehre.\n\nDann kam Oli. Mit K♦ K♠ traf er auf 5♠ 9♣ K♥ das Set, der Turn brachte den K♣. Vier Könige, Jubel am ganzen Tisch, und für ein paar Stunden die beste Hand der Clubgeschichte.\n\nDomi C bekam an diesem Abend einen neuen Namen. Weil er gefühlt in jeder Hand ein Ass hielt, wurde er live auf der Tafel zu „The Ace Factory“ getauft. Wenig später lieferte er prompt: Full House mit Assen, Pot gewonnen, und Oli war raus.\n\nNico war mit vier Entries der Kämpfer des Abends und der Erste, der den Tisch verlassen musste. Danach gingen Oli, Jonny, Tim und Philipp. Tim schied zwar früh aus, hatte vorher aber den Rekord geholt: A♥ K♦ auf J♠ 3♦ A♦ A♣ A♠, Vier Asse gegen J♥ 8♥. Damit löste er Olis Vier Könige noch am selben Abend als beste Hand im Club ab.\n\nThe Ace Factory ging als Fünfter. Auf der Bubble schlug Niklas Magg raus, das Board J♦ 4♣ J♣ 2♠ J♠ entschied es, und Benno, Niklas und Manu waren im Geld.\n\nBenno erwischte Q♦ Q♥ gegen Manus A♣ K♥ und lag lange vorne, bis der K♠ auf dem Turn kam. Platz drei für Benno.\n\nIm Heads-up hielt Niklas A♣ J♦ gegen Manus A♠ Q♥. Das Board 3♣ 9♥ 5♦ J♥ 2♣ brachte den Buben auf dem Turn, und das war es. Niklas gewinnt das Dead Man's Hand Deepstack und ist der erste Name auf dem Wanderpokal.",
+   "img": "dmh-sieger-niklas",
+   "imgCaption": "Niklas mit der Siegerhand A♣ J♦",
+   "winHand": "A♣ J♦"
   }
  ],
  "hands": [
@@ -897,8 +947,7 @@ textarea { min-height: 150px; resize: vertical; }
   {
    "id": "h5",
    "kind": "hand",
-   "tid": null,
-   "event": "Dead Man's Hand Deepstack, 28. Okt.",
+   "tid": "t5",
    "player": "Oli",
    "opponent": "",
    "cat": 7,
@@ -911,8 +960,7 @@ textarea { min-height: 150px; resize: vertical; }
   {
    "id": "h6",
    "kind": "hand",
-   "tid": null,
-   "event": "Dead Man's Hand Deepstack, 28. Okt.",
+   "tid": "t5",
    "player": "Tim",
    "opponent": "",
    "cat": 7,
@@ -953,6 +1001,58 @@ textarea { min-height: 150px; resize: vertical; }
    "title": "Der 9 6 Bluff",
    "cards": "",
    "text": "Erste Bullet, Manu blufft mit 9 6 komplett rein, und der Bluffcatcher callt ihn weg. Legendär."
+  },
+  {
+   "id": "h7",
+   "kind": "spot",
+   "tid": "t5",
+   "player": "Manu",
+   "opponent": "",
+   "title": "Double-up mit Trips",
+   "cards": "",
+   "text": "Q♥ 9♥ gegen J♥ J♠. Der Flop 9♣ K♥ 9♦ bringt Manu die Trips, Turn 10♦ und River 8♥ ändern nichts. Früher Double-up.",
+   "pics": [
+    "dmh-manu-double-up"
+   ]
+  },
+  {
+   "id": "h8",
+   "kind": "spot",
+   "tid": "t5",
+   "player": "Niklas",
+   "opponent": "",
+   "title": "Bubble geplatzt",
+   "cards": "",
+   "text": "Niklas schlägt Magg auf dem Board J♦ 4♣ J♣ 2♠ J♠ raus. Damit sind Benno, Niklas und Manu im Geld.",
+   "pics": [
+    "dmh-bubble-niki-magg"
+   ]
+  },
+  {
+   "id": "h9",
+   "kind": "spot",
+   "tid": "t5",
+   "player": "Manu",
+   "opponent": "",
+   "title": "Der König auf dem Turn",
+   "cards": "",
+   "text": "Benno hält Q♦ Q♥ gegen Manus A♣ K♥ und liegt vorne, bis der K♠ auf dem Turn fällt. Platz drei für Benno.",
+   "pics": [
+    "dmh-benno-raus"
+   ]
+  },
+  {
+   "id": "h10",
+   "kind": "spot",
+   "tid": "t5",
+   "player": "Niklas",
+   "opponent": "",
+   "title": "Die Siegerhand",
+   "cards": "",
+   "text": "Heads-up: Niklas mit A♣ J♦ gegen Manus A♠ Q♥. Board 3♣ 9♥ 5♦ J♥ 2♣, der Bube auf dem Turn entscheidet das Turnier.",
+   "pics": [
+    "dmh-siegerhand"
+   ]
   }
  ]
 }</script>
@@ -1127,13 +1227,14 @@ textarea { min-height: 150px; resize: vertical; }
       return cx('post' + (t.img ? '' : ' noimg'),  (t.img ? '<div class="post-img"><img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy"></div>' : '') +
         '<div class="post-body"><div class="tags"><span class="tag gold">' + esc(tName(t)) + '</span><span class="tag">' + fmtDate(t.date) + '</span>' + (t.title ? '<span class="tag">' + esc(t.title) + '</span>' : '') + (t.pot ? '<span class="tag">' + eur(t.pot) + '</span>' : '') + (t.entries ? '<span class="tag">' + t.entries + ' Spieler</span>' : '') + '</div>' +
         '<h3>' + esc(hl) + '</h3>' + podiumHtml(t) +
-        (t.report ? '<div class="report">' + paras(t.report) + '</div>' : '<p class="empty">Der Bericht zu diesem Abend kommt noch.</p>') +
+        (t.report ? '<div class="report">' + paras(t.report) + '</div>' : '<p class="empty">Der Bericht zu diesem Abend kommt noch.</p>') + vids(t) +
         (t.imgCaption ? '<p class="note">' + esc(t.imgCaption) + '</p>' : '') +
         (hs.length ? '<div class="hands">' + hs.map(x => handHtml(x, null)).join('') + '</div>' : '') + '</div>', ' id="t-' + esc(t.id) + '"');
     }).join('') + '</div>';
   }
 
-  const pics = x => (x.pics || []).length ? '<div class="hpics">' + x.pics.map(id => '<a href="' + imgSrc(esc(id)) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(id)) + '" alt="Foto zur Hand" loading="lazy"></a>').join('') + '</div>' : '';
+  const vids = x => (x.vids || []).length ? '<div class="hvids">' + x.vids.map(v => /^yt:/.test(v) ? '<iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.slice(3)) + '" title="Video" allowfullscreen loading="lazy"></iframe>' : '<video controls playsinline preload="metadata" src="vid/' + esc(v) + '.mp4"></video>').join('') + '</div>' : '';
+  const pics = x => vids(x) + ((x.pics || []).length ? '<div class="hpics">' + x.pics.map(id => '<a href="' + imgSrc(esc(id)) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(id)) + '" alt="Foto zur Hand" loading="lazy"></a>').join('') + '</div>' : '');
   function handHtml(x, pos) {
     const t = tById(x.tid);
     const where = (x.player ? esc(x.player) : '') + (x.opponent ? (x.kind === 'badbeat' ? ' verliert gegen ' : ' gegen ') + esc(x.opponent) : '') + ' · ' + (t ? esc(tName(t)) + ', ' + fmtDate(t.date) : x.event ? esc(x.event) : 'Turnier offen');
