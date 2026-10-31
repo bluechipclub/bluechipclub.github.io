@@ -46,7 +46,8 @@ h1{font-size:clamp(34px,6vw,64px);margin:44px 0 6px;letter-spacing:-.02em;backgr
 .ptop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
 .pgrid{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:32px;align-items:start}
 .pcard{position:relative;aspect-ratio:378/1024;border-radius:16px;overflow:hidden;cursor:zoom-in;border:0;padding:0;background:#111;box-shadow:0 0 0 1px var(--gold3),0 18px 40px rgba(0,0,0,.7);width:100%}
-.c>img{transition:opacity .45s,filter .45s}.c.swap>img,.c.swap>.anim{opacity:.1;filter:blur(4px)}
+.gal{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.gal button{width:62px;aspect-ratio:378/600;border-radius:8px;overflow:hidden;border:0;padding:0;cursor:pointer;background:#111;box-shadow:0 0 0 1px #333;opacity:.55;transition:opacity .3s,box-shadow .3s}.gal button.on{opacity:1;box-shadow:0 0 0 2px var(--gold3)}.gal img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}.gal .gl{width:100%;font:11px 'Geist Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+@media(max-width:760px){.gal{justify-content:center}.gal .gl{text-align:center}}
 .pcard img{width:100%;height:100%;object-fit:cover;display:block}
 .pcard .anim,.pcard .fg{position:absolute;left:0;top:0;width:100%;height:62.5%}
 .pname{font-size:clamp(34px,5vw,56px);font-weight:650;letter-spacing:-.02em;margin:0;background:linear-gradient(180deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -90,15 +91,15 @@ td.n,th.n{text-align:right}
 <script>
 const K="../tafel/karten/",V="?v=10";
 const P=[
- {n:"Tim",img:"tim.jpg"},{n:"Niklas",img:"niklas.jpg",alt:[{img:"niklas-2.jpg",fg:"niklas-2-fg.png"}]},{n:"Nico",img:"nico.jpg",alt:[{img:"nico-2.jpg",fg:"nico-2-fg.png"}]},{n:"Manu",img:"manu.jpg",fg:"manu-fg.png"},
+ {n:"Tim",img:"tim.jpg"},{n:"Niklas",img:"niklas.jpg",alt:[{img:"niklas-2.jpg",fg:"niklas-2-fg.png"}]},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu.jpg",fg:"manu-fg.png"},
  {n:"Magg",img:"magg.jpg",alt:[{img:"magg-2.jpg",fg:"magg-2-fg.png"}]},{n:"Oli",img:"oli.jpg",fg:"oli-fg.png",alt:[{img:"oli-2.jpg",fg:"oli-2-fg.png"}]},{n:"Domi C",img:"domi-c.jpg",fg:"domi-c-fg.png"},{n:"Philipp",img:"philipp.jpg",fg:"philipp-fg.png"},
  {n:"Jonny",img:"jonny.jpg",fg:"jonny-fg.png"},{n:"Benno",img:"benno.jpg"},{n:"Chris",img:"chris.jpg",fg:"chris-fg.png"}
 ];
 const R=(a,b)=>(a+Math.random()*(b-a));
-/* several pictures per player: one is picked at random and swapped every few minutes */
+/* several pictures per player: main card in the grid, all of them as a gallery on the profile */
 const vars=p=>[{img:p.img,fg:p.fg}].concat(p.alt||[]);
 const pick=(p,not)=>{const v=vars(p),c=v.length>1&&not?v.filter(x=>x.img!==not):v;return c[Math.floor(Math.random()*c.length)];};
-function inner(p,v){v=v||p.cur||(p.cur=pick(p));
+function inner(p,v){v=v||p.cur||vars(p)[0];
   const bok=Array.from({length:14},()=>'<i style="--x:'+R(0,100).toFixed(0)+'%;--y:'+R(0,95).toFixed(0)+'%;--s:'+R(6,30).toFixed(0)+'px;--d:'+R(3,8).toFixed(1)+'s;--w:'+R(-6,0).toFixed(1)+'s"></i>').join("");
   return '<img src="'+K+v.img+V+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(v.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+v.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
@@ -111,9 +112,6 @@ const champBadge=n=>n&&n===CH?'<span class="champ">♛ Amtierender Champion</spa
 function grid(){document.getElementById("g").innerHTML=P.map((p,k)=>'<button class="c" style="--k:'+k+'" data-n="'+esc(p.n)+'">'+inner(p)+champBadge(p.n)+'</button>').join("");
  document.querySelectorAll(".c[data-n]").forEach(b=>b.onclick=()=>{location.hash="p="+encodeURIComponent(b.dataset.n)});}
 grid();
-setInterval(()=>{P.forEach((p,k)=>{if(!p.alt||!p.alt.length)return;p.cur=pick(p,p.cur&&p.cur.img);
-  const b=document.querySelectorAll(".c[data-n]")[k];if(!b)return;b.classList.add("swap");
-  setTimeout(()=>{b.innerHTML=inner(p)+champBadge(p.n);b.classList.remove("swap");},450);});},180000);
 const ov=document.getElementById("ov"),bw=document.getElementById("bigw"),pr=document.getElementById("prof");
 function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">'+inner(real[cur])+champBadge(real[cur].n)+'</div>';ov.hidden=false;}
 function stats(n){
@@ -152,13 +150,14 @@ function profile(n){
  const p=P.find(x=>x.n===n);if(!p){pr.hidden=true;return}
  const s=stats(n),nick=(D&&D.settings.nicknames||{})[n]||"",first=D?D.tournaments.filter(t=>t.entriesBy&&Object.keys(t.entriesBy).length).sort((a,b)=>a.date<b.date?-1:1)[0]:null;
  const tbl=s.rows.length?'<div class="tw"><table><thead><tr><th>Turnier</th><th>Datum</th><th>Platz</th><th class="n">Entries</th><th class="n">Eingesetzt</th><th class="n">Gewonnen</th><th class="n">Abend</th></tr></thead><tbody>'+s.rows.slice().reverse().map(r=>'<tr><td>'+esc(tN(r.t))+'</td><td>'+fd(r.t.date)+'</td><td>'+(r.pl?r.pl+".":"–")+'</td><td class="n">'+(r.e??"–")+'</td><td class="n">'+(r.cost==null?"–":fmtA(r.cost))+'</td><td class="n">'+(r.pz?fmtA(r.pz):"–")+'</td><td class="n">'+(r.net==null?"–":fmt(r.net))+'</td></tr>').join("")+'</tbody></table></div>':'<p class="empty">Noch kein Turnier gespielt.</p>';
- pr.innerHTML='<div class="wrap"><div class="ptop"><a class="back" href="#">← Alle Spieler</a><span class="logo">♠ Blue Chip Club</span></div><div class="pgrid"><div><button class="pcard" id="pc" aria-label="Karte vergrößern">'+inner(p)+champBadge(n)+'</button></div><div>'+
+ pr.innerHTML='<div class="wrap"><div class="ptop"><a class="back" href="#">← Alle Spieler</a><span class="logo">♠ Blue Chip Club</span></div><div class="pgrid"><div><button class="pcard" id="pc" aria-label="Karte vergrößern">'+inner(p)+champBadge(n)+'</button>'+(vars(p).length>1?'<div class="gal"><span class="gl">Galerie · '+vars(p).length+' Bilder</span>'+vars(p).map((v,k)=>'<button type="button" data-k="'+k+'" class="'+((p.cur||vars(p)[0]).img===v.img?"on":"")+'" aria-label="Bild '+(k+1)+'"><img src="'+K+v.img+V+'" alt=""></button>').join("")+'</div>':'')+'</div><div>'+
   '<h1 class="pname">'+esc(n)+'</h1><p class="pnick">'+(n===CH?"♛ Amtierender Champion":"")+(n===CH&&nick?" · ":"")+esc(nick)+'</p>'+
   '<div class="tiles"><div class="tile"><b>'+s.played+'</b><span>Turniere</span></div><div class="tile"><b>'+s.wins+'</b><span>Siege</span></div><div class="tile"><b>'+s.pod+'</b><span>Im Geld</span></div><div class="tile"><b>'+s.points+'</b><span>Liga-Punkte</span></div></div>'+
   '<div class="box"><h3>Bankroll</h3><p class="note">Gewonnen minus eingesetzt, Turnier für Turnier'+(first?' · gezählt ab '+esc(tN(first)):"")+'</p>'+(s.curve.length?'<div class="hero">'+esc(fmt(s.bal))+'</div>':"")+chart(s.curve)+'</div>'+
   '<div class="box"><h3>Alle Turniere</h3><p class="note">Preisgeld gesamt '+fmtA(s.prize)+'</p>'+tbl+'</div></div></div></div>';
  pr.hidden=false;pr.scrollTop=0;wire(s.curve);
- document.getElementById("pc").onclick=()=>show(real.indexOf(p));}
+ document.getElementById("pc").onclick=()=>show(real.indexOf(p));
+ pr.querySelectorAll(".gal button").forEach(b=>b.onclick=()=>{p.cur=vars(p)[+b.dataset.k];document.getElementById("pc").innerHTML=inner(p)+champBadge(n);pr.querySelectorAll(".gal button").forEach(x=>x.classList.toggle("on",x===b));});}
 function route(){const m=location.hash.match(/^#p=(.+)$/);if(m)profile(decodeURIComponent(m[1]));else pr.hidden=true;}
 addEventListener("hashchange",route);
 fetch("../index.html",{cache:"no-cache"}).then(r=>r.text()).then(h=>{const m=h.match(/<script[^>]*id="liga-data"[^>]*>([\s\S]*?)<\/script>/);if(m)D=JSON.parse(m[1]);
