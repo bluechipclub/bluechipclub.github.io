@@ -216,6 +216,8 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .inPh{width:100%;height:100%;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh}
 .inPh b{font-size:14vh;color:#c8202a}.inPh span{font-size:5vh;font-weight:800}
 .inT{max-width:40vw}
+.inV{height:84vh;aspect-ratio:576/1024;border-radius:1.2vw;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 4vh 10vh rgba(0,0,0,.9);background:#000}.inV video{width:100%;height:100%;object-fit:cover;display:block}
+.intro.go .inV{animation:inCard .9s .15s var(--ease) both}
 .inT .eyebrow{font-size:max(12px,1.2vw)}
 .inT h3{font-size:max(40px,7vw);font-weight:800;letter-spacing:-.03em;line-height:1;margin:1.5vh 0;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
 .inD{font-family:var(--mono);font-size:max(12px,1vw);color:var(--blue2);letter-spacing:.12em;text-transform:uppercase}
@@ -818,28 +820,36 @@ function drawOverview(a){
 }
 
 /* ---------- player cards: one by one after the seat draw ---------- */
-const CARDS={"tim":"karten/tim.jpg","niklas":"karten/niklas.jpg","niki":"karten/niklas.jpg","nico":"karten/nico.jpg","manu":"karten/manu.jpg","domi m":"karten/magg.jpg","domi c":{img:"karten/domi-c.jpg",fg:"karten/domi-c-fg.png"},"oli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"olli":{img:"karten/oli.jpg",fg:"karten/oli-fg.png"},"magg":"karten/magg.jpg","philipp":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phillip":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"phil":{img:"karten/philipp.jpg",fg:"karten/philipp-fg.png"},"jonny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"jonas":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"johnny":{img:"karten/jonny.jpg",fg:"karten/jonny-fg.png"},"benno":"karten/benno.jpg"};
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno"};
-function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=5";const c=cardOf(n);return null;}
+const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
+const C_NIK=[CA("niklas.jpg"),CA("niklas-2.jpg","niklas-2-fg.png")],C_MAGG=[CA("magg.jpg"),CA("magg-2.jpg","magg-2-fg.png")],C_OLI=[CA("oli.jpg","oli-fg.png"),CA("oli-2.jpg","oli-2-fg.png")],C_PHIL=CA("philipp.jpg","philipp-fg.png"),C_JON=CA("jonny.jpg","jonny-fg.png");
+/* a list = several pictures, one is picked at random each time the card is shown */
+const CARDS={"tim":CA("tim.jpg"),"niklas":C_NIK,"niki":C_NIK,"nico":[CA("nico.jpg"),CA("nico-2.jpg","nico-2-fg.png")],"manu":CA("manu.jpg","manu-fg.png"),"domi m":C_MAGG,"magg":C_MAGG,"domi c":CA("domi-c.jpg","domi-c-fg.png"),"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":CA("benno.jpg"),"chris":CA("chris.jpg","chris-fg.png")};
+/* video that plays with sound when this player's card comes up in the seat draw */
+const VIDS={"nico":"karten/nico.mp4?v=1"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris"};
+function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=6";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
-const cardOf=n=>(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;
-Object.values(CARDS).forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).forEach(x=>{const i=new Image();i.src=x;}));
+const cardOf=n=>{const c=(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;return Array.isArray(c)?c[Math.floor(Math.random()*c.length)]:c;};
+Object.values(CARDS).flat().forEach(u=>[].concat(typeof u==="string"?u:[u.img,u.fg]).forEach(x=>{const i=new Image();i.src=x+"?v=10";}));
 function cardHtml(c){
   if(!c)return null;const o=typeof c==="string"?{img:c}:c;
   const bokeh=Array.from({length:14},(_,j)=>'<i style="--x:'+(Math.random()*100).toFixed(0)+'%;--y:'+(Math.random()*95).toFixed(0)+'%;--s:'+(6+Math.random()*26).toFixed(0)+'px;--d:'+(3+Math.random()*5).toFixed(1)+'s;--w:'+(Math.random()*-6).toFixed(1)+'s"></i>').join("");
-  const V=/^karten\//.test(o.img)?"?v=9":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
+  const V=/^karten\//.test(o.img)?"?v=10":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
 function introShow(list,done,o){o=o||{};
-  const box=$("intro");let k=0;intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
+  const box=$("intro");let k=0;const sv=()=>{if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
-    if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
-    const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4];
-    box.innerHTML='<div class="inC">'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+
+    sv();if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
+    const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&VIDS[p.name.toLowerCase()];
+    box.innerHTML='<div class="inC">'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+(vid?'<div class="inV"><video src="'+vid+'" playsinline preload="auto"></video></div>':'')+
       '<div class="inT"><div class="eyebrow">'+(o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
       '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+    if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
+      v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});v.addEventListener("loadedmetadata",go);intro.t=setTimeout(()=>{k++;step();},30000);if(v.readyState>=1)go();
+      intro.stopVid=()=>{try{v.pause();}catch(e){}};return;}
     if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
     intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000);
   }
@@ -1067,10 +1077,10 @@ async function bdayShow(){
   el.innerHTML=bdayConfetti()+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button><div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1></div>';
   $("bdX").onclick=bdayClose;bdaySong();log("bday",{});
   const D=await bdayLoad();const conf=bdayConfetti();
-  const card=(CARDS[BDAY.name.toLowerCase()]||{});const img=typeof card==="string"?card:card.img;
+  const card=cardOf(BDAY.name)||{};const img=typeof card==="string"?card:card.img;
   const slides=[
     ()=>'<div class="sl"><div class="ey">00:00 · 2. November</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Der ganze Club stößt an</div></div>',
-    ()=>'<div class="sl row">'+(img?'<img class="bcard" src="'+img+'?v=9" alt="">':'')+'<div><div class="ey">Nikis Bilanz im Blue Chip Club</div><h1 style="font-size:max(36px,5.5vw);margin:1.4vh 0">'+(D.wins>1?D.wins+"-facher Sieger":D.wins?"Sieger":"Stammgast")+'</h1><div class="stats">'+
+    ()=>'<div class="sl row">'+(img?'<img class="bcard" src="'+img+'?v=10" alt="">':'')+'<div><div class="ey">Nikis Bilanz im Blue Chip Club</div><h1 style="font-size:max(36px,5.5vw);margin:1.4vh 0">'+(D.wins>1?D.wins+"-facher Sieger":D.wins?"Sieger":"Stammgast")+'</h1><div class="stats">'+
       '<div><b>'+D.played+'</b><span>Turniere</span></div><div><b>'+D.wins+'</b><span>Siege</span></div><div><b>'+D.podium+'</b><span>Podestplätze</span></div><div><b>'+fmt(D.prize)+' P</b><span>gewonnen</span></div>'+(D.rank?'<div><b>#'+D.rank+'</b><span>in der Rangliste</span></div>':'')+(D.winNames.length?'<div><b style="font-size:max(16px,1.6vw);line-height:1.25">'+D.winNames.map(esc).join("<br>")+'</b><span>Titel</span></div>':'')+'</div></div></div>'
   ].concat(D.greets.map(g=>()=>'<div class="sl"><div class="ey">Nachricht für '+esc(BDAY.call)+'</div><p class="q" style="margin-top:3vh">'+esc(g.text)+'</p><div class="who">'+esc(g.name)+'</div></div>'))
    .concat([()=>'<div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Alles Gute,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Und jetzt: weiter geht\'s</div></div>']);
