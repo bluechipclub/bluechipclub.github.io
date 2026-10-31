@@ -168,6 +168,29 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 /* big announcement */
 .ann{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(0,0,0,.62);backdrop-filter:blur(8px)}
 .ann[hidden]{display:none}
+.seatop{position:fixed;inset:0;z-index:45;display:grid;place-items:center;pointer-events:none}
+.seatop[hidden]{display:none}
+.seatop div{font-weight:850;font-size:max(48px,9vw);letter-spacing:-.03em;padding:3vh 5vw;border-radius:2vw;background:rgba(8,8,8,.88);border:2px solid var(--gold);color:var(--gold2);box-shadow:0 0 12vw rgba(226,184,87,.35);animation:seatIn 3.2s var(--ease) both;text-transform:uppercase}
+.seatop span{display:block;word-spacing:.3em}
+.seatop small{display:block;font-family:var(--mono);font-size:max(12px,1.1vw);letter-spacing:.4em;color:var(--grey);font-weight:500;margin-top:1vh;text-align:center}
+@keyframes seatIn{0%{opacity:0;transform:scale(.7)}12%{opacity:1;transform:scale(1.04)}20%{transform:scale(1)}82%{opacity:1}100%{opacity:0}}
+.bday{position:fixed;inset:0;z-index:50;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#1b2a5c 0%,#090b14 55%,#000 100%);color:#fff;text-align:center}
+.bday[hidden]{display:none}
+.bday .cf{position:absolute;opacity:.75;top:-6vh;width:1.2vw;min-width:10px;aspect-ratio:1;border-radius:50%;animation:cf linear infinite}
+@keyframes cf{to{transform:translateY(115vh) rotate(720deg)}}
+.bday .sl{position:relative;z-index:1;max-width:82vw;animation:pop .9s var(--ease) both}
+.bday .ey{font-family:var(--mono);letter-spacing:.4em;text-transform:uppercase;color:var(--gold);font-size:max(12px,1.1vw)}
+.bday h1{font-size:max(44px,8.5vw);font-weight:850;letter-spacing:-.045em;line-height:.95;margin:2vh 0;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bday .row{display:flex;gap:3vw;align-items:center;justify-content:center;text-align:left}
+.bday .bcard{height:52vh;width:auto;flex:none;border-radius:1.4vw;box-shadow:0 3vh 10vh rgba(0,0,0,.8),0 0 0 1px rgba(226,184,87,.5)}
+.bday .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.6vh 2.4vw;margin-top:2vh}
+.bday .stats b{display:block;font-size:max(26px,3.6vw);font-weight:800;color:var(--gold2);letter-spacing:-.02em}
+.bday .stats span{font-family:var(--mono);font-size:max(11px,.9vw);letter-spacing:.18em;text-transform:uppercase;color:#aab}
+.bday .q{font-size:max(26px,4vw);font-weight:650;line-height:1.25;letter-spacing:-.02em;max-width:70vw;margin:0 auto}
+.bday .q::before{content:"„";color:var(--gold)}.bday .q::after{content:"“";color:var(--gold)}
+.bday .who{margin-top:4vh;font-size:max(18px,2vw);color:var(--gold2);font-weight:650}
+.bday .dots{position:absolute;bottom:4vh;left:0;right:0;justify-self:stretch;font-family:var(--mono);color:#889;font-size:max(11px,.9vw);letter-spacing:.3em}
+.bday .bx{position:absolute;top:2vh;right:2vw;z-index:2}
 .annBox{pointer-events:auto;text-align:center;max-width:78vw;padding:5vh 5vw;border-radius:2vw;background:radial-gradient(ellipse at 50% 0%,rgba(143,29,29,.55),rgba(10,10,10,.96) 70%);border:1px solid rgba(226,184,87,.45);box-shadow:0 0 0 1px #000,0 4vh 12vh rgba(0,0,0,.9),0 0 10vw rgba(143,29,29,.35);animation:pop .7s var(--ease) both}
 @keyframes pop{from{opacity:0;transform:scale(.85) translateY(4vh)}}
 .annBox .eyebrow{font-size:max(11px,1vw)}
@@ -223,14 +246,14 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
       <svg class="chip" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cg" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#4d82ff"/><stop offset=".55" stop-color="#1f55e0"/><stop offset="1" stop-color="#12379c"/></radialGradient></defs><circle cx="32" cy="32" r="31" fill="url(#cg)" stroke="#0f2f86" stroke-width="2"/><g fill="#f5f7ff"><path d="M32 2a30 30 0 0 1 7 1l-2 8a22 22 0 0 0-10 0l-2-8a30 30 0 0 1 7-1z"/><path d="M32 62a30 30 0 0 1-7-1l2-8a22 22 0 0 0 10 0l2 8a30 30 0 0 1-7 1z"/><path d="M2 32a30 30 0 0 1 1-7l8 2a22 22 0 0 0 0 10l-8 2a30 30 0 0 1-1-7z"/><path d="M62 32a30 30 0 0 1-1 7l-8-2a22 22 0 0 0 0-10l8-2a30 30 0 0 1 1 7z"/><path d="M11 11a30 30 0 0 1 5-5l5 6a22 22 0 0 0-7 7l-6-5a30 30 0 0 1 3-3z"/><path d="M53 53a30 30 0 0 1-5 5l-5-6a22 22 0 0 0 7-7l6 5a30 30 0 0 1-3 3z"/><path d="M53 11a30 30 0 0 1 5 5l-6 5a22 22 0 0 0-7-7l5-6a30 30 0 0 1 3 3z"/><path d="M11 53a30 30 0 0 1-5-5l6-5a22 22 0 0 0 7 7l-5 6a30 30 0 0 1-3-3z"/></g><circle cx="32" cy="32" r="18" fill="#2459e6" stroke="#fff" stroke-width="1.5"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/></svg>
       <div>
         <div class="eyebrow" id="sub">Blue Chip Club · Halloween Deepstack</div>
-        <div class="title" id="ttl">Dead Man's Hand Deepstack</div>
+        <div class="title" id="ttl">Midnight Birthday Deepstack</div>
       </div>
-      <div class="hand" aria-label="A♠ A♣ 8♠ 8♣ 9♦">
-        <div class="card" style="--k:0;--r:-8deg">A<br>♠</div>
-        <div class="card" style="--k:1;--r:-3deg;--y:-.2vw">A<br>♣</div>
-        <div class="card" style="--k:2;--r:2deg;--y:-.25vw">8<br>♠</div>
-        <div class="card" style="--k:3;--r:6deg">8<br>♣</div>
-        <div class="card red dim" style="--k:4;--r:11deg;--y:.3vw">9<br>♦</div>
+      <div class="hand" aria-label="A♥ K♥ Q♥ J♥ 10♥">
+        <div class="card red" style="--k:0;--r:-8deg">A<br>♥</div>
+        <div class="card red" style="--k:1;--r:-3deg;--y:-.2vw">K<br>♥</div>
+        <div class="card red" style="--k:2;--r:2deg;--y:-.25vw">Q<br>♥</div>
+        <div class="card red" style="--k:3;--r:6deg">J<br>♥</div>
+        <div class="card red" style="--k:4;--r:11deg;--y:.3vw">10<br>♥</div>
       </div>
     </div>
     <div class="right">
@@ -300,6 +323,8 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <button class="b" id="bResult">Abrechnung</button>
   <button class="b" id="bExport">⬇ Export</button>
   <button class="b" id="bSet">⚙</button>
+  <button class="b" id="bSeat">🪑 Seat open</button>
+  <button class="b" id="bBday">🎂</button>
   <button class="b" id="bSnd">Test-Sound</button>
   <button class="b" id="bFull">⛶ Vollbild</button>
 </nav>
@@ -376,11 +401,13 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 <div class="intro" id="intro" hidden></div>
 <div class="count" id="count" hidden></div>
 <div class="toast" id="toast" hidden></div>
+<div class="seatop" id="seatop" hidden></div>
+<div class="bday" id="bday" hidden></div>
 <button class="snd" id="snd" type="button" hidden>🔇 Einmal klicken für Ton</button>
 
 <script>
 "use strict";
-const KEY="bcc-tafel-dmh-2026-10-28";
+const KEY="bcc-tafel-mbd-2026-11-01";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -392,7 +419,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const DEFAULT_LEVELS=[
  {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
 ];
-const NAMES=["Tim","Oli","Philipp","Niklas","Domi M","Nico","Jonas","Benno","Domi C","Manu"];
+const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno"];
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -406,9 +433,9 @@ const GAMES={
  "Pass the Trash":{bb:0,pay:"",short:"Eine Hand · 3 Karten · 1 nach links schieben · 1 abwerfen",rules:"1. Jeder bekommt 3 Karten.  2. Alle schieben gleichzeitig eine Karte verdeckt zum linken Nachbarn.  3. Jeder wirft eine Karte weg und spielt mit 2 Karten ganz normal weiter."},
  "Omaha-Hand":{bb:0,pay:"",short:"Eine Hand · 4 Karten · genau 2 benutzen · Pot-Limit",rules:"Die nächste Hand ist Pot-Limit Omaha: Jeder bekommt 4 Karten und muss genau 2 davon mit genau 3 vom Board benutzen. Gesetzt wird maximal der Pot."}
 };
-const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
+const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"Dead Man's Hand Deepstack",sub:"Blue Chip Club · Halloween Special · 10.000 Chips",i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"Midnight Birthday Deepstack",sub:"Blue Chip Club · Nikis Geburtstag · 10.000 Chips",i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:20,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
@@ -917,6 +944,9 @@ function runCmd(c){
     case "export":download();break;
     case "reload":save();setTimeout(()=>location.reload(),300);break;
     case "sync":break;
+    case "seatopen":seatOpen();break;
+    case "bday":bdayShow();break;
+    case "bdayclose":bdayClose();break;
     case "close":if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
@@ -987,6 +1017,57 @@ $("bDealer").onclick=()=>{let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++)
 $("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawSeats();};
 $("bResult").onclick=openResult;
 $("bSet").onclick=openSettings;
+/* ---------- Floorman: Seat open ---------- */
+let seatT=null;
+function seatOpen(){
+  ac();[[784,0],[622,.28]].forEach(([f,t])=>{tone(f,t,.9,.32);tone(f*2,t,.5,.06);});
+  try{const u=new SpeechSynthesisUtterance("Seat open! Seat open!"),vs=speechSynthesis.getVoices(),v=vs.find(x=>/en-(US|GB)/i.test(x.lang)&&/male|david|daniel|guy|george/i.test(x.name))||vs.find(x=>/^en/i.test(x.lang));if(v)u.voice=v;u.lang=v?v.lang:"en-US";u.rate=.92;u.pitch=.85;u.volume=1;speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),700);}catch(e){}
+  const el=$("seatop");el.innerHTML='<div><span>Seat&nbsp;open</span><small>Floorman · ein Platz ist frei</small></div>';el.hidden=false;clearTimeout(seatT);seatT=setTimeout(()=>{el.hidden=true;},3300);
+}
+$("bSeat").onclick=seatOpen;
+
+/* ---------- Geburtstag: Mitternachts-Screen + Diashow ---------- */
+const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",greet:"Grüße für Niki"};
+let bdayData=null,bdayT=null;
+async function bdayLoad(){
+  try{
+    const html=await (await fetch("../index.html?b="+Date.now(),{cache:"no-store"})).text();
+    const d=new DOMParser().parseFromString(html,"text/html").getElementById("liga-data");const L=JSON.parse(d.textContent);
+    const pt=L.settings.points||{p1:10,p2:6,p3:3},m={};
+    L.tournaments.forEach(t=>{(t.results||[]).forEach(r=>{if(!r.name)return;const x=m[r.name]=m[r.name]||{pts:0};x.pts+=Number(pt["p"+r.place])||0;});});
+    const rank=Object.entries(m).sort((a,b)=>b[1].pts-a[1].pts).findIndex(e=>e[0]===BDAY.name)+1;
+    const mine=L.tournaments.filter(t=>(t.participants||[]).includes(BDAY.name)||(t.results||[]).some(r=>r.name===BDAY.name));
+    const res=L.tournaments.flatMap(t=>(t.results||[]).filter(r=>r.name===BDAY.name).map(r=>Object.assign({t},r)));
+    const wins=res.filter(r=>r.place===1);
+    let greets=[];
+    if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(BDAY.greet),{credentials:"omit"})).json();greets=(j.signups||[]).filter(x=>String(x.note||"").trim()).map(x=>({name:x.name,text:String(x.note).trim()}));}catch(e){}}
+    bdayData={played:mine.length,wins:wins.length,podium:res.length,prize:res.reduce((a,r)=>a+(Number(r.prize)||0),0),rank,winNames:wins.map(r=>r.t.title),greets};
+  }catch(e){if(!bdayData)bdayData={played:0,wins:0,podium:0,prize:0,rank:0,winNames:[],greets:[]};}
+  return bdayData;
+}
+function bdayConfetti(){const c=["#e2b857","#f3d68f","#2f6bff","#8fb0ff","#fff","#c8202a"];return Array.from({length:70},(_,k)=>'<i class="cf" style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+c[k%c.length]+';animation-duration:'+(4+Math.random()*5).toFixed(1)+'s;animation-delay:'+(-Math.random()*8).toFixed(1)+'s"></i>').join("");}
+function bdaySong(){ac();const n={G:392,A:440,B:494,C:523,D:587,E:659,F:698,G2:784},q=.42;
+  [["G",.75],["G",.25],["A",1],["G",1],["C",1],["B",2],["G",.75],["G",.25],["A",1],["G",1],["D",1],["C",2]].reduce((t,[k,d])=>{tone(n[k],t,d*q*.95,.22,"triangle");tone(n[k]*2,t,d*q*.6,.05);return t+d*q;},.2);}
+async function bdayShow(){
+  const el=$("bday");clearTimeout(bdayT);el.hidden=false;
+  el.innerHTML=bdayConfetti()+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button><div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1></div>';
+  $("bdX").onclick=bdayClose;bdaySong();log("bday",{});
+  const D=await bdayLoad();const conf=bdayConfetti();
+  const card=(CARDS[BDAY.name.toLowerCase()]||{});const img=typeof card==="string"?card:card.img;
+  const slides=[
+    ()=>'<div class="sl"><div class="ey">00:00 · 2. November</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Der ganze Club stößt an</div></div>',
+    ()=>'<div class="sl row">'+(img?'<img class="bcard" src="'+img+'?v=9" alt="">':'')+'<div><div class="ey">Nikis Bilanz im Blue Chip Club</div><h1 style="font-size:max(36px,5.5vw);margin:1.4vh 0">'+(D.wins>1?D.wins+"-facher Sieger":D.wins?"Sieger":"Stammgast")+'</h1><div class="stats">'+
+      '<div><b>'+D.played+'</b><span>Turniere</span></div><div><b>'+D.wins+'</b><span>Siege</span></div><div><b>'+D.podium+'</b><span>Podestplätze</span></div><div><b>'+fmt(D.prize)+' P</b><span>gewonnen</span></div>'+(D.rank?'<div><b>#'+D.rank+'</b><span>in der Rangliste</span></div>':'')+(D.winNames.length?'<div><b style="font-size:max(16px,1.6vw);line-height:1.25">'+D.winNames.map(esc).join("<br>")+'</b><span>Titel</span></div>':'')+'</div></div></div>'
+  ].concat(D.greets.map(g=>()=>'<div class="sl"><div class="ey">Nachricht für '+esc(BDAY.call)+'</div><p class="q" style="margin-top:3vh">'+esc(g.text)+'</p><div class="who">'+esc(g.name)+'</div></div>'))
+   .concat([()=>'<div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Alles Gute,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Und jetzt: weiter geht\'s</div></div>']);
+  let k=0;const show=()=>{if(el.hidden)return;el.innerHTML=conf+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button>'+slides[k]()+(k>1&&k<slides.length-1?'<div class="dots">'+(k-1)+' / '+D.greets.length+'</div>':'');$("bdX").onclick=bdayClose;
+    const dur=k===0?9000:k===1?16000:k===slides.length-1?60000:Math.min(16000,6000+String((D.greets[k-2]||{}).text||"").length*60);k++;if(k<slides.length)bdayT=setTimeout(show,dur);};
+  bdayT=setTimeout(show,2500);
+}
+function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";}
+$("bBday").onclick=()=>{if(!$("bday").hidden)bdayClose();else bdayShow();};
+setInterval(()=>{const at=new Date(BDAY.at).getTime(),now=Date.now();if(now>=at&&now<at+10*60000&&!S.fired.bday){S.fired.bday=1;save();bdayShow();}if(now>=at-20*60000&&now<at&&!bdayData)bdayLoad();},5000);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bday").hidden)bdayClose();});
 $("bSnd").onclick=()=>{ac();minuteBeep();[3,2,1].forEach((n,k)=>setTimeout(()=>countdown(n),1500+k*1000));setTimeout(levelSound,4500);};
 $("bFull").onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
 $("bGame").onclick=()=>{

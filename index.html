@@ -701,6 +701,11 @@ textarea { min-height: 150px; resize: vertical; }
    "info": "Wieder Deepstack mit 10.000 Chips, wie beim Dead Man's Hand. Je mehr Leute kommen, desto besser: Bei mehr als 10 spielen wir an zwei Tischen und am Ende an einem Final Table.\n\nTreffpunkt ist um 17:00 Uhr, die erste Hand um 17:30 Uhr.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
    "seats": 0,
    "times": [],
+   "greet": {
+    "to": "Niki",
+    "event": "Grüße für Niki",
+    "until": "2026-11-02T00:00"
+   },
    "votes": {},
    "signups": [],
    "tbd": ""
@@ -1516,6 +1521,7 @@ textarea { min-height: 150px; resize: vertical; }
   }
   const noLimit = n => Number(n.seats) === 0;
   const seatsOf = n => noLimit(n) ? Infinity : Number(n.seats) || 10;
+  const greetOn = n => n.greet && n.greet.event && Date.now() < new Date(n.greet.until || 0).getTime();
   const vTimes = n => (n.times || []).filter(x => x.v);
   const votesFor = (n, v) => Object.keys(n.votes || {}).filter(k => n.votes[k] === v);
   const voteLead = n => { const t = vTimes(n).map(x => [x, votesFor(n, x.v).length]).sort((a, b) => b[1] - a[1]); return t.length && t[0][1] && (t.length < 2 || t[0][1] > t[1][1]) ? t[0][0] : null; };
@@ -1529,7 +1535,7 @@ textarea { min-height: 150px; resize: vertical; }
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
     return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
-      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
+      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
   function openSplash() {
@@ -1545,7 +1551,7 @@ textarea { min-height: 150px; resize: vertical; }
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
-      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button><button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
+      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-go="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const tick = () => { const s = Math.max(0, (d - Date.now()) / 1000), v = [s / 86400, s % 86400 / 3600, s % 3600 / 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')); el.querySelectorAll('.cdx b').forEach((b, i) => { b.textContent = v[i]; }); };
     tick(); const iv = setInterval(tick, 1000);
@@ -1596,6 +1602,12 @@ textarea { min-height: 150px; resize: vertical; }
       '<p class="sub" style="font-size:13px">Kommst du später oder gibt es sonst etwas zu beachten? Schreib es hier rein oder direkt mit in die WhatsApp-Nachricht.</p>' +
       '<div class="acts"><a class="btn wa" id="rWa" href="https://wa.me/" target="_blank" rel="noopener noreferrer">' + (isFull(n) ? 'Auf die Warteliste' : 'Per WhatsApp reservieren') + '</a><button class="btn" id="rCopy">Text kopieren</button><span class="status" id="rStatus"></span></div><div class="fb" id="rFb" hidden></div>' +
       '<p class="sub" style="font-size:13px">Nach der Bestätigung stehst du hier in der Liste. Bargeld für deine Entries mitbringen.</p></div>' +
+      (greetOn(n) ? '<div class="resv" id="greet"><div class="head" style="margin:0"><h2>🎂 Nachricht für ' + esc(n.greet.to) + '</h2><span class="eyebrow">geheim bis 0:00</span></div>' +
+        '<p class="sub" style="font-size:14px">Schreib ' + esc(n.greet.to) + ' ein paar persönliche Zeilen. Um Mitternacht laufen alle Nachrichten als Diashow auf der großen Tafel. Bis dahin bleibt alles geheim.</p>' +
+        '<label class="field"><span>Von</span><select id="gP">' + playerOpts('') + '<option value="__g">Jemand anderes …</option></select></label><label class="field" id="gGW" hidden><span>Dein Name</span><input id="gG" placeholder="Vorname"></label>' +
+        '<label class="field"><span>Deine Nachricht <small id="gC" style="float:right">0 / 200</small></span><textarea id="gT" maxlength="200" rows="3" placeholder="Alles Gute, Niki! …"></textarea></label>' +
+        '<div class="acts"><button class="btn wa" id="gSend" type="button">Nachricht abschicken</button><span class="status" id="gStatus"></span></div>' +
+        '<p class="sub" style="font-size:13px">Du kannst sie bis Mitternacht noch ändern: einfach nochmal abschicken, es zählt die letzte.</p></div>' : '') +
       (prog.length ? '<div>' + head('Ablauf', 'Der Abend') + '<ol class="tline">' + prog.map(x => '<li><time>' + esc(x.t) + '</time><i></i><span>' + esc(x.l) + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</span></li>').join('') + '</ol></div>' : '') +
       (n.trophy ? '<div class="trophy">' + TROPHY + '<div><h3>' + esc(n.trophyTitle || 'Wanderpokal') + '</h3>' + paras(n.trophy) + '</div></div>' : '') +
       (n.info ? '<div class="txt">' + head('Was dich erwartet', '') + paras(n.info) + '</div>' : '') + '</div>';
@@ -1611,7 +1623,18 @@ textarea { min-height: 150px; resize: vertical; }
     const reg = () => { const tm = $('input[name=rT]:checked'); register(n, $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value, tm ? tm.value : '', ($('#rN').value || '').trim()); };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); reg(); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); reg(); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
-    if (focus === 'resv') requestAnimationFrame(() => $('#resv').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+    if ($('#greet')) {
+      $('#gP').onchange = () => { $('#gGW').hidden = $('#gP').value !== '__g'; };
+      $('#gT').oninput = () => { $('#gC').textContent = $('#gT').value.length + ' / 200'; };
+      $('#gSend').onclick = () => {
+        const st = $('#gStatus'), nm = $('#gP').value === '__g' ? $('#gG').value.trim() : $('#gP').value, t = $('#gT').value.trim();
+        if (!nm || !t) { st.className = 'status err'; st.textContent = !nm ? 'Bitte wähl deinen Namen.' : 'Schreib erst eine Nachricht.'; return; }
+        const api = DATA.settings.api; if (!api) { st.className = 'status err'; st.textContent = 'Gerade nicht möglich.'; return; }
+        try { fetch(api, { method: 'POST', mode: 'no-cors', credentials: 'omit', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ event: n.greet.event, name: nm, time: '', note: t }) }).then(() => { st.className = 'status'; st.textContent = 'Danke! Deine Nachricht ist angekommen 🎂'; }).catch(() => { st.className = 'status err'; st.textContent = 'Hat nicht geklappt, bitte nochmal.'; }); } catch (e) {}
+        st.className = 'status'; st.textContent = 'Wird gesendet …';
+      };
+    }
+    if (focus === 'resv' || focus === 'greet') requestAnimationFrame(() => $('#' + focus).scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
     else $('#evX').focus({ preventScroll: true });
   }
   function closeEvent() { $('#evov').hidden = true; document.body.style.overflow = ''; }
@@ -2018,10 +2041,11 @@ textarea { min-height: 150px; resize: vertical; }
   }
   function refreshEvent() {
     if ($('#evov').hidden || !$('#resv')) return;
-    const m = $('#evm'), tm = $('input[name=rT]:checked'), k = { p: $('#rP').value, g: $('#rG').value, n: $('#rN').value, t: tm && tm.value, y: m.scrollTop, a: document.activeElement && document.activeElement.id };
+    const m = $('#evm'), tm = $('input[name=rT]:checked'), k = { p: $('#rP').value, g: $('#rG').value, n: $('#rN').value, t: tm && tm.value, y: m.scrollTop, a: document.activeElement && document.activeElement.id, gp: $('#gP') && $('#gP').value, gg: $('#gG') && $('#gG').value, gt: $('#gT') && $('#gT').value };
     openEvent();
     $('#rP').value = k.p; $('#rP').onchange(); $('#rG').value = k.g; $('#rN').value = k.n;
     if (k.t) { const r = document.querySelector('input[name=rT][value="' + k.t + '"]'); if (r) r.checked = true; }
+    if ($('#gP')) { $('#gP').value = k.gp || ''; $('#gP').onchange(); $('#gG').value = k.gg || ''; $('#gT').value = k.gt || ''; $('#gT').oninput(); }
     m.scrollTop = k.y; if (k.a && $('#' + k.a)) $('#' + k.a).focus({ preventScroll: true });
   }
   (async () => {
