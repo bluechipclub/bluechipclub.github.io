@@ -384,7 +384,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
     <label class="f">Rebuys bis Level <input id="sReLvl" type="number" placeholder="immer"></label>
     <label class="f">Max. Rebuys pro Spieler <input id="sMaxRe" type="number" placeholder="unbegrenzt"></label>
     <label class="f">Buy-in (P) <input id="sBuyin" type="number"></label>
-    <label class="f">davon Rake (P) <input id="sFee" type="number"></label>
+    <label class="f">davon Veranstalter (P) <input id="sFee" type="number"></label>
     <label class="f">Rebuy (P) <input id="sRebuy" type="number"></label>
     <label class="f">Bezahlte Plätze <select id="sPlaces"><option value="2">Top 2</option><option value="3">Top 3</option></select></label>
     <label class="f">Platz 3 bekommt (P) <input id="sThird" type="number"></label>
@@ -704,7 +704,7 @@ function openResult(){
   let h='<thead><tr><th>Platz</th><th>Spieler</th><th class="num">Entries</th><th class="num">Eingesetzt</th><th class="num">Bezahlt</th><th class="num">Offen</th><th class="num">Gewinn</th><th class="num">+/−</th></tr></thead><tbody>';
   order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
   h+='</tbody>';$("rTable").innerHTML=h;
-  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries · Rake "+P(s.feeTotal)+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ");
+  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries · An Veranstalter "+P(s.feeTotal)+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ");
   $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. Claude prüft das nach dem Export noch mal.";
   $("sTable").innerHTML=s.tx.length?'<tbody>'+s.tx.map(t=>'<tr><td>'+esc(t.from)+'</td><td>→</td><td>'+esc(t.to)+'</td><td class="num"><b>'+P(t.amount)+'</b></td></tr>').join("")+'</tbody>':'<tbody><tr><td>Noch nichts zu verteilen.</td></tr></tbody>';
   $("mResult").hidden=false;
@@ -745,7 +745,7 @@ async function pdfExport(d){
   txt(new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+"  ·  "+(done?"Endstand":"Zwischenstand ("+alive().length+" noch im Spiel)"),M,30);
   y=46;
   // key numbers
-  const boxes=[["Pot",s.pot+" P"],["Entries",String(totalEntries())],["Preise",s.pays.map((v,k)=>(k+1)+". "+v).join("  ")],["Rake",s.feeTotal+" P"]];
+  const boxes=[["Pot",s.pot+" P"],["Entries",String(totalEntries())],["Preise",s.pays.map((v,k)=>(k+1)+". "+v).join("  ")],["An Veranstalter",s.feeTotal+" P"]];
   const bw=(W-2*M-9)/4;boxes.forEach((b,k)=>{const x=M+k*(bw+3);doc.setDrawColor(220,220,220);doc.roundedRect(x,y-7,bw,16,2,2);
     doc.setFontSize(7.5);doc.setTextColor(...grey);txt(b[0].toUpperCase(),x+3,y-2);doc.setFontSize(12);doc.setFont("helvetica","bold");doc.setTextColor(...ink);txt(b[1],x+3,y+5.5);doc.setFont("helvetica","normal");});
   y+=22;
@@ -781,7 +781,7 @@ async function pdfExport(d){
       if(k===1)doc.setFont("helvetica","bold");txt(t,cols[k][1],y,k===7?{align:"right"}:{});doc.setFont("helvetica","normal");});
     y+=6.2;});
   y+=6;need(14);doc.setFontSize(8.5);doc.setTextColor(...grey);
-  txt("Buy-in "+S.buyin+" P (davon "+S.fee+" P Rake), Rebuy "+S.rebuy+" P. Offen = noch nicht bezahlte Entries.",M,y);y+=4.5;
+  txt("Buy-in "+S.buyin+" P (davon "+S.fee+" P an den Veranstalter), Rebuy "+S.rebuy+" P. Offen = noch nicht bezahlte Entries.",M,y);y+=4.5;
   txt("Wer offen hat und nichts gewonnen hat, zahlt an den Gewinner, der neben seinem Namen steht. Den Rest zahlt "+S.bank+" aus der Kasse aus.",M,y);
   doc.save("abrechnung-"+(d?d.date:new Date().toISOString().slice(0,10))+".pdf");
   toast("PDF gespeichert (Downloads)");
@@ -789,7 +789,7 @@ async function pdfExport(d){
 function pdfPrint(){
   const {s,order,kasse,getsFrom}=pdfLines(),w=window.open("","_blank");if(!w){toast("PDF nicht möglich, Popup blockiert");return;}
   w.document.write('<meta charset="utf-8"><title>Abrechnung</title><style>body{font:14px Arial;margin:24px;color:#111}h1{margin:0}h2{margin:22px 0 8px;border-bottom:2px solid #c49a41;display:inline-block}table{border-collapse:collapse;width:100%}td,th{padding:5px 8px;border-bottom:1px solid #ddd;text-align:left}.r{text-align:right}</style>'+
-    '<h1>'+esc(S.title)+'</h1><p>'+new Date().toLocaleDateString("de-DE")+' · Pot '+s.pot+' P · '+totalEntries()+' Entries · Rake '+s.feeTotal+' P</p>'+
+    '<h1>'+esc(S.title)+'</h1><p>'+new Date().toLocaleDateString("de-DE")+' · Pot '+s.pot+' P · '+totalEntries()+' Entries · An Veranstalter '+s.feeTotal+' P</p>'+
     '<h2>Wer bekommt was</h2><table>'+order.filter(r=>r.win).map(r=>'<tr><td>'+r.place+'.</td><td><b>'+esc(r.name)+'</b></td><td class="r"><b>+'+r.win+' P</b></td></tr>').join("")+'</table>'+
     '<h2>Wer zahlt an wen</h2><table>'+(s.tx.map(t=>'<tr><td><b>'+esc(t.from)+'</b></td><td>zahlt an</td><td><b>'+esc(t.to)+'</b></td><td class="r"><b>'+t.amount+' P</b></td></tr>').join("")||'<tr><td>Keine Zahlungen nötig.</td></tr>')+'</table>'+
     '<h2>Alle Spieler</h2><table><tr><th>Platz</th><th>Spieler</th><th>Entries</th><th>Eingesetzt</th><th>Bezahlt</th><th>Offen</th><th>Gewinn</th><th class="r">+/-</th></tr>'+order.map(r=>'<tr><td>'+(r.place||"-")+'</td><td>'+esc(r.name)+'</td><td>'+r.entries+'</td><td>'+r.cost+'</td><td>'+r.paid+'</td><td>'+(r.open||"-")+'</td><td>'+(r.win||"-")+'</td><td class="r">'+r.net+'</td></tr>').join("")+'</table>');
@@ -798,7 +798,7 @@ function pdfPrint(){
 function summaryText(){
   const s=settlement();
   const order=s.rows.slice().sort((a,b)=>(a.place||99)-(b.place||99));
-  return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries · Rake "+s.feeTotal+" P\n\n"+
+  return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries · An Veranstalter "+s.feeTotal+" P\n\n"+
     order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win:"")).join("\n")+
     "\n\nZahlungen:\n"+(s.tx.map(t=>t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine");
 }

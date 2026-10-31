@@ -698,7 +698,7 @@ textarea { min-height: 150px; resize: vertical; }
    ],
    "trophyTitle": "Nikis Geburtstag",
    "trophy": "Am Montag hat Niki Geburtstag, und wir spielen am Sonntagabend gemeinsam rein. Um Mitternacht wird angestoßen, egal wie der Stand am Tisch ist.",
-   "info": "Wieder Deepstack mit 10.000 Chips, wie beim Dead Man's Hand. Je mehr Leute kommen, desto besser: Bei mehr als 10 spielen wir an zwei Tischen und am Ende an einem Final Table.\n\nTreffpunkt ist um 17:00 Uhr, die erste Hand um 17:30 Uhr.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon 5 P Rake. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
+   "info": "Wieder Deepstack mit 10.000 Chips, wie beim Dead Man's Hand. Je mehr Leute kommen, desto besser: Bei mehr als 10 spielen wir an zwei Tischen und am Ende an einem Final Table.\n\nTreffpunkt ist um 17:00 Uhr, die erste Hand um 17:30 Uhr.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
    "seats": 0,
    "times": [],
    "greet": {
@@ -1435,7 +1435,7 @@ textarea { min-height: 150px; resize: vertical; }
 
     h += cx('c6', head('Buy-in & Rebuy', 'Pro Entry') +
       '<div class="rg-entry"><div class="rg-row"><span>Buy-in</span><b>' + buyin + ' ' + esc(unit()) + '</b></div>' +
-      (fee ? '<div class="rg-bar"><i style="flex:' + pool + '"><span>' + pool + ' ' + esc(unit()) + ' Preispool</span></i><i class="k" style="flex:' + fee + '"><span>' + fee + '</span></i></div><p class="sub">' + pool + ' ' + esc(unit()) + ' gehen in den Preispool, ' + fee + ' ' + esc(unit()) + ' Rake.</p>' : '') +
+      (fee ? '<div class="rg-bar"><i style="flex:' + pool + '"><span>' + pool + ' ' + esc(unit()) + ' Preispool</span></i><i class="k" style="flex:' + fee + '"><span>' + fee + '</span></i></div><p class="sub">' + pool + ' ' + esc(unit()) + ' gehen in den Preispool, ' + fee + ' ' + esc(unit()) + ' an den Veranstalter.</p>' : '') +
       '<div class="rg-row"><span>Rebuy</span><b>' + rebuy + ' ' + esc(unit()) + '</b></div><div class="rg-bar"><i style="flex:1"><span>' + rebuy + ' ' + esc(unit()) + ' komplett in den Preispool</span></i></div>' +
       '<p class="sub">Rebuys sind während der Rebuy-Phase erlaubt, die vor jedem Turnier angesagt wird. Bring Bargeld für so viele Entries mit, wie du spielen willst.</p></div>');
 
@@ -1566,7 +1566,7 @@ textarea { min-height: 150px; resize: vertical; }
     if (audio && soundOn) for (let i = 0; i < 6; i++) clack(audio.currentTime + 0.9 + i * 0.05, .4);
     setTimeout(() => { const x = el.querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 50);
   }
-  const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.fee ? ' (inkl. ' + eur(n.fee) + ' Rake)' : '') + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
+  const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.fee ? ' (inkl. ' + eur(n.fee) + ' Veranstalter)' : '') + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
   function nextOk() { const n = DATA.settings.next; return n && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
   const hhmm = d => d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   const tbdHtml = n => '<p class="tbd">' + esc(n.tbd) + '</p>';
@@ -1587,7 +1587,7 @@ textarea { min-height: 150px; resize: vertical; }
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     const prog = (n.program || []).filter(x => x.t || x.l);
     const paras = t => String(t || '').split(/\n\s*\n/).filter(Boolean).map(x => '<p>' + esc(x).replace(/\n/g, '<br>') + '</p>').join('');
-    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Rake' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
+    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Veranstalter' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Neuer Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
@@ -2000,7 +2000,7 @@ textarea { min-height: 150px; resize: vertical; }
     return '<div class="box"><span class="label">Nächstes Turnier</span><div class="row"><label class="field"><span>Datum &amp; Treffpunkt</span><input id="nDate" type="datetime-local" value="' + esc(n.date || '') + '"></label><label class="field"><span>Name</span><input id="nTitle" value="' + esc(n.title || '') + '"></label></div>' +
       '<label class="field"><span>Termin verschoben (Hinweistext, leer = Termin gilt)</span><input id="nTbd" value="' + esc(n.tbd || '') + '"></label>' +
       '<label class="field"><span>Untertitel</span><input id="nSub" value="' + esc(n.sub || '') + '"></label>' +
-      '<div class="row"><label class="field"><span>Buy-in (P)</span><input id="nBuy" type="number" min="0" value="' + esc(n.buyin || '') + '"></label><label class="field"><span>vom Buy-in Rake (P)</span><input id="nFee" type="number" min="0" value="' + esc(n.fee || '') + '"></label><label class="field"><span>Rebuy (P)</span><input id="nReb" type="number" min="0" value="' + esc(n.rebuy || '') + '"></label><label class="field"><span>Karten-Deko</span><input id="nCards" value="' + esc(n.cards || '') + '" placeholder="A♠ A♣ 8♠ 8♣ 9♦"></label></div>' +
+      '<div class="row"><label class="field"><span>Buy-in (P)</span><input id="nBuy" type="number" min="0" value="' + esc(n.buyin || '') + '"></label><label class="field"><span>vom Buy-in an Veranstalter (P)</span><input id="nFee" type="number" min="0" value="' + esc(n.fee || '') + '"></label><label class="field"><span>Rebuy (P)</span><input id="nReb" type="number" min="0" value="' + esc(n.rebuy || '') + '"></label><label class="field"><span>Karten-Deko</span><input id="nCards" value="' + esc(n.cards || '') + '" placeholder="A♠ A♣ 8♠ 8♣ 9♦"></label></div>' +
       '<label class="field"><span>Weitere Fakten (eine pro Zeile: Wert | Bezeichnung)</span><textarea id="nFacts">' + esc((n.facts || []).map(f => f.v + ' | ' + f.l).join('\n')) + '</textarea></label>' +
       '<label class="field"><span>Ablauf (eine Zeile pro Punkt: Uhrzeit | Was | Zusatz)</span><textarea id="nProg">' + esc((n.program || []).map(x => [x.t, x.l, x.s].filter(Boolean).join(' | ')).join('\n')) + '</textarea></label>' +
       '<label class="field"><span>Wanderpokal / Highlight</span><textarea id="nTrophy">' + esc(n.trophy || '') + '</textarea></label>' +
