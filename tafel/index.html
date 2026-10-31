@@ -1021,10 +1021,13 @@ $("bSet").onclick=openSettings;
 let seatT=null;
 function seatOpen(){
   ac();[[784,0],[622,.28]].forEach(([f,t])=>{tone(f,t,.9,.32);tone(f*2,t,.5,.06);});
-  try{const u=new SpeechSynthesisUtterance("Seat open! Seat open!"),vs=speechSynthesis.getVoices(),v=vs.find(x=>/en-(US|GB)/i.test(x.lang)&&/male|david|daniel|guy|george/i.test(x.name))||vs.find(x=>/^en/i.test(x.lang));if(v)u.voice=v;u.lang=v?v.lang:"en-US";u.rate=.92;u.pitch=.85;u.volume=1;speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),700);}catch(e){}
+  try{const vs=speechSynthesis.getVoices(),v=vs.find(x=>/en-(US|GB)/i.test(x.lang)&&/male|david|daniel|guy|george/i.test(x.name))||vs.find(x=>/^en/i.test(x.lang));
+    // ohne englische Stimme liest eine deutsche "Seat" als "Se-at", darum Lautschrift
+    const u=new SpeechSynthesisUtterance(v?"Seat open! Seat open!":"Siet open! Siet open!");if(v){u.voice=v;u.lang=v.lang;}u.rate=.92;u.pitch=.85;u.volume=1;speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),700);}catch(e){}
   const el=$("seatop");el.innerHTML='<div><span>Seat&nbsp;open</span><small>Floorman · ein Platz ist frei</small></div>';el.hidden=false;clearTimeout(seatT);seatT=setTimeout(()=>{el.hidden=true;},3300);
 }
 $("bSeat").onclick=seatOpen;
+try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}
 
 /* ---------- Geburtstag: Mitternachts-Screen + Diashow ---------- */
 const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",greet:"Grüße für Niki"};
