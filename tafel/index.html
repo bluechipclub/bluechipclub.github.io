@@ -827,11 +827,11 @@ function drawOverview(a){
 const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
 const C_NIK=[CA("niklas.jpg"),CA("niklas-2.jpg","niklas-2-fg.png"),CA("niklas-3.jpg","niklas-3-fg.png")],C_MAGG=[CA("magg.jpg"),CA("magg-2.jpg","magg-2-fg.png")],C_OLI=[CA("oli.jpg","oli-fg.png"),CA("oli-2.jpg","oli-2-fg.png")],C_PHIL=CA("philipp.jpg","philipp-fg.png"),C_JON=CA("jonny.jpg","jonny-fg.png");
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
-const CARDS={"tim":[CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":CA("nico.jpg"),"manu":[CA("manu.jpg","manu-fg.png"),CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":CA("domi-c.jpg","domi-c-fg.png"),"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":CA("benno.jpg"),"chris":CA("chris.jpg","chris-fg.png"),"jan":CA("jan.jpg?v=3","jan-fg.png"),"kevin":[CA("kevin.jpg","kevin-fg.png"),CA("kevin-2.jpg","kevin-2-fg.png")]};
+const CARDS={"tim":[CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":CA("nico.jpg"),"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu.jpg","manu-fg.png"),CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":CA("domi-c.jpg","domi-c-fg.png"),"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":CA("benno.jpg"),"chris":CA("chris.jpg","chris-fg.png"),"jan":CA("jan.jpg?v=3","jan-fg.png"),"kevin":[CA("kevin.jpg","kevin-fg.png"),CA("kevin-2.jpg","kevin-2-fg.png")]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 const VIDS={"nico":"karten/nico.mp4?v=1"};
 const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan"};
-function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=7";const c=cardOf(n);return null;}
+function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=8";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
 const cardOf=n=>{const c=(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;return Array.isArray(c)?c[0]:c;};
@@ -847,7 +847,7 @@ function introShow(list,done,o){o=o||{};
   function step(){
     sv();if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&VIDS[p.name.toLowerCase()];
-    box.innerHTML='<div class="inC">'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+(vid?'<div class="inV"><video src="'+vid+'" playsinline preload="auto"></video></div>':'')+
+    box.innerHTML='<div class="inC"'+(img&&img.ar?' style="aspect-ratio:'+img.ar+'"':'')+'>'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>'+(vid?'<div class="inV"><video src="'+vid+'" playsinline preload="auto"></video></div>':'')+
       '<div class="inT"><div class="eyebrow">'+(o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:k===0?'Platz 1 · Dealer-Platz':'Platz '+(k+1)+' von '+list.length)+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+
       '<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
@@ -866,7 +866,7 @@ function spotlight(c){
   const box=$("intro"),img=cardOf(c.name);let k=0;
   const steps=[
     ()=>'<div class="inT" style="max-width:80vw;text-align:center"><div class="eyebrow">'+esc(c.eyebrow||"Blue Chip Club")+'</div><h3 style="font-size:max(56px,9vw)">'+esc(c.head||"Neuer Name erarbeitet")+'</h3></div>',
-    ()=>'<div class="inC">'+(img?cardHtml(img):'')+'</div><div class="inT"><div class="eyebrow">'+esc(c.name)+'</div><h3>'+esc(c.nick||"")+'</h3>'+(c.sub?'<div class="inD">'+esc(c.sub)+'</div>':'')+'</div>'];
+    ()=>'<div class="inC"'+(img&&img.ar?' style="aspect-ratio:'+img.ar+'"':'')+'>'+(img?cardHtml(img):'')+'</div><div class="inT"><div class="eyebrow">'+esc(c.name)+'</div><h3>'+esc(c.nick||"")+'</h3>'+(c.sub?'<div class="inD">'+esc(c.sub)+'</div>':'')+'</div>'];
   intro={next:()=>{clearTimeout(intro.t);k++;step();},stop:()=>{clearTimeout(intro.t);box.hidden=true;intro=null;}};
   function step(){
     if(k>=steps.length){box.hidden=true;intro=null;return;}

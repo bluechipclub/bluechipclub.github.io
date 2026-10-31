@@ -46,6 +46,7 @@ h1{font-size:clamp(34px,6vw,64px);margin:44px 0 6px;letter-spacing:-.02em;backgr
 .ptop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
 .pgrid{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:32px;align-items:start}
 .pcard{position:relative;aspect-ratio:378/1024;border-radius:16px;overflow:hidden;cursor:zoom-in;border:0;padding:0;background:#111;box-shadow:0 0 0 1px var(--gold3),0 18px 40px rgba(0,0,0,.7);width:100%}
+.arbg{position:absolute;inset:-10%;background-size:cover;background-position:center;filter:blur(22px) brightness(.45)}.c img.ar,.big img.ar,.pcard img.ar{position:relative;object-fit:contain}
 .gal{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.gal button{width:62px;aspect-ratio:378/600;border-radius:8px;overflow:hidden;border:0;padding:0;cursor:pointer;background:#111;box-shadow:0 0 0 1px #333;opacity:.55;transition:opacity .3s,box-shadow .3s}.gal button.on{opacity:1;box-shadow:0 0 0 2px var(--gold3)}.gal img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}.gal .gl{width:100%;font:11px 'Geist Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
 @media(max-width:760px){.gal{justify-content:center}.gal .gl{text-align:center}}
 .pcard img{width:100%;height:100%;object-fit:cover;display:block}
@@ -91,16 +92,17 @@ td.n,th.n{text-align:right}
 <script>
 const K="../tafel/karten/",V="?v=10";
 const P=[
- {n:"Tim",img:"tim.jpg",alt:[{img:"tim-2.jpg"}]},{n:"Niklas",img:"niklas.jpg",alt:[{img:"niklas-2.jpg",fg:"niklas-2-fg.png"},{img:"niklas-3.jpg",fg:"niklas-3-fg.png"}]},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu.jpg",fg:"manu-fg.png",alt:[{img:"manu-2.jpg"}]},
+ {n:"Tim",img:"tim.jpg",alt:[{img:"tim-2.jpg"}]},{n:"Niklas",img:"niklas.jpg",alt:[{img:"niklas-2.jpg",fg:"niklas-2-fg.png"},{img:"niklas-3.jpg",fg:"niklas-3-fg.png"}]},{n:"Nico",img:"nico.jpg"},{n:"Manu",img:"manu-v2.jpg",ar:1,alt:[{img:"manu.jpg",fg:"manu-fg.png"},{img:"manu-2.jpg"}]},
  {n:"Magg",img:"magg.jpg",alt:[{img:"magg-2.jpg",fg:"magg-2-fg.png"}]},{n:"Oli",img:"oli.jpg",fg:"oli-fg.png",alt:[{img:"oli-2.jpg",fg:"oli-2-fg.png"}]},{n:"Domi C",img:"domi-c.jpg",fg:"domi-c-fg.png"},{n:"Philipp",img:"philipp.jpg",fg:"philipp-fg.png"},
  {n:"Jonny",img:"jonny.jpg",fg:"jonny-fg.png"},{n:"Benno",img:"benno.jpg"},{n:"Chris",img:"chris.jpg",fg:"chris-fg.png"},{n:"Jan",img:"jan.jpg?v=3",fg:"jan-fg.png"},{n:"Kevin",img:"kevin.jpg",fg:"kevin-fg.png",alt:[{img:"kevin-2.jpg",fg:"kevin-2-fg.png"}]}
 ];
 const R=(a,b)=>(a+Math.random()*(b-a));
 /* several pictures per player: main card in the grid, all of them as a gallery on the profile */
-const vars=p=>[{img:p.img,fg:p.fg}].concat(p.alt||[]);
+const vars=p=>[{img:p.img,fg:p.fg,ar:p.ar}].concat(p.alt||[]);
 const pick=(p,not)=>{const v=vars(p),c=v.length>1&&not?v.filter(x=>x.img!==not):v;return c[Math.floor(Math.random()*c.length)];};
 function inner(p,v){v=v||p.cur||vars(p)[0];
   const bok=Array.from({length:14},()=>'<i style="--x:'+R(0,100).toFixed(0)+'%;--y:'+R(0,95).toFixed(0)+'%;--s:'+R(6,30).toFixed(0)+'px;--d:'+R(3,8).toFixed(1)+'s;--w:'+R(-6,0).toFixed(1)+'s"></i>').join("");
+  if(v.ar)return '<div class="arbg" style="background-image:url(\''+K+v.img+V+'\')"></div><img class="ar" src="'+K+v.img+V+'" alt="Spielerkarte '+p.n+'" loading="lazy"><span class="shine"></span>';
   return '<img src="'+K+v.img+V+'" alt="Spielerkarte '+p.n+'" loading="lazy">'+(v.fg?'<div class="anim">'+bok+'<b class="smk"></b></div><img class="fg" src="'+K+v.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 const real=P.filter(p=>p.img);let cur=-1,D=null,CH="";
