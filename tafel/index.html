@@ -810,10 +810,9 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 function drawSeats(){
   closeAll();
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  // Tim (organiser) always sits at the dealer spot = place 1, Manu directly left or right of him
-  const rule=S.seatRule||{anchor:"Tim",next:"Manu"},anc=a.find(p=>p.name.toLowerCase()===String(rule.anchor).toLowerCase());
-  if(anc){a=[anc,...a.filter(p=>p!==anc)];const nb=rule.next&&a.find(p=>p.name.toLowerCase()===String(rule.next).toLowerCase());
-    if(nb&&a.length>2){a=a.filter(p=>p!==nb);if(Math.random()<.5)a.splice(1,0,nb);else a.push(nb);}}
+  // Tim (organiser) always sits on the dealer spot = last place in the order (place 10 on a full table); everyone else is shuffled freely
+  const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
+  if(anc)a=[...a.filter(p=>p!==anc),anc];
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
   introShow(a,()=>drawOverview(a));
 }
