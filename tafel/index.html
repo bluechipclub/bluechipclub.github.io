@@ -1018,16 +1018,27 @@ $("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem n
 $("bResult").onclick=openResult;
 $("bSet").onclick=openSettings;
 /* ---------- Floorman: Seat open ---------- */
-let seatT=null;
+const seatMp3=new Audio("seat-open.mp3?v=1");seatMp3.preload="auto";
+// Spannung: Rauschen + Ton steigen 1 s an, dann Einschlag (tiefer Boom + Knall), danach die Floorman-Ansage
+function shock(a,t0){
+  const noise=a.createBuffer(1,a.sampleRate*2,a.sampleRate),d=noise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const t=a.currentTime+t0,src=a.createBufferSource(),bp=a.createBiquadFilter(),g=a.createGain();src.buffer=noise;bp.type="bandpass";bp.Q.value=6;
+  bp.frequency.setValueAtTime(300,t);bp.frequency.exponentialRampToValueAtTime(6000,t+1);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.95);g.gain.exponentialRampToValueAtTime(.0001,t+1.05);
+  src.connect(bp);bp.connect(g);g.connect(a.destination);src.start(t);src.stop(t+1.1);
+  const o=a.createOscillator(),og=a.createGain();o.type="sawtooth";o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(880,t+1);og.gain.setValueAtTime(.0001,t);og.gain.exponentialRampToValueAtTime(.08,t+.95);og.gain.exponentialRampToValueAtTime(.0001,t+1.02);o.connect(og);og.connect(a.destination);o.start(t);o.stop(t+1.05);
+  const h=t+1,b=a.createOscillator(),bg=a.createGain();b.type="sine";b.frequency.setValueAtTime(140,h);b.frequency.exponentialRampToValueAtTime(32,h+1.4);bg.gain.setValueAtTime(.9,h);bg.gain.exponentialRampToValueAtTime(.0001,h+1.8);b.connect(bg);bg.connect(a.destination);b.start(h);b.stop(h+1.9);
+  const n2=a.createBufferSource(),lp=a.createBiquadFilter(),ng=a.createGain();n2.buffer=noise;lp.type="lowpass";lp.frequency.setValueAtTime(5000,h);lp.frequency.exponentialRampToValueAtTime(200,h+.8);ng.gain.setValueAtTime(.6,h);ng.gain.exponentialRampToValueAtTime(.0001,h+.9);n2.connect(lp);lp.connect(ng);ng.connect(a.destination);n2.start(h);n2.stop(h+1);
+  [55,82.4,110].forEach(f=>tone(f,1+t0,2.2,.12,"triangle"));
+}
+let seatT=null,seatT2=null;
 function seatOpen(){
-  ac();[[784,0],[622,.28]].forEach(([f,t])=>{tone(f,t,.9,.32);tone(f*2,t,.5,.06);});
-  try{const vs=speechSynthesis.getVoices(),v=vs.find(x=>/en-(US|GB)/i.test(x.lang)&&/male|david|daniel|guy|george/i.test(x.name))||vs.find(x=>/^en/i.test(x.lang));
-    // ohne englische Stimme liest eine deutsche "Seat" als "Se-at", darum Lautschrift
-    const u=new SpeechSynthesisUtterance(v?"Seat open! Seat open!":"Siet open! Siet open!");if(v){u.voice=v;u.lang=v.lang;}u.rate=.92;u.pitch=.85;u.volume=1;speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),700);}catch(e){}
-  const el=$("seatop");el.innerHTML='<div><span>Seat&nbsp;open</span><small>Floorman · ein Platz ist frei</small></div>';el.hidden=false;clearTimeout(seatT);seatT=setTimeout(()=>{el.hidden=true;},3300);
+  const a=ac();if(a)shock(a,0);clearTimeout(seatT2);
+  seatT2=setTimeout(()=>{
+    try{seatMp3.currentTime=0;seatMp3.volume=1;seatMp3.play().catch(()=>{});}catch(e){}
+    const el=$("seatop");el.innerHTML='<div><span>Seat&nbsp;open</span><small>Floorman · ein Platz ist frei</small></div>';el.hidden=false;clearTimeout(seatT);seatT=setTimeout(()=>{el.hidden=true;},3300);
+  },a?1000:0);
 }
 $("bSeat").onclick=seatOpen;
-try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}
 
 /* ---------- Geburtstag: Mitternachts-Screen + Diashow ---------- */
 const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",greet:"Grüße für Niki"};
