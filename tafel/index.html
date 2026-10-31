@@ -824,13 +824,13 @@ function drawOverview(a){
 
 /* ---------- player cards: one by one after the seat draw ---------- */
 const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
-const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=CA("philipp.jpg","philipp-fg.png"),C_JON=CA("jonny.jpg","jonny-fg.png");
+const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=[{img:"karten/v2/philipp.jpg",ar:"2/3"}],C_JON=[{img:"karten/v2/jonny.jpg",ar:"2/3"}];
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
-const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[CA("kevin.jpg","kevin-fg.png")]};
+const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 const VIDS={"nico":"karten/nico.mp4?v=1"};
 const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan"};
-function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=11";const c=cardOf(n);return null;}
+function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=12";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
 const cardOf=n=>{const c=(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;return Array.isArray(c)?c[0]:c;};
