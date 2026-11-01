@@ -660,6 +660,31 @@
 "id": 82,
 "op": "out",
 "name": "Jan"
+},
+{
+"id": 83,
+"op": "lobbyclose"
+},
+{
+"id": 84,
+"op": "spotlight",
+"name": "Benno",
+"eyebrow": "💥 Doppel-Knockout",
+"head": "BENNO BOSS räumt ab!",
+"nick": "Zwei auf einen Streich",
+"sub": "10♥ 10♣ · Full House auf 8♦ 9♦ 10♦ 8♣ Q♦ · Kevin und Zeno sind raus",
+"sec1": 8,
+"sec": 35
+},
+{
+"id": 85,
+"op": "out",
+"name": "Kevin"
+},
+{
+"id": 86,
+"op": "out",
+"name": "Zeno"
 }
 ]
 }
