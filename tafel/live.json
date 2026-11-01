@@ -604,6 +604,17 @@
 "sub": "Herzlich willkommen im Blue Chip Club",
 "sec1": 5,
 "sec": 18
+},
+{
+"id": 75,
+"op": "spotlight",
+"name": "Zeno",
+"eyebrow": "Jetzt am Tisch",
+"head": "Herzlich willkommen, Zeno!",
+"nick": "Herzlich willkommen!",
+"sub": "Herzlich willkommen im Blue Chip Club",
+"sec1": 5,
+"sec": 18
 }
 ]
 }
