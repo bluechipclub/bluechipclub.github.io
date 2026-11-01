@@ -575,6 +575,20 @@
 "head": "Herzlich willkommen, Zeno!",
 "nick": "Herzlich willkommen!",
 "sec": 40
+},
+{
+"id": 71,
+"op": "lobbyclose"
+},
+{
+"id": 72,
+"op": "spotlight",
+"name": "Pasi",
+"eyebrow": "Erster raus · Chris mit A-K",
+"head": "RIP Pasi 🎸",
+"nick": "RIP Pasi",
+"sub": "Der Freigeist verlässt als Erster den Tisch",
+"sec": 35
 }
 ]
 }
