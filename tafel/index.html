@@ -857,9 +857,9 @@ function drawOverview(a){
 
 /* ---------- player cards: one by one after the seat draw ---------- */
 const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
-const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=[{img:"karten/v2/philipp.jpg",ar:"2/3"}],C_JON=[{img:"karten/v2/jonny.jpg",ar:"2/3"}];
+const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=[{img:"karten/v2/philipp.jpg",ar:"2/3"}],C_JON=[{img:"karten/v2/jonny.jpg?v=2",ar:"2/3"}];
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
-const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}]};
+const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
 const ANN_INTRO="ansagen/intro.mp3?v=1";
@@ -879,8 +879,8 @@ function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;}
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
 const BDAY_NAMES=["niklas","niki"];
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan"};
-function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=12";const c=cardOf(n);return null;}
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno"};
+function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=13";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
 const cardOf=n=>{const c=(S.cards&&S.cards[n.toLowerCase()])||CARDS[n.toLowerCase()]||null;return Array.isArray(c)?c[0]:c;};
@@ -1120,7 +1120,7 @@ function seatOpen(){
 $("bSeat").onclick=seatOpen;
 
 /* ---------- Geburtstag: Mitternachts-Screen + Diashow ---------- */
-const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",from:"Tim",msg:"Bleib wie du bist Bruder. Bist mir ein Vorbild in sehr vielen Dingen und dennoch begegnen wir uns stets auf Augenhöhe. Ich respektiere deine Meinung sehr. Danke! Entwickel dich stets so weiter!"};
+const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00"};
 let bdayData=null,bdayT=null,bdayPaused=false;
 /* photos of the friendship, mixed at random between the greetings */
 const MOMENTS=["momente/m1.jpg","momente/m2.jpg"];
@@ -1151,12 +1151,11 @@ async function bdayShow(){
   $("bdX").onclick=bdayClose;bdaySong();log("bday",{});
   if(S.running&&!S.ended){toggle();bdayPaused=true;}
   const conf=bdayConfetti();
-  /* short show (Tim 01.11.): happy birthday, Tim's message, toast, then straight back to the game */
+  /* short show (Tim 01.11.): happy birthday + toast only (no messages), then straight back to the game */
   const slides=[
     ()=>'<div class="sl"><div class="ey">00:00 · 2. November</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Der ganze Club stößt an</div></div>',
-    ()=>'<div class="sl"><div class="ey">Nachricht für '+esc(BDAY.call)+'</div><p class="q" style="margin-top:3vh">'+esc(BDAY.msg)+'</p><div class="who">'+esc(BDAY.from)+'</div></div>',
     ()=>'<div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Prost,<br>'+esc(BDAY.call)+'! 🥂</h1><div class="ey" style="letter-spacing:.2em">Und jetzt: weiter geht\'s</div></div>'];
-  const durs=[9000,16000,15000];
+  const durs=[14000,14000];
   let k=0;const show=()=>{if(el.hidden)return;el.innerHTML=conf+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button>'+slides[k]();$("bdX").onclick=bdayClose;
     const dur=durs[k];k++;bdayT=setTimeout(k<slides.length?show:bdayClose,dur);};
   bdayT=setTimeout(show,2500);
