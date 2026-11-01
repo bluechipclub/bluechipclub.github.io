@@ -645,6 +645,21 @@
 "sub": "K♣ J♥ auf 7♣ J♣ J♦ 4♠ J♠ · gegen Jans Full House K♦ K♥",
 "sec1": 8,
 "sec": 40
+},
+{
+"id": 80,
+"op": "out",
+"name": "Nico"
+},
+{
+"id": 81,
+"op": "out",
+"name": "Pasi"
+},
+{
+"id": 82,
+"op": "out",
+"name": "Jan"
 }
 ]
 }
