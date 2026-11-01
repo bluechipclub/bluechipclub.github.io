@@ -540,6 +540,15 @@
 {
 "id": 65,
 "op": "reload"
+},
+{
+"id": 66,
+"op": "spotlight",
+"name": "Pasi",
+"eyebrow": "Blue Chip Club präsentiert",
+"head": "Special Guest",
+"nick": "Freigeist",
+"sec": 45
 }
 ]
 }
