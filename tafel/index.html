@@ -837,11 +837,13 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
 function drawSeats(){
-  closeAll();lobbyClose();bgStart();
+  closeAll();lobbyClose();bgActive=BG_ON;if(BG_ON&&!bg){bg=new Audio("ansagen/bg-nico.mp3?v=1");bg.loop=true;bg.preload="auto";bg.load();}
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   // Tim (organiser) always sits on the dealer spot = last place in the order (place 10 on a full table); everyone else is shuffled freely
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
+  // Nico always opens the draw on place 1 (his video starts the music)
+  const first=a.find(p=>p.name.toLowerCase()==="nico");if(first)a=[first,...a.filter(p=>p!==first)];
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
   if(ANN_INTRO){const box=$("intro");box.classList.remove("bd");box.innerHTML='<div class="inT" style="text-align:center;max-width:80vw"><div class="eyebrow">♠ Blue Chip Club · Platzauslosung</div><h3>'+esc(S.title)+'</h3></div>';box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     playAnn(ANN_INTRO,()=>introShow(a,()=>drawOverview(a)));}
@@ -866,10 +868,10 @@ let annAudio=null;
 function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return;}
   try{if(annAudio)annAudio.pause();}catch(e){}
   if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);}
-/* TEST (only with ?musik=1): Nico's song as background music from "Plätze auslosen" until the clock starts */
-const BG_ON=/[?&]musik=1/.test(location.search);let bg=null,bgActive=false,bgFade=null;
+/* background music: Nico's song starts with his video on place 1, then continues under the draw until the clock starts (?musik=0 switches it off) */
+const BG_ON=!/[?&]musik=0/.test(location.search);let bg=null,bgActive=false,bgFade=null;
 function bgVol(v){if(bg){clearInterval(bgFade);bg.volume=v;}}
-function bgStart(){if(!BG_ON)return;bgActive=true;if(!bg){bg=new Audio("ansagen/bg-nico.mp3?v=1");bg.loop=true;}bgVol(.35);bg.play().catch(()=>{});}
+function bgStart(at){if(!BG_ON)return;bgActive=true;if(!bg){bg=new Audio("ansagen/bg-nico.mp3?v=1");bg.loop=true;}if(at!=null){try{bg.currentTime=isFinite(bg.duration)&&bg.duration?at%bg.duration:at;}catch(e){}}bgVol(.35);bg.play().catch(()=>{});}
 function bgPause(){if(bg)bg.pause();}
 function bgResume(){if(bg&&bgActive&&bg.paused)bg.play().catch(()=>{});}
 function bgStop(){bgActive=false;if(!bg||bg.paused)return;clearInterval(bgFade);bgFade=setInterval(()=>{if(bg.volume>.04)bg.volume=Math.max(0,bg.volume-.03);else{clearInterval(bgFade);bg.pause();}},60);}
@@ -905,10 +907,14 @@ function introShow(list,done,o){o=o||{};
       '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     const annU=!o.label&&ANNS[p.name.toLowerCase()],me=k;
-    if(vid)bgPause();else bgResume();
+    const isNico=p.name.toLowerCase()==="nico";
+    if(!vid&&bgActive&&bg)bgResume();
     if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
       intro.stopVid=()=>{try{v.pause();}catch(e){}};intro.t=setTimeout(()=>{k++;step();},50000);
-      const startVid=()=>{if(!intro||k!==me)return;v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
+      const startVid=()=>{if(!intro||k!==me)return;
+        if(BG_ON&&isNico){if(bg)bg.pause();v.addEventListener("ended",()=>bgStart(v.currentTime));v.addEventListener("pause",()=>{if(bgActive&&(!bg||bg.paused))bgStart(v.currentTime);});}
+        else if(BG_ON&&bg&&!bg.paused){v.muted=true;}
+        v.volume=1;if(v.muted){v.play().catch(()=>{});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);return;}v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
       if(annU)playAnn(annU,startVid);else startVid();return;}
     if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1500,(o.sec||7)*1000-(Date.now()-t0)));});return;}
     if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
