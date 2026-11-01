@@ -562,6 +562,19 @@
 "head": "Special Guest",
 "nick": "Freigeist",
 "sec": 45
+},
+{
+"id": 69,
+"op": "lobbyclose"
+},
+{
+"id": 70,
+"op": "spotlight",
+"name": "Zeno",
+"eyebrow": "Jetzt am Tisch",
+"head": "Herzlich willkommen, Zeno!",
+"nick": "Herzlich willkommen!",
+"sec": 40
 }
 ]
 }
