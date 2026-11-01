@@ -351,6 +351,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <button class="b" id="bPlus">+1 Min</button>
   <button class="b" id="bPlayers">Spieler & Rebuys</button>
   <button class="b" id="bDealer">Dealer ▶</button>
+  <button class="b" id="bLobby" style="border-color:rgba(226,184,87,.6);color:#f3d68f">🖼 Bildschirmschoner</button>
   <button class="b" id="bDraw">Plätze auslosen</button>
   <button class="b" id="bGame">Minigame</button>
   <button class="b" id="bResult">Abrechnung</button>
@@ -358,7 +359,6 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <button class="b" id="bSet">⚙</button>
   <button class="b" id="bSeat">🪑 Seat open</button>
   <button class="b" id="bBday">🎂</button>
-  <button class="b" id="bLobby" title="Bildschirmschoner">🖼</button>
   <button class="b" id="bSnd">Test-Sound</button>
   <button class="b" id="bFull">⛶ Vollbild</button>
 </nav>
@@ -612,7 +612,7 @@ function tick(){
   }
   render();
 }
-function toggle(){if(typeof lobbyClose==="function")lobbyClose();
+function toggle(){if(typeof lobbyClose==="function")lobbyClose();if(typeof bgStop==="function")bgStop();
   ac();
   if(S.running){S.left=leftNow();S.running=false;S.endAt=null;log("pause");}
   else{if(S.left==null||S.left<=0)S.left=dur(S.i);S.running=true;S.endAt=Date.now()+S.left*1000;if(!S.started){S.started=new Date().toISOString();log("start");}else log("weiter");lock();}
@@ -837,7 +837,7 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
 function drawSeats(){
-  closeAll();lobbyClose();
+  closeAll();lobbyClose();bgStart();
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   // Tim (organiser) always sits on the dealer spot = last place in the order (place 10 on a full table); everyone else is shuffled freely
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
@@ -863,9 +863,16 @@ const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.j
 const ANN_INTRO="ansagen/intro.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
 let annAudio=null;
-function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;cb&&cb();};if(!u){f();return;}
+function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return;}
   try{if(annAudio)annAudio.pause();}catch(e){}
-  const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);}
+  if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);}
+/* TEST (only with ?musik=1): Nico's song as background music from "Plätze auslosen" until the clock starts */
+const BG_ON=/[?&]musik=1/.test(location.search);let bg=null,bgActive=false,bgFade=null;
+function bgVol(v){if(bg){clearInterval(bgFade);bg.volume=v;}}
+function bgStart(){if(!BG_ON)return;bgActive=true;if(!bg){bg=new Audio("ansagen/bg-nico.mp3?v=1");bg.loop=true;}bgVol(.35);bg.play().catch(()=>{});}
+function bgPause(){if(bg)bg.pause();}
+function bgResume(){if(bg&&bgActive&&bg.paused)bg.play().catch(()=>{});}
+function bgStop(){bgActive=false;if(!bg||bg.paused)return;clearInterval(bgFade);bgFade=setInterval(()=>{if(bg.volume>.04)bg.volume=Math.max(0,bg.volume-.03);else{clearInterval(bgFade);bg.pause();}},60);}
 function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;}
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
@@ -898,6 +905,7 @@ function introShow(list,done,o){o=o||{};
       '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     const annU=!o.label&&ANNS[p.name.toLowerCase()],me=k;
+    if(vid)bgPause();else bgResume();
     if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
       intro.stopVid=()=>{try{v.pause();}catch(e){}};intro.t=setTimeout(()=>{k++;step();},50000);
       const startVid=()=>{if(!intro||k!==me)return;v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
@@ -1184,7 +1192,8 @@ function lobbyClose(){clearTimeout(lobbyT);clearInterval(lobbyCd);$("lobby").hid
 $("bLobby").onclick=lobbyShow;
 $("lobby").onclick=lobbyClose;
 document.addEventListener("keydown",e=>{if(!$("lobby").hidden&&e.key==="Escape")lobbyClose();});
-if(!S.started&&Date.now()<new Date(LOBBY_AT).getTime()+3600000)setTimeout(lobbyShow,800);
+/* auto-start: before the first hand (also if the clock was only tested), or up to 1 h later while the tournament has not started */
+{const at=new Date(LOBBY_AT).getTime(),now=Date.now();if((now<at&&!S.running)||(!S.started&&now<at+3600000))setTimeout(lobbyShow,800);}
 $("bBday").onclick=()=>{if(!$("bday").hidden)bdayClose();else bdayShow();};
 setInterval(()=>{const at=new Date(BDAY.at).getTime(),now=Date.now();if(now>=at&&now<at+10*60000&&!S.fired.bday){S.fired.bday=1;save();bdayShow();}},5000);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bday").hidden)bdayClose();});
