@@ -589,6 +589,21 @@
 "nick": "RIP Pasi",
 "sub": "Der Freigeist verlässt als Erster den Tisch",
 "sec": 35
+},
+{
+"id": 73,
+"op": "lobbyclose"
+},
+{
+"id": 74,
+"op": "spotlight",
+"name": "Magg",
+"eyebrow": "Jetzt am Tisch",
+"head": "Herzlich willkommen, Magg!",
+"nick": "The Poet",
+"sub": "Herzlich willkommen im Blue Chip Club",
+"sec1": 5,
+"sec": 18
 }
 ]
 }
