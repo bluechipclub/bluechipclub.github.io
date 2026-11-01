@@ -1054,7 +1054,7 @@ function seatOpen(){
 $("bSeat").onclick=seatOpen;
 
 /* ---------- Geburtstag: Mitternachts-Screen + Diashow ---------- */
-const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",greet:"Grüße für Niki"};
+const BDAY={name:"Niklas",call:"Niki",at:"2026-11-02T00:00",from:"Tim",msg:"Bleib wie du bist Bruder. Bist mir ein Vorbild in sehr vielen Dingen und dennoch begegnen wir uns stets auf Augenhöhe. Ich respektiere deine Meinung sehr. Danke! Entwickel dich stets so weiter!"};
 let bdayData=null,bdayT=null,bdayPaused=false;
 /* photos of the friendship, mixed at random between the greetings */
 const MOMENTS=["momente/m1.jpg","momente/m2.jpg"];
@@ -1084,26 +1084,20 @@ async function bdayShow(){
   el.innerHTML=bdayConfetti()+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button><div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1></div>';
   $("bdX").onclick=bdayClose;bdaySong();log("bday",{});
   if(S.running&&!S.ended){toggle();bdayPaused=true;}
-  const D=await bdayLoad();const conf=bdayConfetti();
-  const card=cardOf(BDAY.name)||{};const img=typeof card==="string"?card:card.img;
+  const conf=bdayConfetti();
+  /* short show (Tim 01.11.): happy birthday, Tim's message, toast, then straight back to the game */
   const slides=[
     ()=>'<div class="sl"><div class="ey">00:00 · 2. November</div><h1>Happy Birthday,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Der ganze Club stößt an</div></div>',
-    ()=>'<div class="sl row">'+(img?'<img class="bcard" src="'+img+'?v=10" alt="">':'')+'<div><div class="ey">Nikis Bilanz im Blue Chip Club</div><h1 style="font-size:max(36px,5.5vw);margin:1.4vh 0">'+(D.wins>1?D.wins+"-facher Sieger":D.wins?"Sieger":"Stammgast")+'</h1><div class="stats">'+
-      '<div><b>'+D.played+'</b><span>Turniere</span></div><div><b>'+D.wins+'</b><span>Siege</span></div><div><b>'+D.podium+'</b><span>Podestplätze</span></div><div><b>'+fmt(D.prize)+' P</b><span>gewonnen</span></div>'+(D.rank?'<div><b>#'+D.rank+'</b><span>in der Rangliste</span></div>':'')+(D.winNames.length?'<div><b style="font-size:max(16px,1.6vw);line-height:1.25">'+D.winNames.map(esc).join("<br>")+'</b><span>Titel</span></div>':'')+'</div></div></div>'
-  ];
-  const gs=shuf(D.greets).map(g=>({d:Math.min(16000,6000+String(g.text||"").length*60),f:()=>'<div class="sl"><div class="ey">Nachricht für '+esc(BDAY.call)+'</div><p class="q" style="margin-top:3vh">'+esc(g.text)+'</p><div class="who">'+esc(g.name)+'</div></div>'}));
-  const ps=shuf(MOMENTS).map(u=>({d:7000,f:()=>'<div class="ph" style="background-image:url(\''+u+'\')"></div><img class="phi" src="'+u+'" alt="">'}));
-  const mid=[];while(gs.length||ps.length){if(gs.length)mid.push(gs.shift());if(ps.length)mid.push(ps.shift());}
-  const midDur=mid.map(x=>x.d);slides.push(...mid.map(x=>x.f));
-  slides.push(
-   ()=>'<div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Alles Gute,<br>'+esc(BDAY.call)+'!</h1><div class="ey" style="letter-spacing:.2em">Und jetzt: weiter geht\'s</div></div>');
-  let k=0;const show=()=>{if(el.hidden)return;el.innerHTML=conf+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button>'+slides[k]()+(k>1&&k<slides.length-1?'<div class="dots">'+(k-1)+' / '+mid.length+'</div>':'');$("bdX").onclick=bdayClose;
-    const dur=k===0?9000:k===1?16000:k===slides.length-1?60000:midDur[k-2];k++;if(k<slides.length)bdayT=setTimeout(show,dur);};
+    ()=>'<div class="sl"><div class="ey">Nachricht für '+esc(BDAY.call)+'</div><p class="q" style="margin-top:3vh">'+esc(BDAY.msg)+'</p><div class="who">'+esc(BDAY.from)+'</div></div>',
+    ()=>'<div class="sl"><div class="ey">♠ Blue Chip Club</div><h1>Prost,<br>'+esc(BDAY.call)+'! 🥂</h1><div class="ey" style="letter-spacing:.2em">Und jetzt: weiter geht\'s</div></div>'];
+  const durs=[9000,16000,15000];
+  let k=0;const show=()=>{if(el.hidden)return;el.innerHTML=conf+'<button class="b bx" type="button" id="bdX">Weiterspielen ✕</button>'+slides[k]();$("bdX").onclick=bdayClose;
+    const dur=durs[k];k++;bdayT=setTimeout(k<slides.length?show:bdayClose,dur);};
   bdayT=setTimeout(show,2500);
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 $("bBday").onclick=()=>{if(!$("bday").hidden)bdayClose();else bdayShow();};
-setInterval(()=>{const at=new Date(BDAY.at).getTime(),now=Date.now();if(now>=at&&now<at+10*60000&&!S.fired.bday){S.fired.bday=1;save();bdayShow();}if(now>=at-20*60000&&now<at&&!bdayData)bdayLoad();},5000);
+setInterval(()=>{const at=new Date(BDAY.at).getTime(),now=Date.now();if(now>=at&&now<at+10*60000&&!S.fired.bday){S.fired.bday=1;save();bdayShow();}},5000);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bday").hidden)bdayClose();});
 $("bSnd").onclick=()=>{ac();minuteBeep();[3,2,1].forEach((n,k)=>setTimeout(()=>countdown(n),1500+k*1000));setTimeout(levelSound,4500);};
 $("bFull").onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
