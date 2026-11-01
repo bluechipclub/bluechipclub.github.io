@@ -843,7 +843,9 @@ function drawSeats(){
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
-  introShow(a,()=>drawOverview(a));
+  if(ANN_INTRO){const box=$("intro");box.classList.remove("bd");box.innerHTML='<div class="inT" style="text-align:center;max-width:80vw"><div class="eyebrow">♠ Blue Chip Club · Platzauslosung</div><h3>'+esc(S.title)+'</h3></div>';box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+    playAnn(ANN_INTRO,()=>introShow(a,()=>drawOverview(a)));}
+  else introShow(a,()=>drawOverview(a));
 }
 function drawOverview(a){
   const suits=["♠","♥","♣","♦"];
@@ -857,6 +859,14 @@ const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
 const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
+/* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
+const ANN_INTRO=null;
+const ANNS={};
+let annAudio=null;
+function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;cb&&cb();};if(!u){f();return;}
+  try{if(annAudio)annAudio.pause();}catch(e){}
+  const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);}
+function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;}
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
 const BDAY_NAMES=["niklas","niki"];
@@ -873,7 +883,7 @@ function cardHtml(c){
 }
 let intro=null;
 function introShow(list,done,o){o=o||{};
-  const box=$("intro");let k=0;const sv=()=>{if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
+  const box=$("intro");let k=0;const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
     sv();if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&VIDS[p.name.toLowerCase()];
@@ -887,9 +897,12 @@ function introShow(list,done,o){o=o||{};
     else box.innerHTML=cardEl+vidEl+
       '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+    const annU=!o.label&&ANNS[p.name.toLowerCase()],me=k;
     if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
-      v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});v.addEventListener("loadedmetadata",go);intro.t=setTimeout(()=>{k++;step();},30000);if(v.readyState>=1)go();
-      intro.stopVid=()=>{try{v.pause();}catch(e){}};return;}
+      intro.stopVid=()=>{try{v.pause();}catch(e){}};intro.t=setTimeout(()=>{k++;step();},50000);
+      const startVid=()=>{if(!intro||k!==me)return;v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
+      if(annU)playAnn(annU,startVid);else startVid();return;}
+    if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1500,(o.sec||7)*1000-(Date.now()-t0)));});return;}
     if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
     intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000);
   }
