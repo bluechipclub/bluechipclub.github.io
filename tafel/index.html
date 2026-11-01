@@ -860,8 +860,8 @@ const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten
 const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
-const ANN_INTRO=null;
-const ANNS={};
+const ANN_INTRO="ansagen/intro.mp3?v=1";
+const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
 let annAudio=null;
 function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;cb&&cb();};if(!u){f();return;}
   try{if(annAudio)annAudio.pause();}catch(e){}
