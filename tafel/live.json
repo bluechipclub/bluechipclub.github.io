@@ -521,6 +521,17 @@
 "id": 62,
 "op": "add",
 "name": "Pasi"
+},
+{
+"id": 63,
+"op": "set",
+"v": {
+"min1": 30,
+"min": 30,
+"minLate": 25,
+"reLvl": 9,
+"left": null
+}
 }
 ]
 }
