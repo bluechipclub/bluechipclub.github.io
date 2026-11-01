@@ -689,6 +689,21 @@
 {
 "id": 87,
 "op": "reload"
+},
+{
+"id": 88,
+"op": "lobbyclose"
+},
+{
+"id": 89,
+"op": "spotlight",
+"name": "Der Freigeist",
+"eyebrow": "Blue Chip Club",
+"head": "Der Freigeist 🕊️",
+"nick": "Pasi",
+"sub": "Rausgeflogen, aber tiefenentspannt",
+"sec1": 6,
+"sec": 30
 }
 ]
 }
