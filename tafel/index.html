@@ -454,7 +454,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const DEFAULT_LEVELS=[
  {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
 ];
-const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno","Kevin"];
+const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno","Kevin","Pasi"];
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -904,7 +904,7 @@ function introShow(list,done,o){o=o||{};
     box.classList.toggle("bd",bd);
     if(bd)box.innerHTML=bdayConfetti()+'<div class="bdh"><div class="eyebrow">🎂 '+place+' 🎂</div><h3>Happy Birthday, Niki!</h3><div class="tag">The Birthday Man'+(k===S.dealer?' · startet mit dem Dealer-Button':'')+'</div></div><div class="bdr">'+cardEl+vidEl+'</div>'+dots;
     else box.innerHTML=cardEl+vidEl+
-      '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
+      '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&p.name.toLowerCase()==="pasi"?'<div class="inD">⭐ Special Guest · Freigeist</div>':'')+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     const annU=!o.label&&ANNS[p.name.toLowerCase()],me=k;
     const isNico=p.name.toLowerCase()==="nico";
