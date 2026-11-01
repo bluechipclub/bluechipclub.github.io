@@ -615,6 +615,21 @@
 "sub": "Herzlich willkommen im Blue Chip Club",
 "sec1": 5,
 "sec": 18
+},
+{
+"id": 76,
+"op": "lobbyclose"
+},
+{
+"id": 77,
+"op": "spotlight",
+"name": "Chris",
+"eyebrow": "Blue Chip Club",
+"head": "Neuer Name erarbeitet",
+"nick": "Der Top-Raiser",
+"sub": "Chris hat sich heute seinen Spitznamen verdient",
+"sec1": 6,
+"sec": 30
 }
 ]
 }
