@@ -195,6 +195,24 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .bday .phi{position:relative;z-index:2;max-width:86vw;max-height:86vh;border-radius:1.2vw;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45);animation:kb 7.5s ease-out both}
 @keyframes kb{from{opacity:0;transform:scale(.94)}12%{opacity:1}to{transform:scale(1.04)}}
 .bday .dots{z-index:2}
+/* lobby screensaver (before the first hand) */
+.lobby{position:fixed;inset:0;z-index:45;overflow:hidden;background:#000;color:#fff;cursor:none}
+.lobby[hidden]{display:none}
+.lobby .lbg{position:absolute;inset:-6%;background-size:cover;background-position:center;filter:blur(46px) brightness(.38);transition:background-image 1s}
+.lobby .lst{position:absolute;inset:0;display:grid;place-items:center;padding:11vh 4vw 9vh}
+.lobby .lsl{display:flex;align-items:center;gap:4vw;animation:lin 1.1s var(--ease) both}
+.lobby .lsl img{max-height:70vh;max-width:62vw;border-radius:1.3vw;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45);animation:kb 8s ease-out both}
+.lobby .lsl .card{height:70vh;width:auto;aspect-ratio:2/3;object-fit:cover}
+.lobby .lcap{max-width:34vw;text-align:left}
+.lobby .lcap .ey{font-family:var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-size:max(12px,1vw)}
+.lobby .lcap h2{font-size:max(34px,5vw);font-weight:850;letter-spacing:-.04em;line-height:1;margin:1.4vh 0;background:linear-gradient(180deg,#fff,#f3d68f 60%,#c49a41);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lobby .lcap p{font-size:max(15px,1.5vw);color:#ccd;line-height:1.35}
+.lobby .ltop{position:absolute;top:3.5vh;left:4vw;right:4vw;display:flex;justify-content:space-between;align-items:baseline;z-index:2}
+.lobby .ltop .t{font-family:var(--mono);letter-spacing:.35em;text-transform:uppercase;color:var(--gold2);font-size:max(12px,1.1vw)}
+.lobby .lbot{position:absolute;bottom:4vh;right:4vw;text-align:right;z-index:2}
+.lobby .lbot .ey{font-family:var(--mono);letter-spacing:.4em;text-transform:uppercase;color:#aab;font-size:max(11px,.95vw)}
+.lobby .lbot .cd{font-size:max(34px,4.6vw);font-weight:850;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 4vh rgba(226,184,87,.45)}
+@keyframes lin{from{opacity:0;transform:translateY(3vh) scale(.97)}}
 .annBox{pointer-events:auto;text-align:center;max-width:78vw;padding:5vh 5vw;border-radius:2vw;background:radial-gradient(ellipse at 50% 0%,rgba(143,29,29,.55),rgba(10,10,10,.96) 70%);border:1px solid rgba(226,184,87,.45);box-shadow:0 0 0 1px #000,0 4vh 12vh rgba(0,0,0,.9),0 0 10vw rgba(143,29,29,.35);animation:pop .7s var(--ease) both}
 @keyframes pop{from{opacity:0;transform:scale(.85) translateY(4vh)}}
 .annBox .eyebrow{font-size:max(11px,1vw)}
@@ -331,6 +349,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <button class="b" id="bSet">⚙</button>
   <button class="b" id="bSeat">🪑 Seat open</button>
   <button class="b" id="bBday">🎂</button>
+  <button class="b" id="bLobby" title="Bildschirmschoner">🖼</button>
   <button class="b" id="bSnd">Test-Sound</button>
   <button class="b" id="bFull">⛶ Vollbild</button>
 </nav>
@@ -409,6 +428,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 <div class="toast" id="toast" hidden></div>
 <div class="seatop" id="seatop" hidden></div>
 <div class="bday" id="bday" hidden></div>
+<div class="lobby" id="lobby" hidden></div>
 <button class="snd" id="snd" type="button" hidden>🔇 Einmal klicken für Ton</button>
 
 <script>
@@ -425,7 +445,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const DEFAULT_LEVELS=[
  {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
 ];
-const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno"];
+const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno","Kevin"];
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -583,7 +603,7 @@ function tick(){
   }
   render();
 }
-function toggle(){
+function toggle(){if(typeof lobbyClose==="function")lobbyClose();
   ac();
   if(S.running){S.left=leftNow();S.running=false;S.endAt=null;log("pause");}
   else{if(S.left==null||S.left<=0)S.left=dur(S.i);S.running=true;S.endAt=Date.now()+S.left*1000;if(!S.started){S.started=new Date().toISOString();log("start");}else log("weiter");lock();}
@@ -808,7 +828,7 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
 function drawSeats(){
-  closeAll();
+  closeAll();lobbyClose();
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   // Tim (organiser) always sits on the dealer spot = last place in the order (place 10 on a full table); everyone else is shuffled freely
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
@@ -960,6 +980,8 @@ function runCmd(c){
     case "seatopen":seatOpen();break;
     case "bday":bdayShow();break;
     case "bdayclose":bdayClose();break;
+    case "lobby":lobbyShow();break;
+    case "lobbyclose":lobbyClose();break;
     case "close":if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
@@ -1096,6 +1118,43 @@ async function bdayShow(){
   bdayT=setTimeout(show,2500);
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
+/* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
+const LOBBY_AT="2026-11-01T17:30";
+/* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
+const LOBBY_PICS=[
+ {u:"../img/dmh-sieger-niklas.jpg",ey:"Dead Man's Hand",t:"Niki holt den Titel",p:"Der amtierende Champion. Wer nimmt ihm heute an seinem Geburtstag die Krone ab?"},
+ {u:"../img/dmh-tim-quad-aces.jpg",ey:"Dead Man's Hand",t:"Quad Aces",p:"Tim mit vier Assen."},
+ {u:"../img/dmh-oli-quad-kings-jubel.jpg",ey:"Dead Man's Hand",t:"Quad Kings",p:"Oli dreht durch."},
+ {u:"../img/dmh-manu-double-up.jpg",ey:"Dead Man's Hand",t:"Double Up",p:"Manu verdoppelt."},
+ {u:"../img/dmh-bubble-niki-magg.jpg",ey:"Dead Man's Hand",t:"Die Bubble",p:"Niki gegen Magg."},
+ {u:"../img/dmh-siegerhand.jpg",ey:"Dead Man's Hand",t:"Die Siegerhand",p:""},
+ {u:"momente/m1.jpg",ey:"Blue Chip Club",t:"Momente",p:""},
+ {u:"momente/m2.jpg",ey:"Blue Chip Club",t:"Momente",p:""}
+];
+let lobbyT=null,lobbyCd=null;
+function lobbySlides(){
+  const cards=S.players.map(p=>{const c=cardOf(p.name);const u=c&&(typeof c==="string"?c:c.img);return u?{u,card:1,ey:"Heute am Tisch",t:p.name,p:""}:null;}).filter(Boolean);
+  const pics=shuf(LOBBY_PICS.slice()),cs=shuf(cards),out=[];
+  while(cs.length||pics.length){if(cs.length)out.push(cs.shift());if(cs.length)out.push(cs.shift());if(pics.length)out.push(pics.shift());}
+  return out;
+}
+function lobbyShow(){
+  const el=$("lobby");clearTimeout(lobbyT);clearInterval(lobbyCd);el.hidden=false;
+  el.innerHTML='<div class="lbg" id="lbg"></div><div class="ltop"><span class="t">♠ Blue Chip Club</span><span class="t">'+esc(S.title||"")+'</span></div><div class="lst" id="lst"></div><div class="lbot"><div class="ey" id="lcdl">Erste Hand in</div><div class="cd" id="lcd"></div></div>';
+  const tick=()=>{const ms=new Date(LOBBY_AT).getTime()-Date.now();if(ms>0){const m=Math.floor(ms/60000),sec=Math.floor(ms/1000)%60;$("lcdl").textContent="Erste Hand in";$("lcd").textContent=(m>=60?Math.floor(m/60)+":"+String(m%60).padStart(2,"0"):m)+":"+String(sec).padStart(2,"0");}else{$("lcdl").textContent="Nehmt Platz";$("lcd").textContent="Shuffle up and deal";}};
+  tick();lobbyCd=setInterval(tick,1000);
+  let list=lobbySlides(),k=0;
+  const next=()=>{if(el.hidden)return;if(!list.length)return;if(k>=list.length){list=lobbySlides();k=0;}const x=list[k++];
+    $("lbg").style.backgroundImage="url('"+x.u+"')";
+    $("lst").innerHTML='<div class="lsl"><img class="'+(x.card?"card":"")+'" src="'+x.u+'" alt=""><div class="lcap"><div class="ey">'+esc(x.ey)+'</div><h2>'+esc(x.t)+'</h2>'+(x.p?'<p>'+esc(x.p)+'</p>':'')+'</div></div>';
+    lobbyT=setTimeout(next,x.card?6000:8000);};
+  next();
+}
+function lobbyClose(){clearTimeout(lobbyT);clearInterval(lobbyCd);$("lobby").hidden=true;$("lobby").innerHTML="";}
+$("bLobby").onclick=lobbyShow;
+$("lobby").onclick=lobbyClose;
+document.addEventListener("keydown",e=>{if(!$("lobby").hidden&&e.key==="Escape")lobbyClose();});
+if(!S.started&&Date.now()<new Date(LOBBY_AT).getTime()+3600000)setTimeout(lobbyShow,800);
 $("bBday").onclick=()=>{if(!$("bday").hidden)bdayClose();else bdayShow();};
 setInterval(()=>{const at=new Date(BDAY.at).getTime(),now=Date.now();if(now>=at&&now<at+10*60000&&!S.fired.bday){S.fired.bday=1;save();bdayShow();}},5000);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bday").hidden)bdayClose();});

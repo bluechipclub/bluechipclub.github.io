@@ -71,6 +71,8 @@ input{font:16px var(--sans);background:var(--s2);color:var(--fg);border:1px soli
 <div class="g g2">
   <button data-c='{"op":"seatopen"}' style="border-color:rgba(226,184,87,.6);color:#f3d68f">🪑 Seat open</button>
   <button id="bdayBtn">🎂 Geburtstags-Show</button>
+  <button id="lobbyBtn">🖼 Bildschirmschoner an</button>
+  <button id="lobbyOff">🖼 Bildschirmschoner aus</button>
 </div>
 <div class="g g4">
   <button data-c='{"op":"prev"}'>◀ Level</button>
@@ -130,6 +132,8 @@ $("play").onclick=()=>{
   if(st){if(run){st.left=Math.max(0,(st.localEnd-Date.now())/1000);st.running=false;st.localEnd=null;}else{st.running=true;st.localEnd=Date.now()+st.left*1000;}
     $("play").textContent=st.running?"❚❚ Pause":"▶ Start";tick();}
 };
+$("lobbyBtn").onclick=()=>send({op:"lobby"},"Bildschirmschoner an");
+$("lobbyOff").onclick=()=>send({op:"lobbyclose"},"Bildschirmschoner aus");
 $("bdayBtn").onclick=()=>{if(confirm("Geburtstags-Show jetzt starten? (Startet um 0:00 auch automatisch)"))send({op:"bday"},"Geburtstags-Show");};
 $("close").onclick=()=>send({op:"close"},"Einblendung zu");
 $("drawBtn").onclick=()=>{if(confirm("Plätze jetzt neu auslosen?"))send({op:"draw"},"Plätze auslosen");};
