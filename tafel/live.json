@@ -630,6 +630,21 @@
 "sub": "Chris hat sich heute seinen Spitznamen verdient",
 "sec1": 6,
 "sec": 30
+},
+{
+"id": 78,
+"op": "lobbyclose"
+},
+{
+"id": 79,
+"op": "spotlight",
+"name": "Magg",
+"eyebrow": "🔥 Krasse Hand des Abends",
+"head": "QUAD JACKS!",
+"nick": "Vierling Buben",
+"sub": "K♣ J♥ auf 7♣ J♣ J♦ 4♠ J♠ · gegen Jans Full House K♦ K♥",
+"sec1": 8,
+"sec": 40
 }
 ]
 }
