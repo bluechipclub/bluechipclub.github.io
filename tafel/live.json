@@ -549,6 +549,19 @@
 "head": "Special Guest",
 "nick": "Freigeist",
 "sec": 45
+},
+{
+"id": 67,
+"op": "lobbyclose"
+},
+{
+"id": 68,
+"op": "spotlight",
+"name": "Pasi",
+"eyebrow": "Blue Chip Club präsentiert",
+"head": "Special Guest",
+"nick": "Freigeist",
+"sec": 45
 }
 ]
 }
