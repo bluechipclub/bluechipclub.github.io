@@ -266,6 +266,11 @@ article.post.noimg { grid-template-columns: 1fr; }
 .hand .pos { font-family: var(--mono); color: var(--grey2); font-size: 14px; }
 .hand.top .pos { color: var(--gold); }
   .hpics { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.hl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.hl-tile { display: grid; gap: 8px; color: inherit; text-decoration: none; }
+.hl-tile img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line2); display: block; }
+.hl-tile span { font-size: 13px; line-height: 1.35; color: var(--grey); }
+.hl-tile b { color: inherit; font-weight: 600; display: block; color: #f2efe8; }
 .hpics img { height: 150px; width: auto; max-width: 100%; border-radius: 10px; object-fit: cover; border: 1px solid var(--line2); display: block; }
 .feature .hpics img { height: 200px; }
 .hvids { display: grid; gap: 10px; margin-top: 12px; }
@@ -1035,7 +1040,7 @@ textarea { min-height: 150px; resize: vertical; }
     "Magg"
    ],
    "headline": "Tim dreht das Heads-up gegen Big Stack Chris und gewinnt Nikis Geburtstagsturnier",
-   "report": "Nikis Geburtstag in The Void: elf Spieler, 29 Entries, 580 P im Pot und Schluss erst um kurz vor drei.\n\nDie krasse Hand des Abends gehörte Magg: Vier Buben gegen Jans Full House mit Königen. Benno Boss schickte mit einem Full House Kevin und Zeno in einer Hand nach Hause, und um Mitternacht stieß der ganze Tisch auf Niki an.\n\nDomi C ging als Dritter, Benno verpasste als Vierter knapp das Geld. Im Heads-up war Debütant Chris, „Der Top-Raiser“, klar der Big Stack. Doch Tim gewann die Flips: erst Ass-Fünf gegen König-Dame, dann K♣ K♠ gegen Ass-Dame. Die Könige hielten, Tim holt das Midnight Birthday Deepstack.",
+   "report": "Nikis Geburtstag in The Void: elf Spieler, 29 Entries, 580 P im Pot. Um Mitternacht stieß der ganze Tisch auf Niki an.\n\nDomi C wurde Dritter, Benno verpasste als Vierter knapp das Geld. Im Heads-up war Debütant Chris klar der Big Stack, doch Tim gewann die entscheidenden Flips und holt mit K♣ K♠ den Titel.",
    "img": "mbd-sieger-tim",
    "imgCaption": "Der Gastgeber holt den Titel: Tim mit den Königen, die das Heads-up entschieden",
    "winHand": "K♣ K♠",
@@ -1057,6 +1062,7 @@ textarea { min-height: 150px; resize: vertical; }
  "hands": [
   {
    "id": "h13",
+   "hl": "Kevin flusht das Geburtstagskind raus",
    "kind": "spot",
    "tid": "t6",
    "player": "Kevin",
@@ -1070,6 +1076,7 @@ textarea { min-height: 150px; resize: vertical; }
   },
   {
    "id": "h14",
+   "hl": "Chris schiebt Asse, Benno und Tim folden",
    "kind": "spot",
    "tid": "t6",
    "player": "Chris",
@@ -1109,6 +1116,7 @@ textarea { min-height: 150px; resize: vertical; }
   },
   {
    "id": "h17",
+   "hl": "Kevin trifft das Wheel gegen Bennos All-in",
    "kind": "spot",
    "tid": "t6",
    "player": "Kevin",
@@ -1148,22 +1156,10 @@ textarea { min-height: 150px; resize: vertical; }
     "mbd-domi-c-platz3"
    ]
   },
-  {
-   "id": "h20",
-   "kind": "spot",
-   "tid": "t6",
-   "player": "Tim",
-   "opponent": "Chris",
-   "title": "Die Siegerhand",
-   "cards": "",
-   "text": "Heads-up gegen Big Stack Chris. Erst hält Tims Ass-Fünf gegen König-Dame, dann die letzte Hand: K♣ K♠ gegen Ass-Dame. Die Könige halten, Tim gewinnt das Turnier.",
-   "pics": [
-    "mbd-siegerhand",
-    "mbd-sieger-tim"
-   ]
-  },
+
   {
    "id": "h12",
+   "hl": "Benno Boss: zwei Knockouts in einer Hand",
    "kind": "spot",
    "tid": "t6",
    "player": "Benno",
@@ -1175,6 +1171,7 @@ textarea { min-height: 150px; resize: vertical; }
   },
   {
    "id": "h11",
+   "hl": "Krasse Hand des Abends: Maggs Vier Buben",
    "kind": "hand",
    "tid": "t6",
    "player": "Magg",
@@ -1185,6 +1182,20 @@ textarea { min-height: 150px; resize: vertical; }
    "cards": "",
    "text": "Magg kommt erst um 22 Uhr und haut direkt die krasse Hand des Abends raus. Er hält K♣ J♥, das Board bringt 7♣ J♣ J♦ 4♠ J♠. Vier Buben gegen Jans Full House mit K♦ K♥. Maggs persönliche Rekordhand.",
    "pics": ["mbd-magg-quad-jacks-board", "mbd-magg-quad-jacks"]
+  },  {
+   "id": "h20",
+   "hl": "Die Siegerhand: Könige halten gegen Ass-Dame",
+   "kind": "spot",
+   "tid": "t6",
+   "player": "Tim",
+   "opponent": "Chris",
+   "title": "Die Siegerhand",
+   "cards": "",
+   "text": "Heads-up gegen Big Stack Chris. Erst hält Tims Ass-Fünf gegen König-Dame, dann die letzte Hand: K♣ K♠ gegen Ass-Dame. Die Könige halten, Tim gewinnt das Turnier.",
+   "pics": [
+    "mbd-siegerhand",
+    "mbd-sieger-tim"
+   ]
   },
   {
    "id": "h1",
@@ -1483,10 +1494,16 @@ textarea { min-height: 150px; resize: vertical; }
         '<h3>' + esc(hl) + '</h3>' + podiumHtml(t) +
         (t.report ? '<div class="report">' + paras(t.report) + '</div>' : '<p class="empty">Der Bericht zu diesem Abend kommt noch.</p>') + vids(t) +
         (t.imgCaption ? '<p class="note">' + esc(t.imgCaption) + '</p>' : '') +
-        (hs.length ? '<div class="hands">' + hs.map(x => handHtml(x, null)).join('') + '</div>' : '') + '</div>', ' id="t-' + esc(t.id) + '"');
+        hlGrid(hs) + '</div>', ' id="t-' + esc(t.id) + '"');
     }).join('') + '</div>';
   }
 
+  function hlGrid(hs) {
+    const sel = hs.some(x => x.hl) ? hs.filter(x => x.hl) : hs;
+    if (!sel.length) return '';
+    return '<div class="hl-grid">' + sel.map(x => { const p = (x.pics || [])[0]; const cap = x.hl || handTitle(x);
+      return (p ? '<a class="hl-tile" href="' + imgSrc(esc(p)) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(p)) + '" alt="' + esc(cap) + '" loading="lazy">' : '<div class="hl-tile">') + '<span><b>' + esc(cap) + '</b>' + (x.hl ? '' : esc(x.player || '')) + '</span>' + (p ? '</a>' : '</div>'); }).join('') + '</div>';
+  }
   const vids = x => (x.vids || []).length ? '<div class="hvids">' + x.vids.map(v => /^yt:/.test(v) ? '<iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.slice(3)) + '" title="Video" allowfullscreen loading="lazy"></iframe>' : '<video controls playsinline preload="metadata" src="vid/' + esc(v) + '.mp4"></video>').join('') + '</div>' : '';
   const pics = x => vids(x) + ((x.pics || []).length ? '<div class="hpics">' + x.pics.map(id => '<a href="' + imgSrc(esc(id)) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(id)) + '" alt="Foto zur Hand" loading="lazy"></a>').join('') + '</div>' : '');
   function handHtml(x, pos) {
