@@ -708,6 +708,31 @@
 {
 "id": 90,
 "op": "reload"
+},
+{
+"id": 91,
+"op": "lobbyclose"
+},
+{
+"id": 92,
+"op": "spotlight",
+"name": "RIP Magg",
+"eyebrow": "✝ Rest in Peace",
+"head": "RIP Magg 🥀",
+"nick": "The Poet verlässt die Bühne",
+"sub": "5♠ 4♠ gegen Chris' Q♥ 10♠ · Board 5♥ 10♦ Q♠ A♦ 8♠",
+"sec1": 7,
+"sec": 30
+},
+{
+"id": 93,
+"op": "out",
+"name": "Magg"
+},
+{
+"id": 94,
+"op": "out",
+"name": "Domi M"
 }
 ]
 }
