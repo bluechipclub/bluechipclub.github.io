@@ -84,6 +84,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .seat .meta{display:flex;gap:.4vw;font-family:var(--mono);font-size:max(9px,.72vw);color:var(--grey);letter-spacing:.08em}
 .seat .re{color:var(--gold)}
 .seat .open{color:var(--red)}
+.seat .hd{color:var(--gold2,#f0d48a);font-weight:700}
+.seat .mwt{color:#fff;background:var(--blood,#8b1d1d);padding:0 .4vw;border-radius:4px;letter-spacing:.12em;text-transform:uppercase}
+.seat.mw .av{border-color:#e5675c;box-shadow:0 0 0 3px rgba(0,0,0,.55),0 0 2.4vh rgba(229,103,92,.85)}
 .seat.out{opacity:.38;filter:grayscale(1)}
 .seat.out .nm{text-decoration:line-through;text-decoration-color:rgba(229,103,92,.7)}
 .seat .place{position:absolute;top:-1.1vh;right:-.8vw;background:var(--blood);color:#fff;font-family:var(--mono);font-size:max(9px,.7vw);padding:.15vh .45vw;border-radius:6px;text-decoration:none}
@@ -279,7 +282,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
       <svg class="chip" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cg" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#4d82ff"/><stop offset=".55" stop-color="#1f55e0"/><stop offset="1" stop-color="#12379c"/></radialGradient></defs><circle cx="32" cy="32" r="31" fill="url(#cg)" stroke="#0f2f86" stroke-width="2"/><g fill="#f5f7ff"><path d="M32 2a30 30 0 0 1 7 1l-2 8a22 22 0 0 0-10 0l-2-8a30 30 0 0 1 7-1z"/><path d="M32 62a30 30 0 0 1-7-1l2-8a22 22 0 0 0 10 0l2 8a30 30 0 0 1-7 1z"/><path d="M2 32a30 30 0 0 1 1-7l8 2a22 22 0 0 0 0 10l-8 2a30 30 0 0 1-1-7z"/><path d="M62 32a30 30 0 0 1-1 7l-8-2a22 22 0 0 0 0-10l8-2a30 30 0 0 1 1 7z"/><path d="M11 11a30 30 0 0 1 5-5l5 6a22 22 0 0 0-7 7l-6-5a30 30 0 0 1 3-3z"/><path d="M53 53a30 30 0 0 1-5 5l-5-6a22 22 0 0 0 7-7l6 5a30 30 0 0 1-3 3z"/><path d="M53 11a30 30 0 0 1 5 5l-6 5a22 22 0 0 0-7-7l5-6a30 30 0 0 1 3 3z"/><path d="M11 53a30 30 0 0 1-5-5l6-5a22 22 0 0 0 7 7l-5 6a30 30 0 0 1-3-3z"/></g><circle cx="32" cy="32" r="18" fill="#2459e6" stroke="#fff" stroke-width="1.5"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/></svg>
       <div>
         <div class="eyebrow" id="sub">Blue Chip Club · Halloween Deepstack</div>
-        <div class="title" id="ttl">Midnight Birthday Deepstack</div>
+        <div class="title" id="ttl">High Noon Knockout</div>
       </div>
       <div class="hand" aria-label="A♥ K♥ Q♥ J♥ 10♥">
         <div class="card red" style="--k:0;--r:-8deg">A<br>♥</div>
@@ -414,6 +417,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
     <label class="f">Buy-in (P) <input id="sBuyin" type="number"></label>
     <label class="f">davon Veranstalter (P) <input id="sFee" type="number"></label>
     <label class="f">Rebuy (P) <input id="sRebuy" type="number"></label>
+    <label class="f">Kopfgeld pro Entry (P, 0 = aus) <input id="sBounty" type="number"></label>
     <label class="f">Bezahlte Plätze <select id="sPlaces"><option value="2">Top 2</option><option value="3">Top 3</option></select></label>
     <label class="f">Platz 3 bekommt (P) <input id="sThird" type="number"></label>
     <label class="f">Platz 1 % vom Rest <input id="sSplit" type="number"></label>
@@ -442,7 +446,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-mbd-2026-11-01";
+const KEY="bcc-tafel-hnk-2026-11";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -470,7 +474,7 @@ const GAMES={
 };
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"Midnight Birthday Deepstack",sub:"Blue Chip Club · Nikis Geburtstag · 10.000 Chips",i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"High Noon Knockout",sub:"Blue Chip Club · Erstes Bounty-Turnier · 10.000 Chips",bounty:10,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:30,min:30,minLate:25,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
@@ -488,7 +492,11 @@ const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().tri
 const alive=()=>S.players.filter(p=>!p.out);
 const totalEntries=()=>S.players.reduce((a,p)=>a+p.entries.length,0);
 const costOf=p=>p.entries.length?S.buyin+(p.entries.length-1)*S.rebuy:0;
-const potOf=()=>S.players.reduce((a,p)=>a+(p.entries.length?S.buyin-S.fee+(p.entries.length-1)*S.rebuy:0),0);
+const potOf=()=>S.players.reduce((a,p)=>a+(p.entries.length?S.buyin-S.fee+(p.entries.length-1)*S.rebuy-(S.bounty||0)*p.entries.length:0),0)+(S.bounty?(S.lostHeads||0):0);
+// bounty (progressive knockout): every entry carries S.bounty P on its head; knockout = half cash to the hunter, half onto his head
+const headOf=p=>!S.bounty||!p.entries.length?0:(p.head==null?S.bounty:p.head);
+const bwOf=p=>S.bounty?(p.bw||0):0;
+const mostWanted=()=>{if(!S.bounty)return null;const a=alive();if(a.length<2)return null;const m=a.reduce((x,p)=>headOf(p)>headOf(x)?p:x,a[0]);return headOf(m)>S.bounty&&a.filter(p=>headOf(p)===headOf(m)).length===1?m:null;};
 const rebuyOpen=()=>S.reLvl==null||playNum(S.i)<=S.reLvl;
 const curBB=()=>{const L=LEVELS[S.i];return L.brk?((LEVELS[S.i+1]||LEVELS[S.i-1]||{}).bb||0):L.bb;};
 function payouts(){
@@ -519,13 +527,15 @@ function buildSeats(){
 function renderSeats(){
   const seats=[...document.querySelectorAll(".seat")];
   if(seats.length!==S.players.length){buildSeats();return renderSeats();}
+  const mw=mostWanted();
   S.players.forEach((p,k)=>{
     const d=seats[k],pl_=placeOf(p),open=p.entries.filter(e=>e.paid==="offen").length;
     d.classList.toggle("out",!!p.out);
     const aw=d.querySelector(".avw");if(aw.dataset.n!==p.name){aw.dataset.n=p.name;aw.innerHTML=avHtml(p.name);}
     d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
     const re=p.entries.length-1;
-    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"");
+    d.classList.toggle("mw",mw===p);
+    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"")+(S.bounty&&!p.out?'<span class="hd">🎯 '+headOf(p)+' P</span>':"")+(mw===p?'<span class="mwt">Most Wanted</span>':"");
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
@@ -548,7 +558,7 @@ function render(){
   $("brkCap").textContent=L.brk?"Weiter in":"Nächste Pause";
   $("brk").textContent=L.brk?mmss(left):found===null?"keine mehr":"in "+Math.round(found/60)+" Min";
   const pot=potOf(),pays=payouts();
-  $("pot").innerHTML=fmt(pot)+" <small>P</small>";
+  $("pot").innerHTML=fmt(pot)+" <small>P</small>"+(S.bounty?'<small style="display:block;font-size:.32em;letter-spacing:.06em;color:var(--gold2,#f0d48a);margin-top:.4vh">+ '+fmt(totalEntries()*S.bounty-(S.lostHeads||0))+' P Kopfgelder 🎯</small>':"");
   $("pays").innerHTML=pays.map((v,k)=>'<div class="pay"><span>'+(k+1)+'. PLATZ</span><b>'+P(v)+'</b></div>').join("");
   const a=alive().length,te=totalEntries();
   $("plc").innerHTML=a+" <small>/ "+S.players.length+"</small>";
@@ -657,28 +667,49 @@ const PAY_TXT={bar:"bar",dig:"überwiesen",offen:"offen"};
 function doRebuy(name,paid){
   const p=pl(name);if(!p)return false;
   p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar"});
+  if(S.bounty)p.head=p.out?S.bounty:headOf(p)+S.bounty;
   if(p.out){p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
   log("rebuy",{name:p.name,entry:p.entries.length,paid:paid||"bar"});
   save();render();flashSeat(p);return true;
 }
-function doOut(name){
+function doOut(name,by){
   const p=pl(name);if(!p||p.out)return;
-  p.out={t:new Date().toISOString(),lvl:playNum(S.i)};S.outOrder.push(p.name);
-  const place=placeOf(p);log("out",{name:p.name,place});
+  p.out={t:new Date().toISOString(),lvl:playNum(S.i)};
+  let ko=null;
+  if(S.bounty){const h=headOf(p),q=by?pl(by):null;
+    if(q&&q!==p&&!q.out){const cash=Math.ceil(h/2),add=h-cash;q.bw=bwOf(q)+cash;q.head=headOf(q)+add;ko={by:q.name,h,cash,add};}
+    else{S.lostHeads=(S.lostHeads||0)+h;ko={by:null,h};}
+    p.head=0;p.out.ko=ko;}
+  S.outOrder.push(p.name);
+  const place=placeOf(p);log("out",{name:p.name,place,ko});
   const rest=alive();
   if(rest.length===1){S.ended=new Date().toISOString();if(S.running){S.left=leftNow();S.running=false;S.endAt=null;}log("winner",{name:rest[0].name});save();render();winner(rest[0]);return;}
   save();render();
+  if(ko&&ko.by){const q=pl(ko.by),king=S.champ&&p.name.toLowerCase()===String(S.champ).toLowerCase();gong();
+    announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.by+" kassiert "+P(ko.cash),text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
+    if(king)burst();}
   if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
   else toast(p.name+" ist raus · Platz "+place);
 }
-function doBack(name){const p=pl(name);if(!p||!p.out)return;p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.ended=null;log("back",{name:p.name});save();render();}
+function doBack(name){const p=pl(name);if(!p||!p.out)return;
+  const ko=p.out.ko;if(ko){const q=ko.by?pl(ko.by):null;if(q){q.bw=bwOf(q)-ko.cash;q.head=headOf(q)-ko.add;}else S.lostHeads=(S.lostHeads||0)-ko.h;p.head=ko.h;}
+  p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.ended=null;log("back",{name:p.name});save();render();}
 function flashSeat(p){const k=S.players.indexOf(p),d=document.querySelectorAll(".seat")[k];if(d){d.classList.remove("flash");void d.offsetWidth;d.classList.add("flash");}}
 function winner(p){
   gong();setTimeout(fanfare,600);
   const pays=payouts();
-  announce({eyebrow:"Champion · "+S.title,title:p.name,text:"Gewinnt "+S.title+" und den Wanderpokal.",stake:P(pays[0]),stakesub:pays.slice(1).map((v,k)=>(k+2)+". "+(S.players.find(x=>placeOf(x)===k+2)||{name:"?"}).name+" "+P(v)).join(" · "),btn:"Zur Abrechnung"});
+  announce({eyebrow:"Champion · "+S.title,title:p.name,text:"Gewinnt "+S.title+" und den Wanderpokal.",stake:P(pays[0]),stakesub:(S.bounty?"+ "+P(bwOf(p)+headOf(p))+" Kopfgeld · ":"")+pays.slice(1).map((v,k)=>(k+2)+". "+(S.players.find(x=>placeOf(x)===k+2)||{name:"?"}).name+" "+P(v)).join(" · "),btn:"Zur Abrechnung"});
   $("annOk").onclick=()=>{$("ann").hidden=true;openResult();};
   burst();
+}
+function pickHunter(p,cb){
+  const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center";
+  const b=document.createElement("div");b.style.cssText="background:#151515;border:1px solid #b8933a;border-radius:14px;padding:22px;max-width:560px;width:92vw";
+  b.innerHTML='<h3 style="margin:0 0 6px">Wer hat '+esc(p.name)+' rausgeworfen?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">Kopfgeld '+P(headOf(p))+': die Hälfte bar, die andere Hälfte auf den Kopf des Werfers.</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
+  const R=b.querySelector(".row"),mk=(t,cls,fn)=>{const x=document.createElement("button");x.className="b "+cls;x.textContent=t;x.onclick=()=>{o.remove();fn();};R.appendChild(x);};
+  alive().filter(q=>q!==p).forEach(q=>mk(q.name+" · 🎯 "+headOf(q),"pri",()=>cb(q.name)));
+  mk("Ohne Werfer (Kopf in den Pot)","",()=>cb(null));mk("Abbrechen","",()=>{});
+  o.appendChild(b);o.onclick=e=>{if(e.target===o)o.remove();};document.body.appendChild(o);
 }
 function openPlayers(focus){
   const L=$("pList");L.innerHTML="";
@@ -686,15 +717,15 @@ function openPlayers(focus){
     const d=document.createElement("div");d.className="pcard"+(p.out?" out":"");
     const place=placeOf(p);
     d.innerHTML='<div class="h"><span></span><span style="font-family:var(--mono);font-size:12px;color:var(--grey)">'+(p.out?"raus · Platz "+place:"im Spiel")+'</span></div><div class="e"></div><div class="row" style="margin-top:4px"></div>';
-    d.querySelector(".h span").textContent=p.name;
+    d.querySelector(".h span").textContent=p.name+(S.bounty?"  ·  🎯 "+headOf(p)+" P"+(bwOf(p)?"  ·  kassiert "+bwOf(p)+" P":""):"");
     const E=d.querySelector(".e");
     p.entries.forEach((e,j)=>{const b=document.createElement("button");b.className="ent p-"+e.paid;b.textContent=(j?"Rebuy "+j:"Buy-in")+" · "+PAY_TXT[e.paid];b.title="Antippen: Zahlart wechseln";b.onclick=()=>{e.paid=PAY_NEXT[e.paid];log("paid",{name:p.name,entry:j+1,paid:e.paid});save();render();openPlayers();};E.appendChild(b);});
     const R=d.querySelector(".row");
     const add=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;R.appendChild(b);};
     const canRe=S.maxRe==null||p.entries.length-1<S.maxRe;
     add("+1 Rebuy",rebuyOpen()&&canRe?"":"",()=>{if(!rebuyOpen()&&!confirm("Rebuy-Phase ist vorbei. Trotzdem eintragen?"))return;if(!canRe&&!confirm("Rebuy-Limit erreicht. Trotzdem?"))return;doRebuy(p.name);openPlayers();});
-    if(p.entries.length>1)add("−1","",()=>{p.entries.pop();log("rebuy-undo",{name:p.name});save();render();openPlayers();});
-    if(!p.out)add("Raus","red",()=>{doOut(p.name);if(!$("ann").hidden)return;openPlayers();});
+    if(p.entries.length>1)add("−1","",()=>{p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});save();render();openPlayers();});
+    if(!p.out)add("Raus","red",()=>{const fin=by=>{doOut(p.name,by);if(!$("ann").hidden)return;openPlayers();};if(!S.bounty)return fin();pickHunter(p,fin);});
     else add("Zurück ins Spiel","",()=>{doBack(p.name);openPlayers();});
     L.appendChild(d);
   });
@@ -709,8 +740,9 @@ function settlement(){
   const pays=payouts(),rows=S.players.map(p=>{
     const place=placeOf(p),cost=costOf(p);
     const paidCash=p.entries.reduce((a,e,j)=>a+(e.paid!=="offen"?(j?S.rebuy:S.buyin):0),0);
-    const open=cost-paidCash,win=place&&place<=pays.length?pays[place-1]:0;
-    return {name:p.name,place,entries:p.entries.length,rebuys:p.entries.length-1,cost,paid:paidCash,open,win,net:win-cost,bal:win-open,
+    const prize=place&&place<=pays.length?pays[place-1]:0,bounty=bwOf(p)+(place===1?headOf(p):0);
+    const open=cost-paidCash,win=prize+bounty;
+    return {name:p.name,place,prize,bounty,entries:p.entries.length,rebuys:p.entries.length-1,cost,paid:paidCash,open,win,net:win-cost,bal:win-open,
       paidBar:p.entries.reduce((a,e,j)=>a+(e.paid==="bar"?(j?S.rebuy:S.buyin):0),0),paidDig:p.entries.reduce((a,e,j)=>a+(e.paid==="dig"?(j?S.rebuy:S.buyin):0),0)};
   });
   const feeTotal=S.players.filter(p=>p.entries.length).length*S.fee;
@@ -731,9 +763,9 @@ function openResult(){
   const s=settlement(),done=alive().length===1;
   const order=s.rows.slice().sort((a,b)=>(a.place||0)-(b.place||0));
   let h='<thead><tr><th>Platz</th><th>Spieler</th><th class="num">Entries</th><th class="num">Eingesetzt</th><th class="num">Bezahlt</th><th class="num">Offen</th><th class="num">Gewinn</th><th class="num">+/−</th></tr></thead><tbody>';
-  order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
+  order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win)+(r.bounty?' <small style="color:#999">(🎯 '+r.bounty+')</small>':''):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
   h+='</tbody>';$("rTable").innerHTML=h;
-  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries · An Veranstalter "+P(s.feeTotal)+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ");
+  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries · An Veranstalter "+P(s.feeTotal)+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ")+(S.bounty?" · Kopfgelder "+P(totalEntries()*S.bounty-(S.lostHeads||0))+" (im Gewinn enthalten)":"");
   $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. Claude prüft das nach dem Export noch mal.";
   $("sTable").innerHTML=s.tx.length?'<tbody>'+s.tx.map(t=>'<tr><td>'+esc(t.from)+'</td><td>→</td><td>'+esc(t.to)+'</td><td class="num"><b>'+P(t.amount)+'</b></td></tr>').join("")+'</tbody>':'<tbody><tr><td>Noch nichts zu verteilen.</td></tr></tbody>';
   $("mResult").hidden=false;
@@ -741,14 +773,14 @@ function openResult(){
 function exportData(){
   const s=settlement();
   return {event:S.title,date:new Date().toISOString().slice(0,10),exported:new Date().toISOString(),started:S.started,ended:S.ended,
-    rules:{stack:S.stack,buyin:S.buyin,fee:S.fee,rebuy:S.rebuy,reLvl:S.reLvl,maxRe:S.maxRe,pay:S.pay,bank:S.bank,unit:"P"},
+    rules:{stack:S.stack,buyin:S.buyin,fee:S.fee,rebuy:S.rebuy,bounty:S.bounty||0,champ:S.champ,lostHeads:S.lostHeads||0,reLvl:S.reLvl,maxRe:S.maxRe,pay:S.pay,bank:S.bank,unit:"P"},
     level:{now:LEVELS[S.i].brk?"Pause":playNum(S.i),blinds:LEVELS[S.i]},pot:s.pot,kasse:s.feeTotal,received:s.received,payouts:s.pays,
     players:S.players.map((p,k)=>Object.assign({seat:k+1},s.rows[k],{out:p.out,entryLog:p.entries})),
     settlementDraft:s.tx,levels:LEVELS,games:S.games,log:S.log};
 }
 function download(){
   const d=exportData(),b=new Blob([JSON.stringify(d,null,1)],{type:"application/json"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="dead-mans-hand-"+d.date+"-"+new Date().toTimeString().slice(0,5).replace(":","")+".json";
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="tafel-"+d.date+"-"+new Date().toTimeString().slice(0,5).replace(":","")+".json";
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   log("export");save();toast("Datei gespeichert (Downloads). Schick sie Claude in den Chat.");
   setTimeout(()=>pdfExport(d),700);
@@ -783,10 +815,10 @@ async function pdfExport(d){
   h2("Wer bekommt was");
   const winners=order.filter(r=>r.win>0);
   if(!winners.length){doc.setFontSize(10);doc.setTextColor(...grey);txt("Noch keine Platzierungen.",M,y);y+=8;}
-  winners.forEach(r=>{need(16);doc.setFillColor(250,246,236);doc.roundedRect(M,y-5,W-2*M,12+(getsFrom(r.name).length+(r.open?1:0)+(r.name.toLowerCase()===S.bank.toLowerCase()?1:0))*5,2,2,"F");
+  winners.forEach(r=>{need(16);doc.setFillColor(250,246,236);doc.roundedRect(M,y-5,W-2*M,12+(getsFrom(r.name).length+(r.open?1:0)+(r.bounty?1:0)+(r.name.toLowerCase()===S.bank.toLowerCase()?1:0))*5,2,2,"F");
     doc.setFont("helvetica","bold");doc.setFontSize(12);doc.setTextColor(...gold);txt(r.place+". Platz",M+4,y+2);doc.setTextColor(...ink);txt(r.name,M+30,y+2);
     txt("+"+r.win+" P",W-M-4,y+2,{align:"right"});doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(...grey);
-    let yy=y+7;const own=r.name.toLowerCase()===S.bank.toLowerCase()?r.win-r.open-getsFrom(r.name).reduce((a,t)=>a+t.amount,0):0;if(own>0){txt("Nimmt "+own+" P direkt aus der Kasse.",M+30,yy);yy+=5;}if(r.open){txt("Davon verrechnet mit seinen offenen "+r.open+" P.",M+30,yy);yy+=5;}
+    let yy=y+7;if(r.bounty){txt((r.prize?"Preisgeld "+r.prize+" P + ":"")+"Kopfgeld "+r.bounty+" P",M+30,yy);yy+=5;}const own=r.name.toLowerCase()===S.bank.toLowerCase()?r.win-r.open-getsFrom(r.name).reduce((a,t)=>a+t.amount,0):0;if(own>0){txt("Nimmt "+own+" P direkt aus der Kasse.",M+30,yy);yy+=5;}if(r.open){txt("Davon verrechnet mit seinen offenen "+r.open+" P.",M+30,yy);yy+=5;}
     getsFrom(r.name).forEach(t=>{txt((t.from===kasse?"Bekommt "+t.amount+" P von "+S.bank+" (Kasse)":"Bekommt "+t.amount+" P von "+t.from),M+30,yy);yy+=5;});
     y=yy+5;});
   y+=2;
@@ -810,7 +842,7 @@ async function pdfExport(d){
       if(k===1)doc.setFont("helvetica","bold");txt(t,cols[k][1],y,k===7?{align:"right"}:{});doc.setFont("helvetica","normal");});
     y+=6.2;});
   y+=6;need(14);doc.setFontSize(8.5);doc.setTextColor(...grey);
-  txt("Buy-in "+S.buyin+" P (davon "+S.fee+" P an den Veranstalter), Rebuy "+S.rebuy+" P. Offen = noch nicht bezahlte Entries.",M,y);y+=4.5;
+  txt("Buy-in "+S.buyin+" P (davon "+S.fee+" P an den Veranstalter"+(S.bounty?", "+S.bounty+" P Kopfgeld":"")+"), Rebuy "+S.rebuy+" P"+(S.bounty?" (davon "+S.bounty+" P Kopfgeld)":"")+". Gewinn enthält Kopfgelder.",M,y);y+=4.5;
   txt("Wer offen hat und nichts gewonnen hat, zahlt an den Gewinner, der neben seinem Namen steht. Den Rest zahlt "+S.bank+" aus der Kasse aus.",M,y);
   doc.save("abrechnung-"+(d?d.date:new Date().toISOString().slice(0,10))+".pdf");
   toast("PDF gespeichert (Downloads)");
@@ -828,7 +860,7 @@ function summaryText(){
   const s=settlement();
   const order=s.rows.slice().sort((a,b)=>(a.place||99)-(b.place||99));
   return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries · An Veranstalter "+s.feeTotal+" P\n\n"+
-    order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win:"")).join("\n")+
+    order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win+(r.bounty?" (davon Kopfgeld "+r.bounty+")":""):"")).join("\n")+
     "\n\nZahlungen:\n"+(s.tx.map(t=>t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine");
 }
 $("bExport").onclick=download;$("rExport").onclick=download;
@@ -953,7 +985,7 @@ function parseGames(t){const out=[];for(const raw of t.split("\n")){const s=raw.
 function openSettings(){
   closeAll();
   $("sTitle").value=S.title;$("sStack").value=S.stack;$("sMin1").value=S.min1;$("sMin").value=S.min;$("sMinLate").value=S.minLate;
-  $("sReLvl").value=S.reLvl??"";$("sMaxRe").value=S.maxRe??"";$("sBuyin").value=S.buyin;$("sFee").value=S.fee;$("sRebuy").value=S.rebuy;
+  $("sReLvl").value=S.reLvl??"";$("sMaxRe").value=S.maxRe??"";$("sBuyin").value=S.buyin;$("sFee").value=S.fee;$("sRebuy").value=S.rebuy;$("sBounty").value=S.bounty||0;
   $("sPlaces").value=String(S.pay.places);$("sThird").value=S.pay.third;$("sSplit").value=S.pay.split;$("sBank").value=S.bank;
   $("sBlinds").value=levelsText();$("sGames").value=S.games.map(e=>e.lvl+" "+e.g).join("\n");$("sCode").value="";$("sErr").textContent="";
   $("mSet").hidden=false;
@@ -964,7 +996,7 @@ function applySettings(){
     const num=(id,min)=>{const v=$(id).value.trim();if(v==="")return null;const n=+v;if(!(n>=min))throw new Error("Ungültige Zahl: "+id);return n;};
     const code=$("sCode").value.trim();
     S.title=$("sTitle").value.trim()||S.title;S.stack=num("sStack",1)||S.stack;S.min1=num("sMin1",1)||S.min1;S.min=num("sMin",1)||S.min;S.minLate=num("sMinLate",1)||S.minLate;
-    S.reLvl=num("sReLvl",0);S.maxRe=num("sMaxRe",0);S.buyin=num("sBuyin",0)??S.buyin;S.fee=num("sFee",0)??S.fee;S.rebuy=num("sRebuy",0)??S.rebuy;
+    S.reLvl=num("sReLvl",0);S.maxRe=num("sMaxRe",0);S.buyin=num("sBuyin",0)??S.buyin;S.fee=num("sFee",0)??S.fee;S.rebuy=num("sRebuy",0)??S.rebuy;S.bounty=num("sBounty",0)??S.bounty;
     S.pay.places=+$("sPlaces").value;S.pay.third=num("sThird",0)??S.pay.third;S.pay.split=num("sSplit",1)||S.pay.split;S.bank=$("sBank").value.trim()||S.bank;
     const keepLeft=leftNow(),sameLen=lv.length===LEVELS.length;
     S.levels=lv;LEVELS=S.levels;S.i=Math.min(S.i,LEVELS.length-1);S.games=gm;
@@ -979,8 +1011,8 @@ function restartTournament(){
   // same players, seats and settings; clock, rebuys, eliminations and minigames back to start
   closeAll();if(intro)intro.stop();
   S.i=0;S.running=false;S.endAt=null;S.left=null;S.started=null;S.ended=null;
-  S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;});
-  S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
+  S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;p.head=null;p.bw=0;});
+  S.lostHeads=0;S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
   save();buildSeats();render();toast("Turnier neu gestartet · Level 1 bereit");
 }
 $("sRestart").onclick=()=>{if(!confirm("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben."))return;restartTournament();$("mSet").hidden=true;};
@@ -1004,7 +1036,7 @@ function runCmd(c){
     case "setlevel":{const L=LEVELS[c.i];if(L)Object.assign(L,c.v);break;}
     case "set":for(const k of Object.keys(c.v||{}))if(k in S&&!["players","log","levels"].includes(k))S[k]=c.v[k];break;
     case "rebuy":doRebuy(c.name,c.paid);break;
-    case "out":doOut(c.name);break;
+    case "out":doOut(c.name,c.by);break;
     case "back":doBack(c.name);break;
     case "paid":{const p=pl(c.name);if(p){const e=p.entries[(c.entry||1)-1];if(e)e.paid=c.paid;}break;}
     case "add":if(!pl(c.name))S.players.push({name:c.name,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:c.paid||"bar"}],out:null});buildSeats();break;
@@ -1034,7 +1066,7 @@ function runCmd(c){
     case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
     case "entries":{const te=totalEntries(),re=te-S.players.length;announce({eyebrow:"Heute Abend",title:te+" Entries",text:S.players.length+" Buy-ins + "+re+(re===1?" Rebuy":" Rebuys")+" · Preisgeld "+P(potOf()),sec:c.sec||25});break;}
     case "restart":restartTournament();break;
-    case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();log("rebuy-undo",{name:p.name});}break;}
+    case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});}break;}
     default:return;
   }}catch(e){console.warn("cmd",c,e);}
   log(c.src||"claude",{op,cmd:c});save();render();pushState();
@@ -1061,7 +1093,7 @@ function stateSnap(){
   const L=LEVELS[S.i];
   return {v:1,at:Date.now(),title:S.title,lvl:L.brk?"Pause":"Level "+playNum(S.i),blinds:L.brk?(L.note||"Pause"):L.sb+" / "+L.bb,
     running:S.running,endAt:S.endAt,left:Math.round(leftNow()),pot:potOf(),entries:totalEntries(),reOpen:rebuyOpen(),active:S.active,
-    games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length])};
+    games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length,headOf(p),bwOf(p)]),bounty:S.bounty||0};
 }
 function pushState(){clearTimeout(pushState.t);pushState.t=setTimeout(()=>{fetch(RELAY+TOPIC+"-state",{method:"POST",body:JSON.stringify(stateSnap())}).catch(()=>{});},800);}
 let es=null,remoteOk=false;

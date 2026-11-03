@@ -148,14 +148,15 @@ function sheet(title,btns){
 }
 function renderPlayers(){
   const L=$("pl");L.innerHTML="";if(!st)return;
-  st.p.forEach(([name,entries,out,place,open])=>{
+  st.p.forEach(([name,entries,out,place,open,head,bw])=>{
     const r=document.createElement("div");r.className="pr"+(out?" out":"");
     r.innerHTML='<div class="n"></div>';
-    r.querySelector(".n").innerHTML='<span></span><small>'+(entries>1?"+"+(entries-1)+" Rebuy":"Buy-in")+(open?' · <b>'+open+' offen</b>':"")+(out?" · Platz "+place:"")+'</small>';
+    r.querySelector(".n").innerHTML='<span></span><small>'+(entries>1?"+"+(entries-1)+" Rebuy":"Buy-in")+(open?' · <b>'+open+' offen</b>':"")+(out?" · Platz "+place:"")+(st.bounty&&!out?" · 🎯 "+head+" P":"")+(st.bounty&&bw?" · kassiert "+bw+" P":"")+'</small>';
     r.querySelector(".n span").textContent=name;
     const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className="sm "+(cls||"");b.textContent=t;b.onclick=fn;r.appendChild(b);};
     mk("+ Rebuy","",()=>sheet(name+": Rebuy",[["Bar bezahlt","pri",()=>send({op:"rebuy",name,paid:"bar"},name+" Rebuy bar")],["Überwiesen","",()=>send({op:"rebuy",name,paid:"dig"},name+" Rebuy überwiesen")],["Offen (zahlt später)","red",()=>send({op:"rebuy",name,paid:"offen"},name+" Rebuy offen")]]));
-    if(!out)mk("Raus","red",()=>{if(confirm(name+" ist raus?"))send({op:"out",name},name+" raus");});
+    if(!out)mk("Raus","red",()=>{if(!st.bounty){if(confirm(name+" ist raus?"))send({op:"out",name},name+" raus");return;}
+      sheet("Wer hat "+name+" rausgeworfen?",st.p.filter(x=>!x[2]&&x[0]!==name).map(x=>[x[0]+" · 🎯 "+x[5]+" P","pri",()=>send({op:"out",name,by:x[0]},x[0]+" wirft "+name+" raus")]).concat([["Ohne Werfer (Kopf in den Pot)","",()=>send({op:"out",name},name+" raus")]]));});
     else mk("Zurück","",()=>send({op:"back",name},name+" zurück"));
     mk("⋯","",()=>sheet(name,[
       ["Buy-in offen (nicht bezahlt)","",()=>send({op:"paid",name,entry:1,paid:"offen"},"Buy-in offen")],
