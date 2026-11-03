@@ -663,53 +663,53 @@ textarea { min-height: 150px; resize: vertical; }
    "Kevin": "High Stakes"
   },
   "next": {
-   "date": "2026-11-01T17:00",
-   "title": "Midnight Birthday Deepstack",
-   "sub": "Wir spielen in Nikis Geburtstag rein · 10.000 Chips",
+   "date": "2026-11-06T18:00",
+   "title": "High Noon Knockout",
+   "sub": "Das erste Bounty-Turnier · Kopfgeld auf jeden Kopf",
    "buyin": 25,
    "rebuy": 20,
    "fee": 5,
-   "cards": "A♥ K♥ Q♥ J♥ 10♥",
+   "cards": "A♠ A♣ 8♠ 8♣ 9♦",
    "facts": [
     {
-     "v": "17:30 Uhr",
-     "l": "Erste Hand"
+     "v": "10 P",
+     "l": "Kopfgeld pro Entry"
     },
     {
-     "v": "10.000 Chips",
-     "l": "Deepstack"
+     "v": "Progressive",
+     "l": "Knockout"
     }
    ],
    "program": [
     {
-     "t": "17:00",
-     "l": "Treffpunkt in The Void",
-     "s": "Ankommen, Buy-in in bar, Plätze auslosen"
+     "t": "Treffpunkt",
+     "l": "Ankommen in The Void",
+     "s": "Buy-in in bar, Plätze auslosen, Kopfgelder verteilen"
     },
     {
-     "t": "17:30",
-     "l": "Erste Hand",
-     "s": "Shuffle up and deal"
+     "t": "Erste Hand",
+     "l": "Shuffle up and deal",
+     "s": "Uhrzeit folgt mit dem Termin"
     },
     {
-     "t": "Abend",
-     "l": "Deepstack mit 10.000 Chips",
-     "s": "Bei mehr als 10 Leuten an zwei Tischen, am Ende ein Final Table"
+     "t": "Jeder Knockout",
+     "l": "Kopfgeld kassieren",
+     "s": "Die Hälfte sofort bar, die andere Hälfte kommt auf deinen eigenen Kopf"
     },
     {
-     "t": "00:00",
-     "l": "Happy Birthday, Niki",
-     "s": "Um Mitternacht wird angestoßen, egal wer noch Chips hat"
+     "t": "Am Ende",
+     "l": "Der letzte Kopf",
+     "s": "Der Sieger holt den Pot-Anteil und sein eigenes Kopfgeld"
     }
    ],
-   "trophyTitle": "Nikis Geburtstag",
-   "trophy": "Am Montag hat Niki Geburtstag, und wir spielen am Sonntagabend gemeinsam rein. Um Mitternacht wird angestoßen, egal wie der Stand am Tisch ist.",
-   "info": "Wieder Deepstack mit 10.000 Chips, wie beim Dead Man's Hand. Je mehr Leute kommen, desto besser: Bei mehr als 10 spielen wir an zwei Tischen und am Ende an einem Final Table.\n\nTreffpunkt ist um 17:00 Uhr, die erste Hand um 17:30 Uhr.\n\nPreise, damit jeder Bescheid weiß: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
+   "trophyTitle": "Kingslayer 👑",
+   "trophy": "Wer den amtierenden Champion rauswirft, wird auf der Website zum Kingslayer gekrönt. Nur Ruhm, aber für immer.",
+   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 10 P Kopfgeld. Wer jemanden rauswirft, bekommt die Hälfte davon sofort bar, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und am Ende geht es um richtig was.\n\nPreise: Der Buy-in kostet 25 P (10 P Pot, 10 P Kopfgeld, 5 P an den Veranstalter). Jeder Rebuy kostet 20 P (10 P Pot, 10 P neues Kopfgeld).\n\nDer Termin (Fr, Sa oder So) wird gerade in der WhatsApp-Gruppe abgestimmt.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
    "seats": 0,
    "times": [],
    "votes": {},
-   "signups": ["Benno", "Niklas", "Tim", "Nico", "Chris", "Jan", "Domi C", "Manu", "Zeno"],
-   "tbd": ""
+   "signups": [],
+   "tbd": "Termin wird in der Gruppe abgestimmt: Fr 06.11., Sa 07.11. oder So 08.11."
   },
   "extraRecords": [
    {
@@ -1738,7 +1738,7 @@ textarea { min-height: 150px; resize: vertical; }
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin wird verschoben' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin folgt' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
       '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
@@ -1751,9 +1751,9 @@ textarea { min-height: 150px; resize: vertical; }
     let chips = '';
     for (let i = 0; i < 22; i++) chips += '<span class="chipf' + (i % 3 ? '' : ' g') + '" style="left:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (2.2 + Math.random() * 2).toFixed(2) + 's;--w:' + (0.3 + Math.random() * 2.2).toFixed(2) + 's;--r:' + ((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540)).toFixed(0) + 'deg;width:' + (24 + Math.random() * 20).toFixed(0) + 'px;height:auto;aspect-ratio:1"></span>';
     el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + chips +
-      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin wird verschoben' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
+      '<div class="box"><button class="x" aria-label="Schließen">×</button><span class="tag"><i></i>' + (n.tbd ? 'Termin folgt' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Neuer Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
+      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
       '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-go="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
@@ -1794,7 +1794,7 @@ textarea { min-height: 150px; resize: vertical; }
     const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Veranstalter' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Neuer Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
+      '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
       '<div class="body"><div class="facts">' + facts.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
       '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + (noLimit(n) ? '' : ' / ' + seatsOf(n)) + ' zugesagt</span></div>' + seatbar(n) +
       (signups(n).length ? '<div class="who">' + signups(n).slice(0, seatsOf(n)).map(x => '<span>' + esc(x) + '</span>').join('') + '</div>' : '<p class="sub" style="font-size:14px">Noch keine Zusagen. Sei der Erste.</p>') +
