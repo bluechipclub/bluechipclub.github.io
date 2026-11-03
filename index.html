@@ -672,7 +672,7 @@ textarea { min-height: 150px; resize: vertical; }
    "cards": "A♠ A♣ 8♠ 8♣ 9♦",
    "facts": [
     {
-     "v": "10 P",
+     "v": "5 P",
      "l": "Kopfgeld pro Entry"
     },
     {
@@ -692,7 +692,7 @@ textarea { min-height: 150px; resize: vertical; }
      "s": "Uhrzeit folgt mit dem Termin"
     },
     {
-     "t": "Jeder Knockout",
+     "t": "Knockout",
      "l": "Kopfgeld kassieren",
      "s": "Die Hälfte sofort bar, die andere Hälfte kommt auf deinen eigenen Kopf"
     },
@@ -704,12 +704,27 @@ textarea { min-height: 150px; resize: vertical; }
    ],
    "trophyTitle": "Kingslayer 👑",
    "trophy": "Wer den amtierenden Champion rauswirft, wird auf der Website zum Kingslayer gekrönt. Nur Ruhm, aber für immer.",
-   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 10 P Kopfgeld. Wer jemanden rauswirft, bekommt die Hälfte davon sofort bar, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und am Ende geht es um richtig was.\n\nPreise: Der Buy-in kostet 25 P (10 P Pot, 10 P Kopfgeld, 5 P an den Veranstalter). Jeder Rebuy kostet 20 P (10 P Pot, 10 P neues Kopfgeld).\n\nDer Termin (Fr, Sa oder So) wird gerade in der WhatsApp-Gruppe abgestimmt.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
+   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 5 P Kopfgeld. Wer jemanden rauswirft, bekommt die Hälfte davon sofort, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und am Ende geht es um richtig was. Die Tafel zählt alles live mit.\n\nPreise: Der Buy-in kostet 25 P (15 P Pot, 5 P Kopfgeld, 5 P an den Veranstalter). Jeder Rebuy kostet 20 P (15 P Pot, 5 P neues Kopfgeld).\n\nDer Termin (Fr, Sa oder So) wird abgestimmt: Kreuz bei der Anmeldung an, wann du kannst. Mehrere Kreuze gehen.\n\nBargeld-Regel: Bring Bargeld für so viele Entries mit, wie du spielen willst.",
    "seats": 0,
    "times": [],
    "votes": {},
    "signups": [],
-   "tbd": "Termin wird in der Gruppe abgestimmt: Fr 06.11., Sa 07.11. oder So 08.11."
+   "tbd": "Termin wird abgestimmt: Fr 06.11., Sa 07.11. oder So 08.11. Kreuz bei der Anmeldung an, wann du kannst.",
+   "days": [
+    {
+     "v": "Fr",
+     "l": "Freitag, 06.11."
+    },
+    {
+     "v": "Sa",
+     "l": "Samstag, 07.11."
+    },
+    {
+     "v": "So",
+     "l": "Sonntag, 08.11."
+    }
+   ],
+   "dvotes": {}
   },
   "extraRecords": [
    {
@@ -1729,6 +1744,9 @@ textarea { min-height: 150px; resize: vertical; }
   const vTimes = n => (n.times || []).filter(x => x.v);
   const votesFor = (n, v) => Object.keys(n.votes || {}).filter(k => n.votes[k] === v);
   const voteLead = n => { const t = vTimes(n).map(x => [x, votesFor(n, x.v).length]).sort((a, b) => b[1] - a[1]); return t.length && t[0][1] && (t.length < 2 || t[0][1] > t[1][1]) ? t[0][0] : null; };
+  const vDays = n => (n.days || []).filter(x => x.v);
+  const dayVotes = (n, v) => Object.keys(n.dvotes || {}).filter(k => (n.dvotes[k] || []).includes(v));
+  const DAYRX = /^[A-Za-zä]{2}(\+[A-Za-zä]{2})*$/;
   const timeTxt = (n, d) => vTimes(n).length ? (voteLead(n) ? 'vorne: ' + voteLead(n).v + ' Uhr' : 'Uhrzeit per Abstimmung') : hhmm(d) + ' Uhr';
   const signups = n => (n.signups || []).filter(Boolean);
   const seatbar = n => { const k = signups(n).length, m = noLimit(n) ? Math.max(10, k) : seatsOf(n); return '<div class="seatbar" aria-hidden="true">' + Array.from({ length: Math.max(m, k) }, (_, i) => '<i class="' + (i < k ? (i < m ? 'on' : 'on ex') : '') + '"></i>').join('') + '</div>'; };
@@ -1738,7 +1756,7 @@ textarea { min-height: 150px; resize: vertical; }
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? 'Termin folgt' : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? (vDays(n).length ? 'Anmeldung offen · Termin per Abstimmung' : 'Termin folgt') : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
       '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
@@ -1801,6 +1819,7 @@ textarea { min-height: 150px; resize: vertical; }
       (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Warteliste</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
       '<p class="sub" style="font-size:13px">' + seatTxt(n) + (isFull(n) ? '. Du kannst dich trotzdem auf die Warteliste setzen: Wer später kommt oder früher geht, macht Platz, und je nach Andrang spielen wir auch zu 11 oder 12. Wer nachrückt, wird per WhatsApp informiert.' : (noLimit(n) ? '. Diesmal ohne Platzlimit: Kommen mehr als 10, spielen wir an zwei Tischen und am Ende an einem Final Table.' : '. Ab ' + (seatsOf(n) + 1) + ' Leuten gibt es eine Warteliste.')) + '</p>' +
       (vTimes(n).length ? '<div class="field"><span>Wann soll es losgehen? Stimm mit ab</span><div class="vote">' + vTimes(n).map((x, i) => { const w = votesFor(n, x.v); return '<label><input type="radio" name="rT" value="' + esc(x.v) + '"' + (i ? '' : ' checked') + '><span><b>' + esc(x.v) + ' Uhr</b> ' + esc(x.l) + '<small>' + esc(x.s || '') + '</small></span><em>' + w.length + (w.length === 1 ? ' Stimme' : ' Stimmen') + '</em>' + (w.length ? '<small class="vn">' + w.map(esc).join(', ') + '</small>' : '') + '</label>'; }).join('') + '</div></div>' : '') +
+      (vDays(n).length ? '<div class="field"><span>Wann kannst du? Mehrere Kreuze möglich</span><div class="vote">' + vDays(n).map(x => { const w = dayVotes(n, x.v); return '<label><input type="checkbox" name="rD" value="' + esc(x.v) + '"><span><b>' + esc(x.l || x.v) + '</b><small>' + esc(x.s || '') + '</small></span><em>' + w.length + (w.length === 1 ? ' Stimme' : ' Stimmen') + '</em>' + (w.length ? '<small class="vn">' + w.map(esc).join(', ') + '</small>' : '') + '</label>'; }).join('') + '</div></div>' : '') +
       '<div class="row"><label class="field"><span>Dein Name</span><select id="rP">' + playerOpts('') + '<option value="__g">Gast / neu …</option></select></label><label class="field" id="rGW" hidden><span>Name des Gasts</span><input id="rG" placeholder="Vorname"></label></div>' +
       '<label class="field"><span>Anmerkung (optional)</span><input id="rN" placeholder="z. B. komme erst gegen 19 Uhr, bringe einen Gast mit …"></label>' +
       '<p class="sub" style="font-size:13px">Kommst du später oder gibt es sonst etwas zu beachten? Schreib es hier rein oder direkt mit in die WhatsApp-Nachricht.</p>' +
@@ -1821,10 +1840,12 @@ textarea { min-height: 150px; resize: vertical; }
     const resvText = () => {
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
       if (!nm) { st.className = 'status err'; st.textContent = 'Bitte wähl deinen Namen.'; return null; }
+      const dd = [...document.querySelectorAll('input[name=rD]:checked')].map(x => x.value);
+      if (vDays(n).length && !dd.length) { st.className = 'status err'; st.textContent = 'Bitte kreuz an, wann du kannst.'; return null; }
       st.className = 'status'; st.textContent = '';
-      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? 'neuer Termin (laut Abstimmung)' : wd + (vTimes(n).length ? '' : ', ' + hhmm(d) + ' Uhr')) + '\nName: ' + nm + (vTimes(n).length && $('input[name=rT]:checked') ? '\nStartzeit: ' + $('input[name=rT]:checked').value + ' Uhr' : '') + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
+      return '♠ Blue Chip Club · Platz-Reservierung\n\nTurnier: ' + n.title + '\nWann: ' + (n.tbd ? (vDays(n).length ? 'kann ' + [...document.querySelectorAll('input[name=rD]:checked')].map(x => (vDays(n).find(y => y.v === x.value) || {}).l || x.value).join(', ') : 'neuer Termin (laut Abstimmung)') : wd + (vTimes(n).length ? '' : ', ' + hhmm(d) + ' Uhr')) + '\nName: ' + nm + (vTimes(n).length && $('input[name=rT]:checked') ? '\nStartzeit: ' + $('input[name=rT]:checked').value + ' Uhr' : '') + '\n\n' + (isFull(n) ? 'Tisch ist voll, setz mich bitte auf die Warteliste.' : 'Ich bin dabei!') + (($('#rN').value || '').trim() ? '\nAnmerkung: ' + $('#rN').value.trim() : '');
     };
-    const reg = () => { const tm = $('input[name=rT]:checked'); register(n, $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value, tm ? tm.value : '', ($('#rN').value || '').trim()); };
+    const reg = () => { const tm = $('input[name=rT]:checked'), dd = [...document.querySelectorAll('input[name=rD]:checked')].map(x => x.value); register(n, $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value, dd.length ? dd.join('+') : (tm ? tm.value : ''), ($('#rN').value || '').trim()); };
     $('#rWa').onclick = e => { const t = resvText(); if (!t) { e.preventDefault(); return; } $('#rWa').href = waUrl(t); showFb($('#rFb'), t); reg(); };
     $('#rCopy').onclick = async () => { const t = resvText(); if (!t) return; showFb($('#rFb'), t); reg(); try { await navigator.clipboard.writeText(t); $('#rStatus').textContent = 'Kopiert. Jetzt per WhatsApp senden.'; } catch (e) { $('#rStatus').textContent = 'Text steht unten, markieren und kopieren.'; } };
     if ($('#greet')) {
@@ -2239,16 +2260,17 @@ textarea { min-height: 150px; resize: vertical; }
   }
   function merge(n, list) {
     n.signups = signups(n); n.votes = n.votes || {};
-    list.forEach(x => { const nm = String(x.name || '').trim(); if (!nm) return; if (!n.signups.includes(nm)) n.signups.push(nm); if (/^\d{1,2}:\d{2}$/.test(x.time || '')) n.votes[nm] = x.time; });
+    list.forEach(x => { const nm = String(x.name || '').trim(); if (!nm) return; if (!n.signups.includes(nm)) n.signups.push(nm); if (/^\d{1,2}:\d{2}$/.test(x.time || '')) n.votes[nm] = x.time; else if (DAYRX.test(x.time || '')) { n.dvotes = n.dvotes || {}; n.dvotes[nm] = x.time.split('+'); } });
     renderRangliste();
     document.querySelectorAll('.splash .seats').forEach(el => { el.innerHTML = seatTxt(n); });
   }
   function refreshEvent() {
     if ($('#evov').hidden || !$('#resv')) return;
-    const m = $('#evm'), tm = $('input[name=rT]:checked'), k = { p: $('#rP').value, g: $('#rG').value, n: $('#rN').value, t: tm && tm.value, y: m.scrollTop, a: document.activeElement && document.activeElement.id, gp: $('#gP') && $('#gP').value, gg: $('#gG') && $('#gG').value, gt: $('#gT') && $('#gT').value };
+    const m = $('#evm'), tm = $('input[name=rT]:checked'), k = { p: $('#rP').value, g: $('#rG').value, n: $('#rN').value, t: tm && tm.value, dd: [...document.querySelectorAll('input[name=rD]:checked')].map(x => x.value), y: m.scrollTop, a: document.activeElement && document.activeElement.id, gp: $('#gP') && $('#gP').value, gg: $('#gG') && $('#gG').value, gt: $('#gT') && $('#gT').value };
     openEvent();
     $('#rP').value = k.p; $('#rP').onchange(); $('#rG').value = k.g; $('#rN').value = k.n;
     if (k.t) { const r = document.querySelector('input[name=rT][value="' + k.t + '"]'); if (r) r.checked = true; }
+    (k.dd || []).forEach(v => { const r = document.querySelector('input[name=rD][value="' + v + '"]'); if (r) r.checked = true; });
     if ($('#gP')) { $('#gP').value = k.gp || ''; $('#gP').onchange(); $('#gG').value = k.gg || ''; $('#gT').value = k.gt || ''; $('#gT').oninput(); }
     m.scrollTop = k.y; if (k.a && $('#' + k.a)) $('#' + k.a).focus({ preventScroll: true });
   }

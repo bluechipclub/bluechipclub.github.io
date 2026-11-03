@@ -474,7 +474,7 @@ const GAMES={
 };
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"High Noon Knockout",sub:"Blue Chip Club · Erstes Bounty-Turnier · 10.000 Chips",bounty:10,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"High Noon Knockout",sub:"Blue Chip Club · Erstes Bounty-Turnier · 10.000 Chips",bounty:5,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:30,min:30,minLate:25,stack:10000,reLvl:9,maxRe:null,
   buyin:25,fee:5,rebuy:20,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
