@@ -456,7 +456,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:25,bb:50},{sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
+ {sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
 ];
 const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno","Kevin","Pasi"];
 // minigames: bb = stake in big blinds of the current level
@@ -475,7 +475,7 @@ const GAMES={
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
 const fresh=()=>({v:1,title:"High Noon Knockout",sub:"Blue Chip Club · Erstes Bounty-Turnier · 7.000 Chips",bounty:10,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:30,min:30,minLate:25,stack:7000,reLvl:9,maxRe:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:20,min:20,minLate:20,stack:7000,reLvl:8,maxRe:null,
   buyin:20,fee:5,rebuy:15,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
