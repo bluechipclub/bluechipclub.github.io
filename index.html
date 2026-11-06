@@ -433,6 +433,10 @@ article.post { scroll-margin-top: 96px; }
 @media (prefers-reduced-motion: reduce) { .splash .chipf { display: none; } }
 .cancel-banner { position: fixed; top: 12px; left: 12px; z-index: 100; padding: 10px 18px; border-radius: 12px; background: #c0281e; color: #fff; font-weight: 800; font-size: clamp(14px, 2.6vw, 18px); letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 0 0 1px rgb(255 255 255 / .25), 0 10px 30px rgb(0 0 0 / .6); transform: rotate(-3deg); pointer-events: none; }
 .cancel-banner small { display: block; font-size: .62em; font-weight: 600; letter-spacing: .1em; opacity: .9; }
+.cancel-banner { pointer-events: auto; padding-right: 46px; }
+.cancel-banner[hidden] { display: none; }
+.cancel-banner .cb-x { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgb(0 0 0 / .28); color: #fff; font-size: 18px; line-height: 30px; font-weight: 700; cursor: pointer; padding: 0; }
+@media (max-width: 600px) { .cancel-banner { top: 8px; left: 8px; padding: 8px 44px 8px 12px; font-size: 13px; transform: none; } .cancel-banner .cb-x { width: 32px; height: 32px; line-height: 32px; } .intro .skip { padding: 12px 20px; font-size: 15px; top: max(14px, env(safe-area-inset-top)); } }
 .intro { position: fixed; inset: 0; z-index: 90; background: #000; display: grid; place-items: center; transition: opacity 400ms ease; }
 .intro.out { opacity: 0; }
 .intro video { width: 100%; height: 100%; object-fit: contain; background: #000; }
@@ -642,7 +646,8 @@ textarea { min-height: 150px; resize: vertical; }
     </div>
   </div>
 </header>
-<div class="cancel-banner" role="status">Turnier abgesagt<small>High Noon Knockout</small></div>
+<div class="cancel-banner" role="status" id="cancelBanner">Turnier abgesagt<small>High Noon Knockout</small><button class="cb-x" type="button" aria-label="Banner schließen">×</button></div>
+<script>(function(){var b=document.getElementById('cancelBanner');try{if(sessionStorage.getItem('cb-closed'))b.hidden=true;}catch(e){}b.querySelector('.cb-x').addEventListener('click',function(){b.hidden=true;try{sessionStorage.setItem('cb-closed','1');}catch(e){}});})();</script>
 <main><div class="wrap">
   <section class="view" id="v-rangliste"></section>
   <section class="view" id="v-news" hidden></section>
