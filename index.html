@@ -447,6 +447,9 @@ article.post { scroll-margin-top: 96px; }
 .intro .enter { padding: 16px 44px; border-radius: 999px; border: 0; font-size: 19px; font-weight: 700; letter-spacing: .04em; color: #0a0a0a; background: linear-gradient(180deg, var(--gold2), var(--gold)); box-shadow: 0 0 60px -10px rgb(226 184 87 / .8); }
 .intro .skip { position: absolute; white-space: nowrap; z-index: 2; border-radius: 999px; border: 1px solid rgb(226 184 87 / .6); background: rgb(0 0 0 / .55); color: var(--fg); font-weight: 600; }
 .intro .skip { right: 16px; top: 16px; padding: 10px 18px; font-size: 14px; }
+.intro .x { position: absolute; z-index: 3; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgb(255 255 255 / .5); background: rgb(0 0 0 / .65); color: #fff; font-size: 26px; line-height: 1; display: grid; place-items: center; }
+.intro .nolink { background: none; border: 0; color: rgb(255 255 255 / .75); font-size: 16px; text-decoration: underline; padding: 10px; }
+@media (max-width: 760px) { .intro .skip { top: auto; right: 50%; transform: translateX(50%); bottom: calc(24px + env(safe-area-inset-bottom)); padding: 14px 28px; font-size: 16px; } }
 .fb { display: grid; gap: 10px; padding: 14px; border-radius: 14px; border: 1px dashed rgb(226 184 87 / .4); background: rgb(0 0 0 / .25); font-size: 13px; color: var(--grey); }
 .fb .acts { display: flex; gap: 8px; flex-wrap: wrap; }
 .fb textarea { min-height: 120px; font-family: var(--mono); font-size: 13px; }
@@ -1804,7 +1807,8 @@ textarea { min-height: 150px; resize: vertical; }
     const el = document.createElement('div');
     el.className = 'intro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
     el.innerHTML = '<video playsinline preload="auto" poster="video/intro-poster.jpg" src="video/intro.mp4"></video>' +
-      '<div class="gate" hidden><span class="gchip" aria-hidden="true"></span><span class="gname goldtext">Blue Chip Club</span><button class="enter">Eintreten</button></div>' +
+      '<div class="gate" hidden><span class="gchip" aria-hidden="true"></span><span class="gname goldtext">Blue Chip Club</span><button class="enter">Eintreten</button><button class="nolink">Ohne Clip zur Seite</button></div>' +
+      '<button class="x" aria-label="Schließen">✕</button>' +
       '<button class="skip">Überspringen ›</button>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const v = el.querySelector('video'), gate = el.querySelector('.gate');
@@ -1812,6 +1816,8 @@ textarea { min-height: 150px; resize: vertical; }
     const close = () => { if (closed) return; closed = true; v.pause(); el.classList.add('out'); setTimeout(() => { el.remove(); document.body.style.overflow = ''; }, 400); };
     v.addEventListener('ended', close);
     el.querySelector('.skip').addEventListener('click', close);
+    el.querySelector('.x').addEventListener('click', close);
+    el.querySelector('.nolink').addEventListener('click', e => { e.stopPropagation(); close(); });
     // Ein Tipp irgendwo auf den Eingangs-Bildschirm startet den Clip mit Ton
     gate.addEventListener('click', () => { gate.hidden = true; v.muted = false; v.currentTime = 0; v.play().catch(close); });
     document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', k); close(); } });
