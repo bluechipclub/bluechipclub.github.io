@@ -431,6 +431,18 @@ article.post { scroll-margin-top: 96px; }
   @keyframes fall { 0% { transform: translateY(0) rotate(0); opacity: 0; } 8% { opacity: 1; } 100% { transform: translateY(115vh) rotate(var(--r, 540deg)); opacity: .9; } }
 }
 @media (prefers-reduced-motion: reduce) { .splash .chipf { display: none; } }
+.cancel-banner { position: fixed; top: 12px; left: 12px; z-index: 100; padding: 10px 18px; border-radius: 12px; background: #c0281e; color: #fff; font-weight: 800; font-size: clamp(14px, 2.6vw, 18px); letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 0 0 1px rgb(255 255 255 / .25), 0 10px 30px rgb(0 0 0 / .6); transform: rotate(-3deg); pointer-events: none; }
+.cancel-banner small { display: block; font-size: .62em; font-weight: 600; letter-spacing: .1em; opacity: .9; }
+.intro { position: fixed; inset: 0; z-index: 90; background: #000; display: grid; place-items: center; transition: opacity 400ms ease; }
+.intro.out { opacity: 0; }
+.intro video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.intro .gate { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; justify-items: center; gap: 22px; cursor: pointer; background: radial-gradient(70% 60% at 50% 45%, rgb(30 24 8 / .95), #000 70%); }
+.intro .gate[hidden] { display: none; }
+.intro .gchip { width: clamp(90px, 18vmin, 150px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 50%, transparent 0 62%, rgb(0 0 0 / .18) 63% 64%, transparent 65%), repeating-conic-gradient(from -7deg, #f5f7ff 0 14deg, transparent 14deg 60deg), radial-gradient(circle at 35% 28%, #4d82ff, #1f55e0 55%, #12379c); box-shadow: 0 0 0 1px rgb(255 255 255 / .25), 0 0 80px rgb(47 107 255 / .45), 0 20px 50px #000; animation: pulse 2.4s ease-in-out infinite; }
+.intro .gname { font-size: clamp(34px, 7vw, 72px); letter-spacing: -.05em; line-height: .9; }
+.intro .enter { padding: 16px 44px; border-radius: 999px; border: 0; font-size: 19px; font-weight: 700; letter-spacing: .04em; color: #0a0a0a; background: linear-gradient(180deg, var(--gold2), var(--gold)); box-shadow: 0 0 60px -10px rgb(226 184 87 / .8); }
+.intro .skip { position: absolute; white-space: nowrap; z-index: 2; border-radius: 999px; border: 1px solid rgb(226 184 87 / .6); background: rgb(0 0 0 / .55); color: var(--fg); font-weight: 600; }
+.intro .skip { right: 16px; top: 16px; padding: 10px 18px; font-size: 14px; }
 .fb { display: grid; gap: 10px; padding: 14px; border-radius: 14px; border: 1px dashed rgb(226 184 87 / .4); background: rgb(0 0 0 / .25); font-size: 13px; color: var(--grey); }
 .fb .acts { display: flex; gap: 8px; flex-wrap: wrap; }
 .fb textarea { min-height: 120px; font-family: var(--mono); font-size: 13px; }
@@ -630,6 +642,7 @@ textarea { min-height: 150px; resize: vertical; }
     </div>
   </div>
 </header>
+<div class="cancel-banner" role="status">Turnier abgesagt<small>High Noon Knockout</small></div>
 <main><div class="wrap">
   <section class="view" id="v-rangliste"></section>
   <section class="view" id="v-news" hidden></section>
@@ -1743,6 +1756,7 @@ textarea { min-height: 150px; resize: vertical; }
   const isFull = n => !noLimit(n) && signups(n).length >= seatsOf(n);
   const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); if (noLimit(n)) return '<b>' + k + (k === 1 ? ' Zusage' : ' Zusagen') + '</b> · kein Limit' + (k > 10 ? ' · zwei Tische' : ''); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Warteliste' : 'Warteliste offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
   function promoCard() {
+    return ''; // High Noon Knockout abgesagt (06.11.2026): keine Anmeldung anzeigen
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -1777,6 +1791,27 @@ textarea { min-height: 150px; resize: vertical; }
     el.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) return close(g.dataset.go); if (e.target.closest('.x') || !e.target.closest('.box')) close(); });
     if (audio && soundOn) for (let i = 0; i < 6; i++) clack(audio.currentTime + 0.9 + i * 0.05, .4);
     setTimeout(() => { const x = el.querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 50);
+  }
+  // Intro-Clip beim Öffnen der Seite (ersetzt das Anmelde-Fenster). Browser erlauben Ton erst nach einem Klick:
+  // erst mit Ton versuchen, sonst stumm starten und groß "Ton an" anbieten.
+  function openIntro() {
+    try { if (sessionStorage.getItem('intro-seen')) return; sessionStorage.setItem('intro-seen', '1'); } catch (e) {}
+    const el = document.createElement('div');
+    el.className = 'intro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
+    el.innerHTML = '<video playsinline preload="auto" poster="video/intro-poster.jpg" src="video/intro.mp4"></video>' +
+      '<div class="gate" hidden><span class="gchip" aria-hidden="true"></span><span class="gname goldtext">Blue Chip Club</span><button class="enter">Eintreten</button></div>' +
+      '<button class="skip">Überspringen ›</button>';
+    document.body.appendChild(el); document.body.style.overflow = 'hidden';
+    const v = el.querySelector('video'), gate = el.querySelector('.gate');
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; v.pause(); el.classList.add('out'); setTimeout(() => { el.remove(); document.body.style.overflow = ''; }, 400); };
+    v.addEventListener('ended', close);
+    el.querySelector('.skip').addEventListener('click', close);
+    // Ein Tipp irgendwo auf den Eingangs-Bildschirm startet den Clip mit Ton
+    gate.addEventListener('click', () => { gate.hidden = true; v.muted = false; v.currentTime = 0; v.play().catch(close); });
+    document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', k); close(); } });
+    v.muted = false;
+    v.play().catch(() => { v.pause(); gate.hidden = false; });
   }
   const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.fee ? ' (inkl. ' + eur(n.fee) + ' Veranstalter)' : '') + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
   function nextOk() { const n = DATA.settings.next; return n && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
@@ -2273,7 +2308,7 @@ textarea { min-height: 150px; resize: vertical; }
   if (!VIEWS.includes(start)) { try { start = sessionStorage.getItem('liga-view') || ''; } catch (e) {} }
   show(start);
   let justSaved = false; try { justSaved = !!sessionStorage.getItem('liga-flash'); } catch (e) {}
-  if (!justSaved) openSplash();
+  if (!justSaved) openIntro();
   try { const f = sessionStorage.getItem('liga-flash'); if (f) sessionStorage.removeItem('liga-flash'); } catch (e) {}
 
   (async () => {
