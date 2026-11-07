@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Dead Man's Hand Deepstack · Tafel</title>
+<title>Sunday Classic · Tafel</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -446,7 +446,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-hnk-2026-11";
+const KEY="bcc-tafel-sc-2026-11-08";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -456,7 +456,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:50,bb:100},{sb:75,bb:150},{brk:10,note:"Rebuys an der Kasse"},{sb:100,bb:200},{sb:150,bb:300},{sb:200,bb:400},{brk:5,note:"Kurze Pause"},{sb:250,bb:500},{sb:300,bb:600},{sb:400,bb:800},{sb:500,bb:1000},{sb:600,bb:1200},{sb:800,bb:1600},{sb:1000,bb:2000},{sb:1200,bb:2400},{sb:1500,bb:3000},{sb:2000,bb:4000},{sb:2500,bb:5000},{sb:3000,bb:6000},{sb:4000,bb:8000},{sb:5000,bb:10000},{sb:6000,bb:12000},{sb:8000,bb:16000}
+ {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300},{sb:200,bb:400,ante:400},{brk:10,note:"Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{sb:800,bb:1600,ante:1600},{brk:10,note:"Rebuys vorbei"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
 const NAMES=["Tim","Niklas","Benno","Nico","Chris","Jan","Domi C","Manu","Zeno","Kevin","Pasi"];
 // minigames: bb = stake in big blinds of the current level
@@ -474,9 +474,9 @@ const GAMES={
 };
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"High Noon Knockout",sub:"Blue Chip Club · Erstes Bounty-Turnier · 7.000 Chips",bounty:10,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:20,min:20,minLate:20,stack:7000,reLvl:8,maxRe:null,
-  buyin:20,fee:5,rebuy:15,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
+const fresh=()=>({v:1,title:"Sunday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:9,maxRe:1,
+  buyin:30,fee:5,rebuy:30,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -548,10 +548,10 @@ function render(){
   $("lvl").textContent=L.brk?"Pause":"Level "+playNum(S.i);
   const c=$("clock");c.textContent=mmss(left);
   c.className="clock"+(!S.running?" paused":left<=10?" crit":left<=60?" warn":"");
-  $("cur").innerHTML=L.brk?esc(L.note||"Pause")+"<small>"+L.brk+" Minuten</small>":fmt(L.sb)+" / "+fmt(L.bb)+"<small>Small / Big Blind</small>";
+  $("cur").innerHTML=L.brk?esc(L.note||"Pause")+"<small>"+L.brk+" Minuten</small>":fmt(L.sb)+" / "+fmt(L.bb)+"<small>Small / Big Blind"+(L.ante?" · BB-Ante "+fmt(L.ante):"")+"</small>";
   $("bar").style.width=(d?100*(1-left/d):0)+"%";
   const st=$("state");st.textContent=S.running?(L.brk?"Pause läuft":"Läuft"):(S.started?"Pausiert":"Bereit · Shuffle up and deal");st.className="state"+(S.running?" go":"");
-  const N=LEVELS[S.i+1];$("nxt").innerHTML=N?(N.brk?"Pause <small>"+N.brk+" Min</small>":fmt(N.sb)+" / "+fmt(N.bb)+" <small>Level "+playNum(S.i+1)+"</small>"):"Letztes Level";
+  const N=LEVELS[S.i+1];$("nxt").innerHTML=N?(N.brk?"Pause <small>"+N.brk+" Min</small>":fmt(N.sb)+" / "+fmt(N.bb)+(N.ante?" <small>Ante "+fmt(N.ante)+"</small>":"")+" <small>Level "+playNum(S.i+1)+"</small>"):"Letztes Level";
   // next break
   let t=left,j=S.i+1,found=null;if(L.brk)found=0;
   while(found===null&&j<LEVELS.length){if(LEVELS[j].brk){found=t;break;}t+=dur(j);j++;}
@@ -608,7 +608,7 @@ function advance(){
   if(S.active&&S.active!=="7-2 Bonus")S.active=null;
   levelSound();save();
   const L=LEVELS[S.i];
-  announce({eyebrow:L.brk?"Pause":"Neues Level",title:L.brk?(L.note||"Pause"):"Level "+playNum(S.i),text:L.brk?L.brk+" Minuten. Rebuys jetzt an der Kasse.":"Blinds jetzt "+fmt(L.sb)+" / "+fmt(L.bb)+".",sec:8});
+  announce({eyebrow:L.brk?"Pause":"Neues Level",title:L.brk?(L.note||"Pause"):"Level "+playNum(S.i),text:L.brk?L.brk+" Minuten. Rebuys jetzt an der Kasse.":"Blinds jetzt "+fmt(L.sb)+" / "+fmt(L.bb)+(L.ante?", Big-Blind-Ante "+fmt(L.ante):"")+".",sec:8});
 }
 function tick(){
   const d=new Date();$("now").textContent=d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
@@ -973,11 +973,11 @@ function spotlight(c){
 }
 
 /* ---------- settings ---------- */
-function levelsText(){return LEVELS.map(l=>l.brk?"Pause "+l.brk+(l.note?" "+l.note:""):l.sb+"/"+l.bb).join("\n");}
+function levelsText(){return LEVELS.map(l=>l.brk?"Pause "+l.brk+(l.note?" "+l.note:""):l.sb+"/"+l.bb+(l.ante?"/"+l.ante:"")).join("\n");}
 function parseLevels(t){
   const out=[];for(const raw of t.split("\n")){const s=raw.trim();if(!s)continue;
     let m=s.match(/^pause\s+(\d+)\s*(.*)$/i);if(m){out.push({brk:+m[1],note:m[2]||"Pause"});continue;}
-    m=s.match(/^(\d+)\s*\/\s*(\d+)$/);if(m){out.push({sb:+m[1],bb:+m[2]});continue;}
+    m=s.match(/^(\d+)\s*\/\s*(\d+)(?:\s*\/\s*(\d+))?$/);if(m){out.push(m[3]?{sb:+m[1],bb:+m[2],ante:+m[3]}:{sb:+m[1],bb:+m[2]});continue;}
     throw new Error("Zeile nicht verstanden: „"+s+"“");}
   if(!out.some(l=>!l.brk))throw new Error("Mindestens ein Level nötig");return out;
 }
@@ -1091,7 +1091,7 @@ let lastRemote=null;try{lastRemote=localStorage.getItem(KEY+"-ntfy");}catch(e){}
 const seenRemote=new Set();
 function stateSnap(){
   const L=LEVELS[S.i];
-  return {v:1,at:Date.now(),title:S.title,lvl:L.brk?"Pause":"Level "+playNum(S.i),blinds:L.brk?(L.note||"Pause"):L.sb+" / "+L.bb,
+  return {v:1,at:Date.now(),title:S.title,lvl:L.brk?"Pause":"Level "+playNum(S.i),blinds:L.brk?(L.note||"Pause"):L.sb+" / "+L.bb+(L.ante?" · A "+L.ante:""),
     running:S.running,endAt:S.endAt,left:Math.round(leftNow()),pot:potOf(),entries:totalEntries(),reOpen:rebuyOpen(),active:S.active,
     games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length,headOf(p),bwOf(p)]),bounty:S.bounty||0};
 }
