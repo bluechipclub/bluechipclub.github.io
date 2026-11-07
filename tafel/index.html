@@ -82,7 +82,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .stage.img11 .seat .nm{padding-left:1.15vw!important;background:linear-gradient(180deg,rgba(18,26,48,.92),rgba(8,12,24,.92));border-color:rgba(110,160,255,.55)}
 .fig{position:absolute;pointer-events:none;z-index:1;filter:drop-shadow(0 1.2vh 1.4vh rgba(0,0,0,.65));transition:filter .6s,opacity .6s}
 .fig img{width:100%;height:100%;display:block}
-.fig.out{filter:grayscale(1) brightness(.35);opacity:.8}
+.fig.out{display:none}
+.stage.img11 .seat.out{display:none!important}
 .stage.img11 .seat{z-index:2}
 .seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.35vh;transition:opacity .5s,filter .5s,transform .8s var(--ease)}
 .seat .nm{padding:.75vh 1.15vw;border-radius:999px;background:linear-gradient(180deg,#1f1f1f,#121212);border:1px solid var(--line2);font-weight:650;font-size:max(13px,1.3vw);white-space:nowrap;box-shadow:0 .6vh 1.6vh rgba(0,0,0,.6);cursor:pointer;position:relative}
@@ -571,6 +572,7 @@ const FIG_ON=false;
 const OVAL=[.245,.33,.755,.655];
 const FIG_SCALE=.82;
 const imgMode=()=>S.players.length>0&&S.players.length<=IMG_SEATS.length+1;
+const timIn=()=>{const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
 const timIdx=()=>S.players.findIndex(p=>/^tim$/i.test(String(p.name).trim()));
 /* Platz -> Stuhl: Tim sitzt immer am Holzteil (Dealer-Platz), die anderen im Uhrzeigersinn danach */
 function imgSeat(k,n){const t=timIdx();if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1;return IMG_SEATS[Math.min(IMG_SEATS.length-1,Math.round((j-1)*IMG_SEATS.length/m+(IMG_SEATS.length/m-1)/2))];}
@@ -580,7 +582,7 @@ function figKey(name,used){let k=String(name).toLowerCase().trim().replace(/\s+/
 function seatPos(k,n){if(imgMode()){const t=imgSeat(k,n);if(t===DEALER_SEAT)return imgToStage(.5,.205);const [x,y]=imgToStage(t[0]+(.5-t[0])*.16,t[1]+(.5-t[1])*.2);return [x,y];}const a=Math.PI/2+(S.rot||0)*Math.PI+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
 function buildSeats(){
   document.querySelectorAll(".seat,.fig").forEach(e=>e.remove());
-  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("tim",im&&timIdx()>=0);const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";buildSeats.used=new Set();const [l,t]=imgToStage(OVAL[0],timIdx()>=0?.39:OVAL[1]),[r,bo]=imgToStage(OVAL[2],OVAL[3]);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
+  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("tim",timIn());const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";buildSeats.used=new Set();const [l,t]=imgToStage(OVAL[0],timIdx()>=0?.39:OVAL[1]),[r,bo]=imgToStage(OVAL[2],OVAL[3]);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
   S.players.forEach((p,k)=>{
     if(im&&FIG_ON){const used=buildSeats.used||(buildSeats.used=new Set());if(k===0)used.clear();const key=figKey(p.name,used);if(key){used.add(key);const F=FIGS[key],t=imgSeat(k,n),[cx,cy,bw]=imgToStage(t[0],t[1]),b=imgBox(),tx=(.5-t[0])*b.w,ty=(.5-t[1])*b.h,rot=Math.atan2(ty,tx)*180/Math.PI-F[4],fw=F[0]*bw*FIG_SCALE,fh=F[1]*bw*FIG_SCALE,g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.width=fw+"px";g.style.height=fh+"px";g.style.left="calc("+cx+"% - "+(F[2]*fw)+"px)";g.style.top="calc("+cy+"% - "+(F[3]*fh)+"px)";g.style.transformOrigin=(F[2]*100)+"% "+(F[3]*100)+"%";g.style.transform="rotate("+rot.toFixed(1)+"deg)";g.innerHTML='<img src="figuren/'+key+'.webp?v=1" alt="">';st.appendChild(g);}}
     const [x,y]=seatPos(k,n),d=document.createElement("div");
@@ -596,7 +598,7 @@ function renderSeats(){
   const mw=mostWanted();
   S.players.forEach((p,k)=>{
     const d=seats[k],pl_=placeOf(p),open=p.entries.filter(e=>e.paid==="offen").length;
-    d.classList.toggle("out",!!p.out);const fg=document.querySelector('.fig[data-k="'+k+'"]');if(fg)fg.classList.toggle("out",!!p.out);
+    d.classList.toggle("out",!!p.out);$("stage").classList.toggle("tim",timIn());const fg=document.querySelector('.fig[data-k="'+k+'"]');if(fg)fg.classList.toggle("out",!!p.out);
     const aw=d.querySelector(".avw");if(aw.dataset.n!==p.name){aw.dataset.n=p.name;aw.innerHTML=avHtml(p.name);}
     d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
     const re=p.entries.length-1;
