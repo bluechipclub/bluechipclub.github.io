@@ -991,7 +991,9 @@ main .wrap { padding-top: 0; }
 .splash .wpic { filter: sepia(.18) saturate(.92) brightness(.95); -webkit-mask: linear-gradient(180deg, #000 50%, transparent) !important; mask: linear-gradient(180deg, #000 50%, transparent) !important; }
 .splash .wel { color: var(--grey) !important; font-size: 11px; letter-spacing: .26em !important; }
 .splash .tag { background: transparent !important; color: var(--fg) !important; border: 1px solid var(--line2); font-weight: 500 !important; letter-spacing: .18em !important; font-size: 11px !important; }
-.splash .tag i { background: #e5675c !important; box-shadow: 0 0 10px #e5675c; }
+.splash .tag i, .promo .live i { background: #3ecf6e !important; box-shadow: 0 0 10px #3ecf6e !important; animation: okping 1.6s ease-out infinite !important; }
+.splash .tag.closed i, .promo .live.closed i { background: #e5675c !important; box-shadow: 0 0 10px #e5675c !important; animation: none !important; }
+@keyframes okping { 0% { box-shadow: 0 0 0 0 rgb(62 207 110 / .7); } 100% { box-shadow: 0 0 0 9px rgb(62 207 110 / 0); } }
 .splash h1 { font-weight: 500 !important; letter-spacing: -.045em !important; text-shadow: none !important; line-height: .95 !important; }
 .splash .when { color: rgb(241 233 221 / .85) !important; }
 .splash .when[style] { color: var(--gold2) !important; }
@@ -2329,7 +2331,7 @@ main .wrap { padding-top: 0; }
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? (vDays(n).length ? 'Anmeldung offen · Termin per Abstimmung' : 'Termin folgt') : 'Anmeldung offen') + '</span><h2 class="chrome-xl">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live' + (n.tbd || isFull(n) ? ' closed' : '') + '"><i></i>' + (n.tbd ? (vDays(n).length ? 'Anmeldung offen · Termin per Abstimmung' : 'Termin folgt') : 'Anmeldung offen') + '</span><h2 class="chrome-xl">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
       '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn live-b" onclick="openLive()">● Live-Tafel</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
@@ -2342,7 +2344,7 @@ main .wrap { padding-top: 0; }
     let chips = '';
     for (let i = 0; i < 22; i++) chips += '<span class="chipf' + (i % 3 ? '' : ' g') + '" style="left:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (2.2 + Math.random() * 2).toFixed(2) + 's;--w:' + (0.3 + Math.random() * 2.2).toFixed(2) + 's;--r:' + ((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540)).toFixed(0) + 'deg;width:' + (24 + Math.random() * 20).toFixed(0) + 'px;height:auto;aspect-ratio:1"></span>';
     el.innerHTML =
-      '<div class="box"><img class="wpic" src="img/willkommen-tisch.webp" alt="Die Runde am Tisch im The Void"><button class="x" aria-label="Schließen">×</button><span class="eyebrow gold wel">Willkommen im ' + esc(DATA.settings.name) + '</span><span class="tag"><i></i>' + (n.tbd ? 'Termin folgt' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
+      '<div class="box"><img class="wpic" src="img/willkommen-tisch.webp" alt="Die Runde am Tisch im The Void"><button class="x" aria-label="Schließen">×</button><span class="eyebrow gold wel">Willkommen im ' + esc(DATA.settings.name) + '</span><span class="tag' + (n.tbd || isFull(n) ? ' closed' : '') + '"><i></i>' + (n.tbd ? 'Termin folgt' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
       '<h1 class="chrome-xl">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
       '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn-cream big" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn-ghost big" data-go="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-go="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn live-b" onclick="openLive()">● Live-Tafel</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
