@@ -233,6 +233,13 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .lobby .ltiles b{display:block;font-size:max(26px,3.2vw);font-weight:850;letter-spacing:-.03em;line-height:1;color:#fff}
 .lobby .ltiles span{display:block;margin-top:.8vh;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;color:#aab;font-size:max(10px,.8vw)}
 .lobby .lsl video.pv{height:70vh;width:auto;max-width:none;aspect-ratio:9/16;object-fit:cover;border-radius:1.3vw;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45)}
+.lobby .pwrap{position:relative;border-radius:1.3vw;overflow:hidden;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45);animation:kb 8s ease-out both}
+.lobby .pwrap img.pw{display:block;max-width:54vw;max-height:66vh;border-radius:0;box-shadow:none;animation:none}
+.lobby .pwrap::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.45) 32%,rgba(0,0,0,0) 55%);pointer-events:none}
+.lobby .ptxt{position:absolute;left:2.4vw;top:3vh;display:flex;flex-direction:column;gap:.9vh;text-align:left}
+.lobby .ptxt b{font-size:max(30px,4vw);font-weight:900;font-style:italic;letter-spacing:.02em;line-height:.9;color:#f4efe6;text-shadow:0 .4vh 2vh rgba(0,0,0,.7)}
+.lobby .ptxt i{font-style:normal;font-weight:800;font-size:max(16px,1.7vw);color:#f39a3b;margin-bottom:1.2vh;text-shadow:0 .3vh 1.5vh rgba(0,0,0,.7)}
+.lobby .ptxt span{font-weight:700;font-size:max(12px,1.05vw);color:#fff;text-shadow:0 .2vh 1vh rgba(0,0,0,.9)}
 .lobby .lsl .card{height:70vh;width:auto;aspect-ratio:2/3;object-fit:cover}
 .lobby .lcap{max-width:34vw;text-align:left}
 .lobby .lcap .ey{font-family:var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-size:max(12px,1vw)}
@@ -1317,6 +1324,8 @@ let lobbyT=null,lobbyCd=null;
 let LIGA=null;
 /* players with their own clip: it replaces the card on their screensaver slide (portrait 9:16) */
 const LOBBY_VIDS={"benno":"lobby/benno.mp4"};
+/* players with their own picture instead of the card (wide 16:9) */
+const LOBBY_IMGS={"tim":{u:"lobby/tim.jpg",n:"TIM",nick:"The Calculator",tr:["🧮 Extrem gute Mathe-Skills","👀 Liest jeden am Tisch","🧱 Spielt sehr solide","📈 Langfristig immer im Plus","🧊 Bleibt immer ruhig","🎯 Stärkste Disziplin"]}};
 async function ligaLoad(){try{const html=await (await fetch("../index.html?b="+Date.now(),{cache:"no-store"})).text();
   LIGA=JSON.parse(new DOMParser().parseFromString(html,"text/html").getElementById("liga-data").textContent);}catch(e){}return LIGA;}
 function pStats(n){const r={played:0,wins:0,pod:0,pts:0,champ:false,nick:""};if(!LIGA)return r;const pt=LIGA.settings.points||{};
@@ -1347,8 +1356,8 @@ function lobbyShow(){
       const v=$("lst").querySelector("video");let done=false;const go=()=>{if(done)return;done=true;clearTimeout(lobbyT);next();};
       v.addEventListener("ended",go);v.addEventListener("error",go);v.play().catch(()=>{});lobbyT=setTimeout(go,20000);return;}
     if(x.pl){ /* player slide: card + nickname + club record */
-      const st=pStats(x.pl),seat=S.players.findIndex(p=>p.name===x.pl)+1,lv=LOBBY_VIDS[x.pl.toLowerCase()];
-      $("lst").innerHTML='<div class="lsl lpl">'+(lv?'<video class="card pv" src="'+lv+'" poster="'+lv.replace(".mp4","-poster.jpg")+'" muted playsinline autoplay preload="auto"></video>':'<img class="card" src="'+x.u+'" alt="">')+'<div class="lcap"><div class="ey">Heute am Tisch'+(S.log.some(l=>l.type==="draw")?' · Platz '+seat:'')+'</div><h2>'+esc(x.pl)+'</h2>'+
+      const st=pStats(x.pl),seat=S.players.findIndex(p=>p.name===x.pl)+1,lv=LOBBY_VIDS[x.pl.toLowerCase()],li=LOBBY_IMGS[x.pl.toLowerCase()];
+      $("lst").innerHTML='<div class="lsl lpl">'+(lv?'<video class="card pv" src="'+lv+'" poster="'+lv.replace(".mp4","-poster.jpg")+'" muted playsinline autoplay preload="auto"></video>':li?'<div class="pwrap"><img class="pw" src="'+li.u+'" alt=""><div class="ptxt"><b>'+esc(li.n)+'</b>'+(li.nick?'<i>„'+esc(li.nick)+'“</i>':'')+(li.tr||[]).map(t=>'<span>'+esc(t)+'</span>').join("")+'</div></div>':'<img class="card" src="'+x.u+'" alt="">')+'<div class="lcap"><div class="ey">Heute am Tisch'+(S.log.some(l=>l.type==="draw")?' · Platz '+seat:'')+'</div><h2>'+esc(x.pl)+'</h2>'+
         (st.champ||st.nick?'<div class="lnick">'+(st.champ?'♛ Amtierender Champion':'')+(st.champ&&st.nick?' · ':'')+esc(st.nick)+'</div>':'')+
         (st.played?'<div class="ltiles"><div><b>'+st.played+'</b><span>Turniere</span></div><div><b>'+st.wins+'</b><span>Siege</span></div><div><b>'+st.pod+'</b><span>Preisränge</span></div><div><b>'+st.pts+'</b><span>Liga-Punkte</span></div></div>':'<div class="lnick">Erstes Turnier im Club. Willkommen!</div>')+'</div></div>';
       if(lv){const v=$("lst").querySelector("video");let done=false;const go=()=>{if(done)return;done=true;clearTimeout(lobbyT);next();};
