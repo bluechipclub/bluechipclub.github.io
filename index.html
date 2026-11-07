@@ -478,6 +478,18 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; justif
 .tline li { display: grid; grid-template-columns: 84px 18px 1fr; gap: 12px; align-items: start; padding-bottom: 18px; position: relative; }
 .tline li::before { content: ""; position: absolute; left: 104px; top: 14px; bottom: -2px; width: 1px; background: var(--line2); }
 .tline li:last-child::before { display: none; }
+.blt { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.blt table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 14px; }
+.blt th { text-align: left; font-weight: 500; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); padding: 10px 12px; background: var(--surface2); }
+.blt table { table-layout: fixed; min-width: 0; }
+.blt th, .blt td { text-align: left !important; white-space: nowrap; }
+.blt th:nth-child(1), .blt td:nth-child(1) { width: 22%; } .blt th:nth-child(2), .blt td:nth-child(2) { width: 16%; } .blt th:nth-child(4), .blt td:nth-child(4) { width: 24%; }
+.blt tr.brk td { white-space: normal; }
+.blt td { padding: 9px 12px; border-top: 1px solid var(--line); }
+@media (max-width: 600px) { .blt table { font-size: 12.5px; } .blt th, .blt td { padding: 8px 8px; } .blt th { font-size: 9.5px; letter-spacing: .08em; } .blt th:nth-child(1), .blt td:nth-child(1) { width: 17%; } .blt th:nth-child(2), .blt td:nth-child(2) { width: 11%; } .blt th:nth-child(4), .blt td:nth-child(4) { width: 22%; } }
+.blt td:first-child { color: var(--grey); }
+.blt tr.an td:nth-child(4) { color: var(--gold); }
+.blt tr.brk td { color: var(--grey); font-style: italic; background: rgb(226 184 87 / .05); }
 .tline time { white-space: nowrap; font-family: var(--mono); font-size: 14px; color: var(--fg); padding-top: 1px; }
 .tline i { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); margin: 5px 0 0 4px; box-shadow: 0 0 0 4px rgb(226 184 87 / .15); }
 .tline span { font-size: 15px; } .tline small { display: block; color: var(--grey); font-size: 13px; margin-top: 2px; }
@@ -987,8 +999,6 @@ main .wrap { padding-top: 0; }
   </div>
   <p class="menu-foot">The Void · Private Poker unter Freunden</p>
 </div></div>
-<div class="cancel-banner v2cb" role="status" id="cancelBanner"><span class="cb-dot" aria-hidden="true"></span>Turnier abgesagt<small>High Noon Knockout</small><button class="cb-x" type="button" aria-label="Banner schließen" hidden>×</button></div>
-<script>(function(){var b=document.getElementById('cancelBanner');try{if(sessionStorage.getItem('cb-closed'))b.hidden=true;}catch(e){}b.querySelector('.cb-x').addEventListener('click',function(){b.hidden=true;try{sessionStorage.setItem('cb-closed','1');}catch(e){}});})();</script>
 <main><div class="wrap">
   <section class="view" id="v-rangliste"></section>
   <section class="view" id="v-news" hidden></section>
@@ -1022,52 +1032,163 @@ main .wrap { padding-top: 0; }
    "Kevin": "High Stakes"
   },
   "next": {
-   "date": "2026-11-06T18:00",
-   "title": "High Noon Knockout",
-   "sub": "Das erste Bounty-Turnier · 7.000 Chips · viel Action",
-   "buyin": 20,
-   "rebuy": 15,
+   "date": "2026-11-08T16:30",
+   "title": "Sunday Classic",
+   "sub": "Deepstack · 25.000 Chips · 25-Minuten-Level",
+   "buyin": 25,
+   "rebuy": 20,
    "fee": 5,
-   "cards": "A♠ A♣ 8♠ 8♣ 9♦",
+   "cards": "A♠ K♠ Q♠ J♠ 10♠",
    "facts": [
     {
-     "v": "18:15 Uhr",
+     "v": "17:00 Uhr",
      "l": "Erste Hand · pünktlich"
     },
     {
-     "v": "10 P",
-     "l": "Bounty pro Entry"
+     "v": "25.000 Chips",
+     "l": "Startstack"
     },
     {
-     "v": "7.000 Chips",
-     "l": "Startstack"
+     "v": "25 Min",
+     "l": "Jedes Level"
     }
    ],
    "program": [
     {
-     "t": "18:00",
+     "t": "16:30",
      "l": "Treffpunkt in The Void",
-     "s": "Ankommen, Plätze auslosen. Bitte pünktlich!"
+     "s": "Ankommen, Plätze auslosen"
     },
     {
-     "t": "18:15",
+     "t": "17:00",
      "l": "Erste Hand",
-     "s": "Shuffle up and deal. Es wird nicht gewartet."
+     "s": "Shuffle up and deal. Extra früh, weil Sonntag."
     },
     {
-     "t": "Knockout",
-     "l": "Bounty einsammeln",
-     "s": "Die Hälfte sofort, die andere Hälfte kommt auf deinen eigenen Kopf"
+     "t": "Level 4",
+     "l": "Ab jetzt mit Ante",
+     "s": "Big-Blind-Ante: der Big Blind legt die Ante für den ganzen Tisch"
+    },
+    {
+     "t": "Level 9",
+     "l": "Letzte Rebuys",
+     "s": "Nach Level 9 ist Schluss mit Rebuys, dann zählt nur noch der Stack"
     },
     {
      "t": "Am Ende",
-     "l": "Der letzte Kopf",
-     "s": "Der Sieger holt den Pot-Anteil und seine eigene Bounty"
+     "l": "Final Table",
+     "s": "Bei mehr als 10 Leuten an zwei Tischen, am Ende ein Final Table"
     }
    ],
-   "trophyTitle": "Kingslayer 👑",
-   "trophy": "Wer den amtierenden Champion rauswirft, wird auf der Website zum Kingslayer gekrönt. Nur Ruhm, aber für immer.",
-   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format. Kurzer Stack, viele Bountys: Hier wird gecallt.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 10 P. Wer jemanden rauswirft, bekommt die Hälfte davon sofort, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und wer am Ende gewinnt, nimmt auch seinen eigenen Kopf mit. Die Tafel zählt alles live mit.\n\nPreise: Der Buy-in kostet 20 P (10 P Bounty, 5 P Pot, 5 P an den Club). Jeder Rebuy kostet 15 P (10 P neue Bounty, 5 P Pot). Startstack 7.000 Chips, Blinds starten bei 50/100, Levels à 20 Minuten, Rebuys bis Ende Level 8.\n\nFreitag, 06.11.: Treffpunkt um 18:00 Uhr, die erste Hand um 18:15 Uhr. Diesmal geht es wirklich pünktlich los, wer später kommt, steigt mit dem laufenden Level ein.",
+   "trophyTitle": "Sunday Classic",
+   "trophy": "Der ruhige Sonntag mit dem tiefen Stack: 25.000 Chips, lange Level, viel Zeit zum Spielen. Wer hier gewinnt, hat es sich verdient.",
+   "info": "Das Format vom Midnight Birthday Deepstack, nur noch tiefer: 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die kleinsten Chips sind 100er, deshalb starten die Blinds bei 100/100. Ab Level 4 gibt es eine Big-Blind-Ante.\n\nPreise: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter. Jeder Rebuy kostet 20 P und geht komplett in den Pot. Rebuys bis Ende Level 9.\n\nSonntag, 08.11.: Treffpunkt um 16:30 Uhr, die erste Hand um 17:00 Uhr. Wir fangen extra früher an, weil Sonntag ist. Wer später kommt, steigt mit dem laufenden Level ein.",
+   "blinds": [
+    {
+     "sb": 100,
+     "bb": 100,
+     "ante": 0
+    },
+    {
+     "sb": 100,
+     "bb": 200,
+     "ante": 0
+    },
+    {
+     "sb": 200,
+     "bb": 300,
+     "ante": 0
+    },
+    {
+     "sb": 200,
+     "bb": 400,
+     "ante": 400
+    },
+    {
+     "brk": 10,
+     "note": "Pause · Rebuys an der Kasse"
+    },
+    {
+     "sb": 300,
+     "bb": 600,
+     "ante": 600
+    },
+    {
+     "sb": 400,
+     "bb": 800,
+     "ante": 800
+    },
+    {
+     "sb": 500,
+     "bb": 1000,
+     "ante": 1000
+    },
+    {
+     "sb": 600,
+     "bb": 1200,
+     "ante": 1200
+    },
+    {
+     "sb": 800,
+     "bb": 1600,
+     "ante": 1600
+    },
+    {
+     "brk": 10,
+     "note": "Pause · Rebuys vorbei"
+    },
+    {
+     "sb": 1000,
+     "bb": 2000,
+     "ante": 2000
+    },
+    {
+     "sb": 1500,
+     "bb": 3000,
+     "ante": 3000
+    },
+    {
+     "sb": 2000,
+     "bb": 4000,
+     "ante": 4000
+    },
+    {
+     "sb": 2500,
+     "bb": 5000,
+     "ante": 5000
+    },
+    {
+     "sb": 3000,
+     "bb": 6000,
+     "ante": 6000
+    },
+    {
+     "sb": 4000,
+     "bb": 8000,
+     "ante": 8000
+    },
+    {
+     "sb": 5000,
+     "bb": 10000,
+     "ante": 10000
+    },
+    {
+     "sb": 6000,
+     "bb": 12000,
+     "ante": 12000
+    },
+    {
+     "sb": 8000,
+     "bb": 16000,
+     "ante": 16000
+    },
+    {
+     "sb": 10000,
+     "bb": 20000,
+     "ante": 20000
+    }
+   ],
+   "blindMin": 25,
    "seats": 0,
    "times": [],
    "votes": {},
@@ -1360,7 +1481,18 @@ main .wrap { padding-top: 0; }
    "img": "dmh-sieger-niklas-2",
    "imgCaption": "Sieg Nummer zwei in The Void: Niklas mit der Siegerhand A♣ J♦",
    "winHand": "A♣ J♦",
-   "entriesBy": {"Tim": 2, "Manu": 2, "Niklas": 1, "Nico": 4, "Jonny": 1, "Magg": 1, "Oli": 2, "Philipp": 3, "Benno": 2, "Domi C": 1}
+   "entriesBy": {
+    "Tim": 2,
+    "Manu": 2,
+    "Niklas": 1,
+    "Nico": 4,
+    "Jonny": 1,
+    "Magg": 1,
+    "Oli": 2,
+    "Philipp": 3,
+    "Benno": 2,
+    "Domi C": 1
+   }
   },
   {
    "id": "t6",
@@ -1520,7 +1652,6 @@ main .wrap { padding-top: 0; }
     "mbd-domi-c-platz3"
    ]
   },
-
   {
    "id": "h12",
    "hl": "Benno Boss: zwei Knockouts in einer Hand",
@@ -1531,7 +1662,9 @@ main .wrap { padding-top: 0; }
    "title": "Doppel-Knockout",
    "cards": "",
    "text": "Board 8♦ 9♦ 10♦ 8♣ Q♦. Benno hält 10♥ 10♣ und macht Full House, Zehnen voll Achten. Kevin hat mit J♠ 10♠ die Straße bis zur Dame, Zeno mit A♠ Q♥ Damen und Achten. Beide sind in derselben Hand raus. Zwei auf einen Streich für Benno Boss.",
-   "pics": ["mbd-benno-doppel-ko"]
+   "pics": [
+    "mbd-benno-doppel-ko"
+   ]
   },
   {
    "id": "h11",
@@ -1545,8 +1678,12 @@ main .wrap { padding-top: 0; }
    "title": "",
    "cards": "",
    "text": "Magg kommt erst um 22 Uhr und haut direkt die krasse Hand des Abends raus. Er hält K♣ J♥, das Board bringt 7♣ J♣ J♦ 4♠ J♠. Vier Buben gegen Jans Full House mit K♦ K♥. Maggs persönliche Rekordhand.",
-   "pics": ["mbd-magg-quad-jacks-board", "mbd-magg-quad-jacks"]
-  },  {
+   "pics": [
+    "mbd-magg-quad-jacks-board",
+    "mbd-magg-quad-jacks"
+   ]
+  },
+  {
    "id": "h20",
    "hl": "Die Siegerhand: Könige halten gegen Ass-Dame",
    "kind": "spot",
@@ -1584,7 +1721,10 @@ main .wrap { padding-top: 0; }
    "title": "",
    "cards": "",
    "text": "Oli hält K♦ K♠. Flop 5♠ 9♣ K♥ bringt das Set, der Turn den K♣, River 7♠. Vier Könige, für ein paar Stunden die beste Hand der Clubgeschichte.",
-   "pics": ["dmh-oli-quad-kings-board", "dmh-oli-quad-kings-jubel"]
+   "pics": [
+    "dmh-oli-quad-kings-board",
+    "dmh-oli-quad-kings-jubel"
+   ]
   },
   {
    "id": "h6",
@@ -1597,7 +1737,9 @@ main .wrap { padding-top: 0; }
    "title": "",
    "cards": "",
    "text": "Tim hält A♥ K♦, das Board bringt J♠ 3♦ A♦ A♣ A♠. Vier Asse, die neue Rekordhand. Löst am selben Abend Olis Vier Könige ab.",
-   "pics": ["dmh-tim-quad-aces"]
+   "pics": [
+    "dmh-tim-quad-aces"
+   ]
   },
   {
    "id": "h2",
@@ -2147,7 +2289,6 @@ main .wrap { padding-top: 0; }
   const isFull = n => !noLimit(n) && signups(n).length >= seatsOf(n);
   const seatTxt = n => { const k = signups(n).length, m = seatsOf(n); if (noLimit(n)) return '<b>' + k + (k === 1 ? ' Zusage' : ' Zusagen') + '</b> · kein Limit' + (k > 10 ? ' · zwei Tische' : ''); return k >= m ? '<b>Tisch voll</b> · ' + (k > m ? (k - m) + ' auf der Warteliste' : 'Warteliste offen') : '<b>' + (m - k) + ' von ' + m + '</b> Plätzen frei'; };
   function promoCard() {
-    return ''; // High Noon Knockout abgesagt (06.11.2026): keine Anmeldung anzeigen
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -2260,6 +2401,7 @@ main .wrap { padding-top: 0; }
         '<div class="acts"><button class="btn wa" id="gSend" type="button">Nachricht abschicken</button><span class="status" id="gStatus"></span></div>' +
         '<p class="sub" style="font-size:13px">Du kannst sie bis Mitternacht noch ändern: einfach nochmal abschicken, es zählt die letzte.</p></div>' : '') +
       (prog.length ? '<div>' + head('Ablauf', 'Der Abend') + '<ol class="tline">' + prog.map(x => '<li><time>' + esc(x.t) + '</time><i></i><span>' + esc(x.l) + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</span></li>').join('') + '</ol></div>' : '') +
+      (Array.isArray(n.blinds) && n.blinds.length ? (() => { let k = 0, t = new Date(d.getTime() + 30 * 60e3); const fm = x => fmtN(x); const rows = n.blinds.map(L => { const at = hhmm(t); t = new Date(t.getTime() + (L.brk || Number(n.blindMin) || 25) * 60e3); if (L.brk) return '<tr class="brk"><td>' + at + '</td><td colspan="3">' + esc(L.note || 'Pause') + ' · ' + L.brk + ' Min</td></tr>'; k++; return '<tr' + (L.ante ? ' class="an"' : '') + '><td>' + at + '</td><td>' + k + '</td><td>' + fm(L.sb) + ' / ' + fm(L.bb) + '</td><td>' + (L.ante ? fm(L.ante) : '–') + '</td></tr>'; }).join(''); return '<div>' + head('Blindstruktur', (Number(n.blindMin) || 25) + ' Min pro Level') + '<div class="blt"><table><thead><tr><th>Ca.</th><th>Lvl</th><th>Blinds</th><th>BB-Ante</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="sub" style="font-size:13px">Uhrzeiten ungefähr, die Tafel zählt live. BB-Ante heißt: der Big Blind legt die Ante für den ganzen Tisch.</p></div>'; })() : '') +
       (n.trophy ? '<div class="trophy">' + TROPHY + '<div><h3>' + esc(n.trophyTitle || 'Wanderpokal') + '</h3>' + paras(n.trophy) + '</div></div>' : '') +
       (n.info ? '<div class="txt">' + head('Was dich erwartet', '') + paras(n.info) + '</div>' : '') + '</div>';
     $('#evov').hidden = false; document.body.style.overflow = 'hidden'; tickCd();
