@@ -1032,7 +1032,7 @@ main .wrap { padding-top: 0; }
    "Kevin": "High Stakes"
   },
   "next": {
-   "date": "2026-11-08T16:30",
+   "date": "2026-11-08T17:00",
    "title": "Sunday Classic",
    "sub": "Deepstack · 25.000 Chips · 25-Minuten-Level",
    "buyin": 30,
@@ -1040,10 +1040,6 @@ main .wrap { padding-top: 0; }
    "fee": 5,
    "cards": "A♠ K♠ Q♠ J♠ 10♠",
    "facts": [
-    {
-     "v": "17:00 Uhr",
-     "l": "Erste Hand · pünktlich"
-    },
     {
      "v": "25.000 Chips",
      "l": "Startstack"
@@ -1059,14 +1055,9 @@ main .wrap { padding-top: 0; }
    ],
    "program": [
     {
-     "t": "16:30",
-     "l": "Treffpunkt in The Void",
-     "s": "Ankommen, Plätze auslosen"
-    },
-    {
      "t": "17:00",
      "l": "Erste Hand",
-     "s": "Shuffle up and deal. Extra früh, weil Sonntag."
+     "s": "Shuffle up and deal. Extra früh, weil Sonntag. Sei vorher da, es wird nicht gewartet."
     },
     {
      "t": "Level 4",
@@ -1086,7 +1077,7 @@ main .wrap { padding-top: 0; }
    ],
    "trophyTitle": "Sunday Classic",
    "trophy": "Der ruhige Sonntag mit dem tiefen Stack: 25.000 Chips, lange Level, viel Zeit zum Spielen. Wer hier gewinnt, hat es sich verdient.",
-   "info": "Das Format vom Midnight Birthday Deepstack, nur noch tiefer: 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die kleinsten Chips sind 100er, deshalb starten die Blinds bei 100/100. Ab Level 4 gibt es eine Big-Blind-Ante.\n\nPreise: Der Buy-in kostet 30 P, davon gehen 5 P an den Veranstalter und 25 P in den Pot. Jeder darf maximal 1 Rebuy machen, bis Ende Level 9. Der Rebuy kostet 30 P und geht komplett in den Pot.\n\nSonntag, 08.11.: Treffpunkt um 16:30 Uhr, die erste Hand um 17:00 Uhr. Wir fangen extra früher an, weil Sonntag ist. Wer später kommt, steigt mit dem laufenden Level ein.",
+   "info": "Das Format vom Midnight Birthday Deepstack, nur noch tiefer: 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die kleinsten Chips sind 100er, deshalb starten die Blinds bei 100/100. Ab Level 4 gibt es eine Big-Blind-Ante.\n\nPreise: Der Buy-in kostet 30 P, davon gehen 5 P an den Veranstalter und 25 P in den Pot. Jeder darf maximal 1 Rebuy machen, bis Ende Level 9. Der Rebuy kostet 30 P und geht komplett in den Pot.\n\nSonntag, 08.11.: Die erste Hand wird um 17:00 Uhr ausgeteilt, also sei vorher da. Wir fangen extra früher an, weil Sonntag ist. Wer später kommt, steigt mit dem laufenden Level ein.",
    "blinds": [
     {
      "sb": 100,
@@ -1198,7 +1189,9 @@ main .wrap { padding-top: 0; }
    "votes": {},
    "signups": [],
    "tbd": "",
-   "dvotes": {}
+   "dvotes": {},
+   "timeLabel": "Erste Hand · pünktlich",
+   "hand0": 0
   },
   "extraRecords": [
    {
@@ -2222,7 +2215,7 @@ main .wrap { padding-top: 0; }
 
     const faq = [
       ['Wie lange darf ich rebuyen?', 'In der Regel bis Ende Level 6. Die genaue Grenze wird vor jedem Turnier angesagt.'],
-      ['Wann geht es los?', 'Treffpunkt ist um 18 Uhr in The Void, die erste Hand kommt um 18:15. Wer später kommt, steigt mit dem laufenden Level ein.'],
+      ['Wann geht es los?', 'Die Uhrzeit steht beim nächsten Turnier oben auf der Seite. Gilt die Zeit der ersten Hand, sei vorher da: Es wird nicht gewartet, wer später kommt, steigt mit dem laufenden Level ein.'],
       ['Wie bekomme ich einen Platz?', 'Über „Platz reservieren“ oben auf der Seite. Es gibt zehn Stühle, wer zuerst zusagt, sitzt.'],
       ['Wie schnell steigen die Blinds?', 'Normalerweise alle 30 Minuten ein Level. Bei Specials kann es schneller gehen, das steht dann beim Turnier.'],
       ['Was sind die Minigames?', 'Zwischendurch und ohne Ankündigung: Omaha, Crazy Pineapple oder ein Bomb Pot.'],
@@ -2382,7 +2375,7 @@ main .wrap { padding-top: 0; }
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     const prog = (n.program || []).filter(x => x.t || x.l);
     const paras = t => String(t || '').split(/\n\s*\n/).filter(Boolean).map(x => '<p>' + esc(x).replace(/\n/g, '<br>') + '</p>').join('');
-    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in']].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
+    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', n.timeLabel || 'Treffpunkt'], [eur(n.buyin), 'Buy-in']].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
@@ -2405,7 +2398,7 @@ main .wrap { padding-top: 0; }
         '<div class="acts"><button class="btn wa" id="gSend" type="button">Nachricht abschicken</button><span class="status" id="gStatus"></span></div>' +
         '<p class="sub" style="font-size:13px">Du kannst sie bis Mitternacht noch ändern: einfach nochmal abschicken, es zählt die letzte.</p></div>' : '') +
       (prog.length ? '<div>' + head('Ablauf', 'Der Abend') + '<ol class="tline">' + prog.map(x => '<li><time>' + esc(x.t) + '</time><i></i><span>' + esc(x.l) + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</span></li>').join('') + '</ol></div>' : '') +
-      (Array.isArray(n.blinds) && n.blinds.length ? (() => { let k = 0, t = new Date(d.getTime() + 30 * 60e3); const fm = x => fmtN(x); const rows = n.blinds.map(L => { const at = hhmm(t); t = new Date(t.getTime() + (L.brk || Number(n.blindMin) || 25) * 60e3); if (L.brk) return '<tr class="brk"><td>' + at + '</td><td colspan="3">' + esc(L.note || 'Pause') + ' · ' + L.brk + ' Min</td></tr>'; k++; return '<tr' + (L.ante ? ' class="an"' : '') + '><td>' + at + '</td><td>' + k + '</td><td>' + fm(L.sb) + ' / ' + fm(L.bb) + '</td><td>' + (L.ante ? fm(L.ante) : '–') + '</td></tr>'; }).join(''); return '<div>' + head('Blindstruktur', (Number(n.blindMin) || 25) + ' Min pro Level') + '<div class="blt"><table><thead><tr><th>Ca.</th><th>Lvl</th><th>Blinds</th><th>BB-Ante</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="sub" style="font-size:13px">Uhrzeiten ungefähr, die Tafel zählt live. BB-Ante heißt: der Big Blind legt die Ante für den ganzen Tisch.</p></div>'; })() : '') +
+      (Array.isArray(n.blinds) && n.blinds.length ? (() => { let k = 0, t = new Date(d.getTime() + (n.hand0 != null ? Number(n.hand0) : 30) * 60e3); const fm = x => fmtN(x); const rows = n.blinds.map(L => { const at = hhmm(t); t = new Date(t.getTime() + (L.brk || Number(n.blindMin) || 25) * 60e3); if (L.brk) return '<tr class="brk"><td>' + at + '</td><td colspan="3">' + esc(L.note || 'Pause') + ' · ' + L.brk + ' Min</td></tr>'; k++; return '<tr' + (L.ante ? ' class="an"' : '') + '><td>' + at + '</td><td>' + k + '</td><td>' + fm(L.sb) + ' / ' + fm(L.bb) + '</td><td>' + (L.ante ? fm(L.ante) : '–') + '</td></tr>'; }).join(''); return '<div>' + head('Blindstruktur', (Number(n.blindMin) || 25) + ' Min pro Level') + '<div class="blt"><table><thead><tr><th>Ca.</th><th>Lvl</th><th>Blinds</th><th>BB-Ante</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="sub" style="font-size:13px">Uhrzeiten ungefähr, die Tafel zählt live. BB-Ante heißt: der Big Blind legt die Ante für den ganzen Tisch.</p></div>'; })() : '') +
       (n.trophy ? '<div class="trophy">' + TROPHY + '<div><h3>' + esc(n.trophyTitle || 'Wanderpokal') + '</h3>' + paras(n.trophy) + '</div></div>' : '') +
       (n.info ? '<div class="txt">' + head('Was dich erwartet', '') + paras(n.info) + '</div>' : '') + '</div>';
     $('#evov').hidden = false; document.body.style.overflow = 'hidden'; tickCd();
