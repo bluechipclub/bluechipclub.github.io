@@ -488,7 +488,7 @@ const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{
 
 const fresh=()=>({v:1,title:"Sunday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:9,maxRe:1,
-  buyin:30,fee:5,rebuy:30,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
+  buyin:30,fee:5,rebuy:25,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
