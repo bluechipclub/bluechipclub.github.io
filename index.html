@@ -2020,8 +2020,8 @@ main .wrap { padding-top: 0; }
     let h = '<div class="bento rg">';
 
     h += cx('c12 rg-intro', '<span class="eyebrow gold">Regelwerk · So funktioniert’s</span><h1 class="silvertext">Wie der ' + esc(DATA.settings.name) + ' zählt</h1>' +
-      '<p class="lead">Punkte, Buy-ins, Verteilung und Bankroll auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die Bankroll.</p>' +
-      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Auszahlung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
+      '<p class="lead">Punkte, Buy-ins, Verteilung und P-Bilanz auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die P-Bilanz.</p>' +
+      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Verteilung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
       '<p class="rg-note"><b>Nicht verwechseln:</b> <em>Punkte</em> zählen für die Rangliste. <em>' + esc(unit()) + '</em> sind reine Spielpunkte für Buy-ins und Preise, kein echtes Geld.</p>');
 
     h += cx('c8', head('Das Punktesystem', 'Nur das Podium punktet') +
@@ -2061,8 +2061,8 @@ main .wrap { padding-top: 0; }
       '<ol class="rg-list"><li><b>Auf 5 abgerundet.</b> Jeder Preis wird auf volle 5 ' + esc(unit()) + ' abgerundet.</li><li><b>Der Rest geht an den Sieger.</b> Was beim Runden übrig bleibt, bekommt der 1. Platz obendrauf.</li><li><b>Kleines Feld.</b> Bei weniger als 8 Spielern bekommen nur zwei Plätze P.</li></ol>' + pay);
 
     const E = entryStats();
-    h += cx('c6', head('Bankroll', 'Dein Profil') +
-      '<p class="rg-formula"><span>Gewonnen</span><i>−</i><span>Eingesetzt</span><i>=</i><b>Bankroll</b></p>' +
+    h += cx('c6', head('P-Bilanz', 'Dein Profil') +
+      '<p class="rg-formula"><span>Gewonnen</span><i>−</i><span>Eingesetzt</span><i>=</i><b>P-Bilanz</b></p>' +
       '<ol class="rg-list"><li><b>Eingesetzt</b> ist dein Buy-in plus alle Rebuys eines Abends.</li><li><b>Turnier für Turnier</b> wird fortgeschrieben, als Kurve auf deinem Spielerprofil.</li><li><b>Gezählt ab ' + esc(E.fromName || 'dem ersten erfassten Turnier') + '.</b> Seitdem werden die Entries pro Spieler erfasst.</li></ol>' +
       '<a class="rg-link" href="spieler/">Alle Spielerprofile →</a>');
 
