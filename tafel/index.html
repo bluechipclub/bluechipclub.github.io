@@ -219,6 +219,10 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .lobby .lst{position:absolute;inset:0;display:grid;place-items:center;padding:11vh 4vw 9vh}
 .lobby .lsl{display:flex;align-items:center;gap:4vw;animation:lin 1.1s var(--ease) both}
 .lobby .lsl img{max-height:70vh;max-width:62vw;border-radius:1.3vw;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45);animation:kb 8s ease-out both}
+.lobby .lsl.lvid{flex-direction:column;gap:2.5vh}
+.lobby .lsl video{max-height:60vh;max-width:84vw;border-radius:1.3vw;box-shadow:0 4vh 12vh rgba(0,0,0,.85),0 0 0 1px rgba(226,184,87,.45);background:#000}
+.lobby .lsl.lvid .lcap{text-align:center;max-width:70vw}
+.lobby .lsl.lvid h2{font-size:max(22px,2.8vw);margin:.2em 0 0}
 .lobby .lsl .card{height:70vh;width:auto;aspect-ratio:2/3;object-fit:cover}
 .lobby .lcap{max-width:34vw;text-align:left}
 .lobby .lcap .ey{font-family:var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-size:max(12px,1vw)}
@@ -1257,9 +1261,12 @@ async function bdayShow(){
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 /* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
-const LOBBY_AT="2026-11-06T18:15";
+const LOBBY_AT="2026-11-08T17:00";
 /* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
 const LOBBY_PICS=[
+ {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
+ {u:"lobby/referenz-tim-intro-poster.jpg",v:"lobby/referenz-tim-intro.mp4",ey:"Blue Chip Club",t:"Welcome to The Void",p:""},
+ {u:"lobby/chip-intro-final-weich-poster.jpg",v:"lobby/chip-intro-final-weich.mp4",ey:"Blue Chip Club",t:"Der Chip fällt",p:""},
  {u:"../img/mbd-sieger-tim.jpg",ey:"Midnight Birthday Deepstack",t:"Tim holt den Titel",p:"Der amtierende Champion. Wer nimmt ihm die Krone ab?"},
  {u:"../img/mbd-magg-quad-jacks.jpg",ey:"Midnight Birthday Deepstack",t:"Quad Jacks",p:"Magg mit vier Buben."},
  {u:"../img/mbd-benno-doppel-ko.jpg",ey:"Midnight Birthday Deepstack",t:"Doppel-Knockout",p:"Benno Boss schickt zwei auf einmal heim."},
@@ -1289,7 +1296,12 @@ function lobbyShow(){
   let list=lobbySlides(),k=0;
   const next=()=>{if(el.hidden)return;if(!list.length)return;if(k>=list.length){list=lobbySlides();k=0;}const x=list[k++];
     $("lbg").style.backgroundImage="url('"+x.u+"')";
-    $("lst").innerHTML='<div class="lsl"><img class="'+(x.card?"card":"")+'" src="'+x.u+'" alt=""><div class="lcap"><div class="ey">'+esc(x.ey)+'</div><h2>'+esc(x.t)+'</h2>'+(x.p?'<p>'+esc(x.p)+'</p>':'')+'</div></div>';
+    const cap='<div class="lcap"><div class="ey">'+esc(x.ey)+'</div><h2>'+esc(x.t)+'</h2>'+(x.p?'<p>'+esc(x.p)+'</p>':'')+'</div>';
+    if(x.v){ /* video slide: plays muted once, then next slide */
+      $("lst").innerHTML='<div class="lsl lvid"><video src="'+x.v+'" poster="'+x.u+'" muted playsinline autoplay preload="auto"></video>'+cap+'</div>';
+      const v=$("lst").querySelector("video");let done=false;const go=()=>{if(done)return;done=true;clearTimeout(lobbyT);next();};
+      v.addEventListener("ended",go);v.addEventListener("error",go);v.play().catch(()=>{});lobbyT=setTimeout(go,20000);return;}
+    $("lst").innerHTML='<div class="lsl"><img class="'+(x.card?"card":"")+'" src="'+x.u+'" alt="">'+cap+'</div>';
     lobbyT=setTimeout(next,x.card?6000:8000);};
   next();
 }

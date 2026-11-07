@@ -2371,7 +2371,7 @@ main .wrap { padding-top: 0; }
     if (!force) { try { if (sessionStorage.getItem('intro-seen')) return welcome(); sessionStorage.setItem('intro-seen', '1'); } catch (e) {} }
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return welcome();
     // Variante wählbar: ?intro=b (Tims Video als Vorlage, Ende mit allen Spielern), sonst A (rollt, Vogelperspektive)
-    const VB = /[?&]intro=b/.test(location.search), CHIP = VB ? { x: 631, y: 541, r: 24 } : { x: 628, y: 339, r: 45 }, VS = VB ? 'video/chip-intro-v2-b' : 'video/chip-clip';
+    const VB = /[?&]intro=b/.test(location.search), CHIP = VB ? { x: 631, y: 541, r: 24 } : { x: 628, y: 339, r: 45 }, VS = VB ? 'video/chip-intro-v2-b' : 'video/ref-fall-4s';
     const el = document.createElement('div');
     el.className = 'cintro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
     el.innerHTML = '<div class="cin-cam"><video muted playsinline autoplay preload="auto" poster="' + VS + '-poster.jpg" src="' + VS + '.mp4"></video></div>' +
