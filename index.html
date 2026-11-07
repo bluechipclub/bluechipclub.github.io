@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
 /* Layout: Poker-Lobby. Feste Kopfleiste, darunter ein Bento-Raster (12 Spalten): großes Siegerbild links, Preispool und Champion rechts, darunter Rangliste, beste Hand, Siegerwand. Eine Schrift (Geist) plus Geist Mono für Zahlen. Gold, Schwarz, Grau. */
 :root {
@@ -626,12 +626,347 @@ textarea { min-height: 150px; resize: vertical; }
   .rg-facts b { font-size: 16px; }
   .rg-step b { font-size: 30px; } .rg-step.s1 b { font-size: 38px; }
 }
-</style>
+
+/* =====================================================================
+   v2 (06.11.2026): Casino bei Nacht. Ein Objekt pro Bühne, Licht statt Flächen,
+   Partikel, eine Kapsel als Navigation, Serifen-Akzent. Messlatte: bar.md
+   ===================================================================== */
+:root { --bg: #070707; --line: rgb(255 255 255 / .08); --line2: rgb(255 255 255 / .16); --serif: "Instrument Serif", "Times New Roman", serif; --surface: rgb(255 255 255 / .025); --surface2: rgb(255 255 255 / .05); }
+body { background: var(--bg); }
+em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+
+/* Licht: ein Kegel von links oben (blau/petrol), keine Goldnebel */
+.ambient { background: radial-gradient(90% 70% at 8% -10%, rgb(30 70 120 / .55), transparent 60%), radial-gradient(60% 50% at 100% 30%, rgb(47 107 255 / .10), transparent 70%), var(--bg); }
+.ambient .o1, .ambient .o3 { display: none; }
+.ambient .o2 { opacity: .35; }
+.ambient .suits { display: none; }
+
+/* Kopfleiste: Logo links, eine Kapsel rechts */
+header.top { background: transparent; border-bottom: 0; backdrop-filter: none; -webkit-backdrop-filter: none; transition: background-color 400ms var(--ease); }
+body.scrolled header.top { background: rgb(7 7 7 / .72); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+header.top .wrap { grid-template-columns: 1fr auto; height: 72px; }
+.logo { text-decoration: none; color: var(--fg); }
+#brandName { font-size: 13px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+header.top .wrap { position: relative; }
+nav.tabs { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgb(10 12 16 / .55); border: 1px solid rgb(255 255 255 / .18); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 5px; }
+nav.tabs button { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; padding: 8px 14px; }
+nav.tabs .pill { background: rgb(255 255 255 / .92); }
+.tools { gap: 10px; }
+.menu-btn { display: inline-flex; align-items: center; gap: 12px; height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .18); background: rgb(10 12 16 / .55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: var(--fg); font-size: 11px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+.menu-btn .mb-line { width: 36px; height: 1px; background: rgb(255 255 255 / .6); transition: width 500ms var(--ease); }
+.menu-btn[aria-expanded="true"] .mb-line { width: 14px; }
+
+/* Menü: Vollbild, große Serifen-Links */
+.menu { position: fixed; inset: 0; z-index: 29; background: rgb(5 6 9 / .94); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); display: grid; align-items: center; }
+.menu-in { width: min(1240px, 100%); margin: 0 auto; padding: 96px max(24px, env(safe-area-inset-left)) 40px; display: grid; gap: 40px; }
+.menu-links { display: grid; gap: 4px; }
+.menu-links a { color: var(--fg); text-decoration: none; font-size: clamp(36px, 9vw, 72px); line-height: 1.08; letter-spacing: -.03em; font-weight: 500; opacity: 0; transform: translateY(16px); animation: mrise 700ms var(--ease) forwards; }
+.menu-links a:nth-child(2) { animation-delay: 60ms; } .menu-links a:nth-child(3) { animation-delay: 120ms; } .menu-links a:nth-child(4) { animation-delay: 180ms; } .menu-links a:nth-child(5) { animation-delay: 240ms; } .menu-links a:nth-child(6) { animation-delay: 300ms; }
+@keyframes mrise { to { opacity: 1; transform: none; } }
+.menu-links a:hover { color: var(--blue2); }
+.menu-tools { display: flex; flex-wrap: wrap; gap: 10px; }
+.menu-tools .icon-btn { height: 42px; padding: 0 18px; background: transparent; border-color: rgb(255 255 255 / .18); color: var(--fg); }
+.menu-tools .ldot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); }
+.menu-foot { color: var(--grey2); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+body.menu-open { overflow: hidden; }
+
+/* Bühne: ein Chip, viel Schwarz */
+main .wrap { padding-top: 0; }
+.stage { position: relative; min-height: calc(100svh - 72px); display: grid; grid-template-rows: 1fr auto; justify-items: center; text-align: center; padding: 24px 0 104px; margin-bottom: 48px; }
+.stage-chip { position: relative; align-self: center; width: clamp(150px, 34vw, 260px); aspect-ratio: 1; perspective: 900px; margin-top: 4vh; }
+.bigchip { position: absolute; inset: 0; border-radius: 50%; transform-style: preserve-3d;
+  background: radial-gradient(circle at 50% 50%, transparent 0 61%, rgb(0 0 0 / .25) 62% 63%, transparent 64%), repeating-conic-gradient(from -7deg, #eef2ff 0 13deg, transparent 13deg 45deg), radial-gradient(circle at 35% 28%, #5b8dff, #1f55e0 55%, #0f2f8a);
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / .22), inset 0 -6px 14px rgb(0 0 0 / .45), 0 0 0 1px #0c2770, 0 0 60px rgb(47 107 255 / .55), 0 0 160px rgb(47 107 255 / .35); }
+.bigchip .face { position: absolute; inset: 17%; border-radius: 50%; background: radial-gradient(circle at 34% 26%, rgb(255 255 255 / .35), transparent 42%), radial-gradient(circle at 50% 55%, #2c64f2, #1a49cc 70%, #12389f); box-shadow: inset 0 0 0 3px #1a49cc, inset 0 0 0 5px rgb(255 255 255 / .7), inset 0 3px 8px rgb(0 0 0 / .35); }
+.bigchip .face::after { content: ""; position: absolute; inset: 14%; border-radius: 50%; border: 2px dashed rgb(255 255 255 / .45); }
+.stage-chip .halo { position: absolute; inset: -60%; border-radius: 50%; background: radial-gradient(circle, rgb(47 107 255 / .32), rgb(47 107 255 / .08) 40%, transparent 65%); filter: blur(10px); }
+.stage-chip .floor { position: absolute; left: 10%; right: 10%; bottom: -26%; height: 16%; border-radius: 50%; background: radial-gradient(closest-side, rgb(47 107 255 / .55), transparent); filter: blur(8px); }
+.stage-copy { display: grid; gap: 18px; justify-items: center; max-width: 640px; padding-top: 6vh; }
+.stage-copy .eyebrow { color: var(--grey); letter-spacing: .2em; }
+.stage h1 { font-size: clamp(46px, 11vw, 112px); line-height: .95; letter-spacing: -.045em; font-weight: 600; }
+.stage h1 em { font-weight: 400; letter-spacing: -.02em; color: #dfe6ff; }
+.stage p { color: rgb(244 244 242 / .7); font-size: 16px; max-width: 34ch; }
+.ctas { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+.btn-light, .btn-ghost { display: inline-flex; align-items: center; height: 48px; padding: 0 24px; border-radius: 999px; font-size: 15px; font-weight: 600; text-decoration: none; }
+.btn-light { background: #f4f4f2; color: #0a0a0a; }
+.btn-ghost { color: var(--fg); border: 1px solid rgb(255 255 255 / .22); background: rgb(255 255 255 / .04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.scrollhint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--grey2); display: grid; justify-items: center; gap: 8px; }
+.scrollhint::after { content: ""; width: 1px; height: 28px; background: linear-gradient(var(--grey2), transparent); }
+
+/* Chip-Fall: einmalig, danach langsames Drehen */
+@media (prefers-reduced-motion: no-preference) {
+  .stage:not(.go) .bigchip, .stage:not(.go) .floor, .stage:not(.go) .halo { opacity: 0; }
+  .stage:not(.go) .stage-copy > * { opacity: 0; }
+  .stage.go:not(.landed) .bigchip { animation: chipfall 1500ms cubic-bezier(.55,.05,.35,1) both; }
+  .stage.go:not(.landed) .floor { animation: floorin 1500ms ease-out both; }
+  .stage.go:not(.landed) .halo { animation: haloin 1800ms ease-out both; }
+  @keyframes chipfall { 0% { opacity: 0; transform: translateY(-70vh) rotateX(70deg) rotateZ(-40deg); } 15% { opacity: 1; } 78% { transform: translateY(0) rotateX(0) rotateZ(0); } 88% { transform: translateY(-3%) rotateX(8deg); } 100% { transform: none; } }
+  @keyframes floorin { 0%, 60% { opacity: 0; transform: scaleX(.3); } 100% { opacity: 1; transform: none; } }
+  @keyframes haloin { 0%, 55% { opacity: 0; } 100% { opacity: 1; } }
+  .stage.landed .bigchip { animation: chipidle 9s var(--ease-io) infinite; }
+  @keyframes chipidle { 0%, 60% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
+  .stage.landed .halo { animation: breathe 6s ease-in-out infinite alternate; }
+  @keyframes breathe { from { opacity: .75; } to { opacity: 1; } }
+  .stage.go .stage-copy > * { opacity: 0; transform: translateY(24px); animation: rise2 800ms var(--ease) forwards; }
+  .stage.go .stage-copy > *:nth-child(1) { animation-delay: 1100ms; } .stage.go .stage-copy > *:nth-child(2) { animation-delay: 1250ms; } .stage.go .stage-copy > *:nth-child(3) { animation-delay: 1400ms; } .stage.go .stage-copy > *:nth-child(4) { animation-delay: 1550ms; }
+  .stage.landed .stage-copy > * { animation: none; opacity: 1; transform: none; }
+  @keyframes rise2 { to { opacity: 1; transform: none; } }
+  /* Einblenden beim Scrollen: 700 ms von unten */
+  section.view:not([hidden]) .cardx { animation: none; }
+  .rv { opacity: 0; transform: translateY(24px); transition: opacity 700ms var(--ease), transform 700ms var(--ease); }
+  .rv.in { opacity: 1; transform: none; }
+  tr.rv { transform: translateY(12px); }
+}
+
+/* Kacheln: Glas statt grauer Boxen */
+.cardx { background: linear-gradient(180deg, rgb(255 255 255 / .035), rgb(255 255 255 / .01)); border: 1px solid var(--line); border-radius: 28px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.cardx::after { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(47 107 255 / .10), transparent 60%); }
+.head h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 500; letter-spacing: -.035em; }
+.head h2 em { color: #dfe6ff; }
+
+/* Rangliste: Chip-Stapel wachsen, Platz 1 im Goldlicht */
+.board td.player { position: relative; }
+.stack { display: block; height: 6px; margin-top: 8px; width: min(220px, 100%); border-radius: 3px; overflow: hidden; background: rgb(255 255 255 / .05); }
+.stack i { display: block; height: 100%; width: calc(var(--w) * 100%); border-radius: 3px; transform-origin: left; background: repeating-linear-gradient(90deg, #2f6bff 0 9px, #e9eeff 9px 11px); box-shadow: 0 0 12px rgb(47 107 255 / .5); transform: scaleX(0); transition: transform 1100ms var(--ease) 200ms; }
+tr.in .stack i, .board tr:not(.rv) .stack i { transform: scaleX(1); }
+.board tr.lead .stack i { background: repeating-linear-gradient(90deg, #e2b857 0 9px, #fff4d6 9px 11px); box-shadow: 0 0 16px rgb(226 184 87 / .55); }
+.board tr.lead td { background: linear-gradient(90deg, rgb(226 184 87 / .08), transparent 70%); }
+.board td.pts { color: var(--fg); }
+.board tr.lead td.pts { color: var(--gold); }
+.board .medals { display: none; }
+
+@media (max-width: 960px) {
+  header.top .wrap { grid-template-columns: 1fr auto; height: 64px; padding-block: 0; }
+  nav.tabs { display: none; }
+}
+@media (max-width: 600px) {
+  .stage { min-height: calc(100svh - 64px); padding-bottom: 92px; margin-bottom: 24px; }
+  .stage-chip { width: 44vw; margin-top: 6vh; }
+  .stage-copy { padding-top: 7vh; gap: 14px; }
+  .stage p { font-size: 15px; }
+  .cardx { border-radius: 22px; }
+  .stack { width: 100%; }
+  #brandName { font-size: 11px; letter-spacing: .16em; }
+}
+@media (prefers-reduced-motion: reduce) { .menu-links a { animation: none; opacity: 1; transform: none; } }
+
+.cancel-banner { top: calc(env(safe-area-inset-top, 0px) + 80px); }
+@media (max-width: 600px) { .cancel-banner { top: calc(env(safe-area-inset-top, 0px) + 70px); } }
+/* v2: Gold knapp halten */
+.cancel-banner { position: absolute; }
+.hero .eyebrow.gold { color: rgb(244 244 242 / .7); }
+.pot .big span { color: var(--grey); }
+.prow .track i { background: var(--blue); } .prow:nth-child(2) .track i { background: #8fb0ff; } .prow:nth-child(3) .track i { background: #44506e; }
+.wcard:not(.cur)::before { display: none; }
+.wcard:not(.cur)::after { background: radial-gradient(120% 70% at 50% 0%, rgb(47 107 255 / .10), transparent 60%), linear-gradient(180deg, #111318, #0a0b0d); }
+.wcard:not(.cur) .laurel { filter: grayscale(1) brightness(.8) contrast(1.1); opacity: .75; }
+.wcard:not(.cur) .eyebrow { color: var(--grey); }
+.wcard:not(.cur) .n { background: none; -webkit-text-fill-color: currentColor; color: var(--fg); }
+.wcard:not(.cur) .pt { border-color: rgb(255 255 255 / .14); background: transparent; }
+.wcard:not(.cur) .shine { display: none; }
+.wcard:not(.cur) { box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); }
+.board tr.lead td { background: none; }
+/* ---------- v2: Chip-Intro (Video) ---------- */
+.cintro { position: fixed; inset: 0; z-index: 110; background: #000; overflow: hidden; transition: opacity 700ms var(--ease); }
+.cintro.out { opacity: 0; }
+.cin-cam { position: absolute; inset: 0; transform-origin: 50% 50%; transition: transform 2200ms cubic-bezier(.65,0,.35,1); }
+.cintro video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
+@media (orientation: portrait) { .cintro video { object-fit: contain; } }
+.cintro.fin .cin-cam { transform: none; }
+.cin-name { position: absolute; left: 50%; top: 50%; display: grid; justify-items: center; line-height: .92; transform: translate(-50%, -50%) scale(0); font-family: var(--sans); font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; color: #fff; text-shadow: 0 1px 0 #c9d6ff, 0 2px 0 #9fb4f5, 0 3px 6px rgb(5 20 70 / .7), 0 0 18px rgb(150 190 255 / .55); pointer-events: none; }
+.cintro .cin-name { font-size: var(--nm, 9px); }
+.cintro.fin .cin-name { animation: inflate 1100ms cubic-bezier(.34,1.56,.64,1) 900ms forwards; }
+@keyframes inflate { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 60% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.cintro .skip { position: absolute; z-index: 2; right: calc(16px + env(safe-area-inset-right)); top: calc(16px + env(safe-area-inset-top)); height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .3); background: rgb(0 0 0 / .45); color: #fff; font-size: 13px; font-weight: 600; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+@media (max-width: 600px) { .cintro .skip { top: auto; bottom: calc(24px + env(safe-area-inset-bottom)); right: 50%; transform: translateX(50%); height: 48px; padding: 0 28px; font-size: 15px; } }
+/* Chip mit Silberschrift (Variante C) bläst sich am Ende auf */
+.cin-chip { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; transform: translate(-50%, -50%) scale(.4); opacity: 0; pointer-events: none; border-radius: 50%; }
+.cintro.fin .cin-chip { animation: emerge 1800ms cubic-bezier(.22,1,.36,1) 1100ms forwards; }
+@keyframes emerge { 0% { opacity: 0; filter: brightness(.2) blur(6px); transform: translate(-50%, -50%) scale(.9); } 45% { opacity: .85; filter: brightness(1.5) blur(1px) drop-shadow(0 0 12px rgb(200 220 255 / .8)); } 100% { opacity: 1; filter: brightness(1) blur(0) drop-shadow(0 2px 3px rgb(0 0 0 / .45)); transform: translate(-50%, -50%) scale(1); } }
+@keyframes inflate2 { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); } 35% { opacity: 1; } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+/* Bühnen-Chip: echtes Foto mit Namen */
+.bigchip.photo { background: none; border-radius: 50%; inset: 0; box-shadow: 0 0 0 1px rgb(255 255 255 / .06), 0 30px 60px -10px rgb(0 0 0 / .9), 0 0 120px rgb(47 107 255 / .35); }
+.bigchip.photo img { border-radius: 50%; }
+.bigchip.photo img { width: 100%; height: 100%; display: block; }
+.stage-chip { container-type: inline-size; }
+.bigchip.photo .cin-name { font-size: 12cqw; transform: translate(-50%, -50%) scale(1); }
+.stage-chip .halo { inset: -40%; background: radial-gradient(circle, rgb(47 107 255 / .20), transparent 60%); }
+.stage.landed .bigchip.photo { animation: none; }
+/* ---------- v2: Bildband „The Void“ (Tims Tischfoto) ---------- */
+.voidband { position: relative; margin: 0 calc(50% - 50vw) 56px; height: min(78svh, 720px); overflow: hidden; display: grid; align-items: end; isolation: isolate; }
+.voidband img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 70%; z-index: -2; transform: scale(1.06); transition: transform 1600ms var(--ease); }
+.voidband.in img, .voidband img.in { transform: none; }
+.voidband::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, var(--bg) 0%, rgb(7 7 7 / 0) 22%, rgb(7 7 7 / 0) 55%, var(--bg) 100%), radial-gradient(120% 90% at 50% 60%, transparent 40%, rgb(7 7 7 / .7)); }
+.vb-copy { width: min(1240px, 100%); margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) 40px; display: grid; gap: 10px; }
+.vb-copy h2 { font-size: clamp(36px, 7vw, 76px); font-weight: 600; letter-spacing: -.04em; line-height: 1; }
+.vb-copy h2 em { color: #dfe6ff; }
+.vb-copy p { color: rgb(244 244 242 / .7); }
+@media (max-width: 600px) { .voidband { height: 64svh; margin-bottom: 32px; } .voidband img { object-position: 50% 78%; } }
+/* =====================================================================
+   v3 (07.11.2026): Messlatte Apple. Jeder Abschnitt eine schwarze Bühne,
+   riesige Headline, ein Motiv, viel Luft. Farben bleiben Schwarz/Gold/Blau.
+   ===================================================================== */
+:root { --bg: #000; }
+body, .ambient { background: #000; }
+.ambient { background: radial-gradient(70% 50% at 50% 0%, rgb(47 107 255 / .10), transparent 70%), #000; }
+main .wrap { max-width: 1180px; }
+#v-rangliste:not([hidden]) { display: block !important; }
+.scene { padding-block: clamp(80px, 12vw, 160px) 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(24px, 4vw, 48px); }
+.sc-head { display: grid; gap: 6px; }
+.sc-kick { font-size: clamp(19px, 2.4vw, 28px); font-weight: 600; letter-spacing: -.01em; color: var(--grey); }
+.scene h2 { font-size: clamp(48px, 9vw, 96px); font-weight: 600; letter-spacing: -.045em; line-height: 1; text-wrap: balance; }
+.scene h2 em { font-weight: 400; color: #dfe6ff; }
+.sc-sub { color: var(--grey); font-size: clamp(17px, 2vw, 21px); }
+.sc-link { color: var(--blue2); text-decoration: none; font-size: 17px; justify-self: start; }
+.sc-link:hover { text-decoration: underline; }
+.chrome { background: linear-gradient(180deg, #ffffff 0%, #d9dde6 38%, #8d93a3 52%, #f2f4f8 70%, #aab0bd 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.chrome-xl { font-size: clamp(88px, 22vw, 260px) !important; line-height: .9 !important; letter-spacing: -.06em !important; background: linear-gradient(180deg, #ffffff 0%, #e3e7ef 35%, #7e8596 50%, #f5f7fb 66%, #9aa1b0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 10px 40px rgb(47 107 255 / .25)); }
+/* Sieger */
+.sc-photo { margin: 0; border-radius: 28px; overflow: hidden; aspect-ratio: 16 / 9; background: #111; }
+.sc-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; transform: scale(1.08); transition: transform 1800ms var(--ease); }
+.winner.in .sc-photo img, .sc-photo.in img { transform: none; }
+.sc-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sc-stats div { display: grid; gap: 4px; }
+.sc-stats b { font-size: clamp(44px, 8vw, 96px); font-weight: 600; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.sc-stats span { color: var(--grey); font-size: 15px; }
+.sc-pay { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pay { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 18px 20px; border-radius: 22px; background: #111; font-size: 16px; }
+.pay .v { font-family: var(--mono); color: var(--grey); }
+/* Rangliste als Apple-Liste */
+.scene.board .tbl-wrap { margin: 0; border-radius: 28px; background: #0d0d0f; padding: 8px 0; }
+.scene.board th { padding-top: 14px; }
+.scene.board td.player { font-size: 18px; }
+.scene.board td.pts { font-size: 18px; font-weight: 600; }
+/* Ewige Nummer 1, Beste Hand */
+.scene.sc-champ, .scene.sc-hand { justify-items: center; text-align: center; grid-template-columns: minmax(0, 1fr); }
+.scene.sc-hand .fan.big { transform: scale(1.6); margin: 40px 0; }
+/* Galgen als Bühne */
+#v-rangliste > .bento { margin-top: clamp(80px, 12vw, 160px); }
+/* Siegerwand zum Wischen */
+.wall.swipe { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; padding-bottom: 8px; scrollbar-width: none; }
+.wall.swipe::-webkit-scrollbar { display: none; }
+.wall.swipe .wcard { scroll-snap-align: start; border-radius: 28px; }
+.voidband { margin-top: clamp(80px, 12vw, 160px); margin-bottom: 0; }
+@media (max-width: 600px) {
+  .sc-stats { grid-template-columns: 1fr 1fr; }
+  .sc-stats div:last-child { display: none; }
+  .sc-pay { grid-template-columns: 1fr; }
+  .scene.sc-hand .fan.big { transform: scale(1.25); margin: 24px 0; }
+  .wall.swipe { grid-auto-columns: 72%; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left))); padding-inline: max(16px, env(safe-area-inset-left)); }
+}
+/* v3: Abend-Kacheln und Spieler wie Apple-Highlights */
+.tiles.swipe { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 1fr); overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; scrollbar-width: none; padding-bottom: 6px; }
+.tiles.swipe::-webkit-scrollbar { display: none; }
+.tile, .ptile { position: relative; scroll-snap-align: start; border-radius: 28px; overflow: hidden; background: #111; aspect-ratio: 3 / 4; display: block; color: var(--fg); text-decoration: none; isolation: isolate; }
+.tile img, .ptile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 900ms var(--ease); }
+.tile::after, .ptile::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(0 0 0 / .55) 0%, transparent 35%, transparent 55%, rgb(0 0 0 / .85) 100%); }
+@media (hover: hover) { .tile:hover img, .ptile:hover img { transform: scale(1.04); } }
+.tile-in { position: absolute; inset: auto 0 0 0; padding: 22px; display: grid; gap: 4px; }
+.tile .tn { position: absolute; top: -360%; left: 22px; font-family: var(--mono); font-size: 13px; color: rgb(255 255 255 / .7); }
+.tile h3, .ptile h3 { font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+.tile p { color: rgb(255 255 255 / .75); font-size: 15px; }
+.ptile .nk { color: rgb(255 255 255 / .7); font-family: var(--serif); font-style: italic; font-size: 19px; }
+.ptile .pp { color: rgb(255 255 255 / .7); font-size: 14px; }
+.ptile .pp b { color: var(--fg); font-size: 18px; }
+.crew-row { grid-auto-columns: minmax(220px, 1fr); }
+@media (max-width: 600px) {
+  .tiles.swipe { grid-auto-columns: 78%; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left))); padding-inline: max(16px, env(safe-area-inset-left)); scroll-padding-inline: max(16px, env(safe-area-inset-left)); }
+  .crew-row { grid-auto-columns: 62%; }
+}
+/* =====================================================================
+   v3 Kino-Sand (Tims Wahl, Entwurf 7): warme Sandtöne, Kinobilder,
+   große Schrift unten links. Überschreibt die schwarzen Apple-Töne.
+   ===================================================================== */
+:root { --bg: #110d0a; --surface: #1b1511; --surface2: #241c16; --fg: #f1e9dd; --grey: #b0a392; --grey2: #7d7163; --line: rgb(241 233 221 / .12); --line2: rgb(241 233 221 / .22); --cream: #f3ece2; --gold: #c9a46a; --gold2: #e2c48e; --gold3: #8c6c3c; --blue2: #e2c48e; }
+body, .ambient { background: var(--bg); }
+.ambient { background: radial-gradient(80% 50% at 50% 0%, rgb(201 164 106 / .10), transparent 70%), var(--bg); }
+.ambient .o2 { display: none; }
+#dust { display: none; }
+.logo { gap: 6px; }
+.wm { font-size: 26px; font-weight: 600; letter-spacing: -.04em; color: var(--fg); }
+.wm-block { width: 14px; height: 22px; background: var(--fg); border-radius: 1px; }
+.btn-cream { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 999px; border: 0; background: var(--cream); color: #15110d; font-size: 15px; font-weight: 600; white-space: nowrap; }
+.btn-cream.big { height: 56px; padding: 0 28px; font-size: 17px; justify-self: start; }
+.btn-ghost { background: transparent; border: 1px solid rgb(241 233 221 / .45); color: var(--fg); }
+.btn-ghost.play { gap: 12px; height: 52px; padding: 0 24px 0 10px; font-size: 16px; }
+.btn-ghost .pl { width: 32px; height: 32px; border-radius: 50%; background: var(--cream); position: relative; }
+.btn-ghost .pl::after { content: ""; position: absolute; left: 12px; top: 9px; border-left: 11px solid #15110d; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+header.top { background: transparent; }
+body.scrolled header.top { background: rgb(17 13 10 / .78); }
+nav.tabs { background: rgb(17 13 10 / .5); border-color: var(--line2); }
+nav.tabs .pill { background: var(--cream); }
+.menu-btn { background: rgb(17 13 10 / .5); border-color: var(--line2); }
+.menu { background: rgb(17 13 10 / .96); }
+.cancel-banner.v2cb { left: max(16px, calc((100vw - 1180px) / 2 + 16px)); }
+/* Kino-Hero: Foto im Vollbild, Schrift unten links */
+main .wrap { padding-top: 0; }
+.kino { position: relative; margin: calc(-1 * (env(safe-area-inset-top, 0px) + 72px)) calc(50% - 50vw) 0; min-height: 100svh; display: grid; align-items: end; isolation: isolate; overflow: hidden; }
+.kino-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%; z-index: -2; filter: sepia(.18) saturate(.92) brightness(.92); }
+.kino::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(17 13 10 / .45) 0%, transparent 22%, transparent 45%, rgb(17 13 10 / .75) 72%, var(--bg) 100%); }
+.kino-copy { width: min(1180px, 100%); margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) clamp(48px, 9vh, 96px); display: grid; gap: 20px; justify-items: start; }
+.kino h1 { font-size: clamp(52px, 11vw, 120px); line-height: .92; letter-spacing: -.045em; font-weight: 500; color: var(--fg); text-wrap: balance; }
+.kino h1 .l1 { display: block; }
+.kino h1 em { display: inline; font-weight: 400; color: var(--fg); letter-spacing: -.03em; }
+.kino p { max-width: 36ch; font-size: clamp(17px, 2vw, 21px); color: rgb(241 233 221 / .85); line-height: 1.45; }
+/* Abschnitte in Sand */
+.sc-kick { color: var(--grey); }
+.scene h2 em, .vb-copy h2 em, .head h2 em { color: var(--fg); }
+.sc-link { color: var(--gold2); }
+.chrome { background: linear-gradient(180deg, #fff8ec 0%, #e8d9c2 40%, #9c8466 55%, #f4e9d6 72%, #b49c7c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.chrome-xl { background: linear-gradient(180deg, #fff8ec 0%, #eadcc5 36%, #8f7657 52%, #f6ecdc 68%, #a88f6e 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 10px 40px rgb(201 164 106 / .2)); }
+.sc-photo, .pay, .tile, .ptile, .scene.board .tbl-wrap { background: var(--surface); }
+.sc-photo img, .tile img, .ptile img, .voidband img { filter: sepia(.18) saturate(.92); }
+.cardx { background: var(--surface); border-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.stack i { background: repeating-linear-gradient(90deg, #2f5fd0 0 9px, #e9eeff 9px 11px); box-shadow: none; }
+.board tr.lead .stack i { background: repeating-linear-gradient(90deg, #c9a46a 0 9px, #fff2d8 9px 11px); }
+.voidband::before { background: linear-gradient(180deg, var(--bg) 0%, rgb(17 13 10 / 0) 22%, rgb(17 13 10 / 0) 55%, var(--bg) 100%); }
+.wcard::after, .wcard:not(.cur)::after { background: linear-gradient(180deg, #211a14, #15100c); }
+.nextsc .btn-cream { margin-top: 8px; }
+@media (max-width: 760px) {
+  .tools .btn-cream { height: 38px; padding: 0 14px; font-size: 13px; }
+  .menu-btn { padding: 0 12px; } .menu-btn .mb-line { width: 16px; }
+  .wm { font-size: 22px; } .wm-block { width: 11px; height: 18px; }
+  .kino { margin-top: calc(-1 * (env(safe-area-inset-top, 0px) + 64px)); }
+  .kino-bg { inset: 0 0 auto 0; height: 66svh; object-position: 50% 100%; -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent); mask-image: linear-gradient(180deg, #000 80%, transparent); }
+  .kino::before { background: linear-gradient(180deg, rgb(17 13 10 / .5) 0%, transparent 20%, transparent 50%, var(--bg) 70%); }
+  .logo { flex-shrink: 0; } .wm-block { display: block; flex-shrink: 0; }
+}
+@media (max-width: 420px) { .wm-block { display: none; }
+}
+/* ---------- v2 Runde 2 ---------- */
+/* Absage: ruhige Kapsel unter dem Logo, immer sichtbar, nicht gekippt */
+.cancel-banner.v2cb { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 76px); left: max(16px, calc((100vw - 1240px) / 2 + 16px)); transform: none; display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; border-radius: 999px; background: rgb(192 40 30 / .14); border: 1px solid rgb(229 103 92 / .45); color: #ffb3ab; font-size: 11px; font-weight: 600; letter-spacing: .16em; box-shadow: none; pointer-events: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.cancel-banner.v2cb small { display: inline; font-size: 11px; font-weight: 500; letter-spacing: .12em; opacity: .75; }
+.cancel-banner.v2cb small::before { content: "· "; }
+.cancel-banner.v2cb .cb-dot { width: 7px; height: 7px; border-radius: 50%; background: #e5675c; box-shadow: 0 0 10px #e5675c; }
+.cancel-banner.v2cb[hidden] { display: inline-flex !important; }
+@media (max-width: 600px) { .cancel-banner.v2cb { top: calc(env(safe-area-inset-top, 0px) + 66px); font-size: 10px; padding: 7px 14px 7px 10px; } .cancel-banner.v2cb small { font-size: 10px; } }
+/* Menü: alle Werkzeuge sichtbar mit Namen */
+.menu-tools #liveBtn, .menu-tools #remBtn { display: inline-flex !important; }
+.menu-tools .icon-btn .lbl { display: inline !important; }
+/* Rangliste am Handy: nur was reinpasst */
+@media (max-width: 600px) {
+  .board table { min-width: 0; }
+  .board th:nth-child(4), .board td:nth-child(4), .board th:nth-child(5), .board td:nth-child(5), .board th:nth-child(6), .board td:nth-child(6), .board th:nth-child(8), .board td:nth-child(8) { display: none; }
+  .board .tbl-wrap { overflow: visible; }
+  .board td.player { white-space: normal; }
+}
+/* Gold: Platz 1 nur Kreis + Stapel */
+.board tr.lead { background: none; }
+.board tr.lead td.pts { color: var(--fg); }
+/* Siegerwand: 3 Spalten am Desktop, kein Waisenkind */
+@media (min-width: 961px) { .wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.wcard.cur .crown { background: rgb(255 255 255 / .92); color: #0a0a0a; }
+.wcard.cur .eyebrow { color: var(--grey); }
+.wcard.cur .n { background: none; -webkit-text-fill-color: currentColor; color: var(--fg); }
+.wcard.cur .pt { border-color: rgb(255 255 255 / .14); background: transparent; }
+/* Weniger Kästen: Hausregeln als Liste */
+.rules li { background: transparent !important; border: 0 !important; border-top: 1px solid var(--line) !important; border-radius: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }</style>
 
 <div class="ambient" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
 <header class="top">
   <div class="wrap">
-    <div class="logo"><span class="coin" aria-hidden="true"></span><span id="brandName"></span></div>
+    <a class="logo" href="#rangliste" data-go="rangliste" aria-label="Blue Chip Club, zur Lobby"><span class="wm">bluechip</span><span class="wm-block" aria-hidden="true"></span><span id="brandName" hidden></span></a>
     <nav class="tabs" role="tablist">
       <span class="pill" aria-hidden="true"></span>
       <button role="tab" data-view="rangliste">Lobby</button>
@@ -640,16 +975,19 @@ textarea { min-height: 150px; resize: vertical; }
       <button role="tab" data-view="turniere">Turniere</button>
       <button role="tab" data-view="regeln">Regeln</button>
     </nav>
-    <div class="tools">
-      <a class="icon-btn" href="spieler/" style="text-decoration:none;color:var(--gold);border-color:var(--gold3)">♠ Spieler</a>
-      <button class="icon-btn" id="liveBtn" style="color:#8fb0ff;border-color:#173a99"><span style="width:7px;height:7px;border-radius:50%;background:#2f6bff;box-shadow:0 0 8px #2f6bff"></span>Live-Tafel</button>
-      <button class="icon-btn" id="remBtn" style="color:#8fb0ff;border-color:#173a99">📱 Fernbedienung</button>
-      <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
-      <button class="edit-btn" id="editBtn" hidden>Eintragen</button>
-    </div>
+    <div class="tools"><button class="btn-cream" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
   </div>
 </header>
-<div class="cancel-banner" role="status" id="cancelBanner">Turnier abgesagt<small>High Noon Knockout</small><button class="cb-x" type="button" aria-label="Banner schließen">×</button></div>
+<div class="menu" id="menu" hidden><div class="menu-in">
+  <nav class="menu-links" aria-label="Bereiche"><a href="#rangliste" data-go="rangliste">Lobby</a><a href="#news" data-go="news">News</a><a href="#rekorde" data-go="rekorde">Hände &amp; <em>Rekorde</em></a><a href="#turniere" data-go="turniere">Turniere</a><a href="#regeln" data-go="regeln">Regeln</a><a href="spieler/">Die <em>Spieler</em></a></nav>
+  <div class="menu-tools">
+    <button class="icon-btn" id="liveBtn"><span class="ldot"></span>Live-Tafel</button>
+    <button class="icon-btn" id="remBtn">Fernbedienung</button>
+    <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
+  </div>
+  <p class="menu-foot">The Void · Private Poker unter Freunden</p>
+</div></div>
+<div class="cancel-banner v2cb" role="status" id="cancelBanner"><span class="cb-dot" aria-hidden="true"></span>Turnier abgesagt<small>High Noon Knockout</small><button class="cb-x" type="button" aria-label="Banner schließen" hidden>×</button></div>
 <script>(function(){var b=document.getElementById('cancelBanner');try{if(sessionStorage.getItem('cb-closed'))b.hidden=true;}catch(e){}b.querySelector('.cb-x').addEventListener('click',function(){b.hidden=true;try{sessionStorage.setItem('cb-closed','1');}catch(e){}});})();</script>
 <main><div class="wrap">
   <section class="view" id="v-rangliste"></section>
@@ -718,7 +1056,7 @@ textarea { min-height: 150px; resize: vertical; }
     },
     {
      "t": "Knockout",
-     "l": "Bounty holen",
+     "l": "Bounty einsammeln",
      "s": "Die Hälfte sofort, die andere Hälfte kommt auf deinen eigenen Kopf"
     },
     {
@@ -729,7 +1067,7 @@ textarea { min-height: 150px; resize: vertical; }
    ],
    "trophyTitle": "Kingslayer 👑",
    "trophy": "Wer den amtierenden Champion rauswirft, wird auf der Website zum Kingslayer gekrönt. Nur Ruhm, aber für immer.",
-   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format. Kurzer Stack, viele Bounties: Hier wird gecallt.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 10 P. Wer jemanden rauswirft, bekommt die Hälfte davon sofort, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und wer am Ende gewinnt, nimmt auch seinen eigenen Kopf mit. Die Tafel zählt alles live mit.\n\nPreise: Der Buy-in kostet 20 P (10 P Bounty, 5 P Pot, 5 P an den Club). Jeder Rebuy kostet 15 P (10 P neue Bounty, 5 P Pot). Startstack 7.000 Chips, Blinds starten bei 50/100, Levels à 20 Minuten, Rebuys bis Ende Level 8.\n\nFreitag, 06.11.: Treffpunkt um 18:00 Uhr, die erste Hand um 18:15 Uhr. Diesmal geht es wirklich pünktlich los, wer später kommt, steigt mit dem laufenden Level ein.",
+   "info": "Unser erstes Bounty-Turnier, im Progressive-Knockout-Format. Kurzer Stack, viele Bountys: Hier wird gecallt.\n\nSo läuft es: Auf jedem Kopf liegen am Anfang 10 P. Wer jemanden rauswirft, bekommt die Hälfte davon sofort, die andere Hälfte kommt auf den eigenen Kopf. Die Köpfe werden also im Lauf des Abends immer teurer, und wer am Ende gewinnt, nimmt auch seinen eigenen Kopf mit. Die Tafel zählt alles live mit.\n\nPreise: Der Buy-in kostet 20 P (10 P Bounty, 5 P Pot, 5 P an den Club). Jeder Rebuy kostet 15 P (10 P neue Bounty, 5 P Pot). Startstack 7.000 Chips, Blinds starten bei 50/100, Levels à 20 Minuten, Rebuys bis Ende Level 8.\n\nFreitag, 06.11.: Treffpunkt um 18:00 Uhr, die erste Hand um 18:15 Uhr. Diesmal geht es wirklich pünktlich los, wer später kommt, steigt mit dem laufenden Level ein.",
    "seats": 0,
    "times": [],
    "votes": {},
@@ -758,12 +1096,12 @@ textarea { min-height: 150px; resize: vertical; }
     "since": "2026-10-24"
    }
   ],
-  "shameText": "Das Volk des Blue Chip Club duldet keine offenen Ehrenschulden. Wer nach dem Turnier seine P nicht ausgleicht, hängt ab dem nächsten Tag hier, für alle sichtbar, bis alles erledigt ist.",
+  "shameText": "Das Volk des Blue Chip Club duldet keine offenen Ehrenschulden. Wer eine verlorene Wette oder eine Club-Strafe nicht einlöst, hängt ab dem nächsten Tag hier, für alle sichtbar, bis sie eingelöst ist.",
   "rules": [
-   "Nur P: Gespielt wird ausschließlich um P, die Punkte des Clubs.",
-   "Ausgleich bis zum nächsten Tag: Wer nach dem Turnier P offen hat, gleicht sie spätestens am nächsten Tag aus.",
-   "Nicht ausgeglichen, Galgen: Wer bis dahin nicht ausgeglichen hat, hängt hier, für alle sichtbar, bis alles erledigt ist.",
-   "Bann bis ausgeglichen: Mit offenen P gibt es keinen neuen Entry und keinen Platz beim nächsten Turnier."
+   "Spielpunkte, kein Geld: P sind reine Spielpunkte des Clubs. Es wird nicht um echtes Geld gespielt.",
+   "Zusage ist Zusage: Wer zugesagt hat und nicht kommen kann, sagt spätestens am Vortag in der Gruppe ab.",
+   "Ehrenschuld, Galgen: Wer eine verlorene Wette oder eine Club-Strafe nicht einlöst, hängt hier, für alle sichtbar, bis sie eingelöst ist.",
+   "Bann bis eingelöst: Wer am Galgen hängt, bekommt keinen Platz beim nächsten Turnier."
   ],
   "wa": "491733185745",
   "api": "https://script.google.com/macros/s/AKfycbxYrsXVWbBsE37FTwgFCIpTHBgko5G4AHIiYT7w5jVEyiRrYwZrr2oNTQVZVJoU8J4h/exec"
@@ -1018,7 +1356,7 @@ textarea { min-height: 150px; resize: vertical; }
     "Manu"
    ],
    "headline": "Niklas bezwingt Manu im Heads-up und holt seinen zweiten Sieg in The Void",
-   "report": "Halloween in The Void: zehn Spieler und 10.000 Chips Deepstack. Am Ende standen 19 Entries auf der Tafel, und es war die Nacht der Vierlinge.\n\nManu legte früh los. Mit Q♥ 9♥ gegen J♥ J♠ fiel auf dem Flop 9♣ K♥ 9♦ die Trips, Turn 10♦ und River 8♥ änderten nichts mehr. Double-up, und Neverfold machte seinem Namen von da an alle Ehre.\n\nDann kam Oli. Mit K♦ K♠ traf er auf 5♠ 9♣ K♥ das Set, der Turn brachte den K♣. Vier Könige, Jubel am ganzen Tisch, und für ein paar Stunden die beste Hand der Clubgeschichte.\n\nDomi C bekam an diesem Abend einen neuen Namen. Weil er gefühlt in jeder Hand ein Ass hielt, wurde er live auf der Tafel zu „The Ace Factory“ getauft. Wenig später lieferte er prompt: Full House mit Assen, Pot gewonnen, und Oli war raus.\n\nNico war mit vier Entries der Kämpfer des Abends und der Erste, der den Tisch verlassen musste. Danach gingen Oli, Jonny, Tim und Philipp. Tim schied zwar früh aus, hatte vorher aber den Rekord geholt: A♥ K♦ auf J♠ 3♦ A♦ A♣ A♠, Vier Asse gegen J♥ 8♥. Damit löste er Olis Vier Könige noch am selben Abend als beste Hand im Club ab.\n\nThe Ace Factory ging als Fünfter. Dann die Bubble: Titelverteidiger Domi M fliegt als Vierter und verpasst das Podium nur knapp. Niklas schlägt ihn auf dem Board J♦ 4♣ J♣ 2♠ J♠ raus. Damit waren Benno, Niklas und Manu auf den Preisrängen.\n\nBenno erwischte Q♦ Q♥ gegen Manus A♣ K♥ und lag lange vorne, bis der K♠ auf dem Turn kam. Platz drei für Benno.\n\nIm Heads-up hielt Niklas A♣ J♦ gegen Manus A♠ Q♥. Das Board 3♣ 9♥ 5♦ J♥ 2♣ brachte den Buben auf dem Turn, und das war es. Niklas gewinnt das Dead Man's Hand Deepstack. Es ist schon sein zweiter Sieg in The Void, daher die zwei Finger auf dem Siegerfoto.",
+   "report": "Halloween in The Void: zehn Spieler und 10.000 Chips Deepstack. Am Ende standen 19 Entries auf der Tafel, und es war die Nacht der Vierlinge.\n\nManu legte früh los. Mit Q♥ 9♥ gegen J♥ J♠ fiel auf dem Flop 9♣ K♥ 9♦ die Trips, Turn 10♦ und River 8♥ änderten nichts mehr. Double-up, und Neverfold machte seinem Namen von da an alle Ehre.\n\nDann kam Oli. Mit K♦ K♠ traf er auf 5♠ 9♣ K♥ das Set, der Turn brachte den K♣. Vier Könige, Jubel am ganzen Tisch, und für ein paar Stunden die beste Hand der Clubgeschichte.\n\nDomi C bekam an diesem Abend einen neuen Namen. Weil er gefühlt in jeder Hand ein Ass hielt, wurde er live auf der Tafel zu „The Ace Factory“ getauft. Wenig später lieferte er prompt: Full House mit Assen, Pot gewonnen, und Oli war raus.\n\nNico war mit vier Entries der Kämpfer des Abends und der Erste, der den Tisch verlassen musste. Danach gingen Oli, Jonny, Tim und Philipp. Tim schied zwar früh aus, hatte vorher aber den Rekord geholt: A♥ K♦ auf J♠ 3♦ A♦ A♣ A♠, Vier Asse gegen J♥ 8♥. Damit löste er Olis Vier Könige noch am selben Abend als beste Hand im Club ab.\n\nThe Ace Factory ging als Fünfter. Dann die Bubble: Titelverteidiger Domi M fliegt als Vierter und verpasst die Preisränge nur knapp. Niklas schlägt ihn auf dem Board J♦ 4♣ J♣ 2♠ J♠ raus. Damit standen Benno, Niklas und Manu auf den Preisrängen.\n\nBenno erwischte Q♦ Q♥ gegen Manus A♣ K♥ und lag lange vorne, bis der K♠ auf dem Turn kam. Platz drei für Benno.\n\nIm Heads-up hielt Niklas A♣ J♦ gegen Manus A♠ Q♥. Das Board 3♣ 9♥ 5♦ J♥ 2♣ brachte den Buben auf dem Turn, und das war es. Niklas gewinnt das Dead Man's Hand Deepstack. Es ist schon sein zweiter Sieg in The Void, daher die zwei Finger auf dem Siegerfoto.",
    "img": "dmh-sieger-niklas-2",
    "imgCaption": "Sieg Nummer zwei in The Void: Niklas mit der Siegerhand A♣ J♦",
    "winHand": "A♣ J♦",
@@ -1066,7 +1404,7 @@ textarea { min-height: 150px; resize: vertical; }
     "Magg"
    ],
    "headline": "Tim dreht das Heads-up gegen Big Stack Chris und gewinnt Nikis Geburtstagsturnier",
-   "report": "Nikis Geburtstag in The Void: elf Spieler, 29 Entries, 580 P im Pot und Schluss erst um kurz vor drei.\n\nDas Geburtstagskind musste früh zittern. Kevin flushte Niki gleich am Anfang raus, Niki kaufte nach und revanchierte sich später mit einem Set Könige gegen Jan. Chris zeigte schon in den ersten Stunden, warum er seit dieser Nacht „Der Top-Raiser“ heißt: Asse all-in, Benno und Tim legten Buben und Zehnen weg. Kurz darauf gewann er auch noch einen Dreier-Pot, der Special Guest Pasi den Abend kostete.\n\nDen fettesten Pot vor Mitternacht holte Kevin. Benno ging mit einem Paar Zweien all-in, und Kevin traf am Turn das Wheel. Dann kam die krasse Hand des Abends: Magg, erst um 22 Uhr eingetroffen, drehte mit Vier Buben Jans Full House um. Eine Hand später war Jan nach sechs Entries endgültig raus.\n\nUm Mitternacht hielt der Tisch kurz an, Prost auf Niki. Danach schlug Benno Boss doppelt zu: Full House, und Kevin und Zeno waren in derselben Hand weg. Chris schickte später Magg nach Hause, Benno verpasste als Vierter knapp das Podium, und Domi C ging als Dritter.\n\nIm Heads-up war Debütant Chris klar der Big Stack. Doch Tim gewann die Flips, auf die es ankam: erst hielt Ass-Fünf gegen König-Dame, dann in der letzten Hand K♥ K♣ gegen Ass-Dame. Tim holt das Midnight Birthday Deepstack, Chris holt bei seinem Debüt direkt 170 P.",
+   "report": "Nikis Geburtstag in The Void: elf Spieler, 29 Entries, 580 P im Pot und Schluss erst um kurz vor drei.\n\nDas Geburtstagskind musste früh zittern. Kevin flushte Niki gleich am Anfang raus, Niki kaufte nach und revanchierte sich später mit einem Set Könige gegen Jan. Chris zeigte schon in den ersten Stunden, warum er seit dieser Nacht „Der Top-Raiser“ heißt: Asse all-in, Benno und Tim legten Buben und Zehnen weg. Kurz darauf gewann er auch noch einen Dreier-Pot, der Special Guest Pasi den Abend kostete.\n\nDen fettesten Pot vor Mitternacht holte Kevin. Benno ging mit einem Paar Zweien all-in, und Kevin traf am Turn das Wheel. Dann kam die krasse Hand des Abends: Magg, erst um 22 Uhr eingetroffen, drehte mit Vier Buben Jans Full House um. Eine Hand später war Jan nach sechs Entries endgültig raus.\n\nUm Mitternacht hielt der Tisch kurz an, Prost auf Niki. Danach schlug Benno Boss doppelt zu: Full House, und Kevin und Zeno waren in derselben Hand weg. Chris schickte später Magg nach Hause, Benno verpasste als Vierter knapp die Preisränge, und Domi C ging als Dritter.\n\nIm Heads-up war Debütant Chris klar der Big Stack. Doch Tim gewann die Flips, auf die es ankam: erst hielt Ass-Fünf gegen König-Dame, dann in der letzten Hand K♥ K♣ gegen Ass-Dame. Tim holt das Midnight Birthday Deepstack, Chris kassiert bei seinem Debüt direkt 170 P.",
    "img": "mbd-sieger-tim",
    "imgCaption": "Der Gastgeber holt den Titel: Tim mit den Königen, die das Heads-up entschieden",
    "winHand": "K♥ K♣",
@@ -1314,7 +1652,7 @@ textarea { min-height: 150px; resize: vertical; }
    "opponent": "",
    "title": "Bubble geplatzt",
    "cards": "",
-   "text": "Titelverteidiger Domi M fliegt als Vierter auf der Bubble, knapp am Podium vorbei. Niklas schlägt ihn auf dem Board J♦ 4♣ J♣ 2♠ J♠ raus. Damit sind Benno, Niklas und Manu auf den Preisrängen.",
+   "text": "Titelverteidiger Domi M fliegt als Vierter auf der Bubble, knapp an den Preisrängen vorbei. Niklas schlägt ihn auf dem Board J♦ 4♣ J♣ 2♠ J♠ raus. Damit stehen Benno, Niklas und Manu auf den Preisrängen.",
    "pics": [
     "dmh-bubble-niki-magg"
    ]
@@ -1467,20 +1805,62 @@ textarea { min-height: 150px; resize: vertical; }
   }
 
   function leaderTable(st) {
+    const mxp = Math.max(1, ...st.map(s => s.points));
     if (!st.length) return '<p class="empty">Die Tabelle füllt sich, sobald bei einem Turnier die ersten drei Plätze eingetragen sind.</p>';
     let h = '<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Spieler</th><th>Punkte</th><th>Siege</th><th>2.</th><th>3.</th><th>Gewonnen</th>' + (Number(pts().teil) ? '<th>Turniere</th>' : '') + '</tr></thead><tbody>';
     st.forEach((s, i) => {
       const r = i + 1;
       const medals = '<span class="medals">' + '<i class="dot d1"></i>'.repeat(s.p1) + '<i class="dot d2"></i>'.repeat(s.p2) + '<i class="dot d3"></i>'.repeat(s.p3) + '</span>';
-      h += '<tr><td><span class="rank ' + (r <= 3 ? 'r' + r : '') + '">' + r + '</span></td><td class="player">' + esc(s.name) + (nick(s.name) ? ' <span class="note">' + esc(nick(s.name)) + '</span>' : '') + medals + '</td><td class="pts">' + s.points + '</td><td>' + s.p1 + '</td><td>' + s.p2 + '</td><td>' + s.p3 + '</td><td>' + (s.prize ? eur(s.prize) : '–') + '</td>' + (Number(pts().teil) ? '<td>' + s.played + '</td>' : '') + '</tr>';
+      h += '<tr' + (r === 1 ? ' class="lead"' : '') + '><td><span class="rank ' + (r <= 3 ? 'r' + r : '') + '">' + r + '</span></td><td class="player">' + esc(s.name) + (nick(s.name) ? ' <span class="note">' + esc(nick(s.name)) + '</span>' : '') + medals + '<span class="stack" style="--w:' + (s.points / mxp).toFixed(3) + '" aria-hidden="true"><i></i></span></td><td class="pts">' + s.points + '</td><td>' + s.p1 + '</td><td>' + s.p2 + '</td><td>' + s.p3 + '</td><td>' + (s.prize ? eur(s.prize) : '–') + '</td>' + (Number(pts().teil) ? '<td>' + s.played + '</td>' : '') + '</tr>';
     });
     return h + '</tbody></table></div>';
   }
 
+  const voidBand = (title, sub) => '<section class="voidband" aria-label="The Void"><img src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, leer, ein blauer Chip vorne im Licht" loading="lazy"><div class="vb-copy"><span class="eyebrow">The Void</span><h2>' + title + '</h2><p>' + sub + '</p></div></section>';
+  let stageLanded = false, stageDone = false;
+  function stageHtml() {
+    return '<section class="kino' + (stageDone ? ' go landed' : stageLanded ? ' go' : '') + '" aria-label="Willkommen">' +
+      '<img class="kino-bg" src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, ein blauer Chip vorne im Licht">' +
+      '<div class="kino-copy"><h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
+      '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
+      '<div class="ctas"><button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
+  }
+  function landStage() {
+    if (stageLanded) return; stageLanded = true;
+    document.querySelectorAll('.kino').forEach(s => s.classList.add('go'));
+    setTimeout(() => { stageDone = true; document.querySelectorAll('.kino').forEach(s => s.classList.add('landed')); }, 2400);
+  }
+  /* ---------- v3: Lobby als Apple-Bühnen ---------- */
   function renderRangliste() {
     ci = 0;
+    const st = standings(), ts = tourneys(), t = ts.at(-1), b = best()[0], c = st[0];
+    let h = '';
+    if (t) {
+      const w = winnerOf(t);
+      h += '<section class="scene winner"><div class="sc-head"><span class="sc-kick">' + esc(tName(t)) + '</span><h2>' + (w ? esc(w) + '.' : 'Name folgt.') + ' <em>Sieger.</em></h2></div>' +
+        '<figure class="sc-photo">' + (t.img ? '<img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy">' : '') + '</figure>' +
+        '<div class="sc-stats"><div><b class="chrome" data-count="' + (Number(t.pot) || 0) + '">' + fmtN(t.pot) + '</b><span>' + esc(unit()) + ' im Pot</span></div><div><b class="chrome">' + (t.entries || '–') + '</b><span>Spieler am Tisch</span></div><div><b class="chrome">' + (t.date ? Number(t.date.split('-')[2]) + '.' + Number(t.date.split('-')[1]) + '.' : '–') + '</b><span>' + fmtDate(t.date) + '</span></div></div>' +
+        '<div class="sc-pay">' + [1, 2, 3].map(p => { const r = t.results.find(x => x.place === p) || {}; return '<div class="pay"><span class="rank r' + p + '">' + p + '</span><span class="nm">' + (named(r) ? esc(r.name) : 'offen') + '</span><span class="v">' + (r.prize ? eur(r.prize) : '–') + '</span></div>'; }).join('') + '</div></section>';
+    }
+    h += '<section class="scene board" id="lobby"><div class="sc-head"><span class="sc-kick">Alle Turniere</span><h2>Die <em>Rangliste.</em></h2></div>' + leaderTable(st) + '<a class="sc-link" href="#regeln" data-go="regeln">So werden die Punkte vergeben ›</a></section>';
+    const nx = nextOk();
+    h += '<section class="scene nextsc" id="nextbox"><div class="sc-head"><span class="sc-kick">Nächstes Turnier</span><h2>' + (nx ? esc(nx.title) + '<em>.</em>' : 'Termin <em>folgt.</em>') + '</h2></div><p class="sc-sub">' + (nx ? (nx.tbd ? esc(nx.tbd) : esc(new Date(nx.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })) + ' · ' + priceLine(nx)) : 'Der neue Termin kommt in die WhatsApp-Gruppe und hierher.') + '</p>' + (nx ? '<button class="btn-cream big" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button>' : '') + '</section>';
+    h += '<section class="voidband" aria-label="Der Tisch"><img src="img/tisch-oben.webp" srcset="img/tisch-oben-960.webp 960w, img/tisch-oben.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void von oben, Ge-man-Logo in der Mitte, zehn leere Stühle" loading="lazy"><div class="vb-copy"><span class="eyebrow">The Void</span><h2>Ein Tisch. Zehn <em>Plätze.</em></h2></div></section>';
+    const STEPS = [['tafel', 'Plätze auslosen', 'Die Tafel auf dem Fernseher lost die Sitze aus.'], ['chips', 'Blinds erhöhen', 'Alle 30 Minuten steigt das Level. Rebuys bis Ende Level 6.'], ['minigame', 'Minigames spielen', 'Ohne Ankündigung: Omaha, Crazy Pineapple oder Bomb Pot.'], ['sieger', 'Sieger krönen', 'Die ersten drei teilen den Pot 50, 30 und 20 Prozent.']];
+    h += '<section class="scene abend"><div class="sc-head"><span class="sc-kick">Treffpunkt 18 Uhr</span><h2>So läuft ein <em>Abend.</em></h2></div><div class="tiles swipe">' + STEPS.map(([img, t1, t2], k) => '<article class="tile"><img src="img/v3/' + img + '.webp" alt="' + esc(t1) + '" loading="lazy"><div class="tile-in"><span class="tn">' + (k + 1) + '</span><h3>' + esc(t1) + '</h3><p>' + esc(t2) + '</p></div></article>').join('') + '</div></section>';
+    const PICS = ['benno', 'chris', 'domi-c', 'magg', 'manu', 'niklas', 'oli', 'tim'], slug = n => n.toLowerCase().trim().replace(/\s+/g, '-');
+    const withPic = st.filter(s => PICS.includes(slug(s.name)));
+    if (withPic.length) h += '<section class="scene crew"><div class="sc-head"><span class="sc-kick">Die Stammspieler</span><h2>Die <em>Spieler.</em></h2></div><div class="tiles swipe crew-row">' + withPic.map(s => '<a class="ptile" href="spieler/"><img src="img/v3/spieler-' + slug(s.name) + '.webp" alt="' + esc(s.name) + '" loading="lazy"><div class="tile-in"><h3>' + esc(s.name) + '</h3>' + (nick(s.name) ? '<p class="nk">' + esc(nick(s.name)) + '</p>' : '') + '<p class="pp"><b>' + s.points + '</b> Punkte</p></div></a>').join('') + '</div><a class="sc-link" href="spieler/">Alle Spielerprofile ›</a></section>';
+    if (c) h += '<section class="scene sc-champ"><span class="sc-kick">Ewige Nummer 1</span><h2 class="chrome-xl">' + esc(c.name) + '</h2><p class="sc-sub">' + c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') + ' · ' + (c.prize ? eur(c.prize) + ' gewonnen' : '') + '</p></section>';
+    if (b) h += '<section class="scene sc-hand"><span class="sc-kick">Beste Hand ever</span>' + fan(b, true) + '<h2>' + esc(handTitle(b)) + '<em>.</em></h2><p class="sc-sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p><a class="sc-link" href="#rekorde" data-go="rekorde">Alle Hände und Rekorde ›</a></section>';
+    h += '<div class="bento">' + shameCard() + '</div>';
+    h += '<section class="scene wallsc"><div class="sc-head"><span class="sc-kick">' + ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere') + '</span><h2>Die <em>Siegerwand.</em></h2></div>' + (ts.length ? '<div class="wall swipe">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>') + '</section>';
+    $('#v-rangliste').innerHTML = promoCard() + h;
+  }
+  function renderRanglisteAlt() {
+    ci = 0;
     const st = standings(), ts = tourneys(), t = ts.at(-1), b = best()[0];
-    let h = '<div class="bento">' + promoCard();
+    let h = voidBand('Der Tisch <em>wartet.</em>', esc(DATA.settings.tagline || 'The Void')) + '<div class="bento" id="lobby">' + promoCard();
     if (t) {
       const w = winnerOf(t), cs = parseCards(t.winHand);
       h += cx('hero', (t.img ? '<img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '">' : '<div class="ph">♠</div>') +
@@ -1493,8 +1873,8 @@ textarea { min-height: 150px; resize: vertical; }
         '<div class="payout">' + [1, 2, 3].map((p, k) => { const r = t.results.find(x => x.place === p) || {}; return '<div class="prow"><span class="rank r' + p + '">' + p + '</span><span class="nm' + (named(r) ? '' : ' open') + '">' + (named(r) ? esc(r.name) : 'offen') + '</span><span class="v">' + (r.prize ? eur(r.prize) : '–') + '</span><span class="track"><i style="width:' + ((Number(r.prize) || 0) / maxP * 100) + '%;--k:' + k + '"></i></span></div>'; }).join('') + '</div>');
     }
     const c = st[0];
-    h += cx('champ c4', '<div><span class="eyebrow">Champion of all time</span><h3>' + (c ? esc(c.name) : 'Noch offen') + '</h3><p class="sub">' + (c ? c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') : 'Der erste Sieger übernimmt den Thron') + '</p></div><div class="chip3d" aria-hidden="true"><div class="c"></div></div>');
-    h += cx('c8', head('Rangliste', 'Alle Turniere') + leaderTable(st) + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>');
+    h += cx('champ c4', '<div><span class="eyebrow">Ewige Nummer 1</span><h3>' + (c ? esc(c.name) : 'Noch offen') + '</h3><p class="sub">' + (c ? c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') : 'Der erste Sieger übernimmt den Thron') + '</p></div><div class="chip3d" aria-hidden="true"><div class="c"></div></div>');
+    h += cx('c8 board', head('Die <em>Rangliste</em>', 'Alle Turniere') + leaderTable(st) + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>');
     h += cx('best c4', '<span class="eyebrow">Beste Hand ever</span>' + (b ? fan(b, true) + '<div><h3>' + esc(handTitle(b)) + '</h3><p class="sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p></div>' + ((b.pics || []).length ? '<a class="bpic" href="' + imgSrc(esc(b.pics[0])) + '" target="_blank" rel="noopener"><img src="' + imgSrc(esc(b.pics[0])) + '" alt="Foto der besten Hand" loading="lazy"></a>' : '') : '<p class="empty">Noch keine Hand eingetragen.</p>'));
     h += shameCard();
     h += cx('c12 wallcard', head('Siegerwand', ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere')) + (ts.length ? '<div class="wall">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); const r1 = t.results.find(x => x.place === 1) || {}; return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>'));
@@ -1623,7 +2003,7 @@ textarea { min-height: 150px; resize: vertical; }
       const c = p => { const r = t.results.find(x => x.place === p); return named(r) ? '<span style="color:var(--fg)">' + esc(r.name) + '</span>' + (r.prize ? ' <span class="note">' + eur(r.prize) + '</span>' : '') : '<span class="note">offen' + (r && r.prize ? ' · ' + eur(r.prize) : '') + '</span>'; };
       h += '<tr class="click" data-open="' + esc(t.id) + '" tabindex="0"><td class="player tl">' + esc(tName(t)) + ' <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>' + eur(t.pot) + '</td></tr>';
     }
-    $('#v-turniere').innerHTML = '<div class="bento">' + cx('c12', head('Alle Turniere', 'Ergebnisse') + h + '</tbody></table></div>') + entriesCard() + '</div>';
+    $('#v-turniere').innerHTML = voidBand('Jeder Abend <em>zählt.</em>', 'Alle Turniere, alle Ergebnisse.') + '<div class="bento">' + cx('c12', head('Alle Turniere', 'Ergebnisse') + h + '</tbody></table></div>') + entriesCard() + '</div>';
   }
 
   /* ---------- Regeln: So funktioniert der Club ---------- */
@@ -1640,9 +2020,9 @@ textarea { min-height: 150px; resize: vertical; }
     let h = '<div class="bento rg">';
 
     h += cx('c12 rg-intro', '<span class="eyebrow gold">Regelwerk · So funktioniert’s</span><h1 class="silvertext">Wie der ' + esc(DATA.settings.name) + ' zählt</h1>' +
-      '<p class="lead">Punkte, Buy-ins, Verteilung und P-Bilanz auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die P-Bilanz.</p>' +
-      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Verteilung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
-      '<p class="rg-note"><b>Nicht verwechseln:</b> <em>Punkte</em> zählen für die Rangliste. <em>' + esc(unit()) + '</em> sind Buy-ins und Gewinne.</p>');
+      '<p class="lead">Punkte, Buy-ins, Verteilung und Bankroll auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die Bankroll.</p>' +
+      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Auszahlung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
+      '<p class="rg-note"><b>Nicht verwechseln:</b> <em>Punkte</em> zählen für die Rangliste. <em>' + esc(unit()) + '</em> sind reine Spielpunkte für Buy-ins und Preise, kein echtes Geld.</p>');
 
     h += cx('c8', head('Das Punktesystem', 'Nur das Podium punktet') +
       '<div class="rg-pod">' + [[1, P.p1, 'Sieger'], [2, P.p2, 'Zweiter'], [3, P.p3, 'Dritter']].map(x => '<div class="rg-step s' + x[0] + '"><span class="rank r' + x[0] + '">' + x[0] + '</span><b>' + x[1] + '</b><span>Punkte · ' + x[2] + '</span></div>').join('') + '</div>' +
@@ -1676,13 +2056,13 @@ textarea { min-height: 150px; resize: vertical; }
       pay = '<div class="rg-ex"><span class="eyebrow">Beispiel · ' + esc(tName(lt)) + ' · ' + eur(lt.pot) + ' im Pot</span><div class="rg-calc">' +
         s.a.map((v, k) => '<div><span class="rank r' + (k + 1) + '">' + (k + 1) + '</span><span class="nm">' + s.pc[k] + ' % = ' + fmtD(s.raw[k]) + (k === 0 && s.rest ? ' + ' + s.rest + ' Rest' : (s.raw[k] !== v ? ' → abgerundet' : '')) + '</span><b>' + eur(v) + '</b></div>').join('') + '</div></div>';
     }
-    h += cx('c6', head('Verteilung', 'Die Top 3 bekommen P') +
+    h += cx('c6', head('Verteilung', 'Top 3 bekommen P') +
       '<div class="rg-bar big"><i style="flex:50"><span>1. · 50 %</span></i><i class="b2" style="flex:30"><span>2. · 30 %</span></i><i class="b3" style="flex:20"><span>3. · 20 %</span></i></div>' +
       '<ol class="rg-list"><li><b>Auf 5 abgerundet.</b> Jeder Preis wird auf volle 5 ' + esc(unit()) + ' abgerundet.</li><li><b>Der Rest geht an den Sieger.</b> Was beim Runden übrig bleibt, bekommt der 1. Platz obendrauf.</li><li><b>Kleines Feld.</b> Bei weniger als 8 Spielern bekommen nur zwei Plätze P.</li></ol>' + pay);
 
     const E = entryStats();
-    h += cx('c6', head('P-Bilanz', 'Dein Profil') +
-      '<p class="rg-formula"><span>Gewonnen</span><i>−</i><span>Eingesetzt</span><i>=</i><b>P-Bilanz</b></p>' +
+    h += cx('c6', head('Bankroll', 'Dein Profil') +
+      '<p class="rg-formula"><span>Gewonnen</span><i>−</i><span>Eingesetzt</span><i>=</i><b>Bankroll</b></p>' +
       '<ol class="rg-list"><li><b>Eingesetzt</b> ist dein Buy-in plus alle Rebuys eines Abends.</li><li><b>Turnier für Turnier</b> wird fortgeschrieben, als Kurve auf deinem Spielerprofil.</li><li><b>Gezählt ab ' + esc(E.fromName || 'dem ersten erfassten Turnier') + '.</b> Seitdem werden die Entries pro Spieler erfasst.</li></ol>' +
       '<a class="rg-link" href="spieler/">Alle Spielerprofile →</a>');
 
@@ -1692,16 +2072,17 @@ textarea { min-height: 150px; resize: vertical; }
       '<li><b>Der Wanderpokal</b> geht seit Dead Man’s Hand an den Sieger und wandert von Turnier zu Turnier weiter.</li></ol>');
 
     const rs = (DATA.settings.rules || []).filter(Boolean);
-    if (rs.length) h += cx('c12', head('Hausregeln', 'P & Galgen') + '<div class="rules" style="margin:0;padding:0;border:0"><ol>' + rs.map((r, i) => { const [a, ...b] = String(r).split(':'); return '<li><span class="rn">' + String(i + 1).padStart(2, '0') + '</span><span>' + (b.length ? '<b>' + esc(a.trim()) + '</b> ' + esc(b.join(':').trim()) : esc(r)) + '</span></li>'; }).join('') + '</ol></div>');
+    if (rs.length) h += cx('c12', head('Hausregeln', 'Fairness & Galgen') + '<div class="rules" style="margin:0;padding:0;border:0"><ol>' + rs.map((r, i) => { const [a, ...b] = String(r).split(':'); return '<li><span class="rn">' + String(i + 1).padStart(2, '0') + '</span><span>' + (b.length ? '<b>' + esc(a.trim()) + '</b> ' + esc(b.join(':').trim()) : esc(r)) + '</span></li>'; }).join('') + '</ol></div>');
 
     const faq = [
-      ['Wie lange gibt es Rebuys?', 'Bis zum Ende von Level 6, sofern vor dem Turnier nichts anderes angesagt wird. Danach ist Schluss: Wer dann rausfliegt, schaut zu.'],
-      ['Kann ich später dazukommen?', 'Ja, solange die Rebuy-Phase läuft. Du steigst mit vollem Startstack im laufenden Level ein. Gewartet wird auf niemanden.'],
-      ['Wie viele Plätze gibt es?', 'Zehn Stühle an einem Tisch. Bei Specials wird auf bis zu zwölf erweitert. Wer zuerst reserviert, sitzt.'],
-      ['Wie reserviere ich meinen Platz?', 'Beim nächsten Turnier auf „Platz reservieren“ tippen. Nach der Bestätigung stehst du in der Liste.'],
-      ['Bekomme ich Punkte, wenn ich nur mitspiele?', Number(P.teil) ? 'Ja, ' + P.teil + ' Punkte pro Turnier. Dazu kommen die Punkte fürs Podium.' : 'Nein. Punkte gibt es nur für die Plätze 1 bis 3.'],
+      ['Wie lange darf ich rebuyen?', 'In der Regel bis Ende Level 6. Die genaue Grenze wird vor jedem Turnier angesagt.'],
+      ['Wann geht es los?', 'Treffpunkt ist um 18 Uhr in The Void, die erste Hand kommt um 18:15. Wer später kommt, steigt mit dem laufenden Level ein.'],
+      ['Wie bekomme ich einen Platz?', 'Über „Platz reservieren“ oben auf der Seite. Es gibt zehn Stühle, wer zuerst zusagt, sitzt.'],
+      ['Wie schnell steigen die Blinds?', 'Normalerweise alle 30 Minuten ein Level. Bei Specials kann es schneller gehen, das steht dann beim Turnier.'],
+      ['Was sind die Minigames?', 'Zwischendurch und ohne Ankündigung: Omaha, Crazy Pineapple oder ein Bomb Pot.'],
+      ['Wie bekomme ich Punkte?', Number(P.teil) ? 'Für jedes Turnier gibt es ' + P.teil + ' Punkte, dazu die Punkte fürs Podium.' : 'Nur über das Podium: Platz 1 bis 3 bekommt Punkte für die Rangliste. Rebuys zählen dabei nicht.'],
       ['Was passiert bei Punktgleichheit?', 'Erst zählen die Siege, dann die 2. Plätze, dann die 3. Plätze und zuletzt die gewonnenen ' + esc(unit()) + '.'],
-      ['Wie wird der Platz am Tisch bestimmt?', 'Die Plätze werden vor der ersten Hand ausgelost. Niemand sucht sich seinen Stuhl aus.']
+      ['Wo sehe ich meine Statistik?', 'Unter „Die Spieler“ hat jeder ein Profil mit Platzierungen, Punkten und besten Händen. Aktualisiert wird direkt nach jedem Turnier.']
     ];
     h += cx('c12', head('Häufige Fragen', 'FAQ') + '<div class="rg-faq">' + faq.map(q => '<details><summary>' + q[0] + '</summary><p>' + q[1] + '</p></details>').join('') + '</div>');
 
@@ -1744,10 +2125,10 @@ textarea { min-height: 150px; resize: vertical; }
   function shameCore() {
     const ds = (DATA.settings.debts || []).slice().sort((a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0) || daysSince(b.since) - daysSince(a.since));
     const txt = '<p class="decree">' + esc(DATA.settings.shameText || '') + '</p>';
-    if (!ds.length) return cx('c12 shame clear', '<div class="shame-head"><span class="eyebrow">Galgen der Ehrenschulden</span><span class="tag gold">Alle sind sauber</span></div><div class="shame-body"><svg class="gal" viewBox="0 0 220 240" width="160" height="175" aria-hidden="true"><g stroke="var(--grey2)" stroke-width="6" stroke-linecap="round" fill="none"><path d="M20 230 H120"/><path d="M50 230 V20 H150"/><path d="M50 60 L90 20"/></g><path d="M150 20 V58" stroke="var(--gold3)" stroke-width="3"/></svg><div><h3>Der Galgen ist leer.</h3>' + txt + '</div></div>');
+    if (!ds.length) return cx('c12 shame clear', '<div class="shame-head"><span class="eyebrow">Galgen der Ehrenschulden</span><span class="tag gold">Alle sauber</span></div><div class="shame-body"><svg class="gal" viewBox="0 0 220 240" width="160" height="175" aria-hidden="true"><g stroke="var(--grey2)" stroke-width="6" stroke-linecap="round" fill="none"><path d="M20 230 H120"/><path d="M50 230 V20 H150"/><path d="M50 60 L90 20"/></g><path d="M150 20 V58" stroke="var(--gold3)" stroke-width="3"/></svg><div><h3>Der Galgen ist leer.</h3>' + txt + '</div></div>');
     const top = ds[0];
-    const line = x => esc(x.name) + (x.to ? ' hat bei ' + esc(x.to) + ' offen' : ' hat P offen') + (x.amount ? ' <b>' + eur(x.amount) + '</b>' : '') + ' · offen seit ' + daysSince(x.since) + (daysSince(x.since) === 1 ? ' Tag' : ' Tagen');
-    return cx('c12 shame', '<div class="shame-head"><span class="eyebrow red">Galgen der Ehrenschulden</span><span class="tag red">' + ds.length + (ds.length === 1 ? ' am Galgen' : ' am Galgen') + '</span></div>' +
+    const line = x => esc(x.name) + (x.to ? ' schuldet ' + esc(x.to) : ' hat eine offene Ehrenschuld') + (x.amount ? ' <b>' + eur(x.amount) + '</b>' : '') + ' · offen seit ' + daysSince(x.since) + (daysSince(x.since) === 1 ? ' Tag' : ' Tagen');
+    return cx('c12 shame', '<div class="shame-head"><span class="eyebrow red">Galgen der Ehrenschulden</span><span class="tag red">' + ds.length + ' am Galgen' + '</span></div>' +
       '<div class="shame-body"><div class="gals">' + gallows(top.name, true, 0) + ds.slice(1).map((x, i) => gallows(x.name, false, i + 1)).join('') + '</div>' +
       '<div><h3>' + esc(top.name) + ' hängt.</h3><ul class="debts">' + ds.map(x => '<li>' + line(x) + '</li>').join('') + '</ul>' + txt + '</div></div>');
   }
@@ -1804,29 +2185,38 @@ textarea { min-height: 150px; resize: vertical; }
   }
   // Intro-Clip beim Öffnen der Seite (ersetzt das Anmelde-Fenster). Browser erlauben Ton erst nach einem Klick:
   // erst mit Ton versuchen, sonst stumm starten und groß "Ton an" anbieten.
-  function openIntro() {
-    try { if (sessionStorage.getItem('intro-seen')) return; sessionStorage.setItem('intro-seen', '1'); } catch (e) {}
+  // v2: Chip-Intro (fällt, rollt über den Tisch, Vogelperspektive, Name bläst sich auf), stumm, läuft am iPhone automatisch
+  function openIntro(force) {
+    if (!force) { try { if (sessionStorage.getItem('intro-seen')) return; sessionStorage.setItem('intro-seen', '1'); } catch (e) {} }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Variante wählbar: ?intro=b (Tims Video als Vorlage, Ende mit allen Spielern), sonst A (rollt, Vogelperspektive)
+    const VB = /[?&]intro=b/.test(location.search), CHIP = VB ? { x: 631, y: 541, r: 24 } : { x: 628, y: 339, r: 45 }, VS = VB ? 'video/chip-intro-v2-b' : 'video/chip-clip';
     const el = document.createElement('div');
-    el.className = 'intro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
-    el.innerHTML = '<video playsinline preload="auto" poster="video/intro-poster.jpg" src="video/intro.mp4"></video>' +
-      '<div class="gate" hidden><span class="gchip" aria-hidden="true"></span><span class="gname goldtext">Blue Chip Club</span><button class="enter">Eintreten</button><button class="nolink">Ohne Clip zur Seite</button></div>' +
-      '<button class="x" aria-label="Schließen">✕</button>' +
+    el.className = 'cintro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
+    el.innerHTML = '<div class="cin-cam"><video muted playsinline autoplay preload="auto" poster="' + VS + '-poster.jpg" src="' + VS + '.mp4"></video></div>' +
       '<button class="skip">Überspringen ›</button>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
-    const v = el.querySelector('video'), gate = el.querySelector('.gate');
+    const v = el.querySelector('video');
     let closed = false;
-    const close = () => { if (closed) return; closed = true; v.pause(); el.classList.add('out'); setTimeout(() => { el.remove(); document.body.style.overflow = ''; }, 400); };
-    v.addEventListener('ended', close);
+    const close = () => { if (closed) return; closed = true; el.classList.add('out'); setTimeout(() => { el.remove(); document.body.style.overflow = ''; landStage(); }, 700); };
+    // Chip im letzten Bild: Mitte (628|339), Radius 45 bei 1280×720
+    const place = () => {
+      const W = innerWidth, H = innerHeight, s = Math.max(W / 1280, H / 720);
+      const x = W / 2 + (CHIP.x - 640) * s, y = H / 2 + (CHIP.y - 360) * s, r = CHIP.r * s;
+      const cam = el.querySelector('.cin-cam'), nm = el.querySelector('.cin-chip');
+      cam.style.transformOrigin = x + 'px ' + y + 'px';
+      cam.style.setProperty('--zoom', (VB ? 1.12 : Math.max(1.5, Math.min(W, H) * 0.22 / r)).toFixed(2));
+      nm.style.left = x + 'px'; nm.style.top = y + 'px'; nm.style.width = nm.style.height = (2 * r * 1.04).toFixed(1) + 'px';
+    };
+    const finale = () => { if (el.classList.contains('fin')) return; el.classList.add('fin'); setTimeout(close, 1600); }; // Schrift erscheint im Video selbst, nichts mehr darüber legen
+    v.addEventListener('ended', finale);
+    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > v.duration - 0.15) finale(); });
     el.querySelector('.skip').addEventListener('click', close);
-    el.querySelector('.x').addEventListener('click', close);
-    el.querySelector('.nolink').addEventListener('click', e => { e.stopPropagation(); close(); });
-    // Ein Tipp irgendwo auf den Eingangs-Bildschirm startet den Clip mit Ton
-    gate.addEventListener('click', () => { gate.hidden = true; v.muted = false; v.currentTime = 0; v.play().catch(close); });
     document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', k); close(); } });
-    v.muted = false;
-    v.play().catch(() => { v.pause(); gate.hidden = false; });
+    v.play().catch(() => close());
+    setTimeout(() => { if (!closed && v.currentTime === 0) close(); }, 4000);
   }
-  const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.fee ? ' (inkl. ' + eur(n.fee) + ' Club)' : '') + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
+  const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.rebuy ? ' · jeder Rebuy ' + eur(n.rebuy) : '');
   function nextOk() { const n = DATA.settings.next; return n && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
   const hhmm = d => d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   const tbdHtml = n => '<p class="tbd">' + esc(n.tbd) + '</p>';
@@ -1847,7 +2237,7 @@ textarea { min-height: 150px; resize: vertical; }
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     const prog = (n.program || []).filter(x => x.t || x.l);
     const paras = t => String(t || '').split(/\n\s*\n/).filter(Boolean).map(x => '<p>' + esc(x).replace(/\n/g, '<br>') + '</p>').join('');
-    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in' + (n.fee ? ' · inkl. ' + eur(n.fee) + ' Club' : '')]].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
+    const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', 'Treffpunkt'], [eur(n.buyin), 'Buy-in']].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
     $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
       (n.cards ? fanOf(parseCards(n.cards), true) : '') +
       '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
@@ -1926,9 +2316,9 @@ textarea { min-height: 150px; resize: vertical; }
     const x = c.getContext('2d'); let W, H, dpr, P = [];
     const SU = ['♠', '♥', '♦', '♣'];
     function size() { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0); }
-    function mk(init) { const suit = Math.random() < .12; return { x: Math.random() * W, y: init ? Math.random() * H : H + 20, r: suit ? 10 + Math.random() * 10 : .6 + Math.random() * 1.8, v: .12 + Math.random() * .35, w: Math.random() * Math.PI * 2, a: suit ? .05 + Math.random() * .06 : .25 + Math.random() * .55, s: suit ? SU[Math.random() * 4 | 0] : '', rot: Math.random() * 6 }; }
+    function mk(init) { const far = Math.random() < .3, blue = Math.random() < .45; return { x: Math.random() * W, y: init ? Math.random() * H : H + 20, r: far ? 3 + Math.random() * 4 : .6 + Math.random() * 1.6, v: far ? .08 + Math.random() * .12 : .15 + Math.random() * .35, w: Math.random() * Math.PI * 2, a: far ? .08 + Math.random() * .1 : .3 + Math.random() * .55, s: '', blue, far, rot: 0 }; }
     size(); addEventListener('resize', size);
-    const N = Math.round(Math.min(90, W * H / 16000)); for (let i = 0; i < N; i++) P.push(mk(true));
+    const N = Math.round(Math.min(W < 700 ? 60 : 110, W * H / 9000)); for (let i = 0; i < N; i++) P.push(mk(true));
     let last = 0;
     (function frame(t) {
       requestAnimationFrame(frame);
@@ -1939,7 +2329,7 @@ textarea { min-height: 150px; resize: vertical; }
         if (p.y < -30) Object.assign(p, mk(false));
         const tw = .6 + .4 * Math.sin(t / 700 + p.w * 3);
         if (p.s) { x.save(); x.translate(p.x, p.y); x.rotate(Math.sin(p.rot) * .5); x.globalAlpha = p.a; x.fillStyle = '#e2b857'; x.font = p.r + 'px serif'; x.fillText(p.s, 0, 0); x.restore(); }
-        else { x.globalAlpha = p.a * tw; const g = x.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4); g.addColorStop(0, 'rgba(255,226,150,1)'); g.addColorStop(1, 'rgba(226,184,87,0)'); x.fillStyle = g; x.beginPath(); x.arc(p.x, p.y, p.r * 4, 0, 7); x.fill(); }
+        else { x.globalAlpha = p.a * tw; const g = x.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4); g.addColorStop(0, p.blue ? 'rgba(150,185,255,1)' : 'rgba(255,226,150,1)'); g.addColorStop(p.far ? .35 : .2, p.blue ? 'rgba(47,107,255,.45)' : 'rgba(226,184,87,.4)'); g.addColorStop(1, p.blue ? 'rgba(47,107,255,0)' : 'rgba(226,184,87,0)'); x.fillStyle = g; x.beginPath(); x.arc(p.x, p.y, p.r * 4, 0, 7); x.fill(); }
       }
       x.globalAlpha = 1;
     })(0);
@@ -2229,8 +2619,8 @@ textarea { min-height: 150px; resize: vertical; }
 
   function schuldenForm() {
     const ds = DATA.settings.debts || [];
-    return '<div class="box"><span class="label">Offene Ehrenschulden</span><div class="list">' + (ds.length ? ds.map(x => '<div class="it"><span>' + esc(x.name) + (x.to ? ' → ' + esc(x.to) : '') + (x.amount ? ' · ' + eur(x.amount) : '') + ' · seit ' + shortDate(x.since) + '</span><button class="btn small" data-paid="' + esc(x.id) + '">Ausgeglichen</button></div>').join('') : '<span class="note">Niemand offen.</span>') + '</div></div>' +
-      '<div class="box"><span class="label">Nichtzahler eintragen</span><div class="row"><label class="field"><span>Wer schuldet?</span><select id="dN">' + playerOpts('') + '</select></label><label class="field"><span>Wem?</span><select id="dT">' + playerOpts('') + '</select></label></div>' +
+    return '<div class="box"><span class="label">Offene Ehrenschulden</span><div class="list">' + (ds.length ? ds.map(x => '<div class="it"><span>' + esc(x.name) + (x.to ? ' → ' + esc(x.to) : '') + (x.amount ? ' · ' + eur(x.amount) : '') + ' · seit ' + shortDate(x.since) + '</span><button class="btn small" data-paid="' + esc(x.id) + '">Eingelöst</button></div>').join('') : '<span class="note">Niemand offen.</span>') + '</div></div>' +
+      '<div class="box"><span class="label">Ehrenschuld eintragen</span><div class="row"><label class="field"><span>Wer schuldet?</span><select id="dN">' + playerOpts('') + '</select></label><label class="field"><span>Wem?</span><select id="dT">' + playerOpts('') + '</select></label></div>' +
       '<div class="row"><label class="field"><span>Betrag (P)</span><input id="dA" type="number" min="0"></label><label class="field"><span>Offen seit</span><input id="dS" type="date" value="' + new Date().toISOString().slice(0, 10) + '"></label></div>' +
       '<div class="actions"><button class="btn" id="dAdd">Hinzufügen</button></div></div>' +
       '<label class="field"><span>Statement vom Volk</span><textarea id="dTxt" style="min-height:90px">' + esc(DATA.settings.shameText || '') + '</textarea></label>' +
@@ -2239,7 +2629,7 @@ textarea { min-height: 150px; resize: vertical; }
   }
   function bindSchulden() {
     DATA.settings.debts = DATA.settings.debts || [];
-    document.querySelectorAll('[data-paid]').forEach(b => b.onclick = () => { DATA.settings.debts = DATA.settings.debts.filter(x => x.id !== b.dataset.paid); drawEditor(); $('#dStatus').textContent = 'Als ausgeglichen markiert. Noch speichern.'; });
+    document.querySelectorAll('[data-paid]').forEach(b => b.onclick = () => { DATA.settings.debts = DATA.settings.debts.filter(x => x.id !== b.dataset.paid); drawEditor(); $('#dStatus').textContent = 'Als eingelöst markiert. Noch speichern.'; });
     $('#dAdd').onclick = () => {
       const n = $('#dN').value; if (!n) { $('#dStatus').className = 'status err'; $('#dStatus').textContent = 'Bitte wählen, wer schuldet.'; return; }
       DATA.settings.debts.push({ id: uid(), name: n, to: $('#dT').value, amount: $('#dA').value === '' ? '' : Number($('#dA').value), since: $('#dS').value });
@@ -2287,6 +2677,27 @@ textarea { min-height: 150px; resize: vertical; }
     };
   }
 
+  /* ---------- v2: Menü, Einblenden, Scroll ---------- */
+  function initV2() {
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-intro]')) { openIntro(true); return; }
+      if (e.target.closest('[data-reserve]')) { if (nextOk()) openEvent(); else { const b = $('#nextbox'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
+    });
+    $('#v-rangliste').insertAdjacentHTML('beforebegin', stageHtml());
+    const syncStage = () => { const s = $('.kino'); if (s) s.hidden = $('#v-rangliste').hidden; };
+    syncStage(); new MutationObserver(syncStage).observe($('#v-rangliste'), { attributes: true, attributeFilter: ['hidden'] });
+    const menu = $('#menu'), mb = $('#menuBtn');
+    const setMenu = open => { menu.hidden = !open; mb.setAttribute('aria-expanded', open); document.body.classList.toggle('menu-open', open); };
+    mb.addEventListener('click', () => setMenu(menu.hidden));
+    menu.addEventListener('click', e => { if (e.target === menu || e.target.closest('a,#liveBtn,#remBtn')) setMenu(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
+    document.addEventListener('click', e => { const a = e.target.closest('[data-scroll]'); if (!a) return; const t = $(a.dataset.scroll); if (!t) return; e.preventDefault(); t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); });
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }) : null;
+    const watch = () => document.querySelectorAll('.cardx:not(.rv), .voidband:not(.rv), .scene:not(.rv)').forEach(el => { el.classList.add('rv'); if (io) io.observe(el); else el.classList.add('in'); });
+    watch(); new MutationObserver(watch).observe($('main'), { childList: true, subtree: true });
+    addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive: true });
+  }
+
   /* ---------- Start ---------- */
   render();
   // Zusagen automatisch: Google-Sheet-Web-App (settings.api) zählt jeden Klick auf „Reservieren“ mit
@@ -2322,6 +2733,8 @@ textarea { min-height: 150px; resize: vertical; }
   show(start);
   let justSaved = false; try { justSaved = !!sessionStorage.getItem('liga-flash'); } catch (e) {}
   if (!justSaved) openIntro();
+  if (!document.querySelector('.intro, .cintro')) requestAnimationFrame(() => setTimeout(landStage, 250));
+  initV2();
   try { const f = sessionStorage.getItem('liga-flash'); if (f) sessionStorage.removeItem('liga-flash'); } catch (e) {}
 
   (async () => {
