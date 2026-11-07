@@ -579,6 +579,19 @@ const DEALER_SEAT=[.50,.04];
 const IMG_SEATS=[[.69,.06],[.885,.18],[.95,.47],[.885,.80],[.69,.93],[.50,.93],[.31,.93],[.115,.80],[.05,.47],[.115,.18],[.31,.06]];
 const FIG_ON=false;
 let SEATLIB=null;const SEATLIB_V=1;
+/* each figure only paints inside its own slice of the table (between the half-angles to its occupied neighbours), so neighbours never cover each other's arms */
+const angOf=t=>Math.atan2((t[1]-.5)*1072,(t[0]-.5)*1920);
+function wedgeClip(i,r,n){
+  const occ=new Set();for(let k=0;k<n;k++){const t=imgSeat(k,n);occ.add(t===DEALER_SEAT?-1:IMG_SEATS.indexOf(t));}
+  if(timIdx()<0)occ.add(-1);
+  const angs=[...occ].map(j=>j<0?angOf(DEALER_SEAT):angOf(IMG_SEATS[j])).sort((a,b)=>a-b),me=angOf(IMG_SEATS[i]);
+  const m=angs.findIndex(a=>Math.abs(a-me)<1e-6);if(m<0||angs.length<2)return "none";
+  const P=2*Math.PI,prev=angs[(m-1+angs.length)%angs.length],next=angs[(m+1)%angs.length];
+  let a1=me-(((me-prev)%P+P)%P)/2,a2=me+(((next-me)%P+P)%P)/2;
+  const cx=960,cy=536,R=4000,pts=[[cx,cy]];for(let q=0;q<=12;q++){const a=a1+(a2-a1)*q/12;pts.push([cx+R*Math.cos(a),cy+R*Math.sin(a)]);}
+  return "polygon("+pts.map(([x,y])=>((x-r[0])/r[2]*100).toFixed(2)+"% "+((y-r[1])/r[3]*100).toFixed(2)+"%").join(",")+")";
+}
+
 fetch("sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{if(j){SEATLIB=j;try{buildSeats();render();}catch(e){}}}).catch(()=>{});
 /* inneres Oval (Kupferlinie) im Tischbild */
 const OVAL=[.245,.33,.755,.655];
@@ -597,7 +610,7 @@ function buildSeats(){
   const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("tim",timIn());st.classList.toggle("tv1",S.timV===1);const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";buildSeats.used=new Set();const [l,t]=imgToStage(OVAL[0],timIdx()>=0?.39:OVAL[1]),[r,bo]=imgToStage(OVAL[2],OVAL[3]);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
   S.players.forEach((p,k)=>{
     if(im&&FIG_ON){const used=buildSeats.used||(buildSeats.used=new Set());if(k===0)used.clear();const key=figKey(p.name,used);if(key){used.add(key);const F=FIGS[key],t=imgSeat(k,n),[cx,cy,bw]=imgToStage(t[0],t[1]),b=imgBox(),tx=(.5-t[0])*b.w,ty=(.5-t[1])*b.h,rot=Math.atan2(ty,tx)*180/Math.PI-F[4],fw=F[0]*bw*FIG_SCALE,fh=F[1]*bw*FIG_SCALE,g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.width=fw+"px";g.style.height=fh+"px";g.style.left="calc("+cx+"% - "+(F[2]*fw)+"px)";g.style.top="calc("+cy+"% - "+(F[3]*fh)+"px)";g.style.transformOrigin=(F[2]*100)+"% "+(F[3]*100)+"%";g.style.transform="rotate("+rot.toFixed(1)+"deg)";g.innerHTML='<img src="figuren/'+key+'.webp?v=1" alt="">';st.appendChild(g);}}
-    if(im&&SEATLIB){let key=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");key=FIG_ALIAS[key]||key;const t=imgSeat(k,n),i=IMG_SEATS.indexOf(t),nn=String(i).padStart(2,"0"),r=SEATLIB[key]&&SEATLIB[key][nn];if(i>=0&&r){const b=imgBox(),[lx,ty]=imgToStage(r[0]/1920,r[1]/1072),g=document.createElement("div");g.className="fig s2";g.dataset.k=k;g.style.cssText="left:"+lx+"%;top:"+ty+"%;width:"+(r[2]/1920*b.w)+"px;height:"+(r[3]/1072*b.h)+"px;transform:none";g.innerHTML='<img src="sitze/'+key+'/fig-'+nn+'.webp?v='+SEATLIB_V+'" alt="">';st.appendChild(g);}}
+    if(im&&SEATLIB){let key=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");key=FIG_ALIAS[key]||key;const t=imgSeat(k,n),i=IMG_SEATS.indexOf(t),nn=String(i).padStart(2,"0"),r=SEATLIB[key]&&SEATLIB[key][nn];if(i>=0&&r){const b=imgBox(),[lx,ty]=imgToStage(r[0]/1920,r[1]/1072),g=document.createElement("div");g.className="fig s2";g.dataset.k=k;g.style.cssText="left:"+lx+"%;top:"+ty+"%;width:"+(r[2]/1920*b.w)+"px;height:"+(r[3]/1072*b.h)+"px;transform:none";g.innerHTML='<img src="sitze/'+key+'/fig-'+nn+'.webp?v='+SEATLIB_V+'" alt="">';g.style.clipPath=wedgeClip(i,r,n);st.appendChild(g);}}
     const [x,y]=seatPos(k,n),d=document.createElement("div");
     d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;
     d.innerHTML='<div class="avw"></div><div class="nm"></div><div class="meta"></div>';d.querySelector(".avw").onclick=()=>openPlayers(p.name);
