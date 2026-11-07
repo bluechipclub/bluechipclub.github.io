@@ -1369,8 +1369,11 @@ function lobbyShow(){
       lobbyT=setTimeout(next,9000);return;}
     $("lst").innerHTML='<div class="lsl"><img class="'+(x.card?"card":"")+'" src="'+x.u+'" alt="">'+cap+'</div>';
     lobbyT=setTimeout(next,x.card?6000:8000);};
+  /* manual skip: → / D next, ← / A back (lobbyNav is set while the screensaver runs) */
+  lobbyNav=d=>{clearTimeout(lobbyT);if(!list.length)return;k=((k-1+d)%list.length+list.length)%list.length;next();};
   next();
 }
+let lobbyNav=null;
 function lobbyClose(){clearTimeout(lobbyT);clearInterval(lobbyCd);$("lobby").hidden=true;$("lobby").innerHTML="";}
 $("bLobby").onclick=lobbyShow;
 /* ---------- players = sign-ups on the website (manual list + Google-Sheet sign-ups), until the first hand ----------
@@ -1390,6 +1393,10 @@ async function syncSignups(){
 setTimeout(syncSignups,1500);setInterval(syncSignups,180000);
 $("lobby").onclick=lobbyClose;
 document.addEventListener("keydown",e=>{if(!$("lobby").hidden&&e.key==="Escape")lobbyClose();});
+/* while the screensaver runs, arrows and WASD only flip slides (the level keys stay untouched) */
+addEventListener("keydown",e=>{if($("lobby").hidden||!lobbyNav||e.target.matches("input,textarea,select"))return;const k=e.key.toLowerCase();
+  const d=(k==="arrowright"||k==="d"||k==="arrowdown"||k==="s")?1:(k==="arrowleft"||k==="a"||k==="arrowup"||k==="w")?-1:0;
+  if(d){e.preventDefault();e.stopImmediatePropagation();lobbyNav(d);}},true);
 /* auto-start: before the first hand (also if the clock was only tested), or up to 1 h later while the tournament has not started */
 {const at=new Date(LOBBY_AT).getTime(),now=Date.now();if((now<at&&!S.running)||(!S.started&&now<at+3600000))setTimeout(lobbyShow,800);}
 $("bBday").onclick=()=>{if(!$("bday").hidden)bdayClose();else bdayShow();};
