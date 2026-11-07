@@ -600,7 +600,7 @@ const imgMode=()=>S.players.length>0&&S.players.length<=IMG_SEATS.length+1;
 const timIn=()=>{const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
 const timIdx=()=>S.players.findIndex(p=>/^tim$/i.test(String(p.name).trim()));
 /* Platz -> Stuhl: Tim sitzt immer am Holzteil (Dealer-Platz), die anderen im Uhrzeigersinn danach */
-function imgSeat(k,n){const t=timIdx();if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1;return IMG_SEATS[Math.min(IMG_SEATS.length-1,Math.round((j-1)*IMG_SEATS.length/m+(IMG_SEATS.length/m-1)/2))];}
+function imgSeat(k,n){const t=timIdx();if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1,pool=m<=9?IMG_SEATS.slice(1,10):m===10?IMG_SEATS.slice(1):IMG_SEATS;return pool[Math.min(pool.length-1,Math.round((j-1)*pool.length/m+(pool.length/m-1)/2))];}
 function imgBox(){const st=$("stage"),W=st.clientWidth||1,H=st.clientHeight||1;let w=W,h=W/IMG_AR;if(h>H){h=H;w=H*IMG_AR;}const z=1;return {W,H,w:w*z,h:h*z};}
 function imgToStage(fx,fy){const b=imgBox();return [100*((b.W-b.w)/2+fx*b.w)/b.W,100*((b.H-b.h)/2+fy*b.h)/b.H,b.w];}
 function figKey(name,used){let k=String(name).toLowerCase().trim().replace(/\s+/g,"-");k=FIG_ALIAS[k]||k;if(FIGS[k]&&!used.has(k))return k;return Object.keys(FIGS).find(x=>!used.has(x)&&!S.players.some(p=>{let q=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");return (FIG_ALIAS[q]||q)===x;}))||Object.keys(FIGS).find(x=>!used.has(x));}
