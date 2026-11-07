@@ -8,7 +8,7 @@
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
 :root{
   --bg:#070707;--surface:#111111;--surface2:#171717;--line:#242424;--line2:#333;
@@ -285,6 +285,12 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .dcard{aspect-ratio:5/7;border-radius:1vw;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1.4vh 3vh rgba(0,0,0,.7);animation:deal .8s var(--ease) both;animation-delay:calc(var(--k)*.18s);padding:1vh}
 .dcard .s{font-family:var(--mono);font-size:max(10px,.9vw);color:#c8202a}
 .dcard .n{font-size:max(14px,1.6vw);margin-top:.5vh;text-align:center}
+
+/* Uhr und Blinds: kleiner, Kino-Sand-Schrift wie auf der Website */
+.clock{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:max(56px,7.4vw);line-height:.9;letter-spacing:0;text-shadow:0 .4vh 2vh rgba(0,0,0,.85),0 0 3vw rgba(255,240,210,.12)}
+.clock .d{display:inline-block;width:.56em;text-align:center}
+.blinds{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-style:italic;font-size:max(24px,2.9vw);letter-spacing:.01em;color:#f1e3c4;text-shadow:0 .3vh 1.4vh rgba(0,0,0,.8)}
+.blinds small{font-style:normal}
 </style>
 </head>
 <body>
@@ -576,7 +582,7 @@ function render(){
   const L=LEVELS[S.i],left=leftNow(),d=dur(S.i);
   $("ttl").textContent=S.title;$("sub").textContent=S.sub;
   $("lvl").textContent=L.brk?"Pause":"Level "+playNum(S.i);
-  const c=$("clock");c.textContent=mmss(left);
+  const c=$("clock");c.innerHTML=mmss(left).replace(/\d/g,'<span class="d">$&</span>');
   c.className="clock"+(!S.running?" paused":left<=10?" crit":left<=60?" warn":"");
   $("cur").innerHTML=L.brk?esc(L.note||"Pause")+"<small>"+L.brk+" Minuten</small>":fmt(L.sb)+" / "+fmt(L.bb)+"<small>Small / Big Blind"+(L.ante?" · BB-Ante "+fmt(L.ante):"")+"</small>";
   $("bar").style.width=(d?100*(1-left/d):0)+"%";
