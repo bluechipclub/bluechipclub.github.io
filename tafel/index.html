@@ -54,6 +54,10 @@ button{font:inherit;color:inherit;cursor:pointer}
   background:radial-gradient(ellipse at 50% 35%,#1d1d1f 0%,#111 55%,#080808 100%);
   box-shadow:0 0 0 .5vw #1a1a1a,0 0 0 .7vw var(--gold3),0 0 0 .85vw #0b0b0b,0 2vw 5vw rgba(0,0,0,.8),inset 0 0 6vw rgba(0,0,0,.9),0 0 7vw rgba(226,184,87,.08)}
 .felt::before{content:"";position:absolute;inset:6%;border-radius:50%;border:1px dashed rgba(226,184,87,.18)}
+.stage{background:url("../img/tisch-oben.webp?v=1") 50% 50%/cover no-repeat;border-radius:2vw;box-shadow:inset 0 0 4vw 2vw #0a0a0a}
+.stage::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 36% 33% at 50% 52%,rgba(8,6,4,.74),rgba(8,6,4,.35) 70%,transparent 100%)}
+.felt{background:none!important;box-shadow:none!important}
+.felt::before,.felt::after{display:none!important}
 .felt::after{content:"BLUE CHIP CLUB";position:absolute;left:0;right:0;top:13%;text-align:center;font-family:var(--mono);font-size:max(9px,.75vw);letter-spacing:.6em;color:rgba(226,184,87,.28)}
 .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6vh;text-align:center}
 .lvl{font-family:var(--mono);font-size:max(12px,1.15vw);letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
@@ -430,6 +434,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <div class="row">
     <button class="b pri" id="sOk">Übernehmen</button>
     <button class="b" id="sCancel">Abbrechen</button>
+    <button class="b" id="sCloud" type="button">☁ Gespeicherten Stand laden</button> <span id="sCloudInfo" style="font-size:12px;color:var(--grey)"></span>
     <span style="flex:1"></span>
     <button class="b" id="sRestart">Turnier neu starten (Spieler bleiben)</button> <button class="b red" id="sReset">Turnier komplett zurücksetzen</button>
   </div>
@@ -480,9 +485,10 @@ const fresh=()=>({v:1,title:"Sunday Classic",sub:"Blue Chip Club · Deepstack ·
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1)S=Object.assign(fresh(),s);}catch(e){}
+let HAD_LOCAL=false;
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;}}catch(e){}
 let LEVELS=S.levels;
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushState==="function")pushState();};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushState==="function")pushState();if(typeof pushBackup==="function")pushBackup();};
 function log(type,data){S.log.push(Object.assign({t:new Date().toISOString(),lvl:playNum(S.i),type},data||{}));if(S.log.length>2000)S.log.shift();}
 
 const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
@@ -983,7 +989,7 @@ function parseLevels(t){
 }
 function parseGames(t){const out=[];for(const raw of t.split("\n")){const s=raw.trim();if(!s)continue;const m=s.match(/^(\d+)\s+(.+)$/);if(!m||!GAMES[m[2].trim()])throw new Error("Minigame nicht erkannt: „"+s+"“ (bekannt: "+Object.keys(GAMES).join(", ")+")");out.push({lvl:+m[1],g:m[2].trim()});}return out;}
 function openSettings(){
-  closeAll();
+  closeAll();bkInfo();
   $("sTitle").value=S.title;$("sStack").value=S.stack;$("sMin1").value=S.min1;$("sMin").value=S.min;$("sMinLate").value=S.minLate;
   $("sReLvl").value=S.reLvl??"";$("sMaxRe").value=S.maxRe??"";$("sBuyin").value=S.buyin;$("sFee").value=S.fee;$("sRebuy").value=S.rebuy;$("sBounty").value=S.bounty||0;
   $("sPlaces").value=String(S.pay.places);$("sThird").value=S.pay.third;$("sSplit").value=S.pay.split;$("sBank").value=S.bank;
@@ -1112,6 +1118,33 @@ function openRemote(){
   es.onerror=()=>{remoteOk=false;};
 }
 openRemote();setInterval(()=>{if(es&&es.readyState===2)openRemote();},10000);
+
+/* ---------- cloud backup: the whole state (seats, dealer, rebuys, places, clock, settings) ----------
+   Every change is mirrored to ntfy.sh (big bodies become an attachment). A device without local state
+   (other laptop, cleared browser) loads the newest backup automatically; ⚙ has a manual button too. */
+const BK=TOPIC+"-bk-"+KEY.replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);
+let bkReady=false,bkLast=null;
+function pushBackup(){if(!bkReady)return;clearTimeout(pushBackup.t);pushBackup.t=setTimeout(()=>{
+  const body=JSON.stringify({k:KEY,at:Date.now(),S:S});
+  fetch(RELAY+BK,{method:"POST",body:body}).then(r=>{if(r.ok){bkLast=Date.now();bkInfo();}}).catch(()=>{});},2500);}
+async function fetchBackup(){
+  const r=await fetch(RELAY+BK+"/json?poll=1&since=24h");if(!r.ok)throw new Error("HTTP "+r.status);
+  const ms=(await r.text()).split("\n").map(l=>{try{return JSON.parse(l);}catch(e){return null;}}).filter(m=>m&&m.event==="message");
+  for(let i=ms.length-1;i>=0;i--){const m=ms[i];
+    try{const raw=m.attachment&&m.attachment.url?await (await fetch(m.attachment.url)).text():m.message;const b=JSON.parse(raw);if(b&&b.k===KEY&&b.S&&b.S.v===1)return b;}catch(e){}}
+  return null;}
+function applyBackup(b){S=Object.assign(fresh(),b.S);LEVELS=S.levels;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}buildSeats();render();pushState();}
+const hm=t=>new Date(t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+function bkInfo(){const e=$("sCloudInfo");if(e)e.textContent=bkLast?"Letzte Cloud-Sicherung: "+hm(bkLast)+" Uhr":"Noch keine Cloud-Sicherung in dieser Sitzung";}
+(async()=>{
+  if(!HAD_LOCAL){try{const b=await fetchBackup();if(b){applyBackup(b);toast("Gespeicherter Stand von "+hm(b.at)+" Uhr geladen");}}catch(e){}}
+  bkReady=true;pushBackup();
+})();
+setInterval(()=>pushBackup(),20*60e3); // refresh before ntfy forgets attachments (3 h)
+$("sCloud").onclick=async()=>{const e=$("sCloudInfo");e.textContent="Lade …";
+  try{const b=await fetchBackup();if(!b){e.textContent="Keine Cloud-Sicherung gefunden.";return;}
+    if(!confirm("Stand von "+hm(b.at)+" Uhr laden? Der Stand auf diesem Gerät wird ersetzt."))return;applyBackup(b);$("mSet").hidden=true;toast("Stand von "+hm(b.at)+" Uhr geladen");}
+  catch(x){e.textContent="Cloud nicht erreichbar.";}};
 setInterval(()=>{if(S.running)pushState();},60000);
 // sound only works after one click/key on this laptop (browser rule)
 function soundHint(){const a=actx;const off=!a||a.state!=="running";$("snd").hidden=!off;}
