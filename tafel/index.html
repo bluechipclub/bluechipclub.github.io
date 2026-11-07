@@ -963,18 +963,13 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
 function drawSeats(){
-  closeAll();lobbyClose();bgActive=BG_ON;if(BG_ON&&!bg){bg=new Audio("ansagen/bg-nico.mp3?v=1");bg.loop=true;bg.preload="auto";bg.load();}
+  closeAll();lobbyClose();
   S.timV=Math.random()<.5?1:0;
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  // Tim (organiser) always sits on the dealer spot = last place in the order (place 10 on a full table); everyone else is shuffled freely
+  // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
-  // Nico always opens the draw on place 1 (his video starts the music)
-  const first=a.find(p=>p.name.toLowerCase()==="nico");if(first)a=[first,...a.filter(p=>p!==first)];
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
-  if(ANN_INTRO){const box=$("intro");box.classList.remove("bd");box.innerHTML='<div class="inT" style="text-align:center;max-width:80vw"><div class="eyebrow">♠ Blue Chip Club · Platzauslosung</div><h3>'+esc(S.title)+'</h3></div>';box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
-    annSkip=playAnn(ANN_INTRO,()=>{annSkip=null;introShow(a,()=>drawOverview(a));});}
-  else introShow(a,()=>drawOverview(a));
 }
 function drawOverview(a){
   const suits=["♠","♥","♣","♦"];
