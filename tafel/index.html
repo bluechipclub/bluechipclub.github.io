@@ -74,12 +74,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold3),var(--gold2));transition:width .9s linear}
 
 /* Spieler-Tisch (Gesamtbild mit Spielern von oben), aktiv bei bis zu 11 Spielern */
-.stage.img11{background:#0b0907 url("../img/tisch-spieler.webp?v=1") 50% 50%/contain no-repeat}
+.stage.img11{background:#0b0907 url("../img/tisch-oben.webp?v=1") 50% 50%/contain no-repeat}
 .stage.img11 .avw{display:none}
+.stage.img11{overflow:hidden}
 .stage.img11::before{background:radial-gradient(ellipse 30% 30% at 50% 52%,rgba(8,6,4,.9),rgba(8,6,4,.55) 65%,transparent 100%)}
 .stage.img11 .seat .nm{padding-left:1.15vw!important;background:linear-gradient(180deg,rgba(18,26,48,.92),rgba(8,12,24,.92));border-color:rgba(110,160,255,.55)}
-.fig{position:absolute;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(5,4,3,.82) 0%,rgba(5,4,3,.7) 55%,transparent 72%);opacity:0;transition:opacity .6s}
-.fig.out{opacity:1}
+.fig{position:absolute;pointer-events:none;z-index:1;filter:drop-shadow(0 1.2vh 1.4vh rgba(0,0,0,.65));transition:filter .6s,opacity .6s}
+.fig img{width:100%;height:100%;display:block}
+.fig.out{filter:grayscale(1) brightness(.35);opacity:.8}
+.stage.img11 .seat{z-index:2}
 .seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.35vh;transition:opacity .5s,filter .5s,transform .8s var(--ease)}
 .seat .nm{padding:.75vh 1.15vw;border-radius:999px;background:linear-gradient(180deg,#1f1f1f,#121212);border:1px solid var(--line2);font-weight:650;font-size:max(13px,1.3vw);white-space:nowrap;box-shadow:0 .6vh 1.6vh rgba(0,0,0,.6);cursor:pointer;position:relative}
 .seat{display:grid!important;grid-template-columns:auto auto;align-items:center;justify-items:start}
@@ -525,19 +528,25 @@ function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().lengt
 
 /* ---------- render ---------- */
 const mmss=s=>{s=Math.ceil(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");};
-/* Gesamtbild: Namensschild (n) und Figur (f) je Platz, Anteile am Bild (2752x1536), im Uhrzeigersinn ab oben links neben der Lampe */
-const IMG_AR=2752/1536;
-const IMG_SEATS=[{n:[.325,.325],f:[.32,.16]},{n:[.675,.30],f:[.69,.14]},{n:[.81,.36],f:[.86,.19]},{n:[.79,.495],f:[.91,.50]},{n:[.79,.66],f:[.89,.82]},{n:[.695,.705],f:[.70,.93]},{n:[.495,.705],f:[.50,.93]},{n:[.31,.74],f:[.29,.95]},{n:[.205,.66],f:[.12,.82]},{n:[.205,.495],f:[.09,.50]},{n:[.19,.335],f:[.14,.19]}];
+/* Spieler-Figuren von oben (aus dem Higgsfield-Gesamtbild ausgeschnitten), sitzen nach jeder Auslosung am neuen Platz.
+   FIGS: [Breite, Höhe (Anteil Bildbreite), Ankerpunkt x/y im Ausschnitt, Blickrichtung zur Tischmitte im Original in Grad] */
+const FIGS={"zeno":[0.2017,0.194,0.51,0.484,24.9],"manu":[0.1617,0.1701,0.506,0.423,49.1],"kevin":[0.1762,0.1508,0.488,0.438,131.9],"benno":[0.1679,0.1679,0.507,0.476,155.4],"jan":[0.1937,0.1719,0.359,0.518,0.3],"chris":[0.1719,0.1937,0.554,0.49,-179.6],"niklas":[0.2108,0.2082,0.494,0.472,-24.6],"domi-c":[0.1755,0.1232,0.511,0.594,-48.5],"tim":[0.1802,0.1435,0.517,0.589,-89.7],"nico":[0.1755,0.1537,0.504,0.621,-132.5],"pasi":[0.1813,0.1871,0.491,0.517,-155.6]};
+const FIG_ALIAS={"niki":"niklas","domi":"domi-c"};
+const IMG_AR=1920/1072;
+/* 11 Stühle am leeren Ge-man-Tisch (Anteile am Bild), im Uhrzeigersinn ab oben links; oben Mitte = Dealer-Ablage */
+const IMG_SEATS=[[.31,.06],[.69,.06],[.885,.18],[.95,.47],[.885,.80],[.69,.93],[.50,.93],[.31,.93],[.115,.80],[.05,.47],[.115,.18]];
+const FIG_SCALE=.82;
 const imgMode=()=>S.players.length>0&&S.players.length<=IMG_SEATS.length;
 function imgSeatIdx(k,n){const start=(S.rot||0)%2?0:6;return (start+Math.round(k*IMG_SEATS.length/n))%IMG_SEATS.length;}
-function imgBox(){const st=$("stage"),W=st.clientWidth||1,H=st.clientHeight||1;let w=W,h=W/IMG_AR;if(h>H){h=H;w=H*IMG_AR;}const z=Math.min(1.12,Math.max(W/w,H/h));return {W,H,w:w*z,h:h*z};}
+function imgBox(){const st=$("stage"),W=st.clientWidth||1,H=st.clientHeight||1;let w=W,h=W/IMG_AR;if(h>H){h=H;w=H*IMG_AR;}const z=1;return {W,H,w:w*z,h:h*z};}
 function imgToStage(fx,fy){const b=imgBox();return [100*((b.W-b.w)/2+fx*b.w)/b.W,100*((b.H-b.h)/2+fy*b.h)/b.H,b.w];}
-function seatPos(k,n){if(imgMode()){const t=IMG_SEATS[imgSeatIdx(k,n)],[x,y]=imgToStage(t.f[0]+(t.n[0]-t.f[0])*.6,t.f[1]+(t.n[1]-t.f[1])*.6);return [x,y];}const a=Math.PI/2+(S.rot||0)*Math.PI+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
+function figKey(name,used){let k=String(name).toLowerCase().trim().replace(/\s+/g,"-");k=FIG_ALIAS[k]||k;if(FIGS[k]&&!used.has(k))return k;return Object.keys(FIGS).find(x=>!used.has(x)&&!S.players.some(p=>{let q=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");return (FIG_ALIAS[q]||q)===x;}))||Object.keys(FIGS).find(x=>!used.has(x));}
+function seatPos(k,n){if(imgMode()){const t=IMG_SEATS[imgSeatIdx(k,n)],[x,y]=imgToStage(t[0]+(.5-t[0])*.3,t[1]+(.5-t[1])*.34);return [x,y];}const a=Math.PI/2+(S.rot||0)*Math.PI+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
 function buildSeats(){
   document.querySelectorAll(".seat,.fig").forEach(e=>e.remove());
-  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";}else st.style.backgroundSize="";
+  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";buildSeats.used=new Set();}else st.style.backgroundSize="";
   S.players.forEach((p,k)=>{
-    if(im){const [fx,fy,w]=imgToStage(...IMG_SEATS[imgSeatIdx(k,n)].f),g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.left=fx+"%";g.style.top=fy+"%";g.style.width=g.style.height=(w*.2)+"px";st.appendChild(g);}
+    if(im){const used=buildSeats.used||(buildSeats.used=new Set());if(k===0)used.clear();const key=figKey(p.name,used);if(key){used.add(key);const F=FIGS[key],t=IMG_SEATS[imgSeatIdx(k,n)],[cx,cy,bw]=imgToStage(t[0],t[1]),b=imgBox(),tx=(.5-t[0])*b.w,ty=(.5-t[1])*b.h,rot=Math.atan2(ty,tx)*180/Math.PI-F[4],fw=F[0]*bw*FIG_SCALE,fh=F[1]*bw*FIG_SCALE,g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.width=fw+"px";g.style.height=fh+"px";g.style.left="calc("+cx+"% - "+(F[2]*fw)+"px)";g.style.top="calc("+cy+"% - "+(F[3]*fh)+"px)";g.style.transformOrigin=(F[2]*100)+"% "+(F[3]*100)+"%";g.style.transform="rotate("+rot.toFixed(1)+"deg)";g.innerHTML='<img src="figuren/'+key+'.webp?v=1" alt="">';st.appendChild(g);}}
     const [x,y]=seatPos(k,n),d=document.createElement("div");
     d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;
     d.innerHTML='<div class="avw"></div><div class="nm"></div><div class="meta"></div>';d.querySelector(".avw").onclick=()=>openPlayers(p.name);
