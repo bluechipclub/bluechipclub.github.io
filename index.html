@@ -979,7 +979,32 @@ main .wrap { padding-top: 0; }
 .wcard.cur .n { background: none; -webkit-text-fill-color: currentColor; color: var(--fg); }
 .wcard.cur .pt { border-color: rgb(255 255 255 / .14); background: transparent; }
 /* Weniger Kästen: Hausregeln als Liste */
-.rules li { background: transparent !important; border: 0 !important; border-top: 1px solid var(--line) !important; border-radius: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }</style>
+.rules li { background: transparent !important; border: 0 !important; border-top: 1px solid var(--line) !important; border-radius: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+/* v3: Willkommens-Fenster im Kino-Sand-Stil (07.11.) */
+.splash { background: rgb(17 13 10 / .82) !important; backdrop-filter: blur(14px) saturate(.9); -webkit-backdrop-filter: blur(14px) saturate(.9); }
+.splash .box { background: var(--surface) !important; border: 1px solid var(--line2) !important; box-shadow: 0 50px 140px -30px rgb(0 0 0 / .9) !important; border-radius: 26px !important; gap: 12px !important; }
+.splash .wpic { filter: sepia(.18) saturate(.92) brightness(.95); -webkit-mask: linear-gradient(180deg, #000 50%, transparent) !important; mask: linear-gradient(180deg, #000 50%, transparent) !important; }
+.splash .wel { color: var(--grey) !important; font-size: 11px; letter-spacing: .26em !important; }
+.splash .tag { background: transparent !important; color: var(--fg) !important; border: 1px solid var(--line2); font-weight: 500 !important; letter-spacing: .18em !important; font-size: 11px !important; }
+.splash .tag i { background: #e5675c !important; box-shadow: 0 0 10px #e5675c; }
+.splash h1 { font-weight: 500 !important; letter-spacing: -.045em !important; text-shadow: none !important; line-height: .95 !important; }
+.splash .when { color: rgb(241 233 221 / .85) !important; }
+.splash .when[style] { color: var(--gold2) !important; }
+.splash .cdx div { background: var(--surface2) !important; border: 1px solid var(--line) !important; }
+.splash .cdx b { color: var(--fg) !important; font-weight: 400 !important; }
+.splash .x { background: var(--surface2) !important; border-color: var(--line2) !important; }
+.splash .acts { align-items: center; }
+.splash .btn-ghost.big { display: inline-flex; align-items: center; height: 56px; padding: 0 26px; border-radius: 999px; font-size: 17px; font-weight: 500; }
+.btn.live-b { background: transparent; border-color: var(--line2); color: var(--grey); }
+.btn.live-b:hover { color: var(--fg); border-color: var(--fg); }
+.promo { background: var(--surface) !important; border-color: var(--line2) !important; box-shadow: none !important; }
+.promo h2 { font-weight: 500; font-size: clamp(36px, 5.5vw, 68px) !important; line-height: .95 !important; letter-spacing: -.045em; }
+.promo::before, .promo::after, .promo .in::before { display: none !important; background: none !important; }
+.promo .cdi { color: var(--grey) !important; border-color: var(--line2) !important; }
+.promo .live { background: transparent !important; color: var(--fg) !important; border: 1px solid var(--line2); }
+.promo .btn.wa { background: var(--cream) !important; color: #15110d !important; border-color: var(--cream) !important; }
+@media (max-width: 600px) { .splash .btn-cream.big, .splash .btn-ghost.big { height: 50px; font-size: 16px; padding: 0 22px; } }
+</style>
 
 <div class="ambient" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
 <header class="top">
@@ -1000,7 +1025,6 @@ main .wrap { padding-top: 0; }
   <nav class="menu-links" aria-label="Bereiche"><a href="#rangliste" data-go="rangliste">Lobby</a><a href="#news" data-go="news">News</a><a href="#rekorde" data-go="rekorde">Hände &amp; <em>Rekorde</em></a><a href="#turniere" data-go="turniere">Turniere</a><a href="#regeln" data-go="regeln">Regeln</a><a href="spieler/">Die <em>Spieler</em></a></nav>
   <div class="menu-tools">
     <button class="icon-btn" id="liveBtn"><span class="ldot"></span>Live-Tafel</button>
-    <button class="icon-btn" id="remBtn">Fernbedienung</button>
     <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
   </div>
   <p class="menu-foot">The Void · Private Poker unter Freunden</p>
@@ -2296,8 +2320,8 @@ main .wrap { padding-top: 0; }
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
     const wd = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? (vDays(n).length ? 'Anmeldung offen · Termin per Abstimmung' : 'Termin folgt') : 'Anmeldung offen') + '</span><h2 class="goldtext">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
-      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
+    return cx('c12 promo', '<div class="in"><div><span class="live"><i></i>' + (n.tbd ? (vDays(n).length ? 'Anmeldung offen · Termin per Abstimmung' : 'Termin folgt') : 'Anmeldung offen') + '</span><h2 class="chrome-xl">' + esc(n.title) + '</h2><p class="meta">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' +
+      '<div class="row2"><button class="btn wa" data-event="resv">Platz reservieren</button><button class="btn" data-event="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-event="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn live-b" onclick="openLive()">● Live-Tafel</button>' + (n.tbd ? '<span class="cdi">' + esc(n.tbd) + '</span>' : '<span class="cdi" data-cdi="' + esc(n.date) + '">–</span>') + '</div></div>' +
       '<div class="side">' + (n.cards ? fanOf(parseCards(n.cards), true) : '') + seatbar(n) + '<span class="seats">' + seatTxt(n) + '</span></div></div>', ' data-event="1"');
   }
   function openSplash() {
@@ -2308,12 +2332,11 @@ main .wrap { padding-top: 0; }
     el.className = 'splash'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', n.title);
     let chips = '';
     for (let i = 0; i < 22; i++) chips += '<span class="chipf' + (i % 3 ? '' : ' g') + '" style="left:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (2.2 + Math.random() * 2).toFixed(2) + 's;--w:' + (0.3 + Math.random() * 2.2).toFixed(2) + 's;--r:' + ((Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 540)).toFixed(0) + 'deg;width:' + (24 + Math.random() * 20).toFixed(0) + 'px;height:auto;aspect-ratio:1"></span>';
-    el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + chips +
+    el.innerHTML =
       '<div class="box"><img class="wpic" src="img/willkommen-tisch.webp" alt="Die Runde am Tisch im The Void"><button class="x" aria-label="Schließen">×</button><span class="eyebrow gold wel">Willkommen im ' + esc(DATA.settings.name) + '</span><span class="tag"><i></i>' + (n.tbd ? 'Termin folgt' : isFull(n) ? 'Full Table · Warteliste offen' : 'Anmeldung offen') + '</span>' +
-      (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h1 class="goldtext">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
+      '<h1 class="chrome-xl">' + esc(n.title) + '</h1><p class="when">' + (n.tbd ? 'Termin folgt · The Void' : esc(wd) + ' · ' + timeTxt(n, d) + ' · The Void') + (n.sub ? '<br>' + esc(n.sub) : '') + '</p>' +
       (n.tbd ? tbdHtml(n) : '<div class="cdx" data-cds="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div><div><b>–</b><span>Sek</span></div></div>') +
-      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn wa" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn" data-go="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-go="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn" onclick="openLive()" style="border-color:#173a99;color:#8fb0ff">● Live-Tafel</button><button class="btn" onclick="openLive(\'tafel/handy.html\')" style="border-color:#173a99;color:#8fb0ff">📱 Fernbedienung</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
+      '<p class="when" style="font-size:15px;color:var(--gold2)">' + esc(priceLine(n)) + '</p><div class="acts"><button class="btn-cream big" data-go="resv">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + '</button><button class="btn-ghost big" data-go="1">Alle Infos</button>' + (greetOn(n) ? '<button class="btn" data-go="greet" style="border-color:var(--gold);color:var(--gold2)">🎂 Nachricht für ' + esc(n.greet.to) + '</button>' : '') + '<button class="btn live-b" onclick="openLive()">● Live-Tafel</button></div><span class="seats">' + seatTxt(n) + '</span></div>';
     document.body.appendChild(el); document.body.style.overflow = 'hidden';
     const tick = () => { const s = Math.max(0, (d - Date.now()) / 1000), v = [s / 86400, s % 86400 / 3600, s % 3600 / 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')); el.querySelectorAll('.cdx b').forEach((b, i) => { b.textContent = v[i]; }); };
     tick(); const iv = setInterval(tick, 1000);
@@ -2325,7 +2348,7 @@ main .wrap { padding-top: 0; }
     const onKey = e => { if (e.key === 'Escape') close(); };
     document.addEventListener('keydown', onKey);
     el.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) return close(g.dataset.go); if (e.target.closest('.x') || !e.target.closest('.box')) close(); });
-    if (audio && soundOn) for (let i = 0; i < 6; i++) clack(audio.currentTime + 0.9 + i * 0.05, .4);
+    // (kein Chip-Regen mehr im Kino-Stil)
     setTimeout(() => { const x = el.querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 50);
   }
   // Intro-Clip beim Öffnen der Seite (ersetzt das Anmelde-Fenster). Browser erlauben Ton erst nach einem Klick:
@@ -2907,7 +2930,7 @@ main .wrap { padding-top: 0; }
 (function(){const ov=document.getElementById('codeOv'),inp=document.getElementById('codeIn'),err=document.getElementById('codeErr');
 const open=()=>{ov.hidden=false;inp.value='';err.textContent='';setTimeout(()=>inp.focus(),50);};
 let dest='tafel/';const go=()=>{if(inp.value.trim()==='007'){location.href=dest;}else{err.textContent='Falscher Code';inp.value='';inp.focus();}};
-document.getElementById('liveBtn').onclick=()=>window.openLive();document.getElementById('remBtn').onclick=()=>window.openLive('tafel/handy.html');window.openLive=(d)=>{dest=d||'tafel/';document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
+document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive=(d)=>{dest=d||'tafel/';document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 </script>
