@@ -586,7 +586,15 @@ const pKey=n=>{let k=String(n).toLowerCase().trim().replace(/\s+/g,"-");return F
 function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;const e=S.pre,names=Object.values(e.seats).map(pKey).sort().join(),cur=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return names===cur?e:null;}
 function preActive(){const e=preFor();return e&&!S.players.some(p=>p.out)&&timIn()?e:null;}
 function pickPre(a){S.pre=null;if(!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
-function pickCfg(){const n=S.players.length,c=(T10&&T10.lib&&n<=T10.seats.length+1)?T10:OLD;CUR=c;DEALER_SEAT=c.dealer;IMG_SEATS=c.seats;OVAL=c.oval;}
+function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),rest=a.filter(p=>p!==tim);if(!tim)return null;
+  const keep=S.players;S.players=[...rest,tim];const seat=[];for(let k=0;k<n-1;k++)seat.push(IMG_SEATS.indexOf(imgSeat(k,n)));S.players=keep;
+  const lib=CUR.lib,bad=CUR.bad||[],has=(p,i)=>i>=0&&lib[pKey(p.name)]&&lib[pKey(p.name)][String(i).padStart(2,"0")],isBad=(p,i,q,j)=>bad.some(x=>(x[0]===pKey(p.name)&&x[1]===i&&x[2]===pKey(q.name)&&x[3]===j)||(x[2]===pKey(p.name)&&x[3]===i&&x[0]===pKey(q.name)&&x[1]===j));
+  const pool=rest.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const out=[],used=new Set();let steps=0;
+  const go=k=>{if(k===rest.length)return true;if(++steps>200000)return false;const cand=pool.filter(p=>!used.has(p)&&has(p,seat[k]));for(let i=cand.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cand[i],cand[j]]=[cand[j],cand[i]];}
+    for(const p of cand){if(k>0&&isBad(out[k-1],seat[k-1],p,seat[k]))continue;used.add(p);out.push(p);if(go(k+1))return true;out.pop();used.delete(p);}return false;};
+  return go(0)?[...out,tim]:null;}
+function pickCfg(){const n=S.players.length,c=(T10&&T10.lib&&!S.forceOld&&n<=T10.seats.length+1)?T10:OLD;CUR=c;DEALER_SEAT=c.dealer;IMG_SEATS=c.seats;OVAL=c.oval;}
 fetch("t10/config.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(c=>{if(!c)return;const d=c.dealer;T10={base:"t10/",dealer:d,seats:c.seats,oval:c.oval,dealerTag:c.dealerTag||[d[0],d[1]+.085],dBtn:c.dBtn||[d[0]+.075,d[1]+.085],lib:null,spread:true,pre:null,bad:null};fetch("t10/sitze/verboten.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x))T10.bad=x;}).catch(()=>{});fetch("t10/fertig/index.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x)){T10.pre=x;try{buildSeats();render();}catch(e){}}}).catch(()=>{});return fetch("t10/sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{T10.lib=j||{};try{buildSeats();render();}catch(e){}});}).catch(()=>{});
 const FIG_ON=false;
 let SEATLIB=null;const SEATLIB_V=1;
@@ -982,10 +990,9 @@ function drawSeats(){
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
-  S.players=a;pickCfg();a=pickPre(a);
-  // without a finished image: reshuffle until every player has a checked figure for their chair and no neighbour pair is on the bad list
-  if(!S.pre&&CUR.lib&&imgMode()){const ok=b=>{S.players=b;const n=b.length,idx=[];for(let k=0;k<n;k++){if(/^tim$/i.test(String(b[k].name).trim())){idx.push(-1);continue;}const i=IMG_SEATS.indexOf(imgSeat(k,n)),key=pKey(b[k].name);if(i<0||!(CUR.lib[key]&&CUR.lib[key][String(i).padStart(2,"0")]))return false;idx.push(i);}const bad=CUR.bad||[];for(let k=0;k<n;k++){const j=(k+1)%n;if(bad.some(x=>(x[0]===pKey(b[k].name)&&x[1]===idx[k]&&x[2]===pKey(b[j].name)&&x[3]===idx[j])||(x[2]===pKey(b[k].name)&&x[3]===idx[k]&&x[0]===pKey(b[j].name)&&x[1]===idx[j])))return false;}return true;};
-    let b=a,tries=0;while(!ok(b)&&tries++<800){const tim=b.find(p=>/^tim$/i.test(String(p.name).trim()));let r=b.filter(p=>p!==tim);for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}b=tim?[...r,tim]:r;}a=b;}
+  S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
+  // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
+  if(!S.pre&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
 }
 function drawOverview(a){
