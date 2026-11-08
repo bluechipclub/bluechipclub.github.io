@@ -126,5 +126,69 @@
    "9": "kevin"
   },
   "quelle": "kand-009-c7400c54.jpg"
+ },
+ {
+  "file": "09.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "zeno",
+   "2": "manu",
+   "3": "kevin",
+   "4": "chris",
+   "5": "pasi",
+   "6": "niklas",
+   "7": "nico",
+   "8": "benno",
+   "9": "domi-c"
+  },
+  "quelle": "kand-006-11eecaaa.jpg"
+ },
+ {
+  "file": "10.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "nico",
+   "2": "niklas",
+   "3": "domi-c",
+   "4": "benno",
+   "5": "pasi",
+   "6": "chris",
+   "7": "manu",
+   "8": "zeno",
+   "9": "kevin"
+  },
+  "quelle": "kand-012-c648a186.jpg"
+ },
+ {
+  "file": "11.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "nico",
+   "2": "manu",
+   "3": "benno",
+   "4": "niklas",
+   "5": "pasi",
+   "6": "kevin",
+   "7": "zeno",
+   "8": "chris",
+   "9": "domi-c"
+  },
+  "quelle": "kand-011-81e94d6e.jpg"
+ },
+ {
+  "file": "12.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "niklas",
+   "2": "domi-c",
+   "3": "manu",
+   "4": "benno",
+   "5": "nico",
+   "6": "pasi",
+   "7": "chris",
+   "8": "zeno",
+   "9": "kevin"
+  },
+  "quelle": "kand-010-ff965c68.jpg"
  }
 ]
