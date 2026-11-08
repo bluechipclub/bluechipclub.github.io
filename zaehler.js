@@ -16,13 +16,15 @@
   }
   function dauer() { return (sichtbar + (seit ? performance.now() - seit : 0)) / 1000; }
   function ping() { send({ a: "ping", d: dauer(), sc: scroll }); }
-  function misst() {
-    var h = document.documentElement, max = h.scrollHeight - innerHeight;
-    var p = max > 0 ? Math.round((scrollY / max) * 100) : 100;
+  function misst(ev) {
+    var el = ev && ev.target && ev.target.nodeType === 1 ? ev.target : document.scrollingElement || document.documentElement;
+    if (el.clientHeight < innerHeight * 0.6) return;
+    var max = el.scrollHeight - el.clientHeight;
+    var p = max > 0 ? Math.round((el.scrollTop / max) * 100) : 100;
     if (p > scroll) scroll = Math.min(100, p);
   }
   send({ a: "start", r: document.referrer });
-  addEventListener("scroll", misst, { passive: true });
+  document.addEventListener("scroll", misst, { passive: true, capture: true });
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "visible") { seit = performance.now(); }
     else { if (seit) sichtbar += performance.now() - seit; seit = 0; ping(); }
