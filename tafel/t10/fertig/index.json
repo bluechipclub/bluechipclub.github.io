@@ -62,5 +62,21 @@
    "9": "kevin"
   },
   "quelle": "kand-002-640b1e0c.jpg"
+ },
+ {
+  "file": "05.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "pasi",
+   "2": "domi-c",
+   "3": "manu",
+   "4": "kevin",
+   "5": "zeno",
+   "6": "chris",
+   "7": "benno",
+   "8": "nico",
+   "9": "niklas"
+  },
+  "quelle": "kand-005-d14c2150.jpg"
  }
 ]
