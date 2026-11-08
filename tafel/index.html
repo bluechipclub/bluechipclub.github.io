@@ -588,6 +588,15 @@ const pKey=n=>{let k=String(n).toLowerCase().trim().replace(/\s+/g,"-");return F
 function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;const e=S.pre,names=Object.values(e.seats).map(pKey).sort().join(),cur=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return names===cur?e:null;}
 function preActive(){const e=preFor();return e&&!S.players.some(p=>p.out)&&timIn()?e:null;}
 function pickPre(a){S.pre=null;if(!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
+/* Jan kommt nicht mehr an den Tisch (Liga/Profile bleiben). Steht er noch in einem alten Stand, fliegt er raus. */
+const NOT_AT_TABLE=["jan"];
+function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=>!NOT_AT_TABLE.includes(String(p.name).trim().toLowerCase()));if(S.players.length!==n){if(S.dealer>=S.players.length)S.dealer=0;S.pre=null;return true;}return false;}
+/* Nie leere Namensschilder ohne Figuren: wurde für genau diese Spieler noch nicht ausgelost, wird einmal automatisch ausgelost. */
+function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
+  const key=a=>a.map(x=>String(x).toLowerCase()).sort().join(),cur=key(S.players.map(p=>p.name));
+  pickCfg();if(CUR===T10&&preFor())return;
+  if((S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
+  drawSeats();}catch(e){}}
 function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),rest=a.filter(p=>p!==tim);if(!tim)return null;
   const keep=S.players;S.players=[...rest,tim];const seat=[];for(let k=0;k<n-1;k++)seat.push(IMG_SEATS.indexOf(imgSeat(k,n)));S.players=keep;
   const lib=CUR.lib,bad=CUR.bad||[],has=(p,i)=>i>=0&&lib[pKey(p.name)]&&lib[pKey(p.name)][String(i).padStart(2,"0")],isBad=(p,i,q,j)=>bad.some(x=>(x[0]===pKey(p.name)&&x[1]===i&&x[2]===pKey(q.name)&&x[3]===j)||(x[2]===pKey(p.name)&&x[3]===i&&x[0]===pKey(q.name)&&x[1]===j));
@@ -597,7 +606,7 @@ function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.n
     for(const p of cand){if(k>0&&isBad(out[k-1],seat[k-1],p,seat[k]))continue;used.add(p);out.push(p);if(go(k+1))return true;out.pop();used.delete(p);}return false;};
   return go(0)?[...out,tim]:null;}
 function pickCfg(){const n=S.players.length,c=(T10&&T10.lib&&!S.forceOld&&n<=T10.seats.length+1)?T10:OLD;CUR=c;DEALER_SEAT=c.dealer;IMG_SEATS=c.seats;OVAL=c.oval;}
-fetch("t10/config.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(c=>{if(!c)return;const d=c.dealer;T10={base:"t10/",dealer:d,seats:c.seats,oval:c.oval,dealerTag:c.dealerTag||[d[0],d[1]+.085],dBtn:c.dBtn||[d[0]+.075,d[1]+.085],lib:null,spread:true,pre:null,bad:null};fetch("t10/sitze/verboten.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x))T10.bad=x;}).catch(()=>{});fetch("t10/fertig/index.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x)){T10.pre=x;try{buildSeats();render();}catch(e){}}}).catch(()=>{});return fetch("t10/sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{T10.lib=j||{};try{buildSeats();render();}catch(e){}});}).catch(()=>{});
+fetch("t10/config.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(c=>{if(!c)return;const d=c.dealer;T10={base:"t10/",dealer:d,seats:c.seats,oval:c.oval,dealerTag:c.dealerTag||[d[0],d[1]+.085],dBtn:c.dBtn||[d[0]+.075,d[1]+.085],lib:null,spread:true,pre:null,bad:null};fetch("t10/sitze/verboten.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x))T10.bad=x;}).catch(()=>{});fetch("t10/fertig/index.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x)){T10.pre=x;try{buildSeats();render();autoSeat();}catch(e){}}}).catch(()=>{});return fetch("t10/sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{T10.lib=j||{};try{buildSeats();render();autoSeat();}catch(e){}});}).catch(()=>{});
 const FIG_ON=false;
 let SEATLIB=null;const SEATLIB_V=1;
 /* each figure only paints inside its own slice of the table (between the half-angles to its occupied neighbours), so neighbours never cover each other's arms */
@@ -1245,7 +1254,7 @@ async function fetchBackup(){
   for(let i=ms.length-1;i>=0;i--){const m=ms[i];
     try{const raw=m.attachment&&m.attachment.url?await (await fetch(m.attachment.url)).text():m.message;const b=JSON.parse(raw);if(b&&b.k===KEY&&b.S&&b.S.v===1)return b;}catch(e){}}
   return null;}
-function applyBackup(b){S=Object.assign(fresh(),b.S);LEVELS=S.levels;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}buildSeats();render();pushState();}
+function applyBackup(b){S=Object.assign(fresh(),b.S);LEVELS=S.levels;if(dropNotAtTable())log("table",{removed:NOT_AT_TABLE});try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}buildSeats();render();pushState();autoSeat();}
 const hm=t=>new Date(t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
 function bkInfo(){const e=$("sCloudInfo");if(e)e.textContent=bkLast?"Letzte Cloud-Sicherung: "+hm(bkLast)+" Uhr":"Noch keine Cloud-Sicherung in dieser Sitzung";}
 (async()=>{
@@ -1418,14 +1427,14 @@ async function syncSignups(){
   if(S.started)return;const L=await ligaLoad();if(!L||S.started)return;const n=L.settings.next;if(!n||!n.title)return;
   let names=(n.signups||[]).map(x=>String(typeof x==="string"?x:x.name||"").trim());
   if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){return;}}
-  names=names.filter(Boolean);if(!names.length)return;
+  names=names.filter(x=>x&&!NOT_AT_TABLE.includes(x.toLowerCase()));if(!names.length)return;
   const seen=S.syncSeen||[],lc=a=>a.map(x=>x.toLowerCase()),uniq=[];names.forEach(x=>{if(!lc(uniq).includes(x.toLowerCase()))uniq.push(x);});
   if(!lc(uniq).includes("tim"))uniq.unshift("Tim");
   const mk=nm=>({name:nm,entries:[{t:null,lvl:0,paid:"bar"}],out:null});let changed=false;
   if(!S.syncSeen){const old=S.players;S.players=uniq.map(nm=>old.find(p=>p.name.toLowerCase()===nm.toLowerCase())||mk(nm));changed=true;}
   else uniq.forEach(nm=>{if(lc(seen).includes(nm.toLowerCase())||S.players.some(p=>p.name.toLowerCase()===nm.toLowerCase()))return;S.players.push(mk(nm));changed=true;});
   S.syncSeen=Array.from(new Set(seen.concat(uniq)));
-  if(changed){log("signups",{names:S.players.map(p=>p.name)});buildSeats();render();}save();}
+  if(changed){log("signups",{names:S.players.map(p=>p.name)});buildSeats();render();}save();autoSeat();}
 setTimeout(syncSignups,1500);setInterval(syncSignups,180000);
 $("lobby").onclick=lobbyClose;
 document.addEventListener("keydown",e=>{if(!$("lobby").hidden&&e.key==="Escape")lobbyClose();});
@@ -1496,6 +1505,7 @@ function burst(){for(let k=0;k<160;k++)burstP.push({x:innerWidth/2,y:innerHeight
   requestAnimationFrame(frame);
 })();
 
+if(dropNotAtTable()){log("table",{removed:NOT_AT_TABLE});save();}
 buildSeats();render();setInterval(tick,250);tick();pushState();
 poll();setInterval(poll,POLL_MS);
 showCtrl();
