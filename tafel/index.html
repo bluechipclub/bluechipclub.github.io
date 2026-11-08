@@ -616,7 +616,8 @@ fetch("sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{i
 /* inneres Oval (Kupferlinie) im Tischbild */
 let OVAL=OLD.oval;
 const FIG_SCALE=.82;
-const imgMode=()=>S.players.length>0&&S.players.length<=OLD.seats.length+1;
+// table photo only when that table has checked figures; otherwise the classic ring with profile pictures (never a table full of empty chairs)
+const imgMode=()=>S.players.length>0&&S.players.length<=OLD.seats.length+1&&!!(CUR&&CUR.lib&&Object.keys(CUR.lib).length);
 const timIn=()=>{const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
 const timIdx=()=>S.players.findIndex(p=>/^tim$/i.test(String(p.name).trim()));
 /* Platz -> Stuhl: Tim sitzt immer am Holzteil (Dealer-Platz), die anderen im Uhrzeigersinn danach */
