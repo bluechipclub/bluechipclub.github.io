@@ -270,5 +270,37 @@
    "9": "kevin"
   },
   "quelle": "kand-017-50d871c5.jpg"
+ },
+ {
+  "file": "18.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "manu",
+   "2": "niklas",
+   "3": "benno",
+   "4": "pasi",
+   "5": "nico",
+   "6": "kevin",
+   "7": "chris",
+   "8": "domi-c",
+   "9": "zeno"
+  },
+  "quelle": "kand-018-a21fad3b.jpg"
+ },
+ {
+  "file": "19.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "niklas",
+   "2": "nico",
+   "3": "kevin",
+   "4": "pasi",
+   "5": "zeno",
+   "6": "benno",
+   "7": "manu",
+   "8": "chris",
+   "9": "domi-c"
+  },
+  "quelle": "kand-019-999a8881.jpg"
  }
 ]
