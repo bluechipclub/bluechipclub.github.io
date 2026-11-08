@@ -1866,6 +1866,96 @@ main .wrap { padding-top: 0; }
     "dmh-siegerhand"
    ]
   }
+ ],
+ "specials": [
+  {
+   "id": "s1",
+   "nr": 0,
+   "date": "2026-11-08",
+   "title": "Sunday Classic – Das Geisterturnier",
+   "buyin": 30,
+   "entries": 10,
+   "rebuys": 14,
+   "results": [
+    {
+     "place": 1,
+     "name": "Oma Hilde",
+     "prize": ""
+    },
+    {
+     "place": 2,
+     "name": "Professor Dieter",
+     "prize": ""
+    },
+    {
+     "place": 3,
+     "name": "Opa Horst",
+     "prize": ""
+    }
+   ],
+   "participants": [
+    "Oma Hilde",
+    "Professor Dieter",
+    "Opa Horst",
+    "Rocky",
+    "Niemand",
+    "Tim",
+    "Blubb",
+    "Käpt'n Kalle",
+    "Kurt Kugel",
+    "Chantal"
+   ],
+   "headline": "Keiner kam, gespielt wurde trotzdem: Oma Hilde schlägt vier Asse mit dem Royal Flush",
+   "report": "Zusagen: 0. Abgesagt wurde trotzdem nicht. Also saßen heute neue Gesichter am Tisch, und am Dealerplatz Rocco, Golden Retriever mit Weste und Fliege, null Humor. Er hat den ganzen Abend sauber gedealt.\n\nZehn Spieler, 14 Rebuys. Opa Horst hat sich allein neun Mal nachgekauft und damit quasi den ganzen Abend finanziert, mit seiner Rente. Also eigentlich haben wir alle mitbezahlt. Danke, Steuerzahler.\n\nChantal foldete zwei Stunden lang, dann war der Handy-Akku leer und sie ging als Erste. Kurt Kugel aß in der Pause aus Versehen seinen Stack. Käpt'n Kalles Papagei rief bei jeder Hand laut seine Karten. Blubb wurde disqualifiziert, weil er mit seinem einen Auge unter jede Karte am Tisch schaute.\n\nTim lief mit A♠ K♠ gegen Rockys Damen. River König, Drilling, und Rocky hat Full House. Danach ging Niemand einfach durch die Wand, Rocky lief mit seinem Dauer-All-in in Oma Hildes Ass-Dame, und Opa Horst schlief im Short Stack ein und wurde ausgeblindet. Rente für November ist weg.\n\nIm Heads-up dann die Hand des Jahres: Board A♥ A♠ J♥ 10♥ 3♣. Professor Dieter hält A♣ A♦, vier Asse, und schiebt. Oma Hilde callt mit K♥ Q♥. Royal Flush. Dieter weint immer noch.\n\nNächstes Mal kommt ihr bitte. Sonst gewinnt wieder Oma Hilde.",
+   "img": "gt-sieger-hilde",
+   "imgCaption": "Oma Hilde mit dem Pokal, Dealer Rocco und Tim klatschen",
+   "winHand": "K♥ Q♥",
+   "special": true,
+   "hands": [
+    {
+     "id": "gt1",
+     "hl": "Opa Horst kauft sich zum neunten Mal ein",
+     "kind": "spot",
+     "tid": "s1",
+     "player": "Opa Horst",
+     "opponent": "",
+     "title": "Rebuy Nummer neun",
+     "cards": "",
+     "text": "Opa Horst knallt sein Rentenheft auf den Tisch, Rocco schiebt den nächsten Stack rüber. Neun Rebuys, ein Abend, eine Rente.",
+     "pics": [
+      "gt-horst-rebuy"
+     ]
+    },
+    {
+     "id": "gt2",
+     "hl": "Tim: Drilling Könige reicht nicht",
+     "kind": "spot",
+     "tid": "s1",
+     "player": "Rocky",
+     "opponent": "",
+     "title": "Damen-Full-House gegen Könige",
+     "cards": "",
+     "text": "Board K♦ 7♣ 2♠ Q♣ K♥. Tim hält A♠ K♠ und trifft am River den Drilling, Rocky mit Q♥ Q♦ hat Full House. Tim raus.",
+     "pics": [
+      "gt-tim-raus"
+     ]
+    },
+    {
+     "id": "gt3",
+     "hl": "Royal Flush gegen vier Asse",
+     "kind": "spot",
+     "tid": "s1",
+     "player": "Oma Hilde",
+     "opponent": "",
+     "title": "Die Hand des Jahres",
+     "cards": "",
+     "text": "Board A♥ A♠ J♥ 10♥ 3♣. Professor Dieter hält A♣ A♦, vier Asse. Oma Hilde callt mit K♥ Q♥: Royal Flush und der Titel.",
+     "pics": [
+      "gt-headsup"
+     ]
+    }
+   ]
+  }
  ]
 }</script>
 <script>
@@ -2073,10 +2163,10 @@ main .wrap { padding-top: 0; }
 
   function renderNews() {
     ci = 0;
-    const ts = tourneys().reverse();
+    const ts = tourneys().concat(DATA.specials || []).sort(byDate).reverse();
     if (!ts.length) { $('#v-news').innerHTML = '<p class="empty">Noch keine Berichte.</p>'; return; }
     $('#v-news').innerHTML = '<div class="news">' + ts.map(t => {
-      const w = winnerOf(t), hs = DATA.hands.filter(x => x.tid === t.id);
+      const w = winnerOf(t), hs = DATA.hands.filter(x => x.tid === t.id).concat(t.hands || []);
       const hl = t.headline || (w ? w + ' gewinnt ' + tName(t) : tName(t));
       return cx('post' + (t.img ? '' : ' noimg'),  (t.img ? '<div class="post-img"><img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy"></div>' : '') +
         '<div class="post-body"><div class="tags"><span class="tag gold">' + esc(tName(t)) + '</span><span class="tag">' + fmtDate(t.date) + '</span>' + (t.title ? '<span class="tag">' + esc(t.title) + '</span>' : '') + (t.pot ? '<span class="tag">' + eur(t.pot) + '</span>' : '') + (t.entries ? '<span class="tag">' + t.entries + ' Spieler</span>' : '') + '</div>' +
