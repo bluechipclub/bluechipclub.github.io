@@ -1071,6 +1071,7 @@ main .wrap { padding-top: 0; }
    "Benno": "Boss Benno"
   },
   "next": {
+   "hidden": true,
    "date": "2026-11-08T17:00",
    "title": "Sunday Classic",
    "sub": "Deepstack · 25.000 Chips · 25-Minuten-Level",
@@ -2490,7 +2491,7 @@ main .wrap { padding-top: 0; }
     setTimeout(() => { if (!closed && v.currentTime === 0) close(); }, 4000);
   }
   const priceLine = n => 'Buy-in ' + eur(n.buyin) + (n.rebuy ? (n.maxRe ? ' · max. ' + n.maxRe + ' Rebuy à ' : ' · jeder Rebuy ') + eur(n.rebuy) : '');
-  function nextOk() { const n = DATA.settings.next; return n && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
+  function nextOk() { const n = DATA.settings.next; return n && !n.hidden && (n.tbd || (n.date && new Date(n.date) >= new Date(Date.now() - 6 * 3600e3))) ? n : null; }
   const hhmm = d => d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   const tbdHtml = n => '<p class="tbd">' + esc(n.tbd) + '</p>';
   const cdHtml = n => n.tbd ? tbdHtml(n) : '<div class="cd" data-cd="' + esc(n.date) + '"><div><b>–</b><span>Tage</span></div><div><b>–</b><span>Std</span></div><div><b>–</b><span>Min</span></div></div>';
