@@ -1237,7 +1237,8 @@ function stateSnap(){
     running:S.running,endAt:S.endAt,left:Math.round(leftNow()),pot:potOf(),entries:totalEntries(),reOpen:rebuyOpen(),active:S.active,
     games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length,headOf(p),bwOf(p)]),bounty:S.bounty||0};
 }
-function pushState(){clearTimeout(pushState.t);pushState.t=setTimeout(()=>{fetch(RELAY+TOPIC+"-state",{method:"POST",body:JSON.stringify(stateSnap())}).catch(()=>{});},800);}
+// ntfy.sh limits messages per network: state goes out at most every 10 s
+function pushState(){if(pushState.t)return;const w=Math.max(800,10000-(Date.now()-(pushState.last||0)));pushState.t=setTimeout(()=>{pushState.t=null;pushState.last=Date.now();fetch(RELAY+TOPIC+"-state",{method:"POST",body:JSON.stringify(stateSnap())}).catch(()=>{});},w);}
 let es=null,remoteOk=false;
 function openRemote(){
   try{if(es)es.close();}catch(e){}
@@ -1260,9 +1261,9 @@ openRemote();setInterval(()=>{if(es&&es.readyState===2)openRemote();},10000);
    (other laptop, cleared browser) loads the newest backup automatically; ⚙ has a manual button too. */
 const BK=TOPIC+"-bk-"+KEY.replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);
 let bkReady=false,bkLast=null;
-function pushBackup(){if(!bkReady)return;clearTimeout(pushBackup.t);pushBackup.t=setTimeout(()=>{
+function pushBackup(){if(!bkReady||pushBackup.t)return;pushBackup.t=setTimeout(()=>{pushBackup.t=null;
   const body=JSON.stringify({k:KEY,at:Date.now(),S:S});
-  fetch(RELAY+BK,{method:"POST",body:body}).then(r=>{if(r.ok){bkLast=Date.now();bkInfo();}}).catch(()=>{});},2500);}
+  fetch(RELAY+BK,{method:"POST",body:body}).then(r=>{if(r.ok){bkLast=Date.now();bkInfo();}}).catch(()=>{});},60000);}
 async function fetchBackup(){
   const r=await fetch(RELAY+BK+"/json?poll=1&since=24h");if(!r.ok)throw new Error("HTTP "+r.status);
   const ms=(await r.text()).split("\n").map(l=>{try{return JSON.parse(l);}catch(e){return null;}}).filter(m=>m&&m.event==="message");
