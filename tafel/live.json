@@ -768,6 +768,31 @@
    "id": 102,
    "op": "remove",
    "name": "Benno"
+  },
+  {
+   "id": 103,
+   "op": "add",
+   "name": "Benno",
+   "paid": "bar"
+  },
+  {
+   "id": 104,
+   "op": "seats",
+   "names": [
+    "Kevin",
+    "Benno",
+    "Domi C",
+    "Magg",
+    "Manu",
+    "Niklas",
+    "Jonny",
+    "Tim"
+   ]
+  },
+  {
+   "id": 105,
+   "op": "out",
+   "name": "Benno"
   }
  ]
 }
