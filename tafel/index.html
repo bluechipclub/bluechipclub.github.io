@@ -598,6 +598,7 @@ function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=
 function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
   const key=a=>a.map(x=>String(x).toLowerCase()).sort().join(),cur=key(S.players.map(p=>p.name));
   pickCfg();if(CUR===T10&&preFor())return;
+  if(CUR===T10&&!S.fix&&!S.started&&fixFor(S.players).length){drawSeats();return;}
   /* gemerktes Bild gibt es nicht mehr (z.B. nach Rückbau): neu auslosen */
   if(CUR===T10&&S.pre&&!T10.pre.some(x=>x&&x.file===S.pre.file)){S.pre=null;drawSeats();return;}
   if((S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
@@ -638,7 +639,7 @@ const imgMode=()=>S.players.length>0&&S.players.length<=OLD.seats.length+1&&!!(C
 const timIn=()=>{const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
 const timIdx=()=>S.players.findIndex(p=>/^tim$/i.test(String(p.name).trim()));
 /* Platz -> Stuhl: Tim sitzt immer am Holzteil (Dealer-Platz), die anderen im Uhrzeigersinn danach */
-function imgSeat(k,n){const t=timIdx();{const e=preFor();if(e&&k!==t){const nm=pKey(S.players[k].name),sn=Object.keys(e.seats).find(x=>pKey(e.seats[x])===nm);if(sn&&IMG_SEATS[sn-1])return IMG_SEATS[sn-1];}}if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1,pool=CUR.spread?IMG_SEATS:m<=9?IMG_SEATS.slice(1,10):m===10?IMG_SEATS.slice(1):IMG_SEATS;return pool[Math.min(pool.length-1,Math.round((j-1)*pool.length/m+(pool.length/m-1)/2))];}
+function imgSeat(k,n){const t=timIdx();{const e=preFor();if(e&&k!==t){const nm=pKey(S.players[k].name),sn=Object.keys(e.seats).find(x=>pKey(e.seats[x])===nm);if(sn&&IMG_SEATS[sn-1])return IMG_SEATS[sn-1];}}if(S.fix&&CUR===T10&&k!==t){const v=S.fix[pKey(S.players[k].name)];if(v!=null&&IMG_SEATS[v])return IMG_SEATS[v];}if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1,pool=CUR.spread?IMG_SEATS:m<=9?IMG_SEATS.slice(1,10):m===10?IMG_SEATS.slice(1):IMG_SEATS;return pool[Math.min(pool.length-1,Math.round((j-1)*pool.length/m+(pool.length/m-1)/2))];}
 function imgBox(){const st=$("stage"),W=st.clientWidth||1,H=st.clientHeight||1;let w=W,h=W/IMG_AR;if(h>H){h=H;w=H*IMG_AR;}const z=1;return {W,H,w:w*z,h:h*z};}
 function imgToStage(fx,fy){const b=imgBox();return [100*((b.W-b.w)/2+fx*b.w)/b.W,100*((b.H-b.h)/2+fy*b.h)/b.H,b.w];}
 function figKey(name,used){let k=String(name).toLowerCase().trim().replace(/\s+/g,"-");k=FIG_ALIAS[k]||k;if(FIGS[k]&&!used.has(k))return k;return Object.keys(FIGS).find(x=>!used.has(x)&&!S.players.some(p=>{let q=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");return (FIG_ALIAS[q]||q)===x;}))||Object.keys(FIGS).find(x=>!used.has(x));}
@@ -1002,6 +1003,9 @@ $("rCopy").onclick=async()=>{const t=summaryText();try{await navigator.clipboard
 $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
+/* Monday Classic 09.11.: zwei feste, geprüfte Sitzordnungen (Plätze neben Tim frei, kein Stuhl-Fleck) */
+const FIXED=[{kevin:1,benno:2,"domi-c":3,magg:4,manu:5,niklas:6,jonny:7},{magg:1,niklas:2,kevin:3,manu:4,benno:5,"domi-c":6,jonny:7}];
+function fixFor(a){const ks=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return FIXED.map((f,i)=>i).filter(i=>Object.keys(FIXED[i]).sort().join()===ks);}
 function drawSeats(){
   closeAll();lobbyClose();
   S.timV=Math.random()<.5?1:0;
@@ -1010,8 +1014,9 @@ function drawSeats(){
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
+  S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
-  if(!S.pre&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
+  if(!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
 }
 function drawOverview(a){
