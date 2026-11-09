@@ -602,6 +602,7 @@ function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.len
   if(CUR===T10&&S.pre&&!T10.pre.some(x=>x&&x.file===S.pre.file)){S.pre=null;drawSeats();return;}
   if((S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
   drawSeats();}catch(e){}}
+setInterval(()=>{try{autoSeat()}catch(e){}},5000);
 function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),rest=a.filter(p=>p!==tim);if(!tim)return null;
   const keep=S.players;S.players=[...rest,tim];const seat=[];for(let k=0;k<n-1;k++)seat.push(IMG_SEATS.indexOf(imgSeat(k,n)));S.players=keep;
   const lib=CUR.lib,bad=CUR.bad||[],has=(p,i)=>i>=0&&lib[pKey(p.name)]&&lib[pKey(p.name)][String(i).padStart(2,"0")],isBad=(p,i,q,j)=>bad.some(x=>(x[0]===pKey(p.name)&&x[1]===i&&x[2]===pKey(q.name)&&x[3]===j)||(x[2]===pKey(p.name)&&x[3]===i&&x[0]===pKey(q.name)&&x[1]===j));
