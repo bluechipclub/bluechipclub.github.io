@@ -1,13 +1,60 @@
 {
-  "info": "Stream Deck: Clips pro Spieler. p = Name wie auf der Tafel, t = Knopf-Text, src = Datei relativ zu /tafel/. Neue Clips nach tafel/clips/ legen und hier eintragen.",
-  "clips": [
-    {"id": "tim-1",       "p": "Tim",    "t": "Knockout",     "src": "clips/tim-1.mp4"},
-    {"id": "benno-1",     "p": "Benno",  "t": "Money King",   "src": "clips/benno-1.mp4"},
-    {"id": "manu-1",      "p": "Manu",   "t": "Money Rain",   "src": "clips/manu-1.mp4"},
-    {"id": "manu-2",      "p": "Manu",   "t": "Manu Clip",    "src": "clips/manu-2.mp4"},
-    {"id": "niklas-1",    "p": "Niki",   "t": "Der Auftritt", "src": "clips/niklas-1.mp4"},
-    {"id": "kevin-1",     "p": "Kevin",  "t": "Slap Fight",   "src": "clips/kevin-1.mp4"},
-    {"id": "jonny-1",     "p": "Jonny",  "t": "Cabrio",       "src": "clips/jonny-1.mp4"},
-    {"id": "domi-c-1",    "p": "Domi C", "t": "Geldregen",    "src": "clips/domi-c-1.mp4", "stumm": true}
-  ]
+ "info": "Stream Deck: Clips pro Spieler. p = Name wie auf der Tafel, t = Knopf-Text, src = Datei relativ zu /tafel/. Neue Clips nach tafel/clips/ legen und hier eintragen.",
+ "clips": [
+  {
+   "id": "tim-1",
+   "p": "Tim",
+   "t": "Knockout",
+   "src": "clips/tim-1.mp4"
+  },
+  {
+   "id": "benno-1",
+   "p": "Benno",
+   "t": "Money King",
+   "src": "clips/benno-1.mp4"
+  },
+  {
+   "id": "manu-1",
+   "p": "Manu",
+   "t": "Money Rain",
+   "src": "clips/manu-1.mp4"
+  },
+  {
+   "id": "manu-2",
+   "p": "Manu",
+   "t": "Manu Clip",
+   "src": "clips/manu-2.mp4"
+  },
+  {
+   "id": "niklas-1",
+   "p": "Niki",
+   "t": "Der Auftritt",
+   "src": "clips/niklas-1.mp4"
+  },
+  {
+   "id": "kevin-1",
+   "p": "Kevin",
+   "t": "Slap Fight",
+   "src": "clips/kevin-1.mp4"
+  },
+  {
+   "id": "jonny-1",
+   "p": "Jonny",
+   "t": "Cabrio",
+   "src": "clips/jonny-1.mp4"
+  },
+  {
+   "id": "domi-c-1",
+   "p": "Domi C",
+   "t": "Geldregen",
+   "src": "clips/domi-c-1.mp4",
+   "stumm": true
+  },
+  {
+   "id": "magg-1",
+   "p": "Magg",
+   "t": "The Poet",
+   "src": "clips/magg-1.mp4"
+  }
+ ]
 }
