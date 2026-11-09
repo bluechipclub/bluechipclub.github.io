@@ -50,7 +50,8 @@ function unlockAll(){
   if(anyUnlocked&&Object.values(CL).every(x=>x.u))ub.hidden=true;
 }
 ["touchend","pointerdown","click","keydown"].forEach(t=>addEventListener(t,unlockAll,true));
-ub.onclick=()=>{unlockAll();ub.hidden=true;};
+const chime=new Audio("ton-test.mp3?v=1");chime.preload="auto";
+ub.onclick=()=>{unlockAll();ub.hidden=true;try{chime.currentTime=0;chime.play().catch(()=>{});}catch(e){}if(typeof toast==="function")toast("🔊 Ton ist an");};
 setInterval(()=>{if(Object.keys(CL).length&&!Object.values(CL).every(x=>x.u))ub.hidden=false;},4000);
 function duckOn(){try{if(typeof bg!=="undefined"&&bg&&!bg.paused){bgWas=true;bg.pause();}else bgWas=false;}catch(e){}
   try{if(typeof annAudio!=="undefined"&&annAudio)annAudio.pause();}catch(e){}
