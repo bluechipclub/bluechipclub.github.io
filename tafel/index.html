@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Sunday Classic · Tafel</title>
+<title>Monday Classic · Tafel</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -507,7 +507,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-sc-2026-11-08";
+const KEY="bcc-tafel-mc-2026-11-09";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -517,7 +517,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[
- {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300},{sb:200,bb:400,ante:400},{brk:10,note:"Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{sb:800,bb:1600,ante:1600},{brk:10,note:"Rebuys vorbei"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
+ {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{brk:10,note:"Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{brk:10,note:"Rebuys vorbei"},{sb:600,bb:1200,ante:1200},{sb:800,bb:1600,ante:1600},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
 const NAMES=["Tim"]; /* rest comes automatically from the sign-ups on the website (syncSignups) */
 // minigames: bb = stake in big blinds of the current level
@@ -535,8 +535,8 @@ const GAMES={
 };
 const DEFAULT_GAMES=[{lvl:1,g:"Omaha-Hand",at:150},{lvl:2,g:"Crazy Pineapple"},{lvl:2,g:"Omaha-Hand",at:1290},{lvl:3,g:"Pass the Trash"},{lvl:4,g:"Irish Poker"}];
 
-const fresh=()=>({v:1,title:"Sunday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:9,maxRe:1,
+const fresh=()=>({v:1,title:"Monday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
   buyin:30,fee:5,rebuy:25,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
@@ -1348,7 +1348,7 @@ async function bdayShow(){
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 /* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
-const LOBBY_AT="2026-11-08T17:00";
+const LOBBY_AT="2026-11-09T18:00";
 /* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
 const LOBBY_PICS=[
  {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
