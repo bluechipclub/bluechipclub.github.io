@@ -1183,6 +1183,7 @@ function runCmd(c){
     case "export":download();break;
     case "reload":save();setTimeout(()=>location.reload(),300);break;
     case "sync":break;
+    case "tv":try{if(window.parent!==window)window.parent.postMessage({tv:c.f},"*");}catch(e){}return;
     case "seatopen":seatOpen();break;
     case "bday":bdayShow();break;
     case "bdayclose":bdayClose();break;

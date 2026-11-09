@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tafel TV">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="tv.webmanifest">
+<link rel="apple-touch-icon" href="deck-192.png">
+<title>Tafel TV</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#f{position:fixed;left:0;top:0;border:0;transform-origin:0 0;background:#000}
+#hud{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:9;display:flex;gap:8px;align-items:center;background:rgba(15,15,15,.92);border:1px solid #9c7a2f;border-radius:14px;padding:8px 10px;font:600 15px system-ui,sans-serif;color:#f3d68f}
+#hud[hidden]{display:none}
+#hud button{font:inherit;color:#f4f4f2;background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px}
+#hud span{min-width:70px;text-align:center;font-family:ui-monospace,Menlo,monospace}
+#tap{position:fixed;right:0;top:0;width:70px;height:70px;z-index:8}
+</style>
+</head>
+<body>
+<iframe id="f" allow="autoplay; fullscreen" title="Tafel"></iframe>
+<div id="tap" title="TV-Einstellung"></div>
+<div id="hud" hidden>
+  <span>📺</span>
+  <button id="m">− schmaler</button><span id="v"></span><button id="p">breiter +</button>
+  <button id="a">Auto</button><button id="o">Aus</button><button id="x">✕</button>
+</div>
+<script>
+"use strict";
+/* TV-Modus: Die Tafel wird im 16:9-Format gebaut und dann waagrecht gestaucht.
+   Der Fernseher zieht das 4:3-Bild vom iPad in der Bildgröße "16:9" wieder breit -> passt genau und füllt den ganzen Schirm. */
+const K="bcc-tv-f",$=id=>document.getElementById(id),fr=$("f");
+let mode=null;try{mode=localStorage.getItem(K);}catch(e){}
+const q=new URLSearchParams(location.search);if(q.get("f"))mode=q.get("f");
+const autoF=()=>Math.min(1,(innerWidth/innerHeight)/(16/9));
+const cur=()=>mode==="off"?1:mode&&!isNaN(+mode)?+mode:autoF();
+function fit(){
+  const f=cur(),W=innerWidth,H=innerHeight;
+  fr.style.width=Math.round(W/f)+"px";fr.style.height=H+"px";fr.style.transform="scaleX("+f+")";
+  $("v").textContent=mode==="off"?"aus":Math.round(f*100)+"%"+(mode&&mode!=="off"?"":" auto");
+}
+function set(m){mode=m;try{if(m==null)localStorage.removeItem(K);else localStorage.setItem(K,m);}catch(e){}fit();showHud();}
+function step(d){set(String(Math.max(.5,Math.min(1,Math.round((cur()+d)*100)/100))));}
+function showHud(){$("hud").hidden=false;clearTimeout(showHud.t);showHud.t=setTimeout(()=>$("hud").hidden=true,6000);}
+$("m").onclick=()=>step(-.01);$("p").onclick=()=>step(.01);$("a").onclick=()=>set(null);$("o").onclick=()=>set("off");$("x").onclick=()=>$("hud").hidden=true;
+$("tap").onclick=showHud;
+addEventListener("resize",fit);
+addEventListener("keydown",e=>{if(e.key==="+")step(.01);else if(e.key==="-")step(-.01);else if(e.key==="t")showHud();});
+// commands from the phone remote arrive in the board and are passed up here
+addEventListener("message",e=>{const d=e.data;if(!d||d.tv==null)return;
+  if(d.tv==="+")step(.01);else if(d.tv==="-")step(-.01);else if(d.tv==="auto")set(null);else if(d.tv==="off")set("off");else if(!isNaN(+d.tv))set(String(d.tv));});
+const inner=new URLSearchParams(location.search);inner.delete("f");inner.set("tv","1");
+fr.src="index.html?"+inner.toString();
+fit();
+</script>
+</body>
+</html>
