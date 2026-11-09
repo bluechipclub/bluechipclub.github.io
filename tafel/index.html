@@ -535,6 +535,7 @@ const GAMES={
 };
 const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand (handy / ⚙ button) */
 const AUTO_GAMES=false;
+const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
 const fresh=()=>({v:1,title:"Monday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
@@ -726,7 +727,7 @@ const countBeep=n=>tone(n<=3?1320:880,0,.18,.7,"square");
 const levelSound=()=>{[0,.45,.9].forEach(t=>{tone(1046,t,.35,.7,"square");tone(523,t,.35,.4,"sine");});};
 const fanfare=()=>[523,659,784,1047].forEach((f,k)=>tone(f,k*.14,.4,.55,"triangle"));
 const gong=()=>{tone(110,0,2.5,.6,"sine");tone(220,0,2,.3,"triangle");tone(55,0,3,.4,"sine");};
-function countdown(n){const c=$("count");c.hidden=false;c.textContent=n;c.classList.remove("t");void c.offsetWidth;c.classList.add("t");countBeep(n);clearTimeout(countdown.t);countdown.t=setTimeout(()=>c.hidden=true,950);}
+function countdown(n){const c=$("count");c.hidden=false;c.textContent=n;c.classList.remove("t");void c.offsetWidth;c.classList.add("t");if(LEVEL_SOUND)countBeep(n);clearTimeout(countdown.t);countdown.t=setTimeout(()=>c.hidden=true,950);}
 
 /* ---------- clock ---------- */
 let lastSec=null;
@@ -740,7 +741,7 @@ function advance(){
   const carry=S.endAt;S.i++;S.endAt=carry+dur(S.i)*1000;S.left=dur(S.i);
   log("level",{to:LEVELS[S.i].brk?"Pause":"Level "+playNum(S.i)});
   if(S.active&&S.active!=="7-2 Bonus")S.active=null;
-  levelSound();save();
+  if(LEVEL_SOUND)levelSound();save();
   const L=LEVELS[S.i];
   announce({eyebrow:L.brk?"Pause":"Neues Level",title:L.brk?(L.note||"Pause"):"Level "+playNum(S.i),text:L.brk?L.brk+" Minuten. Rebuys jetzt an der Kasse.":"Blinds jetzt "+fmt(L.sb)+" / "+fmt(L.bb)+(L.ante?", Big-Blind-Ante "+fmt(L.ante):"")+".",sec:8});
 }
@@ -750,7 +751,7 @@ function tick(){
     let guard=0;while(S.running&&Date.now()>=S.endAt&&guard++<40)advance();
     const s=Math.ceil(leftNow());
     if(s!==lastSec){
-      if(lastSec!==null){if(s===60)minuteBeep();if(s<=10&&s>=1)countdown(s);}
+      if(lastSec!==null){if(s===60&&LEVEL_SOUND)minuteBeep();if(s<=10&&s>=1)countdown(s);}
       lastSec=s;checkGames();
     }
   }
