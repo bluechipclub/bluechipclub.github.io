@@ -6,12 +6,8 @@
     {"id": "manu-1",      "p": "Manu",   "t": "Money Rain",   "src": "clips/manu-1.mp4"},
     {"id": "manu-2",      "p": "Manu",   "t": "Manu Clip",    "src": "clips/manu-2.mp4"},
     {"id": "niklas-1",    "p": "Niki",   "t": "Der Auftritt", "src": "clips/niklas-1.mp4"},
-    {"id": "niki-bday",   "p": "Niki",   "t": "Birthday Man", "src": "karten/niklas.mp4"},
-    {"id": "nico-song",   "p": "Nico",   "t": "Nicos Song",   "src": "karten/nico.mp4"},
     {"id": "kevin-1",     "p": "Kevin",  "t": "Slap Fight",   "src": "clips/kevin-1.mp4"},
     {"id": "jonny-1",     "p": "Jonny",  "t": "Cabrio",       "src": "clips/jonny-1.mp4"},
-    {"id": "domi-c-1",    "p": "Domi C", "t": "Geldregen",    "src": "clips/domi-c-1.mp4", "stumm": true},
-    {"id": "alle-intro",  "p": "Alle",   "t": "Intro",        "src": "../video/intro.mp4"},
-    {"id": "alle-chip",   "p": "Alle",   "t": "Der Chip fällt", "src": "lobby/chip-intro-final-weich.mp4", "stumm": true}
+    {"id": "domi-c-1",    "p": "Domi C", "t": "Geldregen",    "src": "clips/domi-c-1.mp4", "stumm": true}
   ]
 }
