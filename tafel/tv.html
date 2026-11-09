@@ -37,7 +37,8 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
 const K="bcc-tv-f",$=id=>document.getElementById(id),fr=$("f");
 let mode=null;try{mode=localStorage.getItem(K);}catch(e){}
 const q=new URLSearchParams(location.search);if(q.get("f"))mode=q.get("f");
-const autoF=()=>Math.min(1,(innerWidth/innerHeight)/(16/9));
+/* squeeze only on the iPad (touch); a Mac/laptop on the TV gets the normal picture */
+const autoF=()=>navigator.maxTouchPoints>1?Math.min(1,(innerWidth/innerHeight)/(16/9)):1;
 const cur=()=>mode==="off"?1:mode&&!isNaN(+mode)?+mode:autoF();
 function fit(){
   const f=cur(),W=innerWidth,H=innerHeight;
