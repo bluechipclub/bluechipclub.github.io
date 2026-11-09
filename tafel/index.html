@@ -595,7 +595,9 @@ function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=
 function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
   const key=a=>a.map(x=>String(x).toLowerCase()).sort().join(),cur=key(S.players.map(p=>p.name));
   pickCfg();if(CUR===T10&&preFor())return;
-  if((S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
+  /* gibt es fertige saubere Gesamtbilder für genau diese Spieler, wird vor Turnierstart einmal neu ausgelost (statt Einzelfiguren) */
+  const want=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),hasPre=CUR===T10&&!S.started&&T10.pre.some(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);
+  if(!hasPre&&(S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
   drawSeats();}catch(e){}}
 function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),rest=a.filter(p=>p!==tim);if(!tim)return null;
   const keep=S.players;S.players=[...rest,tim];const seat=[];for(let k=0;k<n-1;k++)seat.push(IMG_SEATS.indexOf(imgSeat(k,n)));S.players=keep;

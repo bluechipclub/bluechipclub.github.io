@@ -542,5 +542,145 @@
    "9": "magg"
   },
   "quelle": "kand-035-4ee9f921.jpg"
+ },
+ {
+  "file": "35.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "manu",
+   "2": "jonny",
+   "4": "domi-c",
+   "5": "niklas",
+   "6": "benno",
+   "8": "magg",
+   "9": "kevin"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "36.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "niklas",
+   "2": "magg",
+   "4": "benno",
+   "5": "manu",
+   "6": "kevin",
+   "8": "domi-c",
+   "9": "jonny"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "37.webp",
+  "tim": "hoodie",
+  "seats": {
+   "2": "kevin",
+   "3": "magg",
+   "4": "niklas",
+   "5": "domi-c",
+   "6": "manu",
+   "7": "benno",
+   "8": "jonny"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "38.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "jonny",
+   "2": "benno",
+   "4": "kevin",
+   "5": "manu",
+   "6": "domi-c",
+   "8": "niklas",
+   "9": "magg"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "39.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "manu",
+   "3": "kevin",
+   "4": "benno",
+   "5": "domi-c",
+   "6": "jonny",
+   "7": "magg",
+   "9": "niklas"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "40.webp",
+  "tim": "hoodie",
+  "seats": {
+   "1": "niklas",
+   "2": "manu",
+   "3": "benno",
+   "5": "kevin",
+   "7": "magg",
+   "8": "domi-c",
+   "9": "jonny"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "41.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "domi-c",
+   "2": "niklas",
+   "3": "manu",
+   "5": "magg",
+   "7": "benno",
+   "8": "jonny",
+   "9": "kevin"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "42.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "jonny",
+   "2": "niklas",
+   "4": "benno",
+   "5": "domi-c",
+   "6": "manu",
+   "8": "magg",
+   "9": "kevin"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "43.webp",
+  "tim": "hoodie",
+  "seats": {
+   "2": "niklas",
+   "3": "benno",
+   "4": "domi-c",
+   "5": "manu",
+   "6": "kevin",
+   "7": "magg",
+   "8": "jonny"
+  },
+  "quelle": "composite-2026-11-09"
+ },
+ {
+  "file": "44.webp",
+  "tim": "outfit",
+  "seats": {
+   "1": "domi-c",
+   "2": "magg",
+   "4": "kevin",
+   "5": "manu",
+   "6": "benno",
+   "8": "niklas",
+   "9": "jonny"
+  },
+  "quelle": "composite-2026-11-09"
  }
 ]
