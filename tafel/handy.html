@@ -9,6 +9,7 @@
 <title>Tafel-Fernbedienung</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="preconnect" href="https://ntfy.sh" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&display=swap">
@@ -52,11 +53,33 @@ input{font:16px var(--sans);background:var(--s2);color:var(--fg);border:1px soli
 .sheet[hidden]{display:none}
 .sheet>div{background:#121212;border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:560px;margin:0 auto}
 .sheet h3{font-size:20px;margin-bottom:12px}
+.deck{display:grid;gap:10px;margin-bottom:14px}
+.pc{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:10px;display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center}
+.pc.away{opacity:.55}
+.pc .av{width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--s2);display:grid;place-items:center;font-weight:800;font-size:22px;color:var(--gold2);border:1px solid var(--gold3)}
+.pc .av img{width:100%;height:100%;object-fit:cover}
+.pc .nm{font-weight:780;font-size:17px;margin-bottom:6px}
+.pc .cb{display:flex;flex-wrap:wrap;gap:6px}
+.pc .cb button{flex:1 1 46%;padding:16px 8px;font-size:15px;border-color:rgba(226,184,87,.45);background:linear-gradient(180deg,#22201a,#171612)}
+.pc .cb button.hit{background:linear-gradient(180deg,#f3d68f,#c49a41);color:#111}
+.pc .cb button small{display:block;font-size:10px;color:var(--grey);font-weight:500;margin-top:2px}
+.stopbar{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));z-index:5;margin-top:4px}
+.stopbar button{width:100%;padding:16px;font-size:16px;background:#1d1212;border-color:rgba(229,103,92,.6);color:var(--red);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+details.ctl{margin-top:18px;border:1px solid var(--line);border-radius:16px;background:#0e0e0e}
+details.ctl>summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+details.ctl>summary::-webkit-details-marker{display:none}
+details.ctl>summary span{font-family:var(--mono);font-size:12px;color:var(--grey);font-weight:500}
+details.ctl[open]>summary{border-bottom:1px solid var(--line)}
+details.ctl>.in{padding:12px}
 </style>
 </head>
 <body>
-<div class="top"><h1>Fernbedienung</h1><div class="dot" id="dot"><i></i><span>verbinde…</span></div></div>
+<div class="top"><h1>Stream Deck</h1><div class="dot" id="dot"><i></i><span>verbinde…</span></div></div>
 
+<div class="deck" id="deck"><p class="note">Lade Clips…</p></div>
+<div class="stopbar"><button id="clipStop">■ Clip stoppen</button></div>
+
+<details class="ctl" id="ctl"><summary>⚙ Steuerung <span id="sum">Uhr, Spieler, Rebuys …</span></summary><div class="in">
 <div class="clock">
   <div class="l" id="lvl">–</div>
   <div class="t p" id="t">--:--</div>
@@ -107,6 +130,7 @@ input{font:16px var(--sans);background:var(--s2);color:var(--fg);border:1px soli
   <button data-c='{"op":"export"}'>⬇ Export am Laptop</button>
 </div>
 <p class="note">Befehle kommen in 1–2 Sekunden auf der Tafel an. Klappt das mal nicht, schreib Claude im Chat, das geht immer.</p>
+</div></details>
 
 <div class="sheet" id="sheet" hidden><div>
   <h3 id="shT"></h3>
@@ -185,8 +209,38 @@ function apply(s){
   $("lvl").textContent=s.lvl;$("bl").textContent=s.blinds;
   $("meta").textContent="Pot "+s.pot+" P · "+s.entries+" Entries · "+(s.reOpen?"Rebuy offen":"Freezeout")+(s.active?" · läuft: "+s.active:"");
   $("play").textContent=s.running?"❚❚ Pause":"▶ Start";
-  renderPlayers();renderGames();tick();
+  $("sum").textContent=s.lvl+" · "+s.blinds+(s.running?"":" · Pause");
+  renderPlayers();renderGames();renderDeck();tick();
 }
+
+/* ---------- Stream Deck ---------- */
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","jonny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi"};
+let CLIPS=[];
+const same=(a,b)=>a.toLowerCase()===b.toLowerCase()||(AV[a.toLowerCase()]&&AV[a.toLowerCase()]===AV[b.toLowerCase()]);
+function renderDeck(){
+  const D=$("deck"),at=st?st.p.map(x=>x[0]):[];
+  const k=JSON.stringify([CLIPS.map(c=>c.id+c.t+c.p),at]);if(D.dataset.k===k)return;D.dataset.k=k;
+  if(!CLIPS.length){D.innerHTML='<p class="note">Noch keine Clips eingetragen.</p>';return;}
+  const groups=[];CLIPS.forEach(c=>{let g=groups.find(g=>same(g.p,c.p));if(!g)groups.push(g={p:c.p,c:[]});g.c.push(c);});
+  const here=g=>g.p==="Alle"?2:at.some(n=>same(n,g.p))?0:1;
+  groups.sort((a,b)=>here(a)-here(b));
+  D.innerHTML="";
+  groups.forEach(g=>{
+    const r=document.createElement("div");r.className="pc"+(here(g)===1&&at.length?" away":"");
+    const a=AV[g.p.toLowerCase()];
+    r.innerHTML='<div class="av">'+(a?'<img src="karten/av/'+a+'.jpg?v=13" alt="">':(g.p==="Alle"?"★":g.p.charAt(0)))+'</div><div><div class="nm"></div><div class="cb"></div></div>';
+    r.querySelector(".nm").textContent=g.p==="Alle"?"Für alle":g.p;
+    const cb=r.querySelector(".cb");
+    g.c.forEach(c=>{const b=document.createElement("button");b.textContent=c.t;if(c.stumm){const s=document.createElement("small");s.textContent="ohne Ton";b.appendChild(s);}
+      b.onclick=()=>{b.classList.add("hit");setTimeout(()=>b.classList.remove("hit"),600);send({op:"clip",id:c.id},"▶ "+c.t);};cb.appendChild(b);});
+    D.appendChild(r);
+  });
+}
+async function loadClips(){try{const r=await fetch("clips/clips.json?t="+Date.now(),{cache:"no-store"});const j=await r.json();CLIPS=j.clips||[];renderDeck();}catch(e){$("deck").innerHTML='<p class="note">Clips nicht geladen. Netz prüfen.</p>';}}
+$("clipStop").onclick=()=>send({op:"clipstop"},"Clip gestoppt");
+try{if(localStorage.getItem("bcc-handy-ctl")==="1")$("ctl").open=true;}catch(e){}
+$("ctl").addEventListener("toggle",()=>{try{localStorage.setItem("bcc-handy-ctl",$("ctl").open?"1":"0");}catch(e){}});
+loadClips();
 // latest state: read recent cache once, then stream
 async function pollState(since){
   try{const r=await fetch(RELAY+TOPIC+"-state/json?poll=1&since="+since+"&t="+Date.now(),{cache:"no-store"});const t=await r.text();const lines=t.trim().split("\n").filter(Boolean);

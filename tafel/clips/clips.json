@@ -1,0 +1,11 @@
+{
+  "info": "Stream Deck: Clips pro Spieler. p = Name wie auf der Tafel, t = Knopf-Text, src = Datei relativ zu /tafel/. Neue Clips nach tafel/clips/ legen und hier eintragen.",
+  "clips": [
+    {"id": "nico-song",   "p": "Nico",  "t": "Nicos Song",  "src": "karten/nico.mp4"},
+    {"id": "niki-bday",   "p": "Niki",  "t": "Birthday Man", "src": "karten/niklas.mp4"},
+    {"id": "benno-money", "p": "Benno", "t": "Money Clip",  "src": "lobby/benno.mp4", "stumm": true},
+    {"id": "alle-prison", "p": "Alle",  "t": "Prison Walk", "src": "../video/prison-clip-1080p.mp4"},
+    {"id": "alle-intro",  "p": "Alle",  "t": "Intro",       "src": "../video/intro.mp4"},
+    {"id": "alle-chip",   "p": "Alle",  "t": "Der Chip fällt", "src": "lobby/chip-intro-final-weich.mp4", "stumm": true}
+  ]
+}

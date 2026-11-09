@@ -1150,6 +1150,7 @@ $("sReset").onclick=()=>{if(!confirm("Wirklich alles zurücksetzen? Rebuys, Plat
 let applied=null;try{const a=localStorage.getItem(APPLIED_KEY);applied=a==null?null:+a;}catch(e){}
 function runCmd(c){
   const op=c.op;
+  if(op==="clip"||op==="clipstop"){if(typeof clipCmd==="function")clipCmd(c);return;}   // stream deck: no log, no save
   try{switch(op){
     case "msg":S.msgs.push({text:c.text,until:c.min?Date.now()+c.min*60000:null});S.msgs=S.msgs.slice(-6);if(c.big!==false)announce({eyebrow:c.eyebrow||"Durchsage",title:c.title||c.text,text:c.title?c.text:"",sec:c.sec||20});break;
     case "clearmsg":S.msgs=[];break;
@@ -1185,7 +1186,7 @@ function runCmd(c){
     case "bdayclose":bdayClose();break;
     case "lobby":lobbyShow();break;
     case "lobbyclose":lobbyClose();break;
-    case "close":if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
+    case "close":if(typeof clipStop==="function"&&clipStop())break;if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
     case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
@@ -1234,7 +1235,7 @@ function openRemote(){
     seenRemote.add(m.id);lastRemote=m.id;try{localStorage.setItem(KEY+"-ntfy",m.id);}catch(e){}
     if(Date.now()/1000-m.time>600)return;          // ignore stale commands after a long outage
     let c;try{c=JSON.parse(m.message);}catch(e){return;}
-    (Array.isArray(c)?c:[c]).forEach(x=>runCmd(Object.assign({src:"handy"},x)));
+    (Array.isArray(c)?c:[c]).forEach(x=>runCmd(Object.assign({src:"handy",_ts:m.time},x)));
   };
   es.onerror=()=>{remoteOk=false;};
 }
@@ -1510,5 +1511,6 @@ buildSeats();render();setInterval(tick,250);tick();pushState();
 poll();setInterval(poll,POLL_MS);
 showCtrl();
 </script>
+<script src="clips.js?v=1"></script>
 </body>
 </html>
