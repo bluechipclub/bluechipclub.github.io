@@ -6,9 +6,13 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stream Deck">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="handy.webmanifest">
 <title>Tafel-Fernbedienung</title>
 <link rel="icon" href="../favicon.svg">
-<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="apple-touch-icon" href="deck-192.png">
 <link rel="preconnect" href="https://ntfy.sh" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -241,6 +245,7 @@ $("clipStop").onclick=()=>send({op:"clipstop"},"Clip gestoppt");
 try{if(localStorage.getItem("bcc-handy-ctl")==="1")$("ctl").open=true;}catch(e){}
 $("ctl").addEventListener("toggle",()=>{try{localStorage.setItem("bcc-handy-ctl",$("ctl").open?"1":"0");}catch(e){}});
 loadClips();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("handy-sw.js",{scope:"./handy"}).catch(()=>{});
 // latest state: read recent cache once, then stream
 async function pollState(since){
   try{const r=await fetch(RELAY+TOPIC+"-state/json?poll=1&since="+since+"&t="+Date.now(),{cache:"no-store"});const t=await r.text();const lines=t.trim().split("\n").filter(Boolean);
