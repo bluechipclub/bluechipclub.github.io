@@ -14,6 +14,17 @@
    "src": "clips/benno-1.mp4"
   },
   {
+   "id": "manu-sf",
+   "p": "Manu",
+   "t": "🏆 Straight Flush",
+   "src": "clips/manu-1.mp4",
+   "rekord": {
+    "ey": "🏆 Neuer Hausrekord",
+    "title": "Straight Flush",
+    "text": "6♦ 2♦ · 2 bis 6 Karo · der erste im Club"
+   }
+  },
+  {
    "id": "manu-1",
    "p": "Manu",
    "t": "Money Rain",

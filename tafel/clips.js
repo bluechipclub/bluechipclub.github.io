@@ -16,13 +16,19 @@ css.textContent=`
 .clipov .ccap .ey{font-family:var(--mono,monospace);font-size:1.6vw;letter-spacing:.3em;text-transform:uppercase;color:#e2b857}
 .clipov .ccap h2{font-size:7vw;line-height:1;font-weight:800;color:#fff;margin-top:1vh;text-shadow:0 1vh 4vh rgba(0,0,0,.7)}
 .clipov .ccap p{font-size:2.2vw;color:#f3d68f;margin-top:1.5vh;font-weight:650}
+.clipov .crek{position:absolute;left:50%;top:3%;transform:translateX(-50%);z-index:3;text-align:center;padding:1.4vw 3vw;border-radius:1.4vw;background:linear-gradient(180deg,rgba(30,24,10,.92),rgba(12,10,6,.92));border:2px solid #e2b857;box-shadow:0 0 4vw rgba(226,184,87,.45);animation:crek 1.2s ease-out both}
+.clipov .crek[hidden]{display:none}
+.clipov .crek .ey{font-family:var(--mono,monospace);font-size:1.4vw;letter-spacing:.35em;text-transform:uppercase;color:#e2b857}
+.clipov .crek b{display:block;font-size:4.2vw;line-height:1.05;font-weight:850;color:#fff;margin-top:.4vw}
+.clipov .crek i{display:block;font-style:normal;font-size:2vw;color:#f3d68f;margin-top:.5vw;font-weight:650}
+@keyframes crek{0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}60%{opacity:1;transform:translate(-50%,0) scale(1.06)}100%{transform:translate(-50%,0) scale(1)}}
 #clipUnlock{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:95;font:800 3vw/1.2 var(--sans,system-ui);padding:2.4vw 4vw;border-radius:1.6vw;border:2px solid #e2b857;background:rgba(10,10,10,.94);color:#f3d68f;box-shadow:0 2vh 6vh rgba(0,0,0,.8);cursor:pointer;text-align:center}
 #clipUnlock small{display:block;font-size:1.4vw;font-weight:500;color:#bdbdb8;margin-top:.8vw}
 #clipUnlock[hidden]{display:none}
 `;
 document.head.appendChild(css);
 const ov=document.createElement("div");ov.className="clipov";ov.hidden=true;
-ov.innerHTML='<video class="cbg" muted playsinline></video><div class="ccap"><div class="ey">Blue Chip Club</div><h2></h2><p></p></div>';
+ov.innerHTML='<video class="cbg" muted playsinline></video><div class="crek" hidden><div class="ey"></div><b></b><i></i></div><div class="ccap"><div class="ey">Blue Chip Club</div><h2></h2><p></p></div>';
 document.body.appendChild(ov);
 const bgv=ov.querySelector(".cbg");
 const ub=document.createElement("button");ub.id="clipUnlock";ub.type="button";ub.innerHTML="🔊 Einmal hier tippen für Ton<small>danach laufen die Clips mit Musik</small>";
@@ -75,12 +81,14 @@ function stop(){
 function play(id){
   const x=CL[id];if(!x){if(typeof toast==="function")toast("Clip „"+id+"“ nicht gefunden");return;}
   if(!cur)duckOn();
+  ub.hidden=true;
   cur=x;const c=x.c;clearTimeout(hideT);
   try{pv.pause();}catch(e){}
   if(pv.dataset.src!==c.src){pv.src=c.src;pv.dataset.src=c.src;}
   try{pv.currentTime=0;}catch(e){}
   pv.muted=false;pv.volume=1;
   ov.querySelector("h2").textContent=c.p==="Alle"?"":c.p;ov.querySelector("p").textContent=c.t||"";
+  {const r=ov.querySelector(".crek"),k=c.rekord;r.hidden=!k;if(k){r.querySelector(".ey").textContent=k.ey||"🏆 Neuer Hausrekord";r.querySelector("b").textContent=k.title||"";r.querySelector("i").textContent=k.text||"";r.style.animation="none";void r.offsetWidth;r.style.animation="";}}
   const setPort=()=>{const pt=pv.videoHeight>pv.videoWidth;ov.classList.toggle("port",pt);ov.classList.toggle("land",!pt&&pv.videoWidth>0);};setPort();pv.onloadedmetadata=setPort;
   ov.hidden=false;void ov.offsetWidth;ov.classList.add("on");
   pv.onended=()=>{if(cur===x)stop();};
