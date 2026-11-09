@@ -793,6 +793,37 @@
    "id": 105,
    "op": "out",
    "name": "Benno"
+  },
+  {
+   "id": 106,
+   "op": "set",
+   "v": {
+    "fix": {
+     "kevin": 1,
+     "benno": 2,
+     "domi-c": 3,
+     "magg": 4,
+     "manu": 5,
+     "niklas": 6,
+     "jonny": 7
+    },
+    "fixN": 0,
+    "pre": null
+   }
+  },
+  {
+   "id": 107,
+   "op": "seats",
+   "names": [
+    "Kevin",
+    "Benno",
+    "Domi C",
+    "Magg",
+    "Manu",
+    "Niklas",
+    "Jonny",
+    "Tim"
+   ]
   }
  ]
 }
