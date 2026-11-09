@@ -588,7 +588,7 @@ const OLD={base:"",dealer:[.50,.04],seats:[[.69,.06],[.885,.18],[.95,.47],[.885,
 let T10=null,CUR=OLD,DEALER_SEAT=OLD.dealer,IMG_SEATS=OLD.seats;
 /* fertige Gesamtbilder: "Plätze auslosen" zieht eins aus t10/fertig/index.json, wenn genau diese Spieler drauf sind */
 const pKey=n=>{let k=String(n).toLowerCase().trim().replace(/\s+/g,"-");return FIG_ALIAS[k]||k;};
-function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;const e=S.pre,names=Object.values(e.seats).map(pKey).sort().join(),cur=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return names===cur?e:null;}
+function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;if(!CUR.pre.some(x=>x&&x.file===S.pre.file))return null;const e=S.pre,names=Object.values(e.seats).map(pKey).sort().join(),cur=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return names===cur?e:null;}
 function preActive(){const e=preFor();return e&&!S.players.some(p=>p.out)&&timIn()?e:null;}
 function pickPre(a){S.pre=null;if(!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
 /* Jan kommt nicht mehr an den Tisch (Liga/Profile bleiben). Steht er noch in einem alten Stand, fliegt er raus. */
@@ -598,6 +598,8 @@ function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=
 function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
   const key=a=>a.map(x=>String(x).toLowerCase()).sort().join(),cur=key(S.players.map(p=>p.name));
   pickCfg();if(CUR===T10&&preFor())return;
+  /* gemerktes Bild gibt es nicht mehr (z.B. nach Rückbau): neu auslosen */
+  if(CUR===T10&&S.pre&&!T10.pre.some(x=>x&&x.file===S.pre.file)){S.pre=null;drawSeats();return;}
   if((S.log||[]).some(l=>l.type==="draw"&&Array.isArray(l.order)&&key(l.order)===cur))return;
   drawSeats();}catch(e){}}
 function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),rest=a.filter(p=>p!==tim);if(!tim)return null;
