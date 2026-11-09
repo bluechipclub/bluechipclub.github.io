@@ -252,7 +252,7 @@ async function loadClips(){try{const r=await fetch("clips/clips.json?t="+Date.no
 $("clipStop").onclick=()=>send({op:"clipstop"},"Clip gestoppt");
 try{if(localStorage.getItem("bcc-handy-ctl")==="1")$("ctl").open=true;}catch(e){}
 $("ctl").addEventListener("toggle",()=>{try{localStorage.setItem("bcc-handy-ctl",$("ctl").open?"1":"0");}catch(e){}});
-loadClips();
+loadClips();setInterval(loadClips,60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")loadClips();});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("handy-sw.js",{scope:"./handy"}).catch(()=>{});
 // latest state: read recent cache once, then stream
 async function pollState(since){
