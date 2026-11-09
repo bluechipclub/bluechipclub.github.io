@@ -54,7 +54,7 @@ addEventListener("keydown",e=>{if(e.key==="+")step(.01);else if(e.key==="-")step
 // commands from the phone remote arrive in the board and are passed up here
 addEventListener("message",e=>{const d=e.data;if(!d||d.tv==null)return;
   if(d.tv==="+")step(.01);else if(d.tv==="-")step(-.01);else if(d.tv==="auto")set(null);else if(d.tv==="off")set("off");else if(!isNaN(+d.tv))set(String(d.tv));});
-const inner=new URLSearchParams(location.search);inner.delete("f");inner.set("tv","1");
+const inner=new URLSearchParams(location.search);inner.delete("f");inner.set("tv","1");inner.set("t",String(Date.now()));
 fr.src="index.html?"+inner.toString();
 fit();
 </script>
