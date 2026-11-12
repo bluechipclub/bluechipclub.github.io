@@ -824,6 +824,11 @@
     "Jonny",
     "Tim"
    ]
+  },
+  {
+   "id": 108,
+   "op": "sync",
+   "note": "Test 12.11.: Live-Verbindung über GitHub-API"
   }
  ]
 }

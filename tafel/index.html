@@ -76,6 +76,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Spieler-Tisch (Gesamtbild mit Spielern von oben), aktiv bei bis zu 11 Spielern */
 .stage.img11{background:#0b0907 url("../img/tisch-oben.webp?v=1") 50% 50%/contain no-repeat}
 .stage.img11 .avw{display:none}
+.stage.img11.simple .avw{display:block}
+.stage.img11.simple .seat .nm{padding-left:2.2vh!important}
 .stage.img11.tim{background-image:url("../img/tisch-tim.webp?v=1")}
 .stage.img11.tim.tv1{background-image:url("../img/tisch-tim2.webp?v=1")}
 .stage.img11.t10{background-image:url("t10/tisch-leer.webp?v=1")}
@@ -507,7 +509,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-tc-2026-11-12";
+const KEY="bcc-tafel-tc-2026-11-12b";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -537,8 +539,8 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Thursday Classic",sub:"Blue Chip Club · Deepstack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
+const fresh=()=>({v:1,title:"Thursday Classic",sub:"Blue Chip Club · Deepstack · 20.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:20000,reLvl:7,maxRe:2,
   buyin:30,fee:5,rebuy:25,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
@@ -554,7 +556,10 @@ function log(type,data){S.log.push(Object.assign({t:new Date().toISOString(),lvl
 const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
 const dur=i=>{const L=LEVELS[i];if(!L)return 0;if(L.brk)return L.brk*60;const n=playNum(i);return (n===1?S.min1:(S.reLvl!=null&&n>S.reLvl?S.minLate:S.min))*60;};
 const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-Date.now())/1000):(S.left==null?dur(S.i):S.left);
-const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim());
+/* Spitznamen: „Niki“ findet Niklas, „Alex“/„PDiddy“ findet P. Diddy usw. */
+const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","max":"magg","olli":"oli"};
+const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS[k]||k;};
+const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||S.players.find(p=>canonName(p.name)===canonName(n));
 const alive=()=>S.players.filter(p=>!p.out);
 const totalEntries=()=>S.players.reduce((a,p)=>a+p.entries.length,0);
 const costOf=p=>p.entries.length?S.buyin+(p.entries.length-1)*S.rebuy:0;
@@ -586,17 +591,19 @@ const IMG_AR=1920/1072;
 /* 11 Stühle am leeren Ge-man-Tisch (Anteile am Bild), im Uhrzeigersinn ab oben links; oben Mitte = Dealer-Ablage */
 const OLD={base:"",dealer:[.50,.04],seats:[[.69,.06],[.885,.18],[.95,.47],[.885,.80],[.69,.93],[.50,.93],[.31,.93],[.115,.80],[.05,.47],[.115,.18],[.31,.06]],oval:[.245,.33,.755,.655],dealerTag:[.5,.205],dBtn:[.585,.205],lib:null,spread:false,pre:null};
 /* new 10-place table (dealer + 9 chairs): loaded from t10/config.json when present, used for up to 10 players */
+/* 12.11.: SIMPLE = altes Design (Tims Wunsch): leerer Tisch, an jedem Stuhl Profilbild + Name, keine eingeblendeten Körper/Figuren, keine fertigen Sitzbilder */
+const SIMPLE=true;
 let T10=null,CUR=OLD,DEALER_SEAT=OLD.dealer,IMG_SEATS=OLD.seats;
 /* fertige Gesamtbilder: "Plätze auslosen" zieht eins aus t10/fertig/index.json, wenn genau diese Spieler drauf sind */
 const pKey=n=>{let k=String(n).toLowerCase().trim().replace(/\s+/g,"-");return FIG_ALIAS[k]||k;};
 function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;if(!CUR.pre.some(x=>x&&x.file===S.pre.file))return null;const e=S.pre,names=Object.values(e.seats).map(pKey).sort().join(),cur=S.players.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return names===cur?e:null;}
 function preActive(){const e=preFor();return e&&!S.players.some(p=>p.out)&&timIn()?e:null;}
-function pickPre(a){S.pre=null;if(!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
+function pickPre(a){S.pre=null;if(SIMPLE||!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
 /* Jan kommt nicht mehr an den Tisch (Liga/Profile bleiben). Steht er noch in einem alten Stand, fliegt er raus. */
 const NOT_AT_TABLE=["jan"];
 function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=>!NOT_AT_TABLE.includes(String(p.name).trim().toLowerCase()));if(S.players.length!==n){if(S.dealer>=S.players.length)S.dealer=0;S.pre=null;return true;}return false;}
 /* Nie leere Namensschilder ohne Figuren: wurde für genau diese Spieler noch nicht ausgelost, wird einmal automatisch ausgelost. */
-function autoSeat(){try{if(!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
+function autoSeat(){try{if(SIMPLE||!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
   const key=a=>a.map(x=>String(x).toLowerCase()).sort().join(),cur=key(S.players.map(p=>p.name));
   pickCfg();if(CUR===T10&&preFor())return;
   if(CUR===T10&&!S.fix&&!S.started&&fixFor(S.players).length){drawSeats();return;}
@@ -613,7 +620,7 @@ function validSeating(a){const n=a.length,tim=a.find(p=>/^tim$/i.test(String(p.n
   const go=k=>{if(k===rest.length)return true;if(++steps>200000)return false;const cand=pool.filter(p=>!used.has(p)&&has(p,seat[k]));for(let i=cand.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cand[i],cand[j]]=[cand[j],cand[i]];}
     for(const p of cand){if(k>0&&isBad(out[k-1],seat[k-1],p,seat[k]))continue;used.add(p);out.push(p);if(go(k+1))return true;out.pop();used.delete(p);}return false;};
   return go(0)?[...out,tim]:null;}
-function pickCfg(){const n=S.players.length,c=(T10&&T10.lib&&!S.forceOld&&n<=T10.seats.length+1)?T10:OLD;CUR=c;DEALER_SEAT=c.dealer;IMG_SEATS=c.seats;OVAL=c.oval;}
+function pickCfg(){const n=S.players.length,c=(!SIMPLE&&T10&&T10.lib&&!S.forceOld&&n<=T10.seats.length+1)?T10:OLD;CUR=c;DEALER_SEAT=c.dealer;IMG_SEATS=c.seats;OVAL=c.oval;}
 fetch("t10/config.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(c=>{if(!c)return;const d=c.dealer;T10={base:"t10/",dealer:d,seats:c.seats,oval:c.oval,dealerTag:c.dealerTag||[d[0],d[1]+.085],dBtn:c.dBtn||[d[0]+.075,d[1]+.085],lib:null,spread:true,pre:null,bad:null};fetch("t10/sitze/verboten.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x))T10.bad=x;}).catch(()=>{});fetch("t10/fertig/index.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(x=>{if(Array.isArray(x)){T10.pre=x;try{buildSeats();render();autoSeat();}catch(e){}}}).catch(()=>{});return fetch("t10/sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{T10.lib=j||{};try{buildSeats();render();autoSeat();}catch(e){}});}).catch(()=>{});
 const FIG_ON=false;
 let SEATLIB=null;const SEATLIB_V=1;
@@ -636,8 +643,8 @@ fetch("sitze/figuren.json?v="+Date.now()).then(r=>r.ok?r.json():null).then(j=>{i
 let OVAL=OLD.oval;
 const FIG_SCALE=.82;
 // table photo only when that table has checked figures; otherwise the classic ring with profile pictures (never a table full of empty chairs)
-const imgMode=()=>S.players.length>0&&S.players.length<=OLD.seats.length+1&&!!(CUR&&CUR.lib&&Object.keys(CUR.lib).length);
-const timIn=()=>{const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
+const imgMode=()=>SIMPLE?(S.players.length>0&&S.players.length<=OLD.seats.length+1):S.players.length>0&&S.players.length<=OLD.seats.length+1&&!!(CUR&&CUR.lib&&Object.keys(CUR.lib).length);
+const timIn=()=>{if(SIMPLE)return false;const t=timIdx();return imgMode()&&t>=0&&!S.players[t].out;};
 const timIdx=()=>S.players.findIndex(p=>/^tim$/i.test(String(p.name).trim()));
 /* Platz -> Stuhl: Tim sitzt immer am Holzteil (Dealer-Platz), die anderen im Uhrzeigersinn danach */
 function imgSeat(k,n){const t=timIdx();{const e=preFor();if(e&&k!==t){const nm=pKey(S.players[k].name),sn=Object.keys(e.seats).find(x=>pKey(e.seats[x])===nm);if(sn&&IMG_SEATS[sn-1])return IMG_SEATS[sn-1];}}if(S.fix&&CUR===T10&&k!==t){const v=S.fix[pKey(S.players[k].name)];if(v!=null&&IMG_SEATS[v])return IMG_SEATS[v];}if(t<0){return IMG_SEATS[Math.round(k*IMG_SEATS.length/n)%IMG_SEATS.length];}const j=((k-t)%n+n)%n;if(j===0)return DEALER_SEAT;const m=n-1,pool=CUR.spread?IMG_SEATS:m<=9?IMG_SEATS.slice(1,10):m===10?IMG_SEATS.slice(1):IMG_SEATS;return pool[Math.min(pool.length-1,Math.round((j-1)*pool.length/m+(pool.length/m-1)/2))];}
@@ -648,10 +655,10 @@ function seatPos(k,n){if(imgMode()){const t=imgSeat(k,n);if(t===DEALER_SEAT)retu
 function buildSeats(){
   pickCfg();
   document.querySelectorAll(".seat,.fig").forEach(e=>e.remove());
-  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("tim",timIn());st.classList.toggle("tv1",S.timV===1);st.classList.toggle("t10",CUR===T10);const PRE=im?preActive():null;st.style.backgroundImage=PRE?'url("'+PRE.base+'fertig/'+PRE.file+'")':"";const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";st.style.setProperty("--ss",Math.min(1,Math.max(.5,b.w/760)).toFixed(3));buildSeats.used=new Set();const ft=CUR===T10?(CUR.feltTop||.47):(timIdx()>=0?.39:OVAL[1]),fb=CUR===T10?(CUR.feltBottom||.66):OVAL[3],[l,t]=imgToStage(OVAL[0],ft),[r,bo]=imgToStage(OVAL[2],fb);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
+  const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("simple",SIMPLE);st.classList.toggle("tim",timIn());st.classList.toggle("tv1",S.timV===1);st.classList.toggle("t10",CUR===T10);const PRE=im?preActive():null;st.style.backgroundImage=PRE?'url("'+PRE.base+'fertig/'+PRE.file+'")':"";const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";st.style.setProperty("--ss",Math.min(1,Math.max(.5,b.w/760)).toFixed(3));buildSeats.used=new Set();const ft=CUR===T10?(CUR.feltTop||.47):(timIdx()>=0?.39:OVAL[1]),fb=CUR===T10?(CUR.feltBottom||.66):OVAL[3],[l,t]=imgToStage(OVAL[0],ft),[r,bo]=imgToStage(OVAL[2],fb);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
   S.players.forEach((p,k)=>{
     if(im&&FIG_ON){const used=buildSeats.used||(buildSeats.used=new Set());if(k===0)used.clear();const key=figKey(p.name,used);if(key){used.add(key);const F=FIGS[key],t=imgSeat(k,n),[cx,cy,bw]=imgToStage(t[0],t[1]),b=imgBox(),tx=(.5-t[0])*b.w,ty=(.5-t[1])*b.h,rot=Math.atan2(ty,tx)*180/Math.PI-F[4],fw=F[0]*bw*FIG_SCALE,fh=F[1]*bw*FIG_SCALE,g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.width=fw+"px";g.style.height=fh+"px";g.style.left="calc("+cx+"% - "+(F[2]*fw)+"px)";g.style.top="calc("+cy+"% - "+(F[3]*fh)+"px)";g.style.transformOrigin=(F[2]*100)+"% "+(F[3]*100)+"%";g.style.transform="rotate("+rot.toFixed(1)+"deg)";g.innerHTML='<img src="figuren/'+key+'.webp?v=1" alt="">';st.appendChild(g);}}
-    if(im&&CUR.lib&&!PRE){const SEATLIB=CUR.lib;let key=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");key=FIG_ALIAS[key]||key;const t=imgSeat(k,n),i=IMG_SEATS.indexOf(t),nn=String(i).padStart(2,"0"),r=SEATLIB[key]&&SEATLIB[key][nn];if(i>=0&&r){const b=imgBox(),[lx,ty]=imgToStage(r[0]/1920,r[1]/1072),g=document.createElement("div");g.className="fig s2";g.dataset.k=k;g.style.cssText="left:"+lx+"%;top:"+ty+"%;width:"+(r[2]/1920*b.w)+"px;height:"+(r[3]/1072*b.h)+"px;transform:none";g.innerHTML='<img src="'+CUR.base+'sitze/'+key+'/fig-'+nn+'.webp?v='+SEATLIB_V+'" alt="">';st.appendChild(g);}}
+    if(im&&CUR.lib&&!PRE&&!SIMPLE){const SEATLIB=CUR.lib;let key=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");key=FIG_ALIAS[key]||key;const t=imgSeat(k,n),i=IMG_SEATS.indexOf(t),nn=String(i).padStart(2,"0"),r=SEATLIB[key]&&SEATLIB[key][nn];if(i>=0&&r){const b=imgBox(),[lx,ty]=imgToStage(r[0]/1920,r[1]/1072),g=document.createElement("div");g.className="fig s2";g.dataset.k=k;g.style.cssText="left:"+lx+"%;top:"+ty+"%;width:"+(r[2]/1920*b.w)+"px;height:"+(r[3]/1072*b.h)+"px;transform:none";g.innerHTML='<img src="'+CUR.base+'sitze/'+key+'/fig-'+nn+'.webp?v='+SEATLIB_V+'" alt="">';st.appendChild(g);}}
     const [x,y]=seatPos(k,n),d=document.createElement("div");
     d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;
     d.innerHTML='<div class="avw"></div><div class="nm"></div><div class="meta"></div>';d.querySelector(".avw").onclick=()=>openPlayers(p.name);
@@ -1017,9 +1024,18 @@ function drawSeats(){
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
   S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
-  if(!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
+  if(!SIMPLE&&!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
 }
+/* 12.11.: Show nach „Plätze auslosen“: Ansager + alle Karten auf einen Blick, dann jede Karte einzeln in Sitzreihenfolge (Tim zuletzt am Dealer-Platz), dann die Sitzordnung */
+const DRAW_SHOW=true;
+function drawShow(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=S.players.slice();
+  const grid='<div class="draw">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
+  announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
+  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;introShow(a,()=>drawOverview(S.players),{sec:6});};
+  $("annOk").onclick=()=>{stopAnn();go();};
+  const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
+const ANNS_INTRO_NOW=()=>"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a){
   const suits=["♠","♥","♣","♦"];
   announce({eyebrow:"Plätze ausgelost · im Uhrzeigersinn",title:"Sitzordnung",html:'<div class="draw">'+a.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div><p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});
@@ -1036,9 +1052,24 @@ const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.j
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
 const ANN_INTRO="ansagen/intro.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
+/* 12.11.: Ansagen ohne passende MP3 spricht der Browser (Stimme des Geräts). Eine MP3 mit gleichem Namen in ansagen/ hat Vorrang (z. B. ansagen/jonny.mp3), dann hier eintragen. */
+const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Thursday Classic. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
+ "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
+ "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
+ "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
+ "philipp":"Ruhig, geduldig, gefährlich. Philippp!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
+ "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
+const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
+/* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
+document.addEventListener("pointerdown",function un(){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}catch(e){}document.removeEventListener("pointerdown",un,true);},true);
+function speakAnn(text,cb){let done=false;const f=()=>{if(done)return;done=true;if(bgActive)bgVol(.35);cb&&cb();};
+  try{if(!("speechSynthesis" in window)){f();return f;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="de-DE";if(ttsVoice)u.voice=ttsVoice;u.rate=.92;u.pitch=.75;u.volume=1;u.onend=f;u.onerror=f;if(bgActive)bgVol(.12);speechSynthesis.speak(u);setTimeout(f,Math.min(20000,2500+text.length*90));}catch(e){f();}return f;}
 let annAudio=null;
 let annSkip=null,skipGuard=0;
-function playAnn(u,cb){let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
+function playAnn(u,cb){if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
   try{if(annAudio)annAudio.pause();}catch(e){}
   if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
 /* background music: Nico's song starts with his video on place 1, then continues under the draw until the clock starts (?musik=0 switches it off) */
@@ -1048,10 +1079,10 @@ function bgStart(at){if(!BG_ON)return;bgActive=true;if(!bg){bg=new Audio("ansage
 function bgPause(){if(bg)bg.pause();}
 function bgResume(){if(bg&&bgActive&&bg.paused)bg.play().catch(()=>{});}
 function bgStop(){bgActive=false;if(!bg||bg.paused)return;clearInterval(bgFade);bgFade=setInterval(()=>{if(bg.volume>.04)bg.volume=Math.max(0,bg.volume-.03);else{clearInterval(bgFade);bg.pause();}},60);}
-function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;}
+function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;try{speechSynthesis.cancel();}catch(e){}}
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
-const BDAY_NAMES=["niklas","niki"];
+const BDAY_NAMES=[];   /* Nikis Geburtstag war am 02.11. */
 const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","pdiddy":"p-diddy","p diddy":"p-diddy","p.diddy":"p-diddy","dede":"dede"};
 function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=13";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
@@ -1079,7 +1110,7 @@ function introShow(list,done,o){o=o||{};
     else box.innerHTML=cardEl+vidEl+
       '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&p.name.toLowerCase()==="pasi"?'<div class="inD">⭐ Special Guest · Freigeist</div>':'')+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
-    const annU=!o.label&&ANNS[p.name.toLowerCase()],me=k;
+    const annU=!o.label&&annFor(p.name),me=k;
     const isNico=p.name.toLowerCase()==="nico";
     if(!vid&&bgActive&&bg)bgResume();
     if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
@@ -1190,7 +1221,7 @@ function runCmd(c){
     case "gamedef":GAMES[c.name]=c.def;break;
     case "schedule":S.games=c.games;break;
     case "endgame":S.active=null;break;
-    case "draw":drawSeats();break;
+    case "draw":if(c.show===false)drawSeats();else drawShow();break;
     case "result":openResult();break;
     case "export":download();break;
     case "reload":save();setTimeout(()=>location.reload(),300);break;
@@ -1214,6 +1245,17 @@ function runCmd(c){
   }}catch(e){console.warn("cmd",c,e);}
   log(c.src||"claude",{op,cmd:c});save();render();pushState();
 }
+/* 12.11.: Live-Befehle kommen zusätzlich direkt aus dem GitHub-Repo (API, ohne Pages-Build).
+   Grund: am 09.11. wurden mehrere Pages-Builds abgebrochen, „Rebuy Niki“ kam deshalb nicht an. API: max. 60 Abrufe/Stunde → alle 65 s. */
+const LIVE_API="https://api.github.com/repos/bluechipclub/bluechipclub.github.io/contents/tafel/live.json?ref=main";
+let apiOk=false,apiFirst=true;const FIRST_VISIT=(()=>{try{return localStorage.getItem(APPLIED_KEY)==null;}catch(e){return true;}})();
+async function pollApi(){try{const r=await fetch(LIVE_API+"&t="+Date.now(),{cache:"no-store",headers:{Accept:"application/vnd.github.raw"}});if(!r.ok)throw new Error(r.status);applyLive(await r.json());apiOk=true;}catch(e){apiOk=false;}}
+function applyLive(j){const cmds=(j.cmds||[]).filter(c=>typeof c.id==="number").sort((a,b)=>a.id-b.id);
+    const max=cmds.reduce((m,c)=>Math.max(m,c.id),0);
+    if(apiFirst){apiFirst=false;if(FIRST_VISIT){applied=Math.max(applied||0,max);return;}}   // first visit on this device: old commands never run
+    if(applied==null){applied=max;}
+    else for(const c of cmds)if(c.id>applied){applied=c.id;runCmd(c);}
+    try{localStorage.setItem(APPLIED_KEY,String(applied));}catch(e){}}
 async function poll(){
   const lv=$("live");
   try{
@@ -1297,7 +1339,7 @@ $("bPrev").onclick=()=>go(S.i-1);$("bNext").onclick=()=>go(S.i+1);
 $("bMinus").onclick=()=>addTime(-60);$("bPlus").onclick=()=>addTime(60);
 $("bPlayers").onclick=()=>openPlayers();
 $("bDealer").onclick=()=>{let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++){k=(k+1)%n;if(!S.players[k].out)break;}S.dealer=k;save();render();};
-$("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawSeats();};
+$("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawShow();};
 $("bResult").onclick=openResult;
 $("bSet").onclick=openSettings;
 /* ---------- Floorman: Seat open ---------- */
@@ -1445,6 +1487,7 @@ async function syncSignups(){
   if(S.started)return;const L=await ligaLoad();if(!L||S.started)return;const n=L.settings.next;if(!n||!n.title)return;
   let names=(n.signups||[]).map(x=>String(typeof x==="string"?x:x.name||"").trim());
   if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){return;}}
+  const DISP={"niklas":"Niklas","p. diddy":"P. Diddy","jonny":"Jonny","philipp":"Philipp","tobi":"Tobi","magg":"Magg","oli":"Oli"};names=names.map(x=>DISP[canonName(x)]||x);
   names=names.filter(x=>x&&!NOT_AT_TABLE.includes(x.toLowerCase()));if(!names.length)return;
   const seen=S.syncSeen||[],lc=a=>a.map(x=>x.toLowerCase()),uniq=[];names.forEach(x=>{if(!lc(uniq).includes(x.toLowerCase()))uniq.push(x);});
   if(!lc(uniq).includes("tim"))uniq.unshift("Tim");
@@ -1525,7 +1568,7 @@ function burst(){for(let k=0;k<160;k++)burstP.push({x:innerWidth/2,y:innerHeight
 
 if(dropNotAtTable()){log("table",{removed:NOT_AT_TABLE});save();}
 buildSeats();render();setInterval(tick,250);tick();pushState();
-poll();setInterval(poll,POLL_MS);
+poll();setInterval(poll,POLL_MS);setTimeout(pollApi,4000);setInterval(pollApi,65000);
 showCtrl();
 </script>
 <script src="clips.js?v=5"></script>

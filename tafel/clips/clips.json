@@ -66,6 +66,24 @@
    "p": "Magg",
    "t": "The Poet",
    "src": "clips/magg-1.mp4"
+  },
+  {
+   "id": "jonny-2",
+   "p": "Jonny",
+   "t": "Der Kick",
+   "src": "clips/jonny-2.mp4"
+  },
+  {
+   "id": "tim-niklas-1",
+   "p": "Tim",
+   "t": "Rap mit Niki",
+   "src": "clips/tim-niklas-1.mp4"
+  },
+  {
+   "id": "niklas-tim-1",
+   "p": "Niki",
+   "t": "Rap mit Tim",
+   "src": "clips/tim-niklas-1.mp4"
   }
  ]
 }
