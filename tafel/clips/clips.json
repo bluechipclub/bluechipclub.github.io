@@ -49,12 +49,6 @@
    "src": "clips/kevin-1.mp4"
   },
   {
-   "id": "jonny-1",
-   "p": "Jonny",
-   "t": "Cabrio",
-   "src": "clips/jonny-1.mp4"
-  },
-  {
    "id": "domi-c-1",
    "p": "Domi C",
    "t": "Geldregen",
@@ -64,7 +58,7 @@
   {
    "id": "magg-1",
    "p": "Magg",
-   "t": "The Poet",
+   "t": "Peaky Blinders",
    "src": "clips/magg-1.mp4"
   },
   {
@@ -74,15 +68,9 @@
    "src": "clips/jonny-2.mp4"
   },
   {
-   "id": "tim-niklas-1",
-   "p": "Tim",
-   "t": "Rap mit Niki",
-   "src": "clips/tim-niklas-1.mp4"
-  },
-  {
-   "id": "niklas-tim-1",
-   "p": "Niki",
-   "t": "Rap mit Tim",
+   "id": "rap-tim-niki",
+   "p": "Alle",
+   "t": "🎤 Rap: Tim & Niki",
    "src": "clips/tim-niklas-1.mp4"
   }
  ]
