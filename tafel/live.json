@@ -835,6 +835,18 @@
    "op": "out",
    "name": "Jonny",
    "by": "Tim"
+  },
+  {
+   "id": 110,
+   "op": "out",
+   "name": "Manu",
+   "by": "Philipp"
+  },
+  {
+   "id": 111,
+   "op": "out",
+   "name": "Magg",
+   "by": "P. Diddy"
   }
  ]
 }
