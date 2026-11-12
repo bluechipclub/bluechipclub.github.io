@@ -860,6 +860,12 @@
     "rebuy": 15,
     "rb15": 1
    }
+  },
+  {
+   "id": 114,
+   "op": "out",
+   "name": "Jonny",
+   "by": "Benno"
   }
  ]
 }
