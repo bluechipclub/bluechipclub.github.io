@@ -230,12 +230,14 @@ const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"ma
 let CLIPS=[];
 const same=(a,b)=>a.toLowerCase()===b.toLowerCase()||(AV[a.toLowerCase()]&&AV[a.toLowerCase()]===AV[b.toLowerCase()]);
 function renderDeck(){
-  const D=$("deck"),at=st?st.p.map(x=>x[0]):[];
+  const D=$("deck"),at=st&&st.p&&st.p.length?st.p.map(x=>x[0]):TODAY;
   const k=JSON.stringify([CLIPS.map(c=>c.id+c.t+c.p),at]);if(D.dataset.k===k)return;D.dataset.k=k;
   if(!CLIPS.length){D.innerHTML='<p class="note">Noch keine Clips eingetragen.</p>';return;}
   const groups=[];CLIPS.forEach(c=>{let g=groups.find(g=>same(g.p,c.p));if(!g)groups.push(g={p:c.p,c:[]});g.c.push(c);});
   const here=g=>g.p==="Alle"?2:at.some(n=>same(n,g.p))?0:1;
   groups.sort((a,b)=>here(a)-here(b));
+  /* nur Clips der heutigen Spieler (Tafel-Spieler, sonst Anmeldeliste der Website) */
+  if(at.length)for(let i=groups.length-1;i>=0;i--)if(here(groups[i])===1)groups.splice(i,1);
   D.innerHTML="";
   groups.forEach(g=>{
     const r=document.createElement("div");r.className="pc"+(here(g)===1&&at.length?" away":"");
@@ -248,6 +250,9 @@ function renderDeck(){
     D.appendChild(r);
   });
 }
+let TODAY=[];
+async function loadToday(){try{const h=await (await fetch("../index.html?t="+Date.now(),{cache:"no-store"})).text();const m=h.match(/id="liga-data">([\s\S]*?)<\/script>/);if(m){const n=JSON.parse(m[1]).settings.next||{};TODAY=(n.signups||[]).map(x=>typeof x==="string"?x:x.name).filter(Boolean);const D=$("deck");D.dataset.k="";renderDeck();}}catch(e){}}
+loadToday();
 async function loadClips(){try{const r=await fetch("clips/clips.json?t="+Date.now(),{cache:"no-store"});const j=await r.json();CLIPS=j.clips||[];renderDeck();}catch(e){$("deck").innerHTML='<p class="note">Clips nicht geladen. Netz prüfen.</p>';}}
 $("clipStop").onclick=()=>send({op:"clipstop"},"Clip gestoppt");
 try{if(localStorage.getItem("bcc-handy-ctl")==="1")$("ctl").open=true;}catch(e){}
