@@ -829,6 +829,12 @@
    "id": 108,
    "op": "sync",
    "note": "Test 12.11.: Live-Verbindung über GitHub-API"
+  },
+  {
+   "id": 109,
+   "op": "out",
+   "name": "Jonny",
+   "by": "Tim"
   }
  ]
 }
