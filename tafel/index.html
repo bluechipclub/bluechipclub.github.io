@@ -1021,6 +1021,12 @@ function drawSeats(){
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
+  /* feste Regeln (Tim 12.11.): Manu immer direkt neben Tim (Platz 1 oder vorletzter Platz), Jonny immer Platz 5 oder 6. Rest zufällig. */
+  if(anc&&a.length>=7){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
+    const slots=new Array(n).fill(null);slots[n-1]=anc;
+    if(ma)slots[Math.random()<.5?0:n-2]=ma;
+    if(jo){const o=[4,5].filter(k=>!slots[k]);slots[o[Math.floor(Math.random()*o.length)]]=jo;}
+    const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
   S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
@@ -1047,7 +1053,7 @@ const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
 const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=[{img:"karten/v2/philipp.jpg",ar:"2/3"}],C_JON=[{img:"karten/v2/jonny.jpg?v=2",ar:"2/3"}];
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
 const C_PD=[{img:"karten/v2/p-diddy.jpg",ar:"2/3"}];
-const CARDS={"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}],"pasi":[{img:"karten/v2/pasi.jpg",ar:"2/3"}],"p. diddy":C_PD,"pdiddy":C_PD,"p diddy":C_PD,"p.diddy":C_PD,"dede":[{img:"karten/v2/dede.jpg",ar:"2/3"}],"der freigeist":[{img:"karten/pasi-freigeist.jpg",ar:"3/4"}],"rip magg":[{img:"karten/magg-rip.jpg",ar:"3/4"}]};
+const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}],"pasi":[{img:"karten/v2/pasi.jpg",ar:"2/3"}],"p. diddy":C_PD,"pdiddy":C_PD,"p diddy":C_PD,"p.diddy":C_PD,"dede":[{img:"karten/v2/dede.jpg",ar:"2/3"}],"der freigeist":[{img:"karten/pasi-freigeist.jpg",ar:"3/4"}],"rip magg":[{img:"karten/magg-rip.jpg",ar:"3/4"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
 const ANN_INTRO="ansagen/intro.mp3?v=1";
@@ -1083,7 +1089,7 @@ function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;try
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
 const BDAY_NAMES=[];   /* Nikis Geburtstag war am 02.11. */
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","pdiddy":"p-diddy","p diddy":"p-diddy","p.diddy":"p-diddy","dede":"dede"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","pdiddy":"p-diddy","p diddy":"p-diddy","p.diddy":"p-diddy","dede":"dede","tobi":"tobi","tobias":"tobi"};
 function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=13";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
