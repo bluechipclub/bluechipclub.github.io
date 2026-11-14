@@ -1062,11 +1062,11 @@ const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten
 const ANN_INTRO="ansagen/intro.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
 /* 12.11.: Ansagen ohne passende MP3 spricht der Browser (Stimme des Geräts). Eine MP3 mit gleichem Namen in ansagen/ hat Vorrang (z. B. ansagen/jonny.mp3), dann hier eintragen. */
-const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Saturday Deep Stack. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
+const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Saturday Deep Stack. Zehn Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
  "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
  "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
- "philipp":"Ruhig, geduldig, gefährlich. Philippp!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
+ "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
 const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
