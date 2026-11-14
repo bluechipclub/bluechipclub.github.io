@@ -924,6 +924,12 @@
    "op": "out",
    "name": "Niklas",
    "by": "Philipp"
+  },
+  {
+   "id": 125,
+   "op": "add",
+   "name": "Felix",
+   "paid": "bar"
   }
  ]
 }

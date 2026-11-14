@@ -1229,6 +1229,8 @@ function runCmd(c){
     case "add":if(!pl(c.name))S.players.push({name:c.name,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:c.paid||"bar"}],out:null});buildSeats();break;
     case "remove":{const p=pl(c.name);if(p){S.players=S.players.filter(x=>x!==p);S.outOrder=S.outOrder.filter(n=>n!==p.name);buildSeats();}break;}
     case "rename":{const p=pl(c.from);if(p){S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);p.name=c.to;}break;}
+    /* 14.11.: place = Spieler zwischen zwei Nachbarn setzen, z. B. {op:"place",name:"Felix",between:["Manu","Tim"]} */
+    case "place":{const p=pl(c.name),x=pl((c.between||[])[0]),y=pl((c.between||[])[1]);if(p&&x&&y&&p!==x&&p!==y){const d=S.players[S.dealer];let a=S.players.filter(q=>q!==p);const i=a.indexOf(x),j=a.indexOf(y),n=a.length;let at=-1;if((i+1)%n===j)at=i+1;else if((j+1)%n===i)at=j+1;if(at>=0){a.splice(at,0,p);S.players=a;S.dealer=Math.max(0,a.indexOf(d));buildSeats();}}break;}
     case "seats":{const m=c.names.map(pl).filter(Boolean);if(m.length===S.players.length){S.players=m;buildSeats();}break;}
     case "dealer":{const p=pl(c.name);if(p)S.dealer=S.players.indexOf(p);break;}
     case "game":if(c.def)GAMES[c.name]=c.def;showGame(c.name,false);break;
