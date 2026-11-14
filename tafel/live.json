@@ -943,6 +943,26 @@
     "Manu",
     "Tim"
    ]
+  },
+  {
+   "id": 128,
+   "op": "add",
+   "name": "Niklas",
+   "paid": "bar"
+  },
+  {
+   "id": 129,
+   "op": "back",
+   "name": "Niklas"
+  },
+  {
+   "id": 130,
+   "op": "place",
+   "name": "Niklas",
+   "between": [
+    "Zeno",
+    "Manu"
+   ]
   }
  ]
 }
