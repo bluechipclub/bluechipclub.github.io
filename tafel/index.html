@@ -1024,11 +1024,11 @@ function drawSeats(){
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
-  /* feste Regeln (Tim 12.11.): Manu immer direkt neben Tim (Platz 1 oder vorletzter Platz), Jonny immer Platz 5 oder 6. Rest zufällig. */
-  if(anc&&a.length>=7){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
+  /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Jonny immer Platz 6. Rest zufällig. */
+  if(anc&&a.length>=3){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
     if(ma)slots[Math.random()<.5?0:n-2]=ma;
-    if(jo){const o=[4,5].filter(k=>!slots[k]);slots[o[Math.floor(Math.random()*o.length)]]=jo;}
+    if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
   S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
