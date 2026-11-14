@@ -963,6 +963,18 @@
     "Zeno",
     "Manu"
    ]
+  },
+  {
+   "id": 131,
+   "op": "out",
+   "name": "Kevin",
+   "by": "Nico"
+  },
+  {
+   "id": 132,
+   "op": "out",
+   "name": "Philipp",
+   "by": "Nico"
   }
  ]
 }
