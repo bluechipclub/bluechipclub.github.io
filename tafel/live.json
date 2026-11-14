@@ -981,6 +981,12 @@
    "op": "out",
    "name": "Tim",
    "by": "Niklas"
+  },
+  {
+   "id": 134,
+   "op": "out",
+   "name": "Manu",
+   "by": "Zeno"
   }
  ]
 }
