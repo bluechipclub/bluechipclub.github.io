@@ -902,6 +902,16 @@
    "id": 121,
    "op": "remove",
    "name": "Max"
+  },
+  {
+   "id": 122,
+   "op": "set",
+   "v": {
+    "buyin": 25,
+    "fee": 5,
+    "rebuy": 20,
+    "bank": "Tim"
+   }
   }
  ]
 }

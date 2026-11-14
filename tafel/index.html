@@ -541,7 +541,7 @@ const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only vi
 
 const fresh=()=>({v:1,title:"Saturday Deep Stack",sub:"Blue Chip Club · Deep Stack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
-  buyin:20,fee:5,rebuy:15,rb15:1,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
+  buyin:25,fee:5,rebuy:20,rb15:1,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -565,7 +565,10 @@ const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS
 const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||S.players.find(p=>canonName(p.name)===canonName(n));
 const alive=()=>S.players.filter(p=>!p.out);
 const totalEntries=()=>S.players.reduce((a,p)=>a+p.entries.length,0);
-const costOf=p=>p.entries.length?S.buyin+(p.entries.length-1)*S.rebuy:0;
+/* 14.11. Tim: der Veranstalter (S.bank) zahlt sich selbst keine Gebühr, sein erster Entry kostet nur den Pot-Anteil */
+const isBank=p=>String(p.name).toLowerCase().trim()===String(S.bank||"").toLowerCase().trim();
+const entPrice=(p,j)=>j?S.rebuy:S.buyin-(isBank(p)?S.fee:0);
+const costOf=p=>p.entries.reduce((a,e,j)=>a+entPrice(p,j),0);
 const potOf=()=>S.players.reduce((a,p)=>a+(p.entries.length?S.buyin-S.fee+(p.entries.length-1)*S.rebuy-(S.bounty||0)*p.entries.length:0),0)+(S.bounty?(S.lostHeads||0):0);
 // bounty (progressive knockout): every entry carries S.bounty P on its head; knockout = half cash to the hunter, half onto his head
 const headOf=p=>!S.bounty||!p.entries.length?0:(p.head==null?S.bounty:p.head);
@@ -885,13 +888,13 @@ $("pClose").onclick=()=>$("mPlayers").hidden=true;
 function settlement(){
   const pays=payouts(),rows=S.players.map(p=>{
     const place=placeOf(p),cost=costOf(p);
-    const paidCash=p.entries.reduce((a,e,j)=>a+(e.paid!=="offen"?(j?S.rebuy:S.buyin):0),0);
+    const paidCash=p.entries.reduce((a,e,j)=>a+(e.paid!=="offen"?entPrice(p,j):0),0);
     const prize=place&&place<=pays.length?pays[place-1]:0,bounty=bwOf(p)+(place===1?headOf(p):0);
     const open=cost-paidCash,win=prize+bounty;
     return {name:p.name,place,prize,bounty,entries:p.entries.length,rebuys:p.entries.length-1,cost,paid:paidCash,open,win,net:win-cost,bal:win-open,
-      paidBar:p.entries.reduce((a,e,j)=>a+(e.paid==="bar"?(j?S.rebuy:S.buyin):0),0),paidDig:p.entries.reduce((a,e,j)=>a+(e.paid==="dig"?(j?S.rebuy:S.buyin):0),0)};
+      paidBar:p.entries.reduce((a,e,j)=>a+(e.paid==="bar"?entPrice(p,j):0),0),paidDig:p.entries.reduce((a,e,j)=>a+(e.paid==="dig"?entPrice(p,j):0),0)};
   });
-  const feeTotal=S.players.filter(p=>p.entries.length).length*S.fee;
+  const feeTotal=S.players.filter(p=>p.entries.length&&!isBank(p)).length*S.fee;
   const received=rows.reduce((a,r)=>a+r.paid,0);
   // debtors pay winners directly, the bank covers the rest from collected money
   const cred=rows.filter(r=>r.bal>0).map(r=>({n:r.name,v:r.bal})).sort((a,b)=>b.v-a.v);
