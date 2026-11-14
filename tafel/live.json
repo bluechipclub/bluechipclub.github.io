@@ -897,6 +897,11 @@
    "id": 120,
    "op": "remove",
    "name": "Linus"
+  },
+  {
+   "id": 121,
+   "op": "remove",
+   "name": "Max"
   }
  ]
 }
