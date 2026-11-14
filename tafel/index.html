@@ -560,7 +560,7 @@ const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
 const dur=i=>{const L=LEVELS[i];if(!L)return 0;if(L.brk)return L.brk*60;const n=playNum(i);return (n===1?S.min1:(S.reLvl!=null&&n>S.reLvl?S.minLate:S.min))*60;};
 const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-Date.now())/1000):(S.left==null?dur(S.i):S.left);
 /* Spitznamen: „Niki“ findet Niklas, „Alex“/„PDiddy“ findet P. Diddy usw. */
-const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","max":"magg","olli":"oli"};
+const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","olli":"oli"};
 const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS[k]||k;};
 const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||S.players.find(p=>canonName(p.name)===canonName(n));
 const alive=()=>S.players.filter(p=>!p.out);
@@ -1066,7 +1066,7 @@ const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heut
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
  "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
  "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
- "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
+ "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","max":"Zum ersten Mal im Blue Chip Club. Maaax!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
 const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
