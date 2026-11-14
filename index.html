@@ -3386,8 +3386,8 @@ main .wrap { padding-top: 0; }
 <script>
 (function(){const ov=document.getElementById('codeOv'),inp=document.getElementById('codeIn'),err=document.getElementById('codeErr');
 const open=()=>{ov.hidden=false;inp.value='';err.textContent='';setTimeout(()=>inp.focus(),50);};
-let dest='tafel/';const go=()=>{if(inp.value.trim()==='007'){location.href=dest;}else{err.textContent='Falscher Code';inp.value='';inp.focus();}};
-document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive=(d)=>{dest=d||'tafel/';document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
+let dest='tafel/?v='+Date.now();const go=()=>{if(inp.value.trim()==='007'){location.href=dest;}else{err.textContent='Falscher Code';inp.value='';inp.focus();}};
+document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive=(d)=>{dest=d||('tafel/?v='+Date.now());document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 </script>
