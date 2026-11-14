@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Thursday Classic · Tafel</title>
+<title>Saturday Deep Stack · Tafel</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -509,7 +509,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-tc-2026-11-12b";
+const KEY="bcc-tafel-sds-2026-11-14";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -539,9 +539,9 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Thursday Classic",sub:"Blue Chip Club · Deepstack · 20.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:20000,reLvl:7,maxRe:2,
-  buyin:30,fee:5,rebuy:15,rb15:1,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
+const fresh=()=>({v:1,title:"Saturday Deep Stack",sub:"Blue Chip Club · Deep Stack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
+  buyin:20,fee:5,rebuy:15,rb15:1,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -1062,7 +1062,7 @@ const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten
 const ANN_INTRO="ansagen/intro.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
 /* 12.11.: Ansagen ohne passende MP3 spricht der Browser (Stimme des Geräts). Eine MP3 mit gleichem Namen in ansagen/ hat Vorrang (z. B. ansagen/jonny.mp3), dann hier eintragen. */
-const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Thursday Classic. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
+const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Saturday Deep Stack. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
  "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
  "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
@@ -1417,7 +1417,7 @@ async function bdayShow(){
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 /* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
-const LOBBY_AT="2026-11-12T18:00";
+const LOBBY_AT="2026-11-14T19:00";
 /* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
 const LOBBY_PICS=[
  {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
