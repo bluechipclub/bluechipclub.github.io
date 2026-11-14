@@ -1078,7 +1078,9 @@ function speakAnn(text,cb){let done=false;const f=()=>{if(done)return;done=true;
   try{if(!("speechSynthesis" in window)){f();return f;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="de-DE";if(ttsVoice)u.voice=ttsVoice;u.rate=.92;u.pitch=.75;u.volume=1;u.onend=f;u.onerror=f;if(bgActive)bgVol(.12);speechSynthesis.speak(u);setTimeout(f,Math.min(20000,2500+text.length*90));}catch(e){f();}return f;}
 let annAudio=null;
 let annSkip=null,skipGuard=0;
-function playAnn(u,cb){if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
+/* 14.11. Tim: bei der Auslosung keine Ringansager-Stimme mehr, Karten nur ohne Voice */
+const NO_VOICE=true;
+function playAnn(u,cb){if(NO_VOICE)u=null;if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
   try{if(annAudio)annAudio.pause();}catch(e){}
   if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
 /* background music: Nico's song starts with his video on place 1, then continues under the draw until the clock starts (?musik=0 switches it off) */
