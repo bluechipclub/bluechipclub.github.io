@@ -912,6 +912,18 @@
     "rebuy": 20,
     "bank": "Tim"
    }
+  },
+  {
+   "id": 123,
+   "op": "out",
+   "name": "Jonny",
+   "by": "Philipp"
+  },
+  {
+   "id": 124,
+   "op": "out",
+   "name": "Niklas",
+   "by": "Philipp"
   }
  ]
 }
