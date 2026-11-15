@@ -1455,7 +1455,7 @@ async function ligaLoad(){try{const html=await (await fetch("../index.html?b="+D
   LIGA=JSON.parse(new DOMParser().parseFromString(html,"text/html").getElementById("liga-data").textContent);}catch(e){}return LIGA;}
 function pStats(n){const r={played:0,wins:0,pod:0,pts:0,champ:false,nick:""};if(!LIGA)return r;const pt=LIGA.settings.points||{};
   const T=LIGA.tournaments.slice().sort((a,b)=>a.date<b.date?-1:1);
-  T.forEach(t=>{const x=(t.results||[]).find(y=>y.name&&y.name.trim()===n);if(!(t.participants||[]).includes(n)&&!x)return;r.played++;if(x){r.pod++;if(x.place===1)r.wins++;r.pts+=Number(pt["p"+x.place])||0;}r.pts+=Number(pt.teil)||0;});
+  T.forEach(t=>{const x=[...(t.results||[]),...(t.places||[])].find(y=>y.name&&y.name.trim()===n);if(!(t.participants||[]).includes(n)&&!x)return;r.played++;if(x){if(x.place<=3)r.pod++;if(x.place===1)r.wins++;r.pts+=Number(pt["p"+x.place])||0;}r.pts+=Number(pt.teil)||0;});
   const W=T.filter(t=>(t.results||[]).some(y=>y.place===1&&y.name));r.champ=!!W.length&&W[W.length-1].results.find(y=>y.place===1).name.trim()===n;
   r.nick=(LIGA.settings.nicknames||{})[n]||"";return r;}
 /* only pictures of people who are at the table tonight (pictures without "who" always run) */
