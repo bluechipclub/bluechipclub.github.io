@@ -843,8 +843,9 @@ main .wrap { max-width: 1180px; }
 .chrome { background: linear-gradient(180deg, #ffffff 0%, #d9dde6 38%, #8d93a3 52%, #f2f4f8 70%, #aab0bd 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .chrome-xl { font-size: clamp(88px, 22vw, 260px) !important; line-height: .9 !important; letter-spacing: -.06em !important; background: linear-gradient(180deg, #ffffff 0%, #e3e7ef 35%, #7e8596 50%, #f5f7fb 66%, #9aa1b0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 10px 40px rgb(47 107 255 / .25)); }
 /* Sieger */
-.sc-photo { margin: 0; border-radius: 28px; overflow: hidden; aspect-ratio: 16 / 9; background: #111; }
-.sc-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; transform: scale(1.08); transition: transform 1800ms var(--ease); }
+.sc-photo { margin: 0; border-radius: 28px; overflow: hidden; background: #111; position: relative; display: flex; justify-content: center; align-items: center; isolation: isolate; }
+.sc-photo::before { content: ""; position: absolute; inset: -40px; background: var(--bg, none) center / cover no-repeat; filter: blur(32px) brightness(.45); z-index: -1; }
+.sc-photo img { position: relative; width: auto; max-width: 100%; height: auto; max-height: min(86vh, 900px); object-fit: contain; display: block; transform: scale(1.03); transition: transform 1800ms var(--ease); }
 .winner.in .sc-photo img, .sc-photo.in img { transform: none; }
 .sc-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .sc-stats div { display: grid; gap: 4px; }
@@ -2668,7 +2669,7 @@ main .wrap { padding-top: 0; }
     if (t) {
       const w = winnerOf(t);
       h += '<section class="scene winner"><div class="sc-head"><span class="sc-kick">' + esc(tName(t)) + '</span><h2>' + (w ? esc(w) + '.' : 'Name folgt.') + ' <em>Sieger.</em></h2></div>' +
-        '<figure class="sc-photo">' + (t.img ? '<img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy">' : '') + '</figure>' +
+        '<figure class="sc-photo"' + (t.img ? ' style="--bg:url(\'' + imgSrc(esc(t.img)) + '\')"' : '') + '>' + (t.img ? '<img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy">' : '') + '</figure>' +
         '<div class="sc-stats"><div><b class="chrome" data-count="' + (Number(t.pot) || 0) + '">' + fmtN(t.pot) + '</b><span>' + esc(unit()) + ' im Pot</span></div><div><b class="chrome">' + (t.entries || '–') + '</b><span>Spieler am Tisch</span></div><div><b class="chrome">' + (t.date ? Number(t.date.split('-')[2]) + '.' + Number(t.date.split('-')[1]) + '.' : '–') + '</b><span>' + fmtDate(t.date) + '</span></div></div>' +
         '<div class="sc-pay">' + [1, 2, 3].map(p => { const r = t.results.find(x => x.place === p) || {}; return '<div class="pay"><span class="rank r' + p + '">' + p + '</span><span class="nm">' + (named(r) ? esc(r.name) : 'offen') + '</span><span class="v">' + (r.prize ? eur(r.prize) : '–') + '</span></div>'; }).join('') + '</div></section>';
     }
