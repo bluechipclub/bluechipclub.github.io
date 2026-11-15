@@ -121,8 +121,8 @@ function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">
 function stats(n){
  const T=(D?D.tournaments:[]).slice().sort((a,b)=>a.date<b.date?-1:1),pts=(D&&D.settings.points)||{};
  const rows=[];let played=0,wins=0,pod=0,points=0,prize=0;
- for(const t of T){const r=(t.results||[]).find(x=>x.name&&x.name.trim()===n),inP=(t.participants||[]).includes(n)||!!r;if(!inP)continue;
-  played++;const pl=r?r.place:null,pz=r?Number(r.prize)||0:0;if(pl===1)wins++;if(pl)pod++;points+=(Number(pts["p"+pl])||0)+(Number(pts.teil)||0);prize+=pz;
+ for(const t of T){const r=[...(t.results||[]),...(t.places||[])].find(x=>x.name&&x.name.trim()===n),inP=(t.participants||[]).includes(n)||!!r;if(!inP)continue;
+  played++;const pl=r?r.place:null,pz=r?Number(r.prize)||0:0;if(pl===1)wins++;if(pl&&pl<=3)pod++;points+=(Number(pts["p"+pl])||0)+(Number(pts.teil)||0);prize+=pz;
   let e=null,cost=null;if(t.entriesBy&&Object.keys(t.entriesBy).length){e=Number(t.entriesBy[n])||0;if(e){const b=Number(t.buyin)||0,rp=t.rebuyPrice==null||t.rebuyPrice===""?b:Number(t.rebuyPrice)||0;cost=b+(e-1)*rp;}}
   rows.push({t,pl,pz,e,cost,net:cost==null?null:pz-cost});}
  let run=0;const curve=rows.filter(x=>x.net!=null).map(x=>(run+=x.net,Object.assign({run},x)));

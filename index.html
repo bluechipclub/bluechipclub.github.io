@@ -599,6 +599,8 @@ textarea { min-height: 150px; resize: vertical; }
 .rg-step { border: 1px solid var(--line); border-radius: 14px; background: var(--surface2); padding: 16px; display: grid; justify-items: center; gap: 6px; text-align: center; }
 .rg-step.s1 { order: 2; padding-top: 30px; border-color: var(--gold3); background: linear-gradient(180deg, rgb(226 184 87 / .1), var(--surface2)); }
 .rg-step.s2 { order: 1; padding-top: 22px; } .rg-step.s3 { order: 3; }
+.rg-step.s4 { order: 4; } .rg-step.s5 { order: 5; } .rg-step.s6 { order: 6; }
+.rg-step.s4, .rg-step.s5, .rg-step.s6 { padding: 10px; } .rg-step.s4 b, .rg-step.s5 b, .rg-step.s6 b { font-size: 26px; }
 .rg-step b { font-family: var(--mono); font-size: 40px; font-weight: 500; line-height: 1; }
 .rg-step.s1 b { color: var(--gold); font-size: 52px; }
 .rg-step > span:last-child { font-size: 12px; color: var(--grey); }
@@ -1050,18 +1052,20 @@ main .wrap { padding-top: 0; }
 <div class="overlay" id="overlay" hidden><div class="drawer" id="drawer"></div></div>
 <datalist id="playerList"></datalist>
 
-<script type="application/json" id="liga-data">
-{
+<script type="application/json" id="liga-data">{
  "settings": {
   "name": "Blue Chip Club",
   "tagline": "The Void · jede Woche ab 18 Uhr · seit Oktober 2026",
   "buyin": 15,
   "unit": "P",
   "points": {
-   "p1": 10,
-   "p2": 6,
-   "p3": 3,
-   "teil": 0
+   "p1": 15,
+   "p2": 10,
+   "p3": 6,
+   "p4": 4,
+   "p5": 2,
+   "p6": 1,
+   "teil": 1
   },
   "nicknames": {
    "Oli": "Two Pair",
@@ -1338,7 +1342,7 @@ main .wrap { padding-top: 0; }
     "Manu",
     "Nico",
     "Jonny",
-    "Alex",
+    "P. Diddy",
     "Oli",
     "Magg",
     "Zeno"
@@ -1549,7 +1553,21 @@ main .wrap { padding-top: 0; }
     "Philipp": 3,
     "Benno": 2,
     "Domi C": 1
-   }
+   },
+   "places": [
+    {
+     "place": 4,
+     "name": "Magg"
+    },
+    {
+     "place": 5,
+     "name": "Domi C"
+    },
+    {
+     "place": 6,
+     "name": "Philipp"
+    }
+   ]
   },
   {
    "id": "t6",
@@ -1609,7 +1627,13 @@ main .wrap { padding-top: 0; }
     "Jan": 6,
     "Pasi": 1,
     "Nico": 4
-   }
+   },
+   "places": [
+    {
+     "place": 4,
+     "name": "Benno"
+    }
+   ]
   },
   {
    "id": "t7",
@@ -1713,7 +1737,17 @@ main .wrap { padding-top: 0; }
     "Manu": 3,
     "Magg": 1
    },
-   "report": "Donnerstagabend in The Void: acht Spieler, 16 Entries, 240 P im Pot. Deepstack mit 20.000 Chips, Ante ab Level 3 und einem Tisch, an dem kaum eine Hand leise zu Ende ging.\n\nJonny erwischte es zuerst und am bittersten. Er lag mit Drilling Zehnen vorne und machte am River sogar noch die Straße. Tim brauchte genau einen Buben, den letzten im Deck, und der kam. Full House, Jonny raus. Er kaufte nach, kämpfte sich durch den Abend und ging am Ende trotzdem als Sechster, als Benno mit Zehn-Vier zwei Paare gegen ihn und Philipp traf. Pechvogel des Hauses, Kapitel zwei.\n\nPhilipp lieferte die Hand der Clubgeschichte: ein Straight Flush von der Neun bis zum König, eine Stufe unter dem Royal Flush. Neue beste Hand des Hauses. Vorher hatte er schon Manu mit einem Flush am River nach Hause geschickt. Magg flog früh raus, holte sich per Flip das Comeback und gewann direkt einen fetten Pot.\n\nDer Mann des Abends hieß aber P. Diddy. Erstes Turnier im Club und sofort zu Hause: Er foldete mit Vorliebe dann, wenn er umsonst hätte checken können, und brachte damit den halben Tisch zur Weißglut. Rage-Bait auf höchstem Niveau, und trotzdem bis ins Heads-up. Der Spitzname sitzt.\n\nAm Ende gehörte der Abend Niki. Erst schickte er Benno raus, dann hielten seine Damen gegen Philipps All-in, und im Heads-up traf er mit König-Drei die Drei am Turn. Zwei Paare gegen P. Diddys Paar Buben. Niki holt nach dem Seven Special und dem Dead Man's Hand seinen dritten Titel und ist neuer Champion. Drei Finger auf dem Siegerfoto, mehr muss man nicht sagen."
+   "report": "Donnerstagabend in The Void: acht Spieler, 16 Entries, 240 P im Pot. Deepstack mit 20.000 Chips, Ante ab Level 3 und einem Tisch, an dem kaum eine Hand leise zu Ende ging.\n\nJonny erwischte es zuerst und am bittersten. Er lag mit Drilling Zehnen vorne und machte am River sogar noch die Straße. Tim brauchte genau einen Buben, den letzten im Deck, und der kam. Full House, Jonny raus. Er kaufte nach, kämpfte sich durch den Abend und ging am Ende trotzdem als Sechster, als Benno mit Zehn-Vier zwei Paare gegen ihn und Philipp traf. Pechvogel des Hauses, Kapitel zwei.\n\nPhilipp lieferte die Hand der Clubgeschichte: ein Straight Flush von der Neun bis zum König, eine Stufe unter dem Royal Flush. Neue beste Hand des Hauses. Vorher hatte er schon Manu mit einem Flush am River nach Hause geschickt. Magg flog früh raus, holte sich per Flip das Comeback und gewann direkt einen fetten Pot.\n\nDer Mann des Abends hieß aber P. Diddy. Erstes Turnier im Club und sofort zu Hause: Er foldete mit Vorliebe dann, wenn er umsonst hätte checken können, und brachte damit den halben Tisch zur Weißglut. Rage-Bait auf höchstem Niveau, und trotzdem bis ins Heads-up. Der Spitzname sitzt.\n\nAm Ende gehörte der Abend Niki. Erst schickte er Benno raus, dann hielten seine Damen gegen Philipps All-in, und im Heads-up traf er mit König-Drei die Drei am Turn. Zwei Paare gegen P. Diddys Paar Buben. Niki holt nach dem Seven Special und dem Dead Man's Hand seinen dritten Titel und ist neuer Champion. Drei Finger auf dem Siegerfoto, mehr muss man nicht sagen.",
+   "places": [
+    {
+     "place": 5,
+     "name": "Benno"
+    },
+    {
+     "place": 6,
+     "name": "Jonny"
+    }
+   ]
   },
   {
    "id": "t9",
@@ -1768,7 +1802,21 @@ main .wrap { padding-top: 0; }
     "Kevin": 1,
     "Jonny": 3
    },
-   "report": "Samstagabend in The Void: neun Spieler, 19 Entries, 380 P im Pot. Deep Stack mit 25.000 Chips, 25-Minuten-Level, Ante ab Level 3, und diesmal wurde kein Level übersprungen.\n\nDen ersten großen Knall lieferte Philipp. Drei Spieler all-in, auf dem Board 7♥ 3♦ 2♦ 10♠, und am River kommt die 8♠. Philipp hält zwei Achter, Set am River, und schickt gleich zwei Leute an die Kasse: Jonny fliegt mit dem kleineren Stack als Erster raus, Niki direkt hinterher.\n\nFür Niki war das allerdings nur der Anlauf, denn ab da hatte er den River gemietet. Zweimal hintereinander Drilling Asse, beim zweiten Mal mit A♣ 7♥ gegen Tim, der damit raus ist. Dann die beste Hand des Tages gegen Felix: 6♣ 6♦, Set am Flop, Vierling Sechser am Turn. Zeno, der vorher Manu mit dem besseren Kicker auf Platz 5 geschickt hatte, ging als Dritter, als Niki mit Ass-König am Turn die Straße machte.\n\nNico hörte den ganzen Abend nicht auf, nach Diamanten zu graben. Er kaufte nach, kam zurück und biss sich am Ende auf Platz 4 die Zähne aus, einen Platz vor dem Geld.\n\nUnd dann Felix. Erstes Turnier im Club, später nachgekommen, durch die Flips gekämpft und direkt bis ins Heads-up. Zweiter Platz beim Debüt, das muss man erstmal schaffen. Das Heads-up war schnell vorbei: Niki mit 10♠ 3♠, zwei Paare, fertig. Niki holt seinen vierten Titel und bleibt Champion. Vier Finger auf dem Siegerfoto."
+   "report": "Samstagabend in The Void: neun Spieler, 19 Entries, 380 P im Pot. Deep Stack mit 25.000 Chips, 25-Minuten-Level, Ante ab Level 3, und diesmal wurde kein Level übersprungen.\n\nDen ersten großen Knall lieferte Philipp. Drei Spieler all-in, auf dem Board 7♥ 3♦ 2♦ 10♠, und am River kommt die 8♠. Philipp hält zwei Achter, Set am River, und schickt gleich zwei Leute an die Kasse: Jonny fliegt mit dem kleineren Stack als Erster raus, Niki direkt hinterher.\n\nFür Niki war das allerdings nur der Anlauf, denn ab da hatte er den River gemietet. Zweimal hintereinander Drilling Asse, beim zweiten Mal mit A♣ 7♥ gegen Tim, der damit raus ist. Dann die beste Hand des Tages gegen Felix: 6♣ 6♦, Set am Flop, Vierling Sechser am Turn. Zeno, der vorher Manu mit dem besseren Kicker auf Platz 5 geschickt hatte, ging als Dritter, als Niki mit Ass-König am Turn die Straße machte.\n\nNico hörte den ganzen Abend nicht auf, nach Diamanten zu graben. Er kaufte nach, kam zurück und biss sich am Ende auf Platz 4 die Zähne aus, einen Platz vor dem Geld.\n\nUnd dann Felix. Erstes Turnier im Club, später nachgekommen, durch die Flips gekämpft und direkt bis ins Heads-up. Zweiter Platz beim Debüt, das muss man erstmal schaffen. Das Heads-up war schnell vorbei: Niki mit 10♠ 3♠, zwei Paare, fertig. Niki holt seinen vierten Titel und bleibt Champion. Vier Finger auf dem Siegerfoto.",
+   "places": [
+    {
+     "place": 4,
+     "name": "Nico"
+    },
+    {
+     "place": 5,
+     "name": "Manu"
+    },
+    {
+     "place": 6,
+     "name": "Tim"
+    }
+   ]
   }
  ],
  "hands": [
@@ -2463,8 +2511,7 @@ main .wrap { padding-top: 0; }
    ]
   }
  ]
-}
-</script>
+}</script>
 <script>
 (function () {
   const SHELL = "";
@@ -2500,12 +2547,13 @@ main .wrap { padding-top: 0; }
   const paras = txt => String(txt || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => '<p>' + esc(p).replace(/\n/g, '<br>') + '</p>').join('');
 
   /* ---------- Rechnen ---------- */
+  const finishers = t => [...(t.results || []), ...(t.places || [])];
   function standings() {
     const P = pts(), m = new Map();
-    const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, prize: 0, played: 0 }); return m.get(n); };
+    const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, p4: 0, p5: 0, p6: 0, prize: 0, played: 0 }); return m.get(n); };
     for (const t of DATA.tournaments) {
       const onPodium = new Set();
-      for (const r of t.results) {
+      for (const r of finishers(t)) {
         if (!named(r)) continue;
         const s = get(r.name.trim());
         s.points += Number(P['p' + r.place]) || 0;
@@ -2567,7 +2615,7 @@ main .wrap { padding-top: 0; }
     $('#brandName').textContent = DATA.settings.name;
     $('#brandSub').textContent = DATA.settings.name + (DATA.settings.tagline ? ' · ' + DATA.settings.tagline : '');
     $('#playerList').innerHTML = DATA.players.map(p => '<option value="' + esc(p) + '">').join('');
-    $('#footText').textContent = 'Punkte: 1. Platz ' + pts().p1 + ' · 2. Platz ' + pts().p2 + ' · 3. Platz ' + pts().p3 + (Number(pts().teil) ? ' · Teilnahme ' + pts().teil : '');
+    $('#footText').textContent = 'Punkte: ' + [1, 2, 3, 4, 5, 6].map(i => Number(pts()['p' + i]) || 0).filter(Boolean).join(' · ') + ' für Platz 1–6' + (Number(pts().teil) ? ' · +' + pts().teil + ' pro Teilnahme' : '');
     renderRangliste(); renderNews(); renderRekorde(); renderTurniere(); renderRegeln();
   }
 
@@ -2801,13 +2849,14 @@ main .wrap { padding-top: 0; }
 
     h += cx('c12 rg-intro', '<span class="eyebrow gold">Regelwerk · So funktioniert’s</span><h1 class="silvertext">Wie der ' + esc(DATA.settings.name) + ' zählt</h1>' +
       '<p class="lead">Punkte, Buy-ins, Verteilung und P-Bilanz auf einen Blick. Jedes Turnier zählt für die Rangliste, jeder Entry für die P-Bilanz.</p>' +
-      '<div class="rg-facts">' + [[P.p1 + ' · ' + P.p2 + ' · ' + P.p3, 'Punkte für die Top 3'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Verteilung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
+      '<div class="rg-facts">' + [[[1, 2, 3, 4, 5, 6].map(i => Number(P['p' + i]) || 0).filter(Boolean).join(' · '), 'Punkte für die Top 6'], [buyin + ' ' + unit(), 'Buy-in'], [rebuy + ' ' + unit(), 'Rebuy'], ['50 · 30 · 20', 'Verteilung in %']].map(f => '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>').join('') + '</div>' +
       '<p class="rg-note"><b>Nicht verwechseln:</b> <em>Punkte</em> zählen für die Rangliste. <em>' + esc(unit()) + '</em> sind reine Spielpunkte für Buy-ins und Preise, kein echtes Geld.</p>');
 
-    h += cx('c8', head('Das Punktesystem', 'Nur das Podium punktet') +
-      '<div class="rg-pod">' + [[1, P.p1, 'Sieger'], [2, P.p2, 'Zweiter'], [3, P.p3, 'Dritter']].map(x => '<div class="rg-step s' + x[0] + '"><span class="rank r' + x[0] + '">' + x[0] + '</span><b>' + x[1] + '</b><span>Punkte · ' + x[2] + '</span></div>').join('') + '</div>' +
+    h += cx('c8', head('Das Punktesystem', 'Top 6 punkten, Dabeisein zählt') +
+      '<div class="rg-pod">' + [[1, P.p1, 'Sieger'], [2, P.p2, 'Zweiter'], [3, P.p3, 'Dritter'], [4, P.p4, 'Vierter'], [5, P.p5, 'Fünfter'], [6, P.p6, 'Sechster']].filter(x => Number(x[1])).map(x => '<div class="rg-step s' + x[0] + '"><span class="rank r' + x[0] + '">' + x[0] + '</span><b>' + x[1] + '</b><span>Punkte · ' + x[2] + '</span></div>').join('') + '</div>' +
       '<ol class="rg-list">' +
-      '<li><b>Nur die Top 3 punkten.</b> Ab Platz 4 gibt es ' + (Number(P.teil) ? P.teil + ' Punkte fürs Mitspielen' : 'keine Punkte') + '. Ein Sieg ist mehr wert als zwei dritte Plätze.</li>' +
+      '<li><b>Die Top 6 punkten.</b> Der Sieg zählt am meisten: ' + P.p1 + ' Punkte, Platz 6 bekommt noch ' + P.p6 + '.</li>' +
+      (Number(P.teil) ? '<li><b>Dabeisein zählt.</b> Für jedes Turnier, bei dem du mitspielst, gibt es ' + P.teil + ' Punkt extra. Wer immer da ist, wird belohnt.</li>' : '') +
       '<li><b>Alles wird addiert.</b> Die Punkte aus allen Turnieren ergeben die ewige Rangliste in der Lobby.</li>' +
       '<li><b>Rebuys zählen nicht.</b> Für die Punkte zählt nur die Platzierung, egal wie viele Entries du gebraucht hast.</li>' +
       '<li><b>Gleichstand?</b> Dann entscheiden der Reihe nach: mehr Siege, mehr 2. Plätze, mehr 3. Plätze, mehr gewonnene ' + esc(unit()) + '.</li>' +
@@ -2816,9 +2865,9 @@ main .wrap { padding-top: 0; }
     const lead = st[0];
     let ex = '<p class="empty">Sobald das erste Podium steht, rechnen wir es hier vor.</p>';
     if (lead) {
-      const rows = ts.map(t => { const r = t.results.find(x => named(x) && x.name.trim() === lead.name); return r ? { t, place: r.place, p: Number(P['p' + r.place]) || 0 } : null; }).filter(Boolean);
+      const rows = ts.map(t => { const r = finishers(t).find(x => named(x) && x.name.trim() === lead.name); const inT = r || (t.participants || []).includes(lead.name); return inT ? { t, place: r ? r.place : 0, p: (r ? Number(P['p' + r.place]) || 0 : 0) + (Number(P.teil) || 0) } : null; }).filter(Boolean);
       ex = '<p class="sub">So kommt <b>' + esc(lead.name) + '</b> auf Platz 1 der Rangliste:</p><div class="rg-calc">' +
-        rows.map(r => '<div><span class="rank r' + r.place + '">' + r.place + '</span><span class="nm">' + esc(tName(r.t)) + '</span><b>+' + r.p + '</b></div>').join('') +
+        rows.map(r => '<div><span class="rank' + (r.place && r.place <= 3 ? ' r' + r.place : '') + '">' + (r.place || '–') + '</span><span class="nm">' + esc(tName(r.t)) + '</span><b>+' + r.p + '</b></div>').join('') +
         '<div class="sum"><span></span><span class="nm">' + rows.map(r => r.p).join(' + ') + '</span><b>' + lead.points + '</b></div></div>';
     }
     h += cx('c4', head('Beispiel', 'Live aus der Tabelle') + ex + '<a class="rg-link" href="#rangliste" data-go="rangliste">Zur Rangliste →</a>');
@@ -2860,7 +2909,7 @@ main .wrap { padding-top: 0; }
       ['Wie bekomme ich einen Platz?', 'Über „Platz reservieren“ oben auf der Seite. Es gibt zehn Stühle, wer zuerst zusagt, sitzt.'],
       ['Wie schnell steigen die Blinds?', 'Normalerweise alle 30 Minuten ein Level. Bei Specials kann es schneller gehen, das steht dann beim Turnier.'],
       ['Was sind die Minigames?', 'Zwischendurch und ohne Ankündigung: Omaha, Crazy Pineapple oder ein Bomb Pot.'],
-      ['Wie bekomme ich Punkte?', Number(P.teil) ? 'Für jedes Turnier gibt es ' + P.teil + ' Punkte, dazu die Punkte fürs Podium.' : 'Nur über das Podium: Platz 1 bis 3 bekommt Punkte für die Rangliste. Rebuys zählen dabei nicht.'],
+      ['Wie bekomme ich Punkte?', Number(P.teil) ? 'Für jedes Turnier gibt es ' + P.teil + ' Punkt fürs Mitspielen, dazu Punkte für Platz 1 bis 6 (' + [1, 2, 3, 4, 5, 6].map(i => Number(P['p' + i]) || 0).join(' · ') + ').' : 'Nur über das Podium: Platz 1 bis 3 bekommt Punkte für die Rangliste. Rebuys zählen dabei nicht.'],
       ['Was passiert bei Punktgleichheit?', 'Erst zählen die Siege, dann die 2. Plätze, dann die 3. Plätze und zuletzt die gewonnenen ' + esc(unit()) + '.'],
       ['Wo sehe ich meine Statistik?', 'Unter „Die Spieler“ hat jeder ein Profil mit Platzierungen, Punkten und besten Händen. Aktualisiert wird direkt nach jedem Turnier.']
     ];
@@ -3456,7 +3505,7 @@ main .wrap { padding-top: 0; }
       DATA.settings.tagline = $('#sTag').value.trim();
       DATA.settings.buyin = Number($('#sBuy').value) || '';
       DATA.settings.wa = $('#sWaN').value.replace(/\D/g, '').replace(/^0+/, '');
-      DATA.settings.points = { p1: +$('#s1').value || 0, p2: +$('#s2').value || 0, p3: +$('#s3').value || 0, teil: +$('#sT').value || 0 };
+      DATA.settings.points = { ...DATA.settings.points, p1: +$('#s1').value || 0, p2: +$('#s2').value || 0, p3: +$('#s3').value || 0, teil: +$('#sT').value || 0 };
       $('#sSave').disabled = true;
       if (!(await save($('#sStatus'), 'Einstellungen gespeichert'))) $('#sSave').disabled = false;
     };
