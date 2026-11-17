@@ -1095,6 +1095,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
 <div class="menu" id="menu" hidden><div class="menu-in">
   <nav class="menu-links" aria-label="Bereiche"><a href="#rangliste" data-go="rangliste">Lobby</a><a href="#news" data-go="news">News</a><a href="#rekorde" data-go="rekorde">Hände &amp; <em>Rekorde</em></a><a href="#turniere" data-go="turniere">Turniere</a><a href="#regeln" data-go="regeln">Regeln</a><a href="spieler/">Die <em>Spieler</em></a></nav>
   <div class="menu-tools">
+    <button class="icon-btn" id="playBtn" style="color:var(--gold2);border-color:var(--gold3)">♠ Online spielen</button>
     <button class="icon-btn" id="liveBtn"><span class="ldot"></span>Live-Tafel</button>
     <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
   </div>
@@ -3590,4 +3591,14 @@ document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 </script>
+<div id="playOv" hidden style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px">
+<div style="width:min(360px,100%);background:#121212;border:1px solid #2e2e2e;border-radius:20px;padding:26px 22px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.8)">
+<div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase">Blue Chip Online</div>
+<div style="font-size:22px;font-weight:650;margin:6px 0 6px">Wo willst du spielen?</div>
+<p style="font-size:13px;color:var(--grey);margin:0 0 16px">Nur Spielgeld. Anmelden mit deinem Konto oder deinem Code.</p>
+<a href="lounge/" class="icon-btn" style="text-decoration:none;width:100%;justify-content:center;height:48px;margin-bottom:8px;background:linear-gradient(180deg,#f3d68f,#c49a41);color:#111;border-color:#c49a41;font-weight:650">3D-Lounge betreten</a>
+<a href="https://blue-chip-game-production.up.railway.app" class="icon-btn" style="text-decoration:none;width:100%;justify-content:center;height:48px;margin-bottom:8px">Direkt an den Tisch (ohne 3D)</a>
+<button id="playNo" class="icon-btn" style="width:100%;justify-content:center;height:40px;border:none;background:none">Schließen</button>
+</div></div>
+<script>(function(){const o=document.getElementById('playOv');document.getElementById('playBtn').onclick=()=>{o.hidden=false;};document.getElementById('playNo').onclick=()=>o.hidden=true;o.addEventListener('click',e=>{if(e.target===o)o.hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')o.hidden=true;});})();</script>
 <script src="/zaehler.js" defer></script></body></html>
