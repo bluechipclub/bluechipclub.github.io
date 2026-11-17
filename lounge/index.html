@@ -64,6 +64,11 @@ h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;text-wrap:balance;l
 #lchatLog div{background:rgba(11,10,8,.62);color:#f3ead6;font:600 13px Manrope,sans-serif;padding:4px 8px;border-radius:8px;width:fit-content;max-width:100%;overflow-wrap:anywhere}
 #lchatLog b{color:#f3d98b}
 #lchatIn{pointer-events:auto;background:rgba(11,10,8,.9);color:#fff;border:1px solid #6b5426;border-radius:8px;padding:7px 10px;font:600 14px Manrope,sans-serif}
+#volBtn{position:fixed;right:150px;top:150px;z-index:11;font-size:13px;padding:6px 10px}
+#volPop{position:fixed;right:16px;top:190px;z-index:31;display:flex;align-items:center;gap:8px;background:rgba(11,10,8,.9);border:1px solid #6b5426;border-radius:12px;padding:8px 12px;color:#f3ead6}
+#volPop[hidden]{display:none}
+#volPop input{width:160px;accent-color:#e8c66a}
+body.couchMode #volBtn,body.e2d #volBtn{display:none}
 #danceBtn{position:fixed;right:16px;top:150px;z-index:11;font-size:13px;padding:6px 12px}
 #danceMenu{position:fixed;right:16px;top:190px;z-index:30;display:flex;flex-direction:column;gap:6px;background:rgba(11,10,8,.9);border:1px solid #6b5426;border-radius:12px;padding:10px;min-width:200px}
 #danceMenu[hidden]{display:none}
@@ -260,7 +265,7 @@ body.liarOn:not(.liarSeated) #lHand{display:none}
 <div id="tvFrame" hidden></div>
 <button class="btn" id="barUp" hidden style="position:fixed;right:12px;bottom:64px;z-index:15">Vom Hocker aufstehen (E)</button>
 <div id="embed2d" hidden></div>
-<div id="onl" hidden></div><div id="danceMenu" hidden></div><button id="danceBtn" class="btn ghost" title="Tanzen (T)">💃 Tanzen (T)</button>
+<div id="onl" hidden></div><div id="danceMenu" hidden></div><button id="volBtn" class="btn ghost" title="Lautstärke">🔊</button><div id="volPop" hidden><span>🔈</span><input type="range" id="volR" min="0" max="100" step="1"><span>🔊</span></div><button id="danceBtn" class="btn ghost" title="Tanzen (T)">💃 Tanzen (T)</button>
 <div id="lchat" hidden><div id="lchatLog"></div><input id="lchatIn" maxlength="200" placeholder="Nachricht … (Enter senden, Esc zu)" hidden></div>
 <div id="lcount" hidden></div>
 <button class="btn" id="jointBtn" hidden style="position:fixed;right:16px;bottom:150px;z-index:12">🚬 Joint ausdrücken (F)</button>
@@ -269,7 +274,7 @@ body.liarOn:not(.liarSeated) #lHand{display:none}
 <div id="tchoice" hidden><h3>Online-Tisch</h3><div class="row2"><button class="btn" id="tc2d">2D spielen</button><button class="btn ghost" id="tc3d">3D spielen</button></div><div style="font-size:12px;opacity:.7;margin-top:10px">Tab wechselt jederzeit · Esc = zurück</div></div>
 <div id="tvBar" class="panel" hidden><span>📺 Blue Chip TV</span><button class="btn ghost" id="tvNext">Nächstes Video ▶</button><a class="btn ghost" id="tvLink" target="_blank" rel="noopener">Auf YouTube</a><button class="btn" id="tvUp">Aufstehen</button></div>
 <div id="toast" class="panel" hidden></div><div id="lockHint" hidden style="position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 0 0 2px rgba(0,0,0,.5);z-index:7;pointer-events:none"></div>
-<div id="help" class="panel" hidden>WASD laufen · Leertaste springen · ins Bild klicken = Maus zum Umschauen (Esc = Maus frei) · E = benutzen · F = Tür</div>
+<div id="help" class="panel" hidden>WASD laufen · Leertaste springen · beim Laufen dreht die Maus mit, im Stand ist sie frei · Pfeiltasten drehen · ziehen = umschauen · E = benutzen · F = Tür</div>
 <div id="joy" hidden><i></i></div><button id="jumpBtn" class="btn" hidden aria-label="Springen">⤒</button>
 <button id="viewBtn" class="btn ghost" hidden title="Ansicht wechseln (V)">👁 Ansicht</button>
 <button id="act" class="btn" hidden>E</button>
@@ -612,9 +617,14 @@ async function checkCode(code){ if(code==='007') return true; if(!ONLINE.login) 
 
 // ---------- Audio (synthetisch, startet erst nach Klick) ----------
 let AC=null;
+let VOL=.3; try{ const v=parseFloat(localStorage.getItem('bccVol')); if(!isNaN(v)) VOL=Math.max(0,Math.min(1,v)); }catch(e){}
+let MASTER=null; function MDEST(a){ if(!MASTER){ MASTER=a.createGain(); MASTER.gain.value=VOL; MASTER.connect(a.destination); } return MASTER; }
 function audio(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
-function tone(f,d,type,vol){ const a=audio(); if(!a) return; const o=a.createOscillator(),g=a.createGain(); o.type=type||'square'; o.frequency.value=f; g.gain.value=vol||.06; g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+d); }
-function noise(d,vol){ const a=audio(); if(!a) return; const b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),c=b.getChannelData(0); for(let i=0;i<c.length;i++) c[i]=(Math.random()*2-1)*Math.pow(1-i/c.length,2.5); const s=a.createBufferSource(),g=a.createGain(); g.gain.value=vol||.5; s.buffer=b; s.connect(g).connect(a.destination); s.start(); }
+function setVol(v){ VOL=Math.max(0,Math.min(1,v)); try{ localStorage.setItem('bccVol',String(VOL)); }catch(e){} if(MASTER) MASTER.gain.value=VOL; document.querySelectorAll('audio,video').forEach(m=>m.volume=VOL); volToFrames(); }
+function volToFrames(){ document.querySelectorAll('iframe').forEach(f=>{ const vis=f.offsetParent!==null&&!f.closest('[hidden]'); try{ f.contentWindow.postMessage({type:'bcc',event:'volume',v:vis?VOL:0},'*'); }catch(e){} }); }
+setInterval(volToFrames,1500);
+function tone(f,d,type,vol){ const a=audio(); if(!a) return; const o=a.createOscillator(),g=a.createGain(); o.type=type||'square'; o.frequency.value=f; g.gain.value=vol||.06; g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d); o.connect(g).connect(MDEST(a)); o.start(); o.stop(a.currentTime+d); }
+function noise(d,vol){ const a=audio(); if(!a) return; const b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),c=b.getChannelData(0); for(let i=0;i<c.length;i++) c[i]=(Math.random()*2-1)*Math.pow(1-i/c.length,2.5); const s=a.createBufferSource(),g=a.createGain(); g.gain.value=vol||.5; s.buffer=b; s.connect(g).connect(MDEST(a)); s.start(); }
 const sfx={ click:()=>tone(1800,.04,'square',.05), card:()=>{noise(.06,.15)}, tick:()=>tone(900,.03,'triangle',.08),
   bang:()=>{noise(.6,.9);tone(80,.4,'sawtooth',.2)}, dry:()=>{tone(2400,.05,'square',.12);setTimeout(()=>tone(1200,.04,'square',.06),40)},
   win:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.25,'triangle',.08),i*120))}, door:()=>tone(160,.25,'sine',.15) };
@@ -935,12 +945,12 @@ const BD={open:false,ang:0};
 function nearBackDoor(){ return !ME.seated&&!ME.couch&&Math.abs(ME.pos.x-BDOOR.x)<1.0&&Math.abs(ME.pos.z-WALLZ)<1.3; }
 function woodKnock(delay,vol){ const a=audio(); if(!a) return; const t=a.currentTime+(delay||0);
   const b=a.createBuffer(1,a.sampleRate*.12,a.sampleRate),c=b.getChannelData(0); for(let i=0;i<c.length;i++) c[i]=(Math.random()*2-1)*Math.pow(1-i/c.length,6);
-  const s=a.createBufferSource(); s.buffer=b; const lp=a.createBiquadFilter(); lp.type='bandpass'; lp.frequency.value=520; lp.Q.value=1.3; const g=a.createGain(); g.gain.value=vol||.9; s.connect(lp).connect(g).connect(a.destination); s.start(t);
-  const o=a.createOscillator(),og=a.createGain(); o.type='triangle'; o.frequency.setValueAtTime(190,t); o.frequency.exponentialRampToValueAtTime(90,t+.1); og.gain.setValueAtTime(.25*(vol||1),t); og.gain.exponentialRampToValueAtTime(.0001,t+.13); o.connect(og).connect(a.destination); o.start(t); o.stop(t+.14); }
+  const s=a.createBufferSource(); s.buffer=b; const lp=a.createBiquadFilter(); lp.type='bandpass'; lp.frequency.value=520; lp.Q.value=1.3; const g=a.createGain(); g.gain.value=vol||.9; s.connect(lp).connect(g).connect(MDEST(a)); s.start(t);
+  const o=a.createOscillator(),og=a.createGain(); o.type='triangle'; o.frequency.setValueAtTime(190,t); o.frequency.exponentialRampToValueAtTime(90,t+.1); og.gain.setValueAtTime(.25*(vol||1),t); og.gain.exponentialRampToValueAtTime(.0001,t+.13); o.connect(og).connect(MDEST(a)); o.start(t); o.stop(t+.14); }
 function creak(){ const a=audio(); if(!a) return; const t=a.currentTime; const o=a.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(95,t); o.frequency.linearRampToValueAtTime(150,t+.18); o.frequency.linearRampToValueAtTime(80,t+.34);
   const lfo=a.createOscillator(), lg=a.createGain(); lfo.frequency.value=31; lg.gain.value=30; lfo.connect(lg).connect(o.frequency);
   const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1100; bp.Q.value=5; const g=a.createGain(); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.07,t+.04); g.gain.exponentialRampToValueAtTime(.0001,t+.36);
-  o.connect(bp).connect(g).connect(a.destination); o.start(t); lfo.start(t); o.stop(t+.37); lfo.stop(t+.37); }
+  o.connect(bp).connect(g).connect(MDEST(a)); o.start(t); lfo.start(t); o.stop(t+.37); lfo.stop(t+.37); }
 sfx.doorOpen=()=>{ woodKnock(0,.8); creak(); };
 sfx.doorClose=()=>{ woodKnock(0,1); woodKnock(.07,.5); };
 function setBackDoor(open){ if(BD.open===open) return; BD.open=open; open?sfx.doorOpen():sfx.doorClose(); }
@@ -1058,7 +1068,7 @@ drawBarTv(0);
 const BAR_SPOTS=[0,1,2,3].map(i=>({x:TBAR.maxx+.35,z:-7.9+i*.85,tv:BARTV,eye:1.4,bar:true,leave:{x:TBAR.maxx+.85,z:-7.9+i*.85}}));
 function nearBar(){ return S.mode==='free'&&!ME.seated&&!ME.couch&&ME.pos.x<TBAR.maxx+.6&&ME.pos.z<-5.0&&ME.pos.z>-8.6; }
 function sitBar(){ const free=BAR_SPOTS.filter(s=>!s.used); if(!free.length){ toast('Alle Barhocker sind besetzt.'); return; } free.sort((a,b)=>Math.hypot(a.x-ME.pos.x,a.z-ME.pos.z)-Math.hypot(b.x-ME.pos.x,b.z-ME.pos.z)); const sp=free[0]; sp.used='me';
-  ME.couch=sp; ME.yaw=couchFaceYaw(sp); ME.pitch=.02; camera.fov=55; camera.updateProjectionMatrix(); status('Du sitzt am Tresen. Auf dem großen TV läuft der Live-Tisch. Oben rechts am TV umschalten: <b>Live-Tisch · WSOP · WSOP live</b> (Ton im YouTube-Player). Zum Klicken auf den TV erst <b>Esc</b> (Maus frei). <b>E</b> zum Aufstehen.'); $('#barUp').hidden=false; }
+  ME.couch=sp; ME.yaw=couchFaceYaw(sp); ME.pitch=.02; camera.fov=55; camera.updateProjectionMatrix(); status('Du sitzt am Tresen. Auf dem großen TV läuft der Live-Tisch. Oben rechts am TV umschalten: <b>Live-Tisch · WSOP · WSOP live</b> (Ton im YouTube-Player). Die Knöpfe am TV kannst du direkt anklicken. <b>E</b> zum Aufstehen.'); $('#barUp').hidden=false; }
 
 // Kollision
 const OBST=[
@@ -1274,10 +1284,10 @@ function standUp(a){ if(a.seat){a.seat.occupant=null;} a.seat=null; a.g.position
 // ---------- Spieler (du) ----------
 const ME={jy:0,vy:0,pos:new THREE.Vector3(DOOR.x,0,DOOR.z-.8),yaw:0,pitch:-.05,seated:false,seat:null,key:null,chips:100,eye:1.62};
 const keys={}; let joy={x:0,y:0};
-addEventListener('keydown',e=>{ keys[e.code]=true; if(e.code==='KeyE') act(); if(e.code==='KeyF'){ if(ME.item==='joint') dropJoint(); else if(takeJoint()){} else if(S.game&&S.game.kind==='poker') lookAtBoard(); else if(nearBackDoor()) toggleBackDoor(); } if(e.code==='Space'&&document.activeElement.tagName!=='INPUT'){ e.preventDefault(); jump(); } if(e.code==='KeyV'&&S.mode!=='login'&&document.activeElement.tagName!=='INPUT') toggleView(); });
+addEventListener('keydown',e=>{ keys[e.code]=true; if(tableHotkey(e)) return; if(e.code==='KeyE') act(); if(e.code==='KeyF'){ if(ME.item==='joint') dropJoint(); else if(takeJoint()){} else if(S.game&&S.game.kind==='poker') lookAtBoard(); else if(nearBackDoor()) toggleBackDoor(); } if(e.code==='Space'&&document.activeElement.tagName!=='INPUT'){ e.preventDefault(); jump(); } if(e.code==='KeyV'&&S.mode!=='login'&&document.activeElement.tagName!=='INPUT') toggleView(); });
 addEventListener('keyup',e=>keys[e.code]=false);
 function jump(){ if(S.mode==='login'||ME.seated||ME.couch||ME.jy>0.001) return; ME.vy=3.3; sfx.jump&&sfx.jump(); }
-sfx.jump=()=>{ const a=audio(); if(!a) return; const o=a.createOscillator(),g=a.createGain(),t=a.currentTime; o.type='sine'; o.frequency.setValueAtTime(260,t); o.frequency.exponentialRampToValueAtTime(520,t+.12); g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+.15); o.connect(g).connect(a.destination); o.start(t); o.stop(t+.16); };
+sfx.jump=()=>{ const a=audio(); if(!a) return; const o=a.createOscillator(),g=a.createGain(),t=a.currentTime; o.type='sine'; o.frequency.setValueAtTime(260,t); o.frequency.exponentialRampToValueAtTime(520,t+.12); g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+.15); o.connect(g).connect(MDEST(a)); o.start(t); o.stop(t+.16); };
 sfx.land=()=>woodKnock(0,.25);
 let drag=null;
 renderer.domElement.addEventListener('pointerdown',e=>{ if(locked()) return; drag={id:e.pointerId,x:e.clientX,y:e.clientY}; });
@@ -1286,8 +1296,9 @@ addEventListener('pointerup',e=>{ if(drag&&drag.id===e.pointerId) drag=null; });
 // Maus-Umschauen ohne Klicken (wie in Shootern): einmal ins Bild klicken, Esc gibt die Maus frei
 const canLock=matchMedia('(pointer:fine)').matches&&'requestPointerLock' in renderer.domElement;
 const locked=()=>document.pointerLockElement===renderer.domElement;
-function wantsFreeMouse(){ return S.mode==='login'||S.mode==='kasse'||(S.game&&ME.seated)||!$('#waitSheet').hidden; }
-renderer.domElement.addEventListener('click',()=>{ if(canLock&&!locked()&&!wantsFreeMouse()){ try{ const r=renderer.domElement.requestPointerLock(); if(r&&r.catch) r.catch(()=>{}); }catch(e){} } });
+function wantsFreeMouse(){ return (ONL.on&&ME.seated)||!$('#danceMenu').hidden||S.mode==='login'||S.mode==='kasse'||(S.game&&ME.seated)||!$('#waitSheet').hidden; }
+const walking=()=>keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD||keys.ArrowUp||keys.ArrowDown;
+addEventListener('mousemove',e=>{ if(locked()||drag||S.mode==='login'||ME.seated||ME.couch||EMBED.open||!walking()) return; ME.yaw-=e.movementX*.004; ME.pitch-=e.movementY*.003; ME.pitch=Math.max(-1.2,Math.min(1.1,ME.pitch)); });
 addEventListener('mousemove',e=>{ if(!locked()) return; ME.yaw-=e.movementX*.0025; ME.pitch-=e.movementY*.0025; ME.pitch=Math.max(-1.2,Math.min(1.1,ME.pitch)); });
 document.addEventListener('pointerlockchange',()=>{ const h=$('#lockHint'); if(h) h.hidden=!locked(); });
 // Zoom wie ein Blick nach vorne: Mausrad am PC, zwei Finger auf dem Handy. Wer weiter weg sitzt, sieht den Flop kleiner.
@@ -1347,6 +1358,7 @@ function updateMe(dt){
   if(ME.couch){ const sp=ME.couch, base=couchFaceYaw(sp); let d=ME.yaw-base; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; d=Math.max(-1.2,Math.min(1.2,d)); ME.yaw=base+d; ME.pitch=Math.max(-.6,Math.min(.4,ME.pitch));
     camera.position.set(sp.x,sp.eye||1.12,sp.z+(sp.tv?0:.05)); ME.pos.set(sp.x,0,sp.z); }
   else if(ME.seated){
+    if(keys.ArrowLeft) ME.yaw+=dt*1.6; if(keys.ArrowRight) ME.yaw-=dt*1.6; if(keys.ArrowUp) ME.pitch=Math.min(.6,ME.pitch+dt); if(keys.ArrowDown) ME.pitch=Math.max(-1.1,ME.pitch-dt);
     const base=Math.atan2(ME.seat.x-TABLE.x,ME.seat.z-TABLE.z); // Blick Richtung Tisch = von Platz weg gedreht
     let d=ME.yaw-base; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; d=Math.max(-1.9,Math.min(1.9,d)); ME.yaw=base+d; // Kopf drehen, nicht ganz rum
     { const dx=ME.seat.x-TABLE.x,dz=ME.seat.z-TABLE.z,l=Math.hypot(dx,dz); camera.position.set(ME.seat.x+dx/l*.15,1.72,ME.seat.z+dz/l*.15); }
@@ -1630,15 +1642,15 @@ function onlHud(){ const v=ONL.v, el=$('#onl'); if(!ONL.on){ el.hidden=true; ret
   const L=v&&v.legal&&v.toAct===v.yourSeat&&ME.seated?v.legal:null; const info=v?(v.tourney?`Level ${v.tourney.level} · Blinds ${v.blinds[0]}/${v.blinds[1]} · ${v.tourney.remaining} übrig`:`${ONL.fixed?'Lounge-Tisch':'Übungstisch'} · Blinds ${v.blinds[0]}/${v.blinds[1]}`):'Verbinde …';
   const me=v&&v.yourSeat>=0?v.seats[v.yourSeat]:null;
   let h=`<div class="oInfo">${info}${me?` · Dein Stack <b>${me.stack.toLocaleString('de-DE')}</b>`:''}</div>`;
-  if(L){ h+=`<div class="oAct"><button class="btn ghost" data-a="fold">Fold</button>`+(L.canCheck?`<button class="btn" data-a="check">Check</button>`:`<button class="btn" data-a="call">Call ${L.callAmount.toLocaleString('de-DE')}</button>`)+
-    (L.canRaise?`<input type="range" id="oR" min="${L.minRaiseTo}" max="${L.maxRaiseTo}" step="${Math.max(1,v.blinds[1]/2)}" value="${L.minRaiseTo}"><button class="btn" data-a="raise" id="oRb">Raise ${L.minRaiseTo.toLocaleString('de-DE')}</button>`:'')+`<button class="btn ghost" data-a="allin">All-in</button></div>`; }
+  if(L){ h+=`<div class="oAct"><button class="btn ghost" data-a="fold">Fold (F)</button>`+(L.canCheck?`<button class="btn" data-a="check">Check (C)</button>`:`<button class="btn" data-a="call">Call ${L.callAmount.toLocaleString('de-DE')} (C)</button>`)+
+    (L.canRaise?`<input type="range" id="oR" min="${L.minRaiseTo}" max="${L.maxRaiseTo}" step="${Math.max(1,v.blinds[1]/2)}" value="${L.minRaiseTo}"><button class="btn" data-a="raise" id="oRb">Raise ${L.minRaiseTo.toLocaleString('de-DE')} (R)</button>`:'')+`<button class="btn ghost" data-a="allin">All-in (2× A)</button></div><div class="oWait">Größe: 1 Min · 2 ½ Pot · 3 ¾ Pot · 4 Max</div>`; }
   else if(ME.seated){ const nP=v?v.seats.filter(x=>x).length:0; const w=v&&v.toAct>=0&&v.seats[v.toAct]?v.seats[v.toAct].name+' ist dran …':(nP<2?'Warte auf Mitspieler: ab 2 Spielern startet die Hand von selbst.':'Warte auf die nächste Hand …'); h+=`<div class="oAct off"><button class="btn ghost" disabled>Fold</button><button class="btn" disabled>Check / Call</button><button class="btn" disabled>Raise</button><button class="btn ghost" disabled>All-in</button></div><div class="oWait">${w}</div>`; }
   el.classList.toggle('mini',!ME.seated);
-  if(!ME.seated) h=`<div class="oInfo">♠ Pause, der Tisch läuft ohne dich weiter (Blinds werden bezahlt)</div><div class="oNav"><button class="btn ghost" id="o2d">🖥 2D (Tab)</button><button class="btn ghost" id="oSit">Zurück an den Platz</button><button class="btn ghost" id="oLeave">Tisch verlassen</button></div>`; else
-  h+=`<div class="oNav"><button class="btn ghost" id="o2d">🖥 2D (Tab)</button><button class="btn ghost" id="oPeek">👀 Karten (C)</button>${ME.seated?'<button class="btn ghost" id="oStand">Aufstehen (Pause)</button>':'<button class="btn ghost" id="oSit">Zurück an den Platz</button>'}<button class="btn ghost" id="oLeave">Tisch verlassen</button></div>`;
+  if(!ME.seated) h=`<div class="oInfo">♠ Pause, der Tisch läuft ohne dich weiter (Blinds werden bezahlt)</div><div class="oNav"><button class="btn ghost" id="o2d">🖥 2D (Q)</button><button class="btn ghost" id="oSit">Zurück an den Platz</button><button class="btn ghost" id="oLeave">Tisch verlassen</button></div>`; else
+  h+=`<div class="oNav"><button class="btn ghost" id="o2d">🖥 2D (Q)</button><button class="btn ghost" id="oPeek">👀 Karten (X)</button>${ME.seated?'<button class="btn ghost" id="oStand">Aufstehen (Pause)</button>':'<button class="btn ghost" id="oSit">Zurück an den Platz</button>'}<button class="btn ghost" id="oLeave">Tisch verlassen</button></div>`;
   const key=h; if(el._k===key) return; el._k=key; el.innerHTML=h;
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{ e.currentTarget.blur(); const a=b.dataset.a; const act=a==='raise'?{type:'raise',amount:+$('#oR').value}:{type:a}; ONL.room&&ONL.room.send('msg',{t:'act',action:act}); sfx.click&&sfx.click(); });
-  const rg=$('#oR'); if(rg) rg.oninput=()=>{ $('#oRb').textContent='Raise '+(+rg.value).toLocaleString('de-DE'); };
+  const rg=$('#oR'); if(rg) rg.oninput=()=>{ $('#oRb').textContent='Raise '+(+rg.value).toLocaleString('de-DE')+' (R)'; };
   if($('#o2d')) $('#o2d').onclick=e=>{ e.currentTarget.blur(); open2D(); }; if($('#oPeek')) $('#oPeek').onclick=e=>{ e.currentTarget.blur(); peekCards(); }; $('#oLeave').onclick=e=>{ e.currentTarget.blur(); onlExit(); };
   if($('#oStand')) $('#oStand').onclick=e=>{ e.currentTarget.blur(); onlStand(); }; if($('#oSit')) $('#oSit').onclick=e=>{ e.currentTarget.blur(); if(onlNearMySeat()) onlSit(); else toast('Geh zurück zu deinem Platz am Pokertisch.'); };
   window.__onlKey=key; }
@@ -1650,7 +1662,19 @@ function peekCards(){ if(!ONL.on||!ONL.myCards||!ME.seated||EMBED.open) return; 
 function stepPeek(){ if(!PEEK.g.visible) return; const s=(performance.now()-PEEK.t0)/1000, up=Math.min(1,s/.35), down=Math.max(0,Math.min(1,(s-2.4)/.35)), k=up*(1-down); const e=k*k*(3-2*k);
   PEEK.g.position.set(0,-.22+.15*e,-.3); PEEK.g.rotation.x=-.9*(1-e)-.15;
   if(s>2.8){ PEEK.g.visible=false; const mine=ONL.seatCards[ONL.v&&ONL.v.yourSeat]; if(mine) mine.forEach(c=>c.visible=true); } }
-addEventListener('keydown',e=>{ if(e.code==='KeyC'&&ONL.on&&document.activeElement.tagName!=='INPUT') peekCards(); });
+addEventListener('keydown',e=>{ if(e.code==='KeyX'&&ONL.on&&document.activeElement.tagName!=='INPUT') peekCards(); });
+let ALLIN_T=0;
+function onlSend(act){ if(!ONL.room) return; ONL.room.send('msg',{t:'act',action:act}); sfx.click&&sfx.click(); }
+function tableHotkey(e){ if(!(ONL.on&&ME.seated)||/INPUT|TEXTAREA/.test(document.activeElement.tagName)||e.repeat) return false; const v=ONL.v, L=v&&v.legal&&v.toAct===v.yourSeat?v.legal:null; const c=e.code;
+  if(c==='KeyQ'){ e.preventDefault(); if(EMBED.open) close2D(); else open2D(); return true; }
+  if(!['KeyF','KeyC','KeyR','KeyA','Digit1','Digit2','Digit3','Digit4'].includes(c)) return false;
+  e.preventDefault(); if(!L){ toast('Du bist noch nicht dran.',900); return true; }
+  if(c==='KeyF') onlSend({type:'fold'});
+  else if(c==='KeyC') onlSend(L.canCheck?{type:'check'}:{type:'call'});
+  else if(c==='KeyR'){ if(!L.canRaise){ toast('Erhöhen geht gerade nicht.',1000); return true; } const r=$('#oR'); onlSend({type:'raise',amount:r?+r.value:L.minRaiseTo}); }
+  else if(c==='KeyA'){ const now=performance.now(); if(now-ALLIN_T<1200){ ALLIN_T=0; onlSend({type:'allin'}); } else { ALLIN_T=now; toast('Nochmal <b>A</b> für All-in',1200); } }
+  else if(L.canRaise){ const r=$('#oR'); if(r){ const pot=v.pot||0, f=[0,.5,.75,1,0][+c.slice(-1)]; let amt=c==='Digit1'?L.minRaiseTo:c==='Digit4'?L.maxRaiseTo:Math.round((v.currentBet||0)+(pot+ (L.callAmount||0))*f); amt=Math.max(L.minRaiseTo,Math.min(L.maxRaiseTo,amt)); r.value=amt; r.dispatchEvent(new Event('input')); toast('Raise auf '+amt.toLocaleString('de-DE')+' · <b>R</b> zum Setzen',1400); } }
+  return true; }
 
 // ---------- Pokertisch: 2D oder 3D spielen ----------
 const EMBED={open:false};
@@ -2167,10 +2191,11 @@ function myDance(id){ const secs=(id==='tanz2'||id==='sonder')?10:6; let sent=fa
   ME.dance=id; ME.danceUntil=performance.now()+secs*1000; if(!SELF){ SELF=makeAvatar(byKey[ME.key]); delete AV[ME.key]; SELF.tag.visible=false; SELF.g.visible=false; }
   if(SELF){ startDance(SELF,id,secs); } danceSound(id); $('#danceMenu').hidden=true;
   setTimeout(()=>{ if(ME.dance===id&&performance.now()>=ME.danceUntil-50) ME.dance=null; },secs*1000); }
+$('#volR').value=Math.round(VOL*100); $('#volR').oninput=e=>setVol(e.target.value/100); $('#volBtn').onclick=e=>{ e.currentTarget.blur(); $('#volPop').hidden=!$('#volPop').hidden; $('#danceMenu').hidden=true; };
 $('#danceBtn').onclick=e=>{ e.currentTarget.blur(); danceMenu(); };
 function danceMenu(){ const el=$('#danceMenu'); if(!el.hidden){ el.hidden=true; return; } const sonderOk=ONL.on&&ONL.v&&ONL.v.sonderBis&&ONL.v.sonderBis>Date.now(); const L=DANCE_LIST.filter(([id])=>id!=='sonder'||sonderOk); el.innerHTML='<div class="dmT">💃 Tanzen</div>'+L.map(([id,n])=>MY_DANCES.has(id)||id==='sonder'?`<button class="btn ghost" data-d="${id}">${n}</button>`:`<button class="btn ghost" disabled title="Im Shop in der Lobby kaufen">🔒 ${n}</button>`).join('')+(sonderOk?'':'<div class="dmH">⭐ Sondertanz auf dem Tisch gibt es nach einem All-in-Knockout.</div>'); el.hidden=false; el.querySelectorAll('button[data-d]').forEach(b=>b.onclick=ev=>{ ev.currentTarget.blur(); myDance(b.dataset.d); }); }
 addEventListener('keydown',e=>{ if(e.code==='KeyT'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)&&!(LNG.chatOpen)) danceMenu(); });
-function danceSound(id){ const f={sonder:'sondertanz.mp3',tanz2:'tanzschritte.mp3'}[id]; if(!f) return; try{ const au=new Audio('https://blue-chip-game-production.up.railway.app/sounds/'+f); au.volume=.6; au.play().catch(()=>{}); setTimeout(()=>au.pause(),10000); }catch(e){} }
+function danceSound(id){ const f={sonder:'sondertanz.mp3',tanz2:'tanzschritte.mp3'}[id]; if(!f) return; try{ const au=new Audio('https://blue-chip-game-production.up.railway.app/sounds/'+f); au.volume=Math.min(1,.6*VOL); au.play().catch(()=>{}); setTimeout(()=>au.pause(),10000); }catch(e){} }
 
 // ---------- Gemeinsame Lounge (Server-Raum 'lounge'): alle, die online sind, sehen sich ----------
 const LNG={room:null,on:false,av:{},sendT:0,last:'',me:null};
@@ -2193,12 +2218,12 @@ function lngPlayers(list){ const seen=new Set(); let n=0;
     if(!L){ const base=byKey[p.key]||{key:p.key||('gast_'+p.id),name:p.name||'Gast',color:'#8a8a8a'}; if(AV[base.key]){ const old=AV[base.key]; if(old.fake||old.lngOwner){ scene.remove(old.g); delete AV[base.key]; } }
       const a=makeAvatar(Object.assign({},base,{name:p.name||base.name})); delete AV[base.key]; a.lngId=p.id; L=LNG.av[p.id]={a,key:base.key,tx:p.x,tz:p.z,tyaw:p.yaw}; a.pos.set(p.x,0,p.z); LNG_AV.push(a); }
     L.tx=p.x; L.tz=p.z; L.tyaw=p.yaw; L.anim=String(p.anim||'idle'); L.t=performance.now(); }
-  for(const id in LNG.av) if(!seen.has(id)) lngRemove(id);
-  $('#lcount').textContent='👥 '+Math.max(1,n)+' in der Lounge'; }
+  if(list&&list.length>=Object.keys(LNG.av).length+2){ for(const id in LNG.av) if(!seen.has(id)&&performance.now()-(LNG.av[id].t||0)>15000) lngRemove(id); }
+  $('#lcount').textContent='👥 '+(Object.keys(LNG.av).length+1)+' in der Lounge'; }
 const LNG_AV=[];
-function lngRemove(id){ const L=LNG.av[id]; if(!L) return; scene.remove(L.a.g); if(L.joint) scene.remove(L.joint); const i=LNG_AV.indexOf(L.a); if(i>=0) LNG_AV.splice(i,1); delete LNG.av[id]; }
+function lngRemove(id){ const L=LNG.av[id]; if(!L) return; setTimeout(()=>{ if($('#lcount')) $('#lcount').textContent='👥 '+(Object.keys(LNG.av).length+1)+' in der Lounge'; },0); scene.remove(L.a.g); if(L.joint) scene.remove(L.joint); const i=LNG_AV.indexOf(L.a); if(i>=0) LNG_AV.splice(i,1); delete LNG.av[id]; }
 function lngUpdate(dt){ if(!LNG.on) return; const now=performance.now(); LNG.moving=Math.hypot(ME.pos.x-(LNG.px||0),ME.pos.z-(LNG.pz||0))>dt*.4; LNG.px=ME.pos.x; LNG.pz=ME.pos.z;
-  for(const id in LNG.av){ const L=LNG.av[id], a=L.a, k=Math.min(1,dt*10); const dx=L.tx-a.pos.x, dz=L.tz-a.pos.z; a.pos.x+=dx*k; a.pos.z+=dz*k; a.g.rotation.y=lerpAng(a.g.rotation.y,(L.tyaw||0)+Math.PI,k);
+  for(const id in LNG.av){ const L=LNG.av[id], a=L.a, k=Math.min(1,dt*8); const dx=L.tx-a.pos.x, dz=L.tz-a.pos.z; const dd=Math.hypot(dx,dz); if(dd>6){ a.pos.x=L.tx; a.pos.z=L.tz; } else { a.pos.x+=dx*k; a.pos.z+=dz*k; } a.g.visible=true; a.g.rotation.y=lerpAng(a.g.rotation.y,(L.tyaw||0)+Math.PI,k);
     const an=L.anim.split(':'); const base=an[0]; a.state=base==='walk'||Math.hypot(dx,dz)>.05?'walk':(base==='sit'||base==='bar'||base==='couch')?'seated':'idle'; if(base==='dance'){ if(!a.dance||a.dance.name!==an[1]) startDance(a,an[1]||'tanz2',3600); a.dance.until=performance.now()+600; }
     // Joint in der Hand sichtbar
     const j=an[an.length-1]==='j'; if(j&&!L.joint){ L.joint=HELD.g.clone(); L.joint.visible=true; scene.add(L.joint); } if(!j&&L.joint){ scene.remove(L.joint); L.joint=null; }
