@@ -1127,7 +1127,8 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "p4": 4,
    "p5": 2,
    "p6": 1,
-   "teil": 1
+   "teil": 1,
+   "online": 0.75
   },
   "nicknames": {
    "Oli": "Two Pair",
@@ -2540,18 +2541,21 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const P = pts(), m = new Map();
     const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, p4: 0, p5: 0, p6: 0, prize: 0, played: 0 }); return m.get(n); };
     for (const t of DATA.tournaments) {
+      /* Online-Turniere (type "online") zählen mit P.online (0,75) der Punkte (Tim 17.11.) */
+      const f = t.type === 'online' ? (P.online != null ? Number(P.online) : 0.75) : 1;
       const onPodium = new Set();
       for (const r of finishers(t)) {
         if (!named(r)) continue;
         const s = get(r.name.trim());
-        s.points += Number(P['p' + r.place]) || 0;
+        s.points += (Number(P['p' + r.place]) || 0) * f;
         s['p' + r.place]++;
         s.prize += Number(r.prize) || 0;
         onPodium.add(s.name);
       }
       const parts = new Set([...(t.participants || []), ...onPodium]);
-      for (const n of parts) { const s = get(n); s.played++; s.points += Number(P.teil) || 0; }
+      for (const n of parts) { const s = get(n); s.played++; s.points += (Number(P.teil) || 0) * f; }
     }
+    for (const s of m.values()) s.points = Math.round(s.points * 100) / 100;
     return [...m.values()].filter(s => s.p1 + s.p2 + s.p3 > 0 || s.points > 0)
       .sort((a, b) => b.points - a.points || b.p1 - a.p1 || b.p2 - a.p2 || b.p3 - a.p3 || b.prize - a.prize);
   }
@@ -2845,6 +2849,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<ol class="rg-list">' +
       '<li><b>Die Top 6 punkten.</b> Der Sieg zählt am meisten: ' + P.p1 + ' Punkte, Platz 6 bekommt noch ' + P.p6 + '.</li>' +
       (Number(P.teil) ? '<li><b>Dabeisein zählt.</b> Für jedes Turnier, bei dem du mitspielst, gibt es ' + P.teil + ' Punkt extra. Wer immer da ist, wird belohnt.</li>' : '') +
+      '<li><b>Online zählt mit.</b> Turniere am Online-Tisch bringen ' + Math.round((P.online != null ? Number(P.online) : 0.75) * 100) + ' % der Punkte eines Turniers am echten Tisch.</li>' +
       '<li><b>Alles wird addiert.</b> Die Punkte aus allen Turnieren ergeben die ewige Rangliste in der Lobby.</li>' +
       '<li><b>Rebuys zählen nicht.</b> Für die Punkte zählt nur die Platzierung, egal wie viele Entries du gebraucht hast.</li>' +
       '<li><b>Gleichstand?</b> Dann entscheiden der Reihe nach: mehr Siege, mehr 2. Plätze, mehr 3. Plätze, mehr gewonnene ' + esc(unit()) + '.</li>' +
