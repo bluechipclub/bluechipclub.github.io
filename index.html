@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
 /* Layout: Poker-Lobby. Feste Kopfleiste, darunter ein Bento-Raster (12 Spalten): großes Siegerbild links, Preispool und Champion rechts, darunter Rangliste, beste Hand, Siegerwand. Eine Schrift (Geist) plus Geist Mono für Zahlen. Gold, Schwarz, Grau. */
 :root {
@@ -1069,6 +1069,12 @@ nav.tabs .pill { background: var(--cream); }
 .rules li { border-top-color: var(--line) !important; }
 /* Tischfoto-Bänder raus (Tim 17.11.: bricht den Nacht-Vibe) */
 .voidband { display: none !important; }
+/* Schrift (Tim 17.11.): Outfit überall, Akzentwörter nicht kursiv, nur Gold */
+:root { --sans: "Outfit", "Helvetica Neue", Arial, sans-serif; --serif: var(--sans); --display: var(--sans); --body: var(--sans); }
+body, h1, h2, h3, h4, button, input, select, textarea, nav, .wm { font-family: var(--sans); }
+em { font-family: var(--sans) !important; font-style: normal !important; font-weight: 600 !important; letter-spacing: -.03em; }
+/* Knopf „Intro ansehen“ ausgeblendet (Tim 17.11.) */
+.kino .ctas [data-intro] { display: none !important; }
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="photo"></span><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
