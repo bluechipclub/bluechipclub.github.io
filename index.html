@@ -3591,6 +3591,7 @@ document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 </script>
+<button id="playPill" style="position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9000;height:48px;padding:0 22px;border-radius:999px;border:1px solid #c49a41;background:linear-gradient(180deg,#f3d68f,#c49a41);color:#111;font:700 15px var(--font,inherit);box-shadow:0 10px 30px rgba(0,0,0,.6);white-space:nowrap;cursor:pointer">♠ Heute: Blue Chip Online #1</button>
 <div id="playOv" hidden style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px">
 <div style="width:min(360px,100%);background:#121212;border:1px solid #2e2e2e;border-radius:20px;padding:26px 22px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.8)">
 <div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase">Blue Chip Online</div>
@@ -3600,5 +3601,5 @@ ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 <a href="https://blue-chip-game-production.up.railway.app" class="icon-btn" style="text-decoration:none;width:100%;justify-content:center;height:44px;margin-bottom:8px">Eigenes Sit &amp; Go</a>
 <button id="playNo" class="icon-btn" style="width:100%;justify-content:center;height:40px;border:none;background:none">Schließen</button>
 </div></div>
-<script>(function(){const o=document.getElementById('playOv');document.getElementById('playBtn').onclick=()=>{o.hidden=false;};document.getElementById('playNo').onclick=()=>o.hidden=true;o.addEventListener('click',e=>{if(e.target===o)o.hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')o.hidden=true;});})();</script>
+<script>(function(){const o=document.getElementById('playOv');document.getElementById('playBtn').onclick=document.getElementById('playPill').onclick=()=>{o.hidden=false;};document.getElementById('playNo').onclick=()=>o.hidden=true;o.addEventListener('click',e=>{if(e.target===o)o.hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')o.hidden=true;});})();</script>
 <script src="/zaehler.js" defer></script></body></html>
