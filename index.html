@@ -213,6 +213,8 @@ tbody tr { transition: background-color 200ms var(--ease); }
 
 /* ---------- Hintergrund ---------- */
 .ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(120% 80% at 50% -10%, #17140d 0%, var(--bg) 55%); }
+.ambient .photo { position: absolute; inset: 0; background: url("img/bg-casino-regen.webp") 62% 40% / cover no-repeat; opacity: .42; filter: saturate(1.05); }
+.ambient .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 10 10 / .35) 0%, rgb(10 10 10 / .55) 45%, rgb(10 10 10 / .8) 100%); }
 .ambient .orb { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(80px); opacity: .5; mix-blend-mode: screen; }
 .ambient .o1 { background: radial-gradient(circle, rgb(226 184 87 / .32), transparent 65%); left: -15vmax; top: -20vmax; }
 .ambient .o2 { background: radial-gradient(circle, rgb(47 107 255 / .22), transparent 65%); right: -20vmax; top: 20vh; }
@@ -1017,7 +1019,7 @@ main .wrap { padding-top: 0; }
 @media (max-width: 600px) { .splash .btn-cream.big, .splash .btn-ghost.big { height: 50px; font-size: 16px; padding: 0 22px; } }
 </style>
 
-<div class="ambient" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
+<div class="ambient" aria-hidden="true"><span class="photo"></span><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#rangliste" data-go="rangliste" aria-label="Blue Chip Club, zur Lobby"><span class="wm">bluechip</span><span class="wm-block" aria-hidden="true"></span><span id="brandName" hidden></span></a>
