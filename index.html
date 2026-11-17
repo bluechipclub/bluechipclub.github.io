@@ -1,4 +1,4 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a0a0a"><meta name="description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:type" content="website"><meta property="og:title" content="Blue Chip Club"><meta property="og:description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:url" content="https://bluechipclub.github.io/"><meta property="og:image" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:secure_url" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bluechipclub.github.io/og.jpg?v=3"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><style>body{margin:0;padding:0}[hidden]{display:none!important}</style></head><body><title>Blue Chip Club</title>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#04070e"><meta name="description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:type" content="website"><meta property="og:title" content="Blue Chip Club"><meta property="og:description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:url" content="https://bluechipclub.github.io/"><meta property="og:image" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:secure_url" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bluechipclub.github.io/og.jpg?v=3"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><style>body{margin:0;padding:0}[hidden]{display:none!important}</style></head><body><title>Blue Chip Club</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1017,6 +1017,56 @@ main .wrap { padding-top: 0; }
 .promo .live { background: transparent !important; color: var(--fg) !important; border: 1px solid var(--line2); }
 .promo .btn.wa { background: var(--cream) !important; color: #15110d !important; border-color: var(--cream) !important; }
 @media (max-width: 600px) { .splash .btn-cream.big, .splash .btn-ghost.big { height: 50px; font-size: 16px; padding: 0 22px; } }
+/* =====================================================================
+   v4 Nacht (17.11.2026, Entwurf): Casino bei Nacht hinter Regenscheibe als
+   fester Hintergrund. Kühles Nachtblau statt Sand/Braun, Gold nur als Akzent
+   (wie die Kronleuchter). Flächen als dunkles Glas. Keine Animationen.
+   ===================================================================== */
+:root { --bg: #04070e; --surface: rgb(12 18 32 / .72); --surface2: rgb(20 28 48 / .78); --fg: #eef2fb; --grey: #a3aec6; --grey2: #6c7893; --line: rgb(170 195 255 / .12); --line2: rgb(170 195 255 / .24); --cream: #eef2fb; --gold: #e2b857; --gold2: #f3d68f; --gold3: #9c7a2f; --blue: #3d7bff; --blue2: #9bbcff; }
+html, body { background: var(--bg); }
+.ambient { background: var(--bg) !important; }
+.ambient .photo { opacity: .62; background-position: 62% 30%; }
+.ambient .photo::after { background: linear-gradient(180deg, rgb(4 7 14 / .15) 0%, rgb(4 7 14 / .45) 40%, rgb(4 7 14 / .78) 100%); }
+.ambient .orb, .ambient .suits { display: none; }
+.ambient .vig { background: radial-gradient(120% 100% at 50% 40%, transparent 45%, rgb(0 0 0 / .7)); }
+/* Keine Animationen, keine Übergänge: alles steht sofort im Endzustand */
+*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important; scroll-behavior: auto !important; }
+.rv, .menu-links a, .stage-copy > * { opacity: 1 !important; transform: none !important; }
+.wcard::before, .wcard .shine, .ambient .orb { display: none !important; }
+/* Kopf */
+header.top, body.scrolled header.top { background: rgb(4 7 14 / .55); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom: 1px solid var(--line); }
+nav.tabs, .menu-btn { background: rgb(12 18 32 / .55); border-color: var(--line2); }
+nav.tabs .pill { background: var(--cream); }
+.menu { background: rgb(4 7 14 / .94); }
+.btn-cream, .btn-ghost .pl { background: var(--cream); color: #070b14; }
+.btn-ghost .pl::after { border-left-color: #070b14; }
+.btn-ghost { border-color: rgb(238 242 251 / .4); }
+/* Hero: kein brauner Schleier mehr, der Casino-Hintergrund ist das Bild */
+.kino-bg { display: none; }
+.kino::before { background: linear-gradient(180deg, transparent 0%, transparent 50%, rgb(4 7 14 / .55) 80%, rgb(4 7 14 / .0) 100%); }
+.kino h1 { text-shadow: 0 2px 30px rgb(0 0 0 / .6); }
+.kino h1 em { color: var(--gold2); }
+.kino p { color: rgb(238 242 251 / .88); }
+/* Flächen als dunkles Glas */
+.cardx, .sc-photo, .pay, .scene.board .tbl-wrap, .promo, .splash .box, .cd div, .seg { background: var(--surface) !important; border: 1px solid var(--line) !important; backdrop-filter: blur(14px) saturate(130%); -webkit-backdrop-filter: blur(14px) saturate(130%); }
+.tile, .ptile { background: #0c1220; }
+.wcard { background: transparent; border: 1px solid var(--line); }
+.wcard::after, .wcard:not(.cur)::after { background: linear-gradient(180deg, rgb(20 28 48 / .85), rgb(10 15 28 / .9)); }
+.wcard.cur { border-color: rgb(226 184 87 / .55); }
+/* Fotos ohne Sepia, Verläufe in Nachtblau statt Braun */
+.sc-photo img, .tile img, .ptile img, .voidband img, .nextsc .nx-bg, .splash .wpic { filter: none !important; }
+.sc-photo::before { filter: blur(32px) brightness(.35) saturate(.8); }
+.voidband::before { background: linear-gradient(180deg, rgb(4 7 14 / .9) 0%, rgb(4 7 14 / 0) 22%, rgb(4 7 14 / 0) 55%, rgb(4 7 14 / .9) 100%); }
+.nextsc::before { background: linear-gradient(90deg, rgb(4 7 14 / .78) 0%, rgb(4 7 14 / .35) 55%, transparent 80%), linear-gradient(180deg, rgb(4 7 14 / .6) 0%, transparent 25%, rgb(4 7 14 / .5) 100%) !important; }
+.splash { background: rgb(4 7 14 / .8) !important; }
+/* Akzente: Gold für Sieger und Platz 1, Silber-Chrom für große Zahlen */
+.chrome, .chrome-xl { background: linear-gradient(180deg, #ffffff 0%, #dfe6f5 38%, #8a96b3 52%, #f2f5fb 70%, #a8b3cc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: none; }
+.sc-link { color: var(--blue2); }
+.sc-kick, .sc-sub, .sc-stats span { color: var(--grey); }
+.scene h2 em, .vb-copy h2 em, .head h2 em { color: var(--gold2); }
+.stack i { background: repeating-linear-gradient(90deg, #3d7bff 0 9px, #e9eeff 9px 11px); }
+.board tr.lead .stack i { background: repeating-linear-gradient(90deg, #e2b857 0 9px, #fff2d8 9px 11px); }
+.rules li { border-top-color: var(--line) !important; }
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="photo"></span><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
