@@ -71,9 +71,11 @@ function duckOn(){try{if(typeof bg!=="undefined"&&bg&&!bg.paused){bgWas=true;bg.
   document.querySelectorAll("#lobby video,#intro video").forEach(v=>{if(!v.paused){v.dataset.clipPaused="1";v.pause();}});}
 function duckOff(){try{if(bgWas&&typeof bgResume==="function")bgResume();}catch(e){}bgWas=false;
   document.querySelectorAll('video[data-clip-paused="1"]').forEach(v=>{delete v.dataset.clipPaused;v.play().catch(()=>{});});}
+let after=null;
 function stop(){
   if(!cur)return false;
-  cur=null;clearTimeout(hideT);
+  cur=null;
+  if(after){const f=after;after=null;setTimeout(f,250);}clearTimeout(hideT);
   try{pv.pause();}catch(e){}try{bgv.pause();bgv.removeAttribute("src");}catch(e){}
   ov.classList.remove("on");setTimeout(()=>{if(!cur)ov.hidden=true;},160);
   duckOff();return true;
@@ -100,6 +102,14 @@ function play(id){
   hideT=setTimeout(()=>{if(cur===x)stop();},((isFinite(pv.duration)&&pv.duration&&pv.dataset.src===c.src?pv.duration:60)+3)*1000);
 }
 window.clipStop=stop;
+/* Mystery Bounty: spielt einen Clip des Spielers und ruft danach cb auf. false = kein Clip vorhanden. */
+window.clipFor=function(name,cb){
+  const cn=n=>typeof canonName==="function"?canonName(n):String(n||"").toLowerCase().trim();
+  const ids=Object.keys(CL).filter(id=>CL[id].c&&CL[id].c.p&&cn(CL[id].c.p)===cn(name));
+  if(!ids.length)return false;
+  const id=ids[Math.floor(Math.random()*ids.length)];
+  if(cur)stop();after=cb||null;play(id);return true;
+};
 window.clipCmd=function(c){
   if(c._ts&&Date.now()/1000-c._ts>30)return;   // a tap from long ago (reconnect) is not played
   if(c.op==="clipstop"){stop();return;}
