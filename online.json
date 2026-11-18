@@ -1,0 +1,4 @@
+{
+  "_hinweis": "Archiv der Online-Turniere (2D-Tisch). Format wie /api/turnier/ergebnis. Probe-Turniere und Bots zählen nie.",
+  "turniere": []
+}
