@@ -1137,13 +1137,13 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       <button role="tab" data-view="turniere">Turniere</button>
       <button role="tab" data-view="regeln">Regeln</button>
     </nav>
-    <div class="tools"><a class="btn-cream op-head" href="https://blue-chip-game-production.up.railway.app/?turnier=1" rel="noopener">Jetzt spielen <span aria-hidden="true">→</span></a><button class="btn-cream op-resv" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
+    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><button class="btn-cream op-resv" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
   </div>
 </header>
 <div class="menu" id="menu" hidden><div class="menu-in">
   <nav class="menu-links" aria-label="Bereiche"><a href="#rangliste" data-go="rangliste">Lobby</a><a href="#news" data-go="news">News</a><a href="#rekorde" data-go="rekorde">Hände &amp; <em>Rekorde</em></a><a href="#turniere" data-go="turniere">Turniere</a><a href="#regeln" data-go="regeln">Regeln</a><a href="spieler/">Die <em>Spieler</em></a></nav>
   <div class="menu-tools">
-    <a class="icon-btn op-menu" href="https://blue-chip-game-production.up.railway.app/?turnier=1" rel="noopener">♠ Jetzt spielen</a>
+    <a class="icon-btn op-menu js-play" href="#anmelden" data-in="♠ Jetzt spielen" data-out="♠ Anmelden / Registrieren"><span class="pl-t">♠ Anmelden / Registrieren</span></a><button class="icon-btn" id="bcLogout" hidden>Abmelden</button>
     <button class="icon-btn" id="liveBtn"><span class="ldot"></span>Live-Tafel</button>
     <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
   </div>
@@ -2783,7 +2783,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<img class="kino-bg" src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, ein blauer Chip vorne im Licht">' +
       '<div class="kino-copy"><h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
       '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
-      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero" href="' + esc(ONLINE_PROMO.url) + '" rel="noopener">Jetzt online spielen <span aria-hidden="true">→</span></a>' : '') + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
+      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : '') + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
   }
   function landStage() {
     if (stageLanded) return; stageLanded = true;
@@ -3118,6 +3118,8 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const pay = (L.pay || []).map((v, i) => (i + 1) + '. ' + eur(v)).join(' · ');
     return '<div class="livebox"><span class="eyebrow gold">● Live' + (L.at ? ' · Stand ' + esc(L.at) + ' Uhr' : '') + '</span><div class="lgrid">' + it(L.players, 'Spieler') + it(L.rebuys, 'Rebuys') + it(L.entries, 'Entries') + it(L.pot != null ? eur(L.pot) : null, 'Preisgeld') + '</div>' + (pay ? '<p class="lpay">Auszahlung: ' + esc(pay) + '</p>' : '') + (L.note ? '<p class="lpay">' + esc(L.note) + '</p>' : '') + '</div>'; };
   /* Promo Blue Chip Online: Tim 18.11. Nur der 2D-Tisch, kein Wort von 3D/Lounge. ONLINE_PROMO.on = false blendet sie aus. */
+  let bcIn = false; /* angemeldet (Supabase-Sitzung), wird vom Login-Skript unten gesetzt */
+  window.bcSetIn = v => { bcIn = !!v; };
   const ONLINE_PROMO = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?turnier=1', badge: 'Heute Abend · Blue Chip Online #1' };
   function onlinePromo() {
     if (!ONLINE_PROMO.on) return '';
@@ -3126,9 +3128,9 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<h2>Blue Chip <em>Online.</em></h2>' +
       '<p class="op-sub">Unser Tisch, jetzt auf deinem Handy und am PC. Wenn nicht alle können, wird trotzdem gezockt.</p>' +
       '<ul><li>Echtes Turnier mit Blinds, Ante und Heads-up</li><li>Sprach- und Videochat am Tisch</li><li>Nur Spielgeld, deine Punkte zählen für die Rangliste</li></ul>' +
-      '<a class="op-cta" href="' + esc(ONLINE_PROMO.url) + '" rel="noopener">Jetzt spielen <span aria-hidden="true">→</span></a>' +
-      '<p class="op-fine">Nur für den Club. Link nicht weitergeben.</p></div>' +
-      '<a class="op-pic" href="' + esc(ONLINE_PROMO.url) + '" rel="noopener" tabindex="-1"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 800px) 100vw, 45vw" alt="Blue Chip Online am PC und am Handy, blaue Chips auf dem Tisch"></a></section>';
+      '<a class="op-cta js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' +
+      '<p class="op-fine">' + (bcIn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.') + '</p></div>' +
+      '<a class="op-pic js-play" href="#anmelden" tabindex="-1"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 800px) 100vw, 45vw" alt="Blue Chip Online am PC und am Handy, blaue Chips auf dem Tisch"></a></section>';
   }
   function promoCard() {
     const n = nextOk(); if (!n) return '';
@@ -3748,5 +3750,148 @@ let dest='tafel/?v='+Date.now();const go=()=>{if(inp.value.trim()==='007'){locat
 document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive=(d)=>{dest=d||('tafel/?v='+Date.now());document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
+</script>
+
+<div id="bcAuth" hidden>
+ <div class="ba-box" role="dialog" aria-modal="true" aria-labelledby="baTitle">
+  <button class="ba-x" type="button" aria-label="Schließen">×</button>
+  <span class="ba-kick">Blue Chip Online</span>
+  <h2 id="baTitle">Anmelden</h2>
+  <div class="ba-tabs" role="tablist"><button type="button" data-m="in" aria-selected="true">Anmelden</button><button type="button" data-m="up" aria-selected="false">Registrieren</button></div>
+  <form id="baForm" autocomplete="on">
+   <label>E-Mail<input id="baMail" type="email" autocomplete="email" required></label>
+   <label>Passwort<input id="baPw" type="password" autocomplete="current-password" minlength="8" required></label>
+   <button class="ba-go" type="submit">Anmelden</button>
+  </form>
+  <button class="ba-link" type="button" id="baForgot">Passwort vergessen?</button>
+  <p class="ba-msg" id="baMsg" role="status"></p>
+  <p class="ba-fine">Ein Konto für alles: Website, Online-Tisch und Need For Pete. Schon ein Konto vom Online-Tisch? Dann einfach anmelden.</p>
+ </div>
+</div>
+<style>
+#bcAuth { position: fixed; inset: 0; z-index: 100000; display: grid; place-items: center; padding: 16px; background: rgb(2 4 10 / .78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#bcAuth[hidden] { display: none; }
+#bcAuth .ba-box { position: relative; width: min(400px, 100%); display: grid; gap: 14px; padding: 28px 22px 22px; border-radius: 24px; background: linear-gradient(180deg, rgb(20 28 48 / .96), rgb(8 12 22 / .98)); border: 1px solid rgb(226 184 87 / .45); box-shadow: 0 30px 90px rgb(0 0 0 / .7); color: #eef2fb; }
+#bcAuth .ba-x { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border: 0; background: none; color: #a3aec6; font-size: 26px; cursor: pointer; }
+#bcAuth .ba-kick { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #f3d68f; }
+#bcAuth h2 { margin: 0; font-size: 30px; font-weight: 650; letter-spacing: -.03em; }
+#bcAuth .ba-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: rgb(12 18 32 / .8); border: 1px solid rgb(170 195 255 / .14); }
+#bcAuth .ba-tabs button { border: 0; background: none; color: #a3aec6; padding: 9px; border-radius: 999px; font: inherit; font-weight: 600; cursor: pointer; }
+#bcAuth .ba-tabs button[aria-selected="true"] { background: #eef2fb; color: #070b14; }
+#bcAuth form { display: grid; gap: 12px; }
+#bcAuth label { display: grid; gap: 6px; font-size: 13px; color: #a3aec6; }
+#bcAuth input { height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid rgb(170 195 255 / .22); background: rgb(4 7 14 / .7); color: #eef2fb; font: inherit; font-size: 16px; }
+#bcAuth input:focus { outline: 2px solid #e2b857; outline-offset: 1px; }
+#bcAuth .ba-go { height: 54px; border-radius: 999px; border: 1px solid #c49a41; background: linear-gradient(180deg, #f3d68f, #c49a41); color: #111; font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+#bcAuth .ba-go:disabled { opacity: .6; }
+#bcAuth .ba-link { justify-self: start; border: 0; background: none; color: #8fb0ff; font: inherit; font-size: 14px; padding: 0; cursor: pointer; }
+#bcAuth .ba-msg { margin: 0; min-height: 1.2em; font-size: 14px; color: #f3d68f; }
+#bcAuth .ba-msg.err { color: #e5675c; }
+#bcAuth .ba-fine { margin: 0; font-size: 12px; color: #6c7893; }
+</style>
+<script>
+(function () {
+  const API = 'https://blue-chip-game-production.up.railway.app';
+  const PLAY = API + '/?turnier=1';
+  const LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+  const $ = id => document.getElementById(id);
+  const ov = $('bcAuth'), msg = $('baMsg'), go = document.querySelector('#bcAuth .ba-go'), title = $('baTitle');
+  let sb = null, sbP = null, session = null, mode = 'in', pendingPlay = false;
+
+  function lib() { return new Promise((ok, no) => { if (window.supabase) return ok(); const s = document.createElement('script'); s.src = LIB; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  function client() {
+    if (sbP) return sbP;
+    sbP = (async () => {
+      try {
+        await lib();
+        const c = await (await fetch(API + '/api/konto/config', { credentials: 'omit' })).json();
+        if (!c || !c.url || !c.anonKey) throw 0;
+        sb = window.supabase.createClient(c.url, c.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'bc-web-auth' } });
+        sb.auth.onAuthStateChange((e, s) => { session = s; paint(); if (e === 'PASSWORD_RECOVERY') { openAuth('neu'); } });
+        const { data } = await sb.auth.getSession(); session = data.session; paint();
+        return sb;
+      } catch (e) { sbP = null; return null; }
+    })();
+    return sbP;
+  }
+  function paint() {
+    const inn = !!session;
+    if (window.bcSetIn) window.bcSetIn(inn);
+    document.querySelectorAll('.js-play').forEach(a => { const t = a.querySelector('.pl-t'); if (t && a.dataset.in) t.textContent = inn ? a.dataset.in : a.dataset.out; });
+    document.querySelectorAll('.op-fine').forEach(p => { p.textContent = inn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.'; });
+    const lo = $('bcLogout'); if (lo) lo.hidden = !inn;
+    if (inn && pendingPlay) { pendingPlay = false; play(); }
+  }
+  async function play() {
+    const c = await client();
+    let s = session;
+    if (c) { const { data } = await c.auth.getSession(); s = data.session; }
+    if (!s || !s.access_token) { pendingPlay = true; return openAuth('in'); }
+    const rest = s.expires_at ? Math.max(60, Math.round(s.expires_at - Date.now() / 1000)) : 3600;
+    /* Nur der Zugangs-Token im #-Teil (wird nie an einen Server geschickt), nie der Refresh-Token */
+    location.href = PLAY + '#access_token=' + encodeURIComponent(s.access_token) + '&expires_in=' + rest;
+  }
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('#bcAuth .ba-tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.m === m)));
+    const T = { in: ['Anmelden', 'Anmelden'], up: ['Registrieren', 'Konto erstellen'], neu: ['Neues Passwort', 'Passwort speichern'] }[m];
+    title.textContent = T[0]; go.textContent = T[1];
+    $('baMail').parentElement.hidden = m === 'neu'; $('baMail').required = m !== 'neu';
+    $('baPw').autocomplete = m === 'in' ? 'current-password' : 'new-password';
+    $('baForgot').hidden = m !== 'in';
+    say('');
+  }
+  function say(t, err) { msg.textContent = t; msg.className = 'ba-msg' + (err ? ' err' : ''); }
+  function openAuth(m) { setMode(m || 'in'); ov.hidden = false; setTimeout(() => (m === 'neu' ? $('baPw') : $('baMail')).focus(), 50); client(); }
+  function close() { ov.hidden = true; pendingPlay = false; }
+  function fehler(m) {
+    const t = String(m || '').toLowerCase();
+    if (t.includes('invalid login')) return 'E-Mail oder Passwort falsch';
+    if (t.includes('not confirmed')) return 'Bitte erst die E-Mail bestätigen (Link in der Mail)';
+    if (t.includes('already')) return 'Zu dieser E-Mail gibt es schon ein Konto. Bitte anmelden.';
+    if (t.includes('password')) return 'Passwort mindestens 8 Zeichen';
+    if (t.includes('email')) return 'Die E-Mail sieht nicht richtig aus';
+    if (t.includes('rate') || t.includes('too many')) return 'Zu viele Versuche, bitte kurz warten';
+    if (t.includes('fetch') || t.includes('network')) return 'Keine Verbindung, bitte nochmal';
+    return m || 'Das hat nicht geklappt';
+  }
+  $('baForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const mail = $('baMail').value.trim(), pw = $('baPw').value;
+    if (pw.length < 8) return say('Passwort mindestens 8 Zeichen', true);
+    go.disabled = true; say('Einen Moment …');
+    try {
+      const c = await client(); if (!c) return say('Konten sind gerade nicht erreichbar. Bitte gleich nochmal.', true);
+      if (mode === 'in') {
+        const { error } = await c.auth.signInWithPassword({ email: mail, password: pw });
+        if (error) return say(fehler(error.message), true);
+        say('Angemeldet.'); ov.hidden = true;
+      } else if (mode === 'up') {
+        const { data, error } = await c.auth.signUp({ email: mail, password: pw, options: { emailRedirectTo: location.origin + '/' } });
+        if (error) return say(fehler(error.message), true);
+        if (data.user && data.user.identities && data.user.identities.length === 0) return say('Zu dieser E-Mail gibt es schon ein Konto. Bitte anmelden.', true);
+        if (data.session) { say('Konto erstellt.'); ov.hidden = true; }
+        else say('Fast geschafft: Wir haben dir eine Mail geschickt. Link darin antippen, dann hier anmelden.');
+      } else {
+        const { error } = await c.auth.updateUser({ password: pw });
+        if (error) return say(fehler(error.message), true);
+        say('Passwort gespeichert.'); setTimeout(() => { ov.hidden = true; }, 900);
+      }
+    } finally { go.disabled = false; }
+  });
+  $('baForgot').addEventListener('click', async () => {
+    const mail = $('baMail').value.trim(); if (!mail) return say('Erst deine E-Mail eintragen', true);
+    const c = await client(); if (!c) return say('Konten sind gerade nicht erreichbar', true);
+    const { error } = await c.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + '/' });
+    say(error ? fehler(error.message) : 'Wenn es das Konto gibt, ist eine Mail mit Link unterwegs.', !!error);
+  });
+  document.querySelectorAll('#bcAuth .ba-tabs button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.m)));
+  document.querySelector('#bcAuth .ba-x').addEventListener('click', close);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('.js-play'); if (!a) return; e.preventDefault(); e.stopPropagation(); play(); }, true);
+  $('bcLogout') && $('bcLogout').addEventListener('click', async () => { const c = await client(); if (c) await c.auth.signOut(); session = null; paint(); });
+  client();
+})();
 </script>
 <script src="/zaehler.js" defer></script></body></html>
