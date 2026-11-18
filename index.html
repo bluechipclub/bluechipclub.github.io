@@ -1075,6 +1075,54 @@ body, h1, h2, h3, h4, button, input, select, textarea, nav, .wm { font-family: v
 em { font-family: var(--sans) !important; font-style: normal !important; font-weight: 600 !important; letter-spacing: -.03em; }
 /* Knopf „Intro ansehen“ ausgeblendet (Tim 17.11.) */
 .kino .ctas [data-intro] { display: none !important; }
+
+/* Drei Tabellen: Offline, Online, Gesamt (18.11.2026) */
+.champs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.champs3 .lbch { position: relative; display: grid; gap: 6px; padding: 22px 20px 20px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); backdrop-filter: blur(14px) saturate(130%); -webkit-backdrop-filter: blur(14px) saturate(130%); text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.champs3 .lbch.lbhero { border-color: rgb(226 184 87 / .55); background: linear-gradient(180deg, rgb(226 184 87 / .14), rgb(12 18 32 / .72)); }
+.champs3 .lbch .k { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); }
+.champs3 .lbch.lbhero .k { color: var(--gold2); }
+.champs3 .lbch b { font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -.03em; line-height: 1.05; }
+.champs3 .lbch b.open { color: var(--grey2); font-weight: 500; }
+.champs3 .lbch span.s { font-size: 13px; color: var(--grey); }
+.champs3 .lbch .crown { position: absolute; top: 16px; right: 18px; font-size: 18px; color: var(--gold); }
+.lbtabs { display: inline-grid; grid-auto-flow: column; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); justify-self: start; }
+.lbtabs button { border: 0; background: transparent; color: var(--grey); padding: 9px 18px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.lbtabs button[aria-selected="true"] { background: var(--cream, #eef2fb); color: #070b14; }
+.lbnote { font-size: 13px; color: var(--grey); margin: 0; }
+.tag-on { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue2); border: 1px solid rgb(143 176 255 / .4); vertical-align: middle; }
+@media (max-width: 700px) {
+  .champs3 { grid-template-columns: minmax(0, 1fr); }
+  .champs3 .lbch { padding: 16px 16px; }
+  .lbtabs { justify-self: stretch; grid-auto-columns: 1fr; }
+  .lbtabs button { padding: 9px 8px; }
+}
+
+/* Promo Blue Chip Online (18.11.2026): nur 2D-Tisch, nichts von 3D */
+.onpromo { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(24px, 4vw, 56px); align-items: center; margin-top: clamp(40px, 8vw, 96px); padding: clamp(24px, 4vw, 56px); border-radius: 32px; border: 1px solid rgb(226 184 87 / .45); background: radial-gradient(120% 120% at 0% 0%, rgb(226 184 87 / .16), transparent 55%), linear-gradient(180deg, rgb(20 28 48 / .82), rgb(8 12 22 / .9)); backdrop-filter: blur(14px) saturate(130%); -webkit-backdrop-filter: blur(14px) saturate(130%); overflow: hidden; }
+.onpromo .op-copy { display: grid; gap: 18px; align-content: center; }
+.onpromo .op-badge { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold2); border: 1px solid rgb(226 184 87 / .5); background: rgb(226 184 87 / .08); }
+.onpromo .op-badge i { width: 8px; height: 8px; border-radius: 50%; background: #e5675c; box-shadow: 0 0 10px #e5675c; }
+.onpromo h2 { font-size: clamp(48px, 8vw, 104px); font-weight: 650; letter-spacing: -.05em; line-height: .95; margin: 0; }
+.onpromo h2 em { color: var(--gold2); font-weight: 650; }
+.onpromo .op-sub { font-size: clamp(17px, 1.8vw, 21px); line-height: 1.45; color: rgb(238 242 251 / .88); margin: 0; max-width: 34ch; }
+.onpromo ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: 15px; color: var(--grey); }
+.onpromo ul li::before { content: "♠"; color: var(--gold); margin-right: 10px; }
+.onpromo .op-cta { justify-self: start; display: inline-flex; align-items: center; gap: 12px; height: 64px; padding: 0 34px; border-radius: 999px; font-size: 20px; font-weight: 700; color: #111; text-decoration: none; background: linear-gradient(180deg, #f3d68f, #c49a41); border: 1px solid #c49a41; box-shadow: 0 14px 40px rgb(226 184 87 / .3); }
+.onpromo .op-cta:hover { filter: brightness(1.06); }
+.onpromo .op-fine { font-size: 13px; color: var(--grey2); margin: 0; }
+.onpromo .op-pic { position: relative; border-radius: 22px; overflow: hidden; aspect-ratio: 4 / 5; border: 1px solid var(--line2); box-shadow: 0 30px 80px rgb(0 0 0 / .55); }
+.onpromo .op-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.menu-tools .op-menu { color: #111 !important; background: linear-gradient(180deg, #f3d68f, #c49a41) !important; border-color: #c49a41 !important; font-weight: 700; text-decoration: none; }
+@media (max-width: 800px) {
+  .onpromo { grid-template-columns: minmax(0, 1fr); padding: 22px 18px; border-radius: 26px; }
+  .onpromo .op-pic { order: -1; aspect-ratio: 4 / 4; }
+  .onpromo .op-cta { justify-self: stretch; justify-content: center; height: 60px; }
+}
+.op-head { background: linear-gradient(180deg, #f3d68f, #c49a41) !important; color: #111 !important; border: 1px solid #c49a41 !important; text-decoration: none; font-weight: 700; }
+.kino .ctas { display: flex !important; }
+.op-hero { display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 30px; border-radius: 999px; font-size: 19px; font-weight: 700; color: #111 !important; text-decoration: none; background: linear-gradient(180deg, #f3d68f, #c49a41); border: 1px solid #c49a41; box-shadow: 0 14px 40px rgb(226 184 87 / .3); }
+.op-resv { display: none !important; }
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="photo"></span><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
@@ -1089,12 +1137,13 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       <button role="tab" data-view="turniere">Turniere</button>
       <button role="tab" data-view="regeln">Regeln</button>
     </nav>
-    <div class="tools"><button class="btn-cream" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
+    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><button class="btn-cream op-resv" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
   </div>
 </header>
 <div class="menu" id="menu" hidden><div class="menu-in">
   <nav class="menu-links" aria-label="Bereiche"><a href="#rangliste" data-go="rangliste">Lobby</a><a href="#news" data-go="news">News</a><a href="#rekorde" data-go="rekorde">Hände &amp; <em>Rekorde</em></a><a href="#turniere" data-go="turniere">Turniere</a><a href="#regeln" data-go="regeln">Regeln</a><a href="spieler/">Die <em>Spieler</em></a></nav>
   <div class="menu-tools">
+    <a class="icon-btn op-menu js-play" href="#anmelden" data-in="♠ Jetzt spielen" data-out="♠ Anmelden / Registrieren"><span class="pl-t">♠ Anmelden / Registrieren</span></a><button class="icon-btn" id="bcLogout" hidden>Abmelden</button>
     <button class="icon-btn" id="liveBtn"><span class="ldot"></span>Live-Tafel</button>
     <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="Chip-Sound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">Sound</span></button>
   </div>
@@ -1127,7 +1176,14 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "p4": 4,
    "p5": 2,
    "p6": 1,
-   "teil": 1
+   "teil": 1,
+   "online": 0.75
+  },
+  "aliases": {
+   "Niki": "Niklas",
+   "Alex": "P. Diddy",
+   "Domi M": "Magg",
+   "Jonas": "Jonny"
   },
   "nicknames": {
    "Oli": "Two Pair",
@@ -2536,6 +2592,60 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
 
   /* ---------- Rechnen ---------- */
   const finishers = t => [...(t.results || []), ...(t.places || [])];
+  /* ---------- Online-Turniere (2D-Tisch, ab 18.11.2026) ----------
+     Quelle 1: online.json im Repo (Archiv, bleibt für immer).
+     Quelle 2: Game-Server /api/turnier/ergebnis?id=online1, sobald das Turnier fertig ist (keine Probe).
+     Bots zählen nie. Punkte wie am echten Tisch; in der Gesamt-Tabelle zählt online mit settings.points.online (0,75). */
+  let ONLINE = [];
+  const GAME_API = 'https://blue-chip-game-production.up.railway.app';
+  const onFactor = () => { const f = pts().online; return f != null && f !== '' ? Number(f) : 0.75; };
+  function canon(n) {
+    n = String(n || '').trim(); if (!n || /\(bot\)/i.test(n)) return '';
+    const al = DATA.settings.aliases || {}, low = n.toLowerCase();
+    for (const [a, b] of Object.entries(al)) if (a.toLowerCase() === low) return b;
+    const hit = (DATA.players || []).find(x => x.toLowerCase() === low);
+    return hit || n.charAt(0).toUpperCase() + n.slice(1);
+  }
+  function normOnline(r, src) {
+    if (!r || r.probe || (r.status && r.status !== 'fertig')) return null;
+    const date = (r.date || r.beendet || r.gestartet || '').slice(0, 10);
+    const res = (r.ergebnis || []).map(e => ({ place: Number(e.platz ?? e.place), name: canon(e.spieler ?? e.name) })).filter(e => e.name && e.place).sort((a, b) => a.place - b.place);
+    if (!res.length) return null;
+    return { id: r.id || ('online-' + date + '-' + (r.name || '')), name: r.name || 'Online-Turnier', date, entries: Number(r.teilnehmer) || res.length, res, src };
+  }
+  async function loadOnline() {
+    const list = [];
+    try { const j = await (await fetch('online.json?v=' + Date.now(), { cache: 'no-store' })).json(); (j.turniere || []).forEach(r => { const t = normOnline(r, 'archiv'); if (t) list.push(t); }); } catch (e) {}
+    try {
+      const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+      const r = await (await fetch(GAME_API + '/api/turnier/ergebnis?id=online1', { credentials: 'omit', signal: ctl.signal })).json();
+      const t = normOnline(r, 'live');
+      if (t && !list.some(x => x.date === t.date && x.name === t.name)) list.push(t);
+    } catch (e) {}
+    list.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    const changed = JSON.stringify(list) !== JSON.stringify(ONLINE);
+    ONLINE = list;
+    if (changed) { renderRangliste(); renderTurniere(); renderRegeln(); }
+  }
+  function onlineStandings() {
+    const P = pts(), m = new Map();
+    const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, p4: 0, p5: 0, p6: 0, prize: 0, played: 0 }); return m.get(n); };
+    for (const t of ONLINE) for (const r of t.res) {
+      const s = get(r.name); s.played++;
+      s.points += (Number(P['p' + r.place]) || 0) + (Number(P.teil) || 0);
+      if (r.place <= 6) s['p' + r.place]++;
+    }
+    return [...m.values()].filter(s => s.points > 0).sort((a, b) => b.points - a.points || b.p1 - a.p1 || b.p2 - a.p2 || b.p3 - a.p3 || a.name.localeCompare(b.name));
+  }
+  function totalStandings() {
+    const f = onFactor(), m = new Map();
+    const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, off: 0, on: 0, p1: 0, p2: 0, p3: 0, prize: 0, played: 0 }); return m.get(n); };
+    for (const s of standings()) { const x = get(s.name); x.off = s.points; x.p1 += s.p1; x.p2 += s.p2; x.p3 += s.p3; x.prize += s.prize; x.played += s.played; }
+    for (const s of onlineStandings()) { const x = get(s.name); x.on = Math.round(s.points * f * 100) / 100; x.p1 += s.p1; x.p2 += s.p2; x.p3 += s.p3; x.played += s.played; }
+    for (const x of m.values()) x.points = Math.round((x.off + x.on) * 100) / 100;
+    return [...m.values()].filter(s => s.points > 0).sort((a, b) => b.points - a.points || b.p1 - a.p1 || b.p2 - a.p2 || b.p3 - a.p3 || b.prize - a.prize);
+  }
+  const fmtP = n => String(Math.round(n * 100) / 100).replace('.', ',');
   function standings() {
     const P = pts(), m = new Map();
     const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, p4: 0, p5: 0, p6: 0, prize: 0, played: 0 }); return m.get(n); };
@@ -2632,6 +2742,40 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     return h + '</tbody></table></div>';
   }
 
+  function lbTable(st, kind) {
+    if (!st.length) return '<p class="empty">' + (kind === 'online' ? 'Die Online-Tabelle füllt sich nach dem ersten Online-Turnier, automatisch sobald das Heads-up vorbei ist.' : 'Noch keine Punkte.') + '</p>';
+    const mxp = Math.max(1, ...st.map(s => s.points));
+    const hd = kind === 'gesamt' ? '<th>Punkte</th><th>Offline</th><th>Online</th><th>Siege</th><th>Turniere</th>' : '<th>Punkte</th><th>Siege</th><th>2.</th><th>3.</th><th>Turniere</th>';
+    let h = '<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Spieler</th>' + hd + '</tr></thead><tbody>';
+    st.forEach((s, i) => {
+      const r = i + 1, medals = '<span class="medals">' + '<i class="dot d1"></i>'.repeat(s.p1) + '<i class="dot d2"></i>'.repeat(s.p2) + '<i class="dot d3"></i>'.repeat(s.p3) + '</span>';
+      const cols = kind === 'gesamt' ? '<td class="pts">' + fmtP(s.points) + '</td><td>' + (s.off ? fmtP(s.off) : '–') + '</td><td>' + (s.on ? fmtP(s.on) : '–') + '</td><td>' + s.p1 + '</td><td>' + s.played + '</td>'
+        : '<td class="pts">' + fmtP(s.points) + '</td><td>' + s.p1 + '</td><td>' + s.p2 + '</td><td>' + s.p3 + '</td><td>' + s.played + '</td>';
+      h += '<tr' + (r === 1 ? ' class="lead"' : '') + '><td><span class="rank ' + (r <= 3 ? 'r' + r : '') + '">' + r + '</span></td><td class="player">' + esc(s.name) + (nick(s.name) ? ' <span class="note">' + esc(nick(s.name)) + '</span>' : '') + medals + '<span class="stack" style="--w:' + (s.points / mxp).toFixed(3) + '" aria-hidden="true"><i></i></span></td>' + cols + '</tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+  let lbView = 'gesamt';
+  try { const v = localStorage.getItem('bc-lb'); if (['offline', 'online', 'gesamt'].includes(v)) lbView = v; } catch (e) {}
+  function boardHtml() {
+    const off = standings(), on = onlineStandings(), tot = totalStandings();
+    const champ = (cls, k, s, sub, view) => '<button type="button" class="lbch' + cls + '" data-lb="' + view + '">' + (cls ? '<span class="crown" aria-hidden="true">♛</span>' : '') + '<span class="k">' + k + '</span>' + (s ? '<b>' + esc(s.name) + '</b><span class="s">' + sub(s) + '</span>' : '<b class="open">Noch offen</b><span class="s">' + (view === 'online' ? 'Ab heute am Online-Tisch' : '–') + '</span>') + '</button>';
+    const wins = s => s.p1 + (s.p1 === 1 ? ' Sieg' : ' Siege');
+    const champs = '<div class="champs3">' +
+      champ(' lbhero', 'Hero-Champion', tot[0], s => fmtP(s.points) + ' Punkte gesamt · ' + wins(s), 'gesamt') +
+      champ('', 'Offline-Champion', off[0], s => fmtP(s.points) + ' Punkte · ' + wins(s), 'offline') +
+      champ('', 'Online-Champion', on[0], s => fmtP(s.points) + ' Punkte · ' + wins(s), 'online') + '</div>';
+    const tabs = '<div class="lbtabs" role="tablist">' + [['gesamt', 'Gesamt'], ['offline', 'Offline'], ['online', 'Online']].map(([v, l]) => '<button type="button" role="tab" data-lb="' + v + '" aria-selected="' + (lbView === v) + '">' + l + '</button>').join('') + '</div>';
+    const notes = { gesamt: 'Alle Turniere zusammen: am echten Tisch und online. Online zählt hier mit ' + Math.round(onFactor() * 100) + ' % der Punkte.', offline: 'Alle Turniere am echten Tisch im The Void.', online: ONLINE.length + (ONLINE.length === 1 ? ' Online-Turnier' : ' Online-Turniere') + ' am 2D-Tisch. Gleiche Punkte wie am echten Tisch.' };
+    const table = lbView === 'offline' ? leaderTable(off) : lbView === 'online' ? lbTable(on, 'online') : lbTable(tot, 'gesamt');
+    return champs + tabs + '<p class="lbnote">' + notes[lbView] + '</p><div class="lbbody">' + table + '</div>';
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('[data-lb]'); if (!b) return;
+    lbView = b.dataset.lb; try { localStorage.setItem('bc-lb', lbView); } catch (x) {}
+    document.querySelectorAll('.lbwrap').forEach(w => { w.innerHTML = boardHtml(); });
+  });
+
   const voidBand = (title, sub) => '<section class="voidband" aria-label="The Void"><img src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, leer, ein blauer Chip vorne im Licht" loading="lazy"><div class="vb-copy"><span class="eyebrow">The Void</span><h2>' + title + '</h2><p>' + sub + '</p></div></section>';
   let stageLanded = false, stageDone = false;
   function stageHtml() {
@@ -2639,7 +2783,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<img class="kino-bg" src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, ein blauer Chip vorne im Licht">' +
       '<div class="kino-copy"><h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
       '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
-      '<div class="ctas"><button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
+      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : '') + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
   }
   function landStage() {
     if (stageLanded) return; stageLanded = true;
@@ -2658,7 +2802,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
         '<div class="sc-stats"><div><b class="chrome" data-count="' + (Number(t.pot) || 0) + '">' + fmtN(t.pot) + '</b><span>' + esc(unit()) + ' im Pot</span></div><div><b class="chrome">' + (t.entries || '–') + '</b><span>Spieler am Tisch</span></div><div><b class="chrome">' + (t.date ? Number(t.date.split('-')[2]) + '.' + Number(t.date.split('-')[1]) + '.' : '–') + '</b><span>' + fmtDate(t.date) + '</span></div></div>' +
         '<div class="sc-pay">' + [1, 2, 3].map(p => { const r = t.results.find(x => x.place === p) || {}; return '<div class="pay"><span class="rank r' + p + '">' + p + '</span><span class="nm">' + (named(r) ? esc(r.name) : 'offen') + '</span><span class="v">' + (r.prize ? eur(r.prize) : '–') + '</span></div>'; }).join('') + '</div></section>';
     }
-    h += '<section class="scene board" id="lobby"><div class="sc-head"><span class="sc-kick">Alle Turniere</span><h2>Die <em>Punkte-Rangliste.</em></h2></div>' + leaderTable(st) + '<a class="sc-link" href="#regeln" data-go="regeln">So werden die Punkte vergeben ›</a></section>';
+    h += '<section class="scene board" id="lobby"><div class="sc-head"><span class="sc-kick">Offline · Online · Gesamt</span><h2>Die <em>Punkte-Rangliste.</em></h2></div><div class="lbwrap" style="display:grid;gap:16px">' + boardHtml() + '</div><a class="sc-link" href="#regeln" data-go="regeln">So werden die Punkte vergeben ›</a></section>';
     const nx = nextOk();
     h += '<section class="scene nextsc" id="nextbox"><img class="nx-bg" src="img/tisch-spieler.webp" alt="" loading="lazy" decoding="async"><div class="sc-head"><span class="sc-kick">Nächstes Turnier</span><h2>' + (nx ? esc(nx.title) + '<em>.</em>' : 'Termin <em>folgt.</em>') + '</h2></div><p class="sc-sub">' + (nx ? (nx.tbd ? esc(nx.tbd) : esc(new Date(nx.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })) + ' · ' + priceLine(nx)) : 'Der neue Termin kommt in die WhatsApp-Gruppe und hierher.') + '</p>' + (nx ? '<button class="btn-cream big" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button>' : '') + '</section>';
     h += '<section class="voidband" aria-label="Der Tisch"><img src="img/tisch-oben.webp" srcset="img/tisch-oben-960.webp 960w, img/tisch-oben.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void von oben, Ge-man-Logo in der Mitte, zehn leere Stühle" loading="lazy"><div class="vb-copy"><span class="eyebrow">The Void</span><h2>Ein Tisch. Zehn <em>Plätze.</em></h2></div></section>';
@@ -2667,11 +2811,12 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const PICS = ['benno', 'chris', 'domi-c', 'magg', 'manu', 'niklas', 'oli', 'tim'], slug = n => n.toLowerCase().trim().replace(/\s+/g, '-');
     const withPic = st.filter(s => PICS.includes(slug(s.name)));
     if (withPic.length) h += '<section class="scene crew"><div class="sc-head"><span class="sc-kick">Die Stammspieler</span><h2>Die <em>Spieler.</em></h2></div><div class="tiles swipe crew-row">' + withPic.map(s => '<a class="ptile" href="spieler/"><img src="img/v3/spieler-' + slug(s.name) + '.webp" alt="' + esc(s.name) + '" loading="lazy"><div class="tile-in"><h3>' + esc(s.name) + '</h3>' + (nick(s.name) ? '<p class="nk">' + esc(nick(s.name)) + '</p>' : '') + '<p class="pp"><b>' + s.points + '</b> Punkte</p></div></a>').join('') + '</div><a class="sc-link" href="spieler/">Alle Spielerprofile ›</a></section>';
-    if (c) h += '<section class="scene sc-champ"><span class="sc-kick">Ewige Nummer 1</span><h2 class="chrome-xl">' + esc(c.name) + '</h2><p class="sc-sub">' + c.points + ' Punkte · ' + c.p1 + (c.p1 === 1 ? ' Sieg' : ' Siege') + ' · ' + (c.prize ? eur(c.prize) + ' gewonnen' : '') + '</p></section>';
+    const hc = totalStandings()[0];
+    if (hc) h += '<section class="scene sc-champ"><span class="sc-kick">Hero-Champion</span><h2 class="chrome-xl">' + esc(hc.name) + '</h2><p class="sc-sub">' + fmtP(hc.points) + ' Punkte gesamt · ' + hc.p1 + (hc.p1 === 1 ? ' Sieg' : ' Siege') + ' · offline und online</p></section>';
     if (b) h += '<section class="scene sc-hand"><span class="sc-kick">Beste Hand ever</span>' + fan(b, true) + '<h2>' + esc(handTitle(b)) + '<em>.</em></h2><p class="sc-sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p><a class="sc-link" href="#rekorde" data-go="rekorde">Alle Hände und Rekorde ›</a></section>';
     h += '<div class="bento">' + shameCard() + '</div>';
     h += '<section class="scene wallsc"><div class="sc-head"><span class="sc-kick">' + ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere') + '</span><h2>Die <em>Siegerwand.</em></h2></div>' + (ts.length ? '<div class="wall swipe">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>') + '</section>';
-    $('#v-rangliste').innerHTML = promoCard() + h;
+    $('#v-rangliste').innerHTML = onlinePromo() + promoCard() + h;
   }
   function renderRanglisteAlt() {
     ci = 0;
@@ -2819,7 +2964,11 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       const c = p => { const r = t.results.find(x => x.place === p); return named(r) ? '<span style="color:var(--fg)">' + esc(r.name) + '</span>' + (r.prize ? ' <span class="note">' + eur(r.prize) + '</span>' : '') : '<span class="note">offen' + (r && r.prize ? ' · ' + eur(r.prize) : '') + '</span>'; };
       h += '<tr class="click" data-open="' + esc(t.id) + '" tabindex="0"><td class="player tl">' + esc(tName(t)) + ' <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>' + eur(t.pot) + '</td></tr>';
     }
-    $('#v-turniere').innerHTML = voidBand('Jeder Abend <em>zählt.</em>', 'Alle Turniere, alle Ergebnisse.') + '<div class="bento">' + cx('c12 board', head('Punkte-Rangliste', 'Gesamtstand aller Turniere') + leaderTable(standings()) + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>') + cx('c12', head('Alle Turniere', 'Ergebnisse') + h + '</tbody></table></div>') + entriesCard() + '</div>';
+    for (const t of ONLINE.slice().reverse()) {
+      const c = p => { const r = t.res.find(x => x.place === p); return r ? '<span style="color:var(--fg)">' + esc(r.name) + '</span>' : '<span class="note">offen</span>'; };
+      h += '<tr><td class="player tl">' + esc(t.name) + '<span class="tag-on">Online</span> <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>–</td></tr>';
+    }
+    $('#v-turniere').innerHTML = voidBand('Jeder Abend <em>zählt.</em>', 'Alle Turniere, alle Ergebnisse.') + '<div class="bento">' + cx('c12 board', head('Punkte-Rangliste', 'Offline · Online · Gesamt') + '<div class="lbwrap" style="display:grid;gap:14px">' + boardHtml() + '</div>' + '<a class="morelink" href="#regeln" data-go="regeln">So werden die Punkte vergeben →</a>') + cx('c12', head('Alle Turniere', 'Ergebnisse') + h + '</tbody></table></div>') + entriesCard() + '</div>';
   }
 
   /* ---------- Regeln: So funktioniert der Club ---------- */
@@ -2845,6 +2994,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<ol class="rg-list">' +
       '<li><b>Die Top 6 punkten.</b> Der Sieg zählt am meisten: ' + P.p1 + ' Punkte, Platz 6 bekommt noch ' + P.p6 + '.</li>' +
       (Number(P.teil) ? '<li><b>Dabeisein zählt.</b> Für jedes Turnier, bei dem du mitspielst, gibt es ' + P.teil + ' Punkt extra. Wer immer da ist, wird belohnt.</li>' : '') +
+      '<li><b>Online zählt mit.</b> Online-Turniere am 2D-Tisch haben eine eigene Online-Tabelle mit denselben Punkten. In der Gesamt-Tabelle zählen sie mit ' + Math.round(onFactor() * 100) + ' %. Wer die Gesamt-Tabelle anführt, ist der Hero-Champion.</li>' +
       '<li><b>Alles wird addiert.</b> Die Punkte aus allen Turnieren ergeben die ewige Rangliste in der Lobby.</li>' +
       '<li><b>Rebuys zählen nicht.</b> Für die Punkte zählt nur die Platzierung, egal wie viele Entries du gebraucht hast.</li>' +
       '<li><b>Gleichstand?</b> Dann entscheiden der Reihe nach: mehr Siege, mehr 2. Plätze, mehr 3. Plätze, mehr gewonnene ' + esc(unit()) + '.</li>' +
@@ -2967,6 +3117,21 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const it = (v, l) => v == null || v === '' ? '' : '<div><b>' + esc(String(v)) + '</b><span>' + esc(l) + '</span></div>';
     const pay = (L.pay || []).map((v, i) => (i + 1) + '. ' + eur(v)).join(' · ');
     return '<div class="livebox"><span class="eyebrow gold">● Live' + (L.at ? ' · Stand ' + esc(L.at) + ' Uhr' : '') + '</span><div class="lgrid">' + it(L.players, 'Spieler') + it(L.rebuys, 'Rebuys') + it(L.entries, 'Entries') + it(L.pot != null ? eur(L.pot) : null, 'Preisgeld') + '</div>' + (pay ? '<p class="lpay">Auszahlung: ' + esc(pay) + '</p>' : '') + (L.note ? '<p class="lpay">' + esc(L.note) + '</p>' : '') + '</div>'; };
+  /* Promo Blue Chip Online: Tim 18.11. Nur der 2D-Tisch, kein Wort von 3D/Lounge. ONLINE_PROMO.on = false blendet sie aus. */
+  let bcIn = false; /* angemeldet (Supabase-Sitzung), wird vom Login-Skript unten gesetzt */
+  window.bcSetIn = v => { bcIn = !!v; };
+  const ONLINE_PROMO = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?turnier=1', badge: 'Heute Abend · Blue Chip Online #1' };
+  function onlinePromo() {
+    if (!ONLINE_PROMO.on) return '';
+    return '<section class="onpromo" aria-label="Blue Chip Online"><div class="op-copy">' +
+      '<span class="op-badge"><i></i>' + esc(ONLINE_PROMO.badge) + '</span>' +
+      '<h2>Blue Chip <em>Online.</em></h2>' +
+      '<p class="op-sub">Unser Tisch, jetzt auf deinem Handy und am PC. Wenn nicht alle können, wird trotzdem gezockt.</p>' +
+      '<ul><li>Echtes Turnier mit Blinds, Ante und Heads-up</li><li>Sprach- und Videochat am Tisch</li><li>Nur Spielgeld, deine Punkte zählen für die Rangliste</li></ul>' +
+      '<a class="op-cta js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' +
+      '<p class="op-fine">' + (bcIn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.') + '</p></div>' +
+      '<a class="op-pic js-play" href="#anmelden" tabindex="-1"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 800px) 100vw, 45vw" alt="Blue Chip Online am PC und am Handy, blaue Chips auf dem Tisch"></a></section>';
+  }
   function promoCard() {
     const n = nextOk(); if (!n) return '';
     const d = new Date(n.date);
@@ -3522,6 +3687,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
 
   /* ---------- Start ---------- */
   render();
+  loadOnline(); setInterval(() => { if (!document.hidden) loadOnline(); }, 120000);
   // Zusagen automatisch: Google-Sheet-Web-App (settings.api) zählt jeden Klick auf „Reservieren“ mit
   function register(n, name, time, note) {
     const api = DATA.settings.api; if (!api || !name) return;
@@ -3584,5 +3750,148 @@ let dest='tafel/?v='+Date.now();const go=()=>{if(inp.value.trim()==='007'){locat
 document.getElementById('liveBtn').onclick=()=>window.openLive();window.openLive=(d)=>{dest=d||('tafel/?v='+Date.now());document.getElementById('codeTitle').textContent=d?'Fernbedienung':'Live-Tafel';open();};document.getElementById('codeNo').onclick=()=>ov.hidden=true;
 document.getElementById('codeOk').onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();if(e.key==='Escape')ov.hidden=true;});
 ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
+</script>
+
+<div id="bcAuth" hidden>
+ <div class="ba-box" role="dialog" aria-modal="true" aria-labelledby="baTitle">
+  <button class="ba-x" type="button" aria-label="Schließen">×</button>
+  <span class="ba-kick">Blue Chip Online</span>
+  <h2 id="baTitle">Anmelden</h2>
+  <div class="ba-tabs" role="tablist"><button type="button" data-m="in" aria-selected="true">Anmelden</button><button type="button" data-m="up" aria-selected="false">Registrieren</button></div>
+  <form id="baForm" autocomplete="on">
+   <label>E-Mail<input id="baMail" type="email" autocomplete="email" required></label>
+   <label>Passwort<input id="baPw" type="password" autocomplete="current-password" minlength="8" required></label>
+   <button class="ba-go" type="submit">Anmelden</button>
+  </form>
+  <button class="ba-link" type="button" id="baForgot">Passwort vergessen?</button>
+  <p class="ba-msg" id="baMsg" role="status"></p>
+  <p class="ba-fine">Ein Konto für alles: Website, Online-Tisch und Need For Pete. Schon ein Konto vom Online-Tisch? Dann einfach anmelden.</p>
+ </div>
+</div>
+<style>
+#bcAuth { position: fixed; inset: 0; z-index: 100000; display: grid; place-items: center; padding: 16px; background: rgb(2 4 10 / .78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#bcAuth[hidden] { display: none; }
+#bcAuth .ba-box { position: relative; width: min(400px, 100%); display: grid; gap: 14px; padding: 28px 22px 22px; border-radius: 24px; background: linear-gradient(180deg, rgb(20 28 48 / .96), rgb(8 12 22 / .98)); border: 1px solid rgb(226 184 87 / .45); box-shadow: 0 30px 90px rgb(0 0 0 / .7); color: #eef2fb; }
+#bcAuth .ba-x { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border: 0; background: none; color: #a3aec6; font-size: 26px; cursor: pointer; }
+#bcAuth .ba-kick { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #f3d68f; }
+#bcAuth h2 { margin: 0; font-size: 30px; font-weight: 650; letter-spacing: -.03em; }
+#bcAuth .ba-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: rgb(12 18 32 / .8); border: 1px solid rgb(170 195 255 / .14); }
+#bcAuth .ba-tabs button { border: 0; background: none; color: #a3aec6; padding: 9px; border-radius: 999px; font: inherit; font-weight: 600; cursor: pointer; }
+#bcAuth .ba-tabs button[aria-selected="true"] { background: #eef2fb; color: #070b14; }
+#bcAuth form { display: grid; gap: 12px; }
+#bcAuth label { display: grid; gap: 6px; font-size: 13px; color: #a3aec6; }
+#bcAuth input { height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid rgb(170 195 255 / .22); background: rgb(4 7 14 / .7); color: #eef2fb; font: inherit; font-size: 16px; }
+#bcAuth input:focus { outline: 2px solid #e2b857; outline-offset: 1px; }
+#bcAuth .ba-go { height: 54px; border-radius: 999px; border: 1px solid #c49a41; background: linear-gradient(180deg, #f3d68f, #c49a41); color: #111; font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+#bcAuth .ba-go:disabled { opacity: .6; }
+#bcAuth .ba-link { justify-self: start; border: 0; background: none; color: #8fb0ff; font: inherit; font-size: 14px; padding: 0; cursor: pointer; }
+#bcAuth .ba-msg { margin: 0; min-height: 1.2em; font-size: 14px; color: #f3d68f; }
+#bcAuth .ba-msg.err { color: #e5675c; }
+#bcAuth .ba-fine { margin: 0; font-size: 12px; color: #6c7893; }
+</style>
+<script>
+(function () {
+  const API = 'https://blue-chip-game-production.up.railway.app';
+  const PLAY = API + '/?turnier=1';
+  const LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+  const $ = id => document.getElementById(id);
+  const ov = $('bcAuth'), msg = $('baMsg'), go = document.querySelector('#bcAuth .ba-go'), title = $('baTitle');
+  let sb = null, sbP = null, session = null, mode = 'in', pendingPlay = false;
+
+  function lib() { return new Promise((ok, no) => { if (window.supabase) return ok(); const s = document.createElement('script'); s.src = LIB; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  function client() {
+    if (sbP) return sbP;
+    sbP = (async () => {
+      try {
+        await lib();
+        const c = await (await fetch(API + '/api/konto/config', { credentials: 'omit' })).json();
+        if (!c || !c.url || !c.anonKey) throw 0;
+        sb = window.supabase.createClient(c.url, c.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'bc-web-auth' } });
+        sb.auth.onAuthStateChange((e, s) => { session = s; paint(); if (e === 'PASSWORD_RECOVERY') { openAuth('neu'); } });
+        const { data } = await sb.auth.getSession(); session = data.session; paint();
+        return sb;
+      } catch (e) { sbP = null; return null; }
+    })();
+    return sbP;
+  }
+  function paint() {
+    const inn = !!session;
+    if (window.bcSetIn) window.bcSetIn(inn);
+    document.querySelectorAll('.js-play').forEach(a => { const t = a.querySelector('.pl-t'); if (t && a.dataset.in) t.textContent = inn ? a.dataset.in : a.dataset.out; });
+    document.querySelectorAll('.op-fine').forEach(p => { p.textContent = inn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.'; });
+    const lo = $('bcLogout'); if (lo) lo.hidden = !inn;
+    if (inn && pendingPlay) { pendingPlay = false; play(); }
+  }
+  async function play() {
+    const c = await client();
+    let s = session;
+    if (c) { const { data } = await c.auth.getSession(); s = data.session; }
+    if (!s || !s.access_token) { pendingPlay = true; return openAuth('in'); }
+    const rest = s.expires_at ? Math.max(60, Math.round(s.expires_at - Date.now() / 1000)) : 3600;
+    /* Nur der Zugangs-Token im #-Teil (wird nie an einen Server geschickt), nie der Refresh-Token */
+    location.href = PLAY + '#access_token=' + encodeURIComponent(s.access_token) + '&expires_in=' + rest;
+  }
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('#bcAuth .ba-tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.m === m)));
+    const T = { in: ['Anmelden', 'Anmelden'], up: ['Registrieren', 'Konto erstellen'], neu: ['Neues Passwort', 'Passwort speichern'] }[m];
+    title.textContent = T[0]; go.textContent = T[1];
+    $('baMail').parentElement.hidden = m === 'neu'; $('baMail').required = m !== 'neu';
+    $('baPw').autocomplete = m === 'in' ? 'current-password' : 'new-password';
+    $('baForgot').hidden = m !== 'in';
+    say('');
+  }
+  function say(t, err) { msg.textContent = t; msg.className = 'ba-msg' + (err ? ' err' : ''); }
+  function openAuth(m) { setMode(m || 'in'); ov.hidden = false; setTimeout(() => (m === 'neu' ? $('baPw') : $('baMail')).focus(), 50); client(); }
+  function close() { ov.hidden = true; pendingPlay = false; }
+  function fehler(m) {
+    const t = String(m || '').toLowerCase();
+    if (t.includes('invalid login')) return 'E-Mail oder Passwort falsch';
+    if (t.includes('not confirmed')) return 'Bitte erst die E-Mail bestätigen (Link in der Mail)';
+    if (t.includes('already')) return 'Zu dieser E-Mail gibt es schon ein Konto. Bitte anmelden.';
+    if (t.includes('password')) return 'Passwort mindestens 8 Zeichen';
+    if (t.includes('email')) return 'Die E-Mail sieht nicht richtig aus';
+    if (t.includes('rate') || t.includes('too many')) return 'Zu viele Versuche, bitte kurz warten';
+    if (t.includes('fetch') || t.includes('network')) return 'Keine Verbindung, bitte nochmal';
+    return m || 'Das hat nicht geklappt';
+  }
+  $('baForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const mail = $('baMail').value.trim(), pw = $('baPw').value;
+    if (pw.length < 8) return say('Passwort mindestens 8 Zeichen', true);
+    go.disabled = true; say('Einen Moment …');
+    try {
+      const c = await client(); if (!c) return say('Konten sind gerade nicht erreichbar. Bitte gleich nochmal.', true);
+      if (mode === 'in') {
+        const { error } = await c.auth.signInWithPassword({ email: mail, password: pw });
+        if (error) return say(fehler(error.message), true);
+        say('Angemeldet.'); ov.hidden = true;
+      } else if (mode === 'up') {
+        const { data, error } = await c.auth.signUp({ email: mail, password: pw, options: { emailRedirectTo: location.origin + '/' } });
+        if (error) return say(fehler(error.message), true);
+        if (data.user && data.user.identities && data.user.identities.length === 0) return say('Zu dieser E-Mail gibt es schon ein Konto. Bitte anmelden.', true);
+        if (data.session) { say('Konto erstellt.'); ov.hidden = true; }
+        else say('Fast geschafft: Wir haben dir eine Mail geschickt. Link darin antippen, dann hier anmelden.');
+      } else {
+        const { error } = await c.auth.updateUser({ password: pw });
+        if (error) return say(fehler(error.message), true);
+        say('Passwort gespeichert.'); setTimeout(() => { ov.hidden = true; }, 900);
+      }
+    } finally { go.disabled = false; }
+  });
+  $('baForgot').addEventListener('click', async () => {
+    const mail = $('baMail').value.trim(); if (!mail) return say('Erst deine E-Mail eintragen', true);
+    const c = await client(); if (!c) return say('Konten sind gerade nicht erreichbar', true);
+    const { error } = await c.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + '/' });
+    say(error ? fehler(error.message) : 'Wenn es das Konto gibt, ist eine Mail mit Link unterwegs.', !!error);
+  });
+  document.querySelectorAll('#bcAuth .ba-tabs button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.m)));
+  document.querySelector('#bcAuth .ba-x').addEventListener('click', close);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('.js-play'); if (!a) return; e.preventDefault(); e.stopPropagation(); play(); }, true);
+  $('bcLogout') && $('bcLogout').addEventListener('click', async () => { const c = await client(); if (c) await c.auth.signOut(); session = null; paint(); });
+  client();
+})();
 </script>
 <script src="/zaehler.js" defer></script></body></html>
