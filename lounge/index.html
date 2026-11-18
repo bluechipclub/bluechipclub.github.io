@@ -1,6 +1,6 @@
 <title>Blue Chip Lounge</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231f4fa8' stroke='%23d4af55' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23d4af55' stroke-width='2'/%3E%3C/svg%3E">
-<script>window.__bccVersion='v41.4'; try{ if(/(^|[#&?])(ticket|code)=/.test(location.hash+location.search)||localStorage.getItem('bcc-sb')) document.documentElement.classList.add('autolog'); }catch(e){} setTimeout(()=>document.documentElement.classList.remove('autolog'),15000);</script>
+<script>window.__bccVersion='v41.5'; try{ if(/(^|[#&?])(ticket|code)=/.test(location.hash+location.search)||localStorage.getItem('bcc-sb')) document.documentElement.classList.add('autolog'); }catch(e){} setTimeout(()=>document.documentElement.classList.remove('autolog'),15000);</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Bodoni+Moda:wght@600;800&family=Manrope:wght@400;600;800&display=swap">
@@ -408,7 +408,7 @@ body.liarOn:not(.liarSeated) #lHand{display:none}
 <div id="tchoice" hidden><h3>Online-Tisch</h3><div class="row2"><button class="btn" id="tc2d">2D spielen</button><button class="btn ghost" id="tc3d">3D spielen</button></div><div style="font-size:12px;opacity:.7;margin-top:10px">Tab wechselt jederzeit · Esc = zurück</div></div>
 <div id="tvBar" class="panel" hidden><span>📺 Blue Chip TV</span><button class="btn ghost" id="tvNext">Nächstes Video ▶</button><a class="btn ghost" id="tvLink" target="_blank" rel="noopener">Auf YouTube</a><button class="btn" id="tvUp">Aufstehen</button></div>
 <div id="toast" class="panel" hidden></div><div id="lockHint" hidden style="position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 0 0 2px rgba(0,0,0,.5);z-index:7;pointer-events:none"></div>
-<div id="help" class="panel" hidden>WASD laufen · Leertaste springen · beim Laufen dreht die Maus mit, im Stand ist sie frei · Pfeiltasten drehen · ziehen = umschauen · E = benutzen · F = Tür</div>
+<div id="help" class="panel" hidden>WASD laufen · Leertaste springen · beim Laufen dreht die Maus mit, im Stand ist sie frei · Pfeiltasten drehen · ziehen = umschauen · E = benutzen · F = Tür · T = Tanz · M = Mikro · Esc = schließen · ? = Hilfe</div>
 <div id="joy" hidden><i></i></div><button id="jumpBtn" class="btn" hidden aria-label="Springen">⤒</button>
 <button id="viewBtn" class="btn ghost" hidden title="Ansicht wechseln (V)"><svg class="ico" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Ansicht wechseln</button>
 <button id="act" class="btn" hidden>E</button>
@@ -2029,7 +2029,7 @@ $('#hrMenu').onclick=e=>{ e.currentTarget.blur(); sheetOpen('menu'); };
 $('#hrVoice').onclick=e=>{ e.currentTarget.blur(); sheetOpen('voice'); };
 setInterval(()=>{ const b=$('#hrVoice'), r=VOICE.room, on=!!(r&&r.localParticipant.isMicrophoneEnabled); b.classList.toggle('live',!!(VOICE.want&&on)); b.classList.toggle('muted',!!(VOICE.want&&r&&!on)); const ic=(VOICE.want&&r&&!on)?IC.micOff:IC.mic; if(b.dataset.ic!==ic){ b.dataset.ic=ic; b.querySelector('.hri').innerHTML=ic; } },600);
 
-addEventListener('keydown',e=>{ if(e.key==='?'&&!(typeof typing==='function'&&typing())){ $('#help').classList.toggle('fade'); } });
+addEventListener('keydown',e=>{ if(e.key==='?'&&!e.repeat&&!(typeof typing==='function'&&typing())){ $('#help').classList.toggle('fade'); } });
 $('#pgClose').onclick=()=>{ $('#phoneGame').hidden=true; $('#pgBody').innerHTML=''; }; addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#phoneGame').hidden) $('#pgClose').click(); });
 $('#jumpBtn').addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); jump(); });
 
@@ -2879,7 +2879,10 @@ function myDance(id){ const secs=(id==='tanz2'||id==='sonder')?10:6; let sent=fa
 $('#volR').value=Math.round(VOL*100); $('#volR').oninput=e=>setVol(e.target.value/100); $('#volBtn').onclick=e=>{ e.currentTarget.blur(); $('#volPop').hidden=!$('#volPop').hidden; $('#danceMenu').hidden=true; };
 $('#danceBtn').onclick=e=>{ e.currentTarget.blur(); danceMenu(); };
 function danceMenu(){ const el=$('#danceMenu'); if(!el.hidden){ el.hidden=true; return; } const sonderOk=ONL.on&&ONL.v&&ONL.v.sonderBis&&ONL.v.sonderBis>Date.now(); const L=DANCE_LIST.filter(([id])=>id!=='sonder'||sonderOk); el.innerHTML='<div class="dmT">Tanz wählen</div>'+L.map(([id,n])=>MY_DANCES.has(id)||id==='sonder'?`<button class="btn ghost" data-d="${id}">${n}</button>`:`<button class="btn ghost" disabled title="Im Shop in der Lobby kaufen">🔒 ${n}</button>`).join('')+(sonderOk?'':'<div class="dmH">⭐ Sondertanz auf dem Tisch gibt es nach einem All-in-Knockout.</div>'); el.hidden=false; el.querySelectorAll('button[data-d]').forEach(b=>b.onclick=ev=>{ ev.currentTarget.blur(); myDance(b.dataset.d); }); }
-addEventListener('keydown',e=>{ if(e.code==='KeyT'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)&&!(LNG.chatOpen)) danceMenu(); });
+addEventListener('keydown',e=>{ if(typing()||S.mode==='login'||LNG.chatOpen||e.repeat||e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.code==='KeyT'&&!e.shiftKey){ danceMenu(); }
+  else if(e.code==='KeyM'&&!e.shiftKey){ e.preventDefault(); $('#micBtn').click(); }
+  else if(e.key==='Escape'){ const d=$('#danceMenu'); if(d&&!d.hidden) d.hidden=true; } });
 function danceSound(id){ const f={sonder:'sondertanz.mp3',tanz2:'tanzschritte.mp3'}[id]; if(!f) return; try{ const au=new Audio('https://blue-chip-game-production.up.railway.app/sounds/'+f); au.volume=Math.min(1,.6*VOL); au.play().catch(()=>{}); setTimeout(()=>au.pause(),10000); }catch(e){} }
 
 // ---------- Gemeinsame Lounge (Server-Raum 'lounge'): alle, die online sind, sehen sich ----------
