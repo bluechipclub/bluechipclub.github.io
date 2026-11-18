@@ -2816,7 +2816,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     if (b) h += '<section class="scene sc-hand"><span class="sc-kick">Beste Hand ever</span>' + fan(b, true) + '<h2>' + esc(handTitle(b)) + '<em>.</em></h2><p class="sc-sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p><a class="sc-link" href="#rekorde" data-go="rekorde">Alle Hände und Rekorde ›</a></section>';
     h += '<div class="bento">' + shameCard() + '</div>';
     h += '<section class="scene wallsc"><div class="sc-head"><span class="sc-kick">' + ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere') + '</span><h2>Die <em>Siegerwand.</em></h2></div>' + (ts.length ? '<div class="wall swipe">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>') + '</section>';
-    $('#v-rangliste').innerHTML = onlinePromo() + promoCard() + h;
+    $('#v-rangliste').innerHTML = onlinePromo() + nfpPromo() + promoCard() + h;
   }
   function renderRanglisteAlt() {
     ci = 0;
@@ -3131,6 +3131,13 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<a class="op-cta js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' +
       '<p class="op-fine">' + (bcIn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.') + '</p></div>' +
       '<a class="op-pic js-play" href="#anmelden" tabindex="-1"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 800px) 100vw, 45vw" alt="Blue Chip Online am PC und am Handy, blaue Chips auf dem Tisch"></a></section>';
+  }
+  const NFP_URL = 'https://timketterle.github.io/need-for-pete/';
+  function nfpPromo() {
+    return '<section class="nfppromo" aria-label="Need For Pete"><div class="nfp-reel"><video src="' + NFP_URL + 'promo/nfp-promo.mp4" poster="' + NFP_URL + 'promo/nfp-promo-poster.jpg" muted autoplay loop playsinline preload="metadata"></video></div>' +
+      '<div class="nfp-copy"><span class="nfp-badge">Tims Rennspiel</span><h2>Need For <em>Pete.</em></h2>' +
+      '<p>Jeden Tag eine neue Welt, live gegen die Jungs fahren, Bestenliste. Gleiches Konto wie beim Poker.</p>' +
+      '<a class="nfp-cta js-nfp" href="' + NFP_URL + '"><span aria-hidden="true">🏎️</span> Jetzt Need For Pete spielen</a></div></section>';
   }
   function promoCard() {
     const n = nextOk(); if (!n) return '';
@@ -3788,6 +3795,22 @@ ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
 #bcAuth .ba-msg { margin: 0; min-height: 1.2em; font-size: 14px; color: #f3d68f; }
 #bcAuth .ba-msg.err { color: #e5675c; }
 #bcAuth .ba-fine { margin: 0; font-size: 12px; color: #6c7893; }
+
+/* Need For Pete (18.11.2026): Clip im Reel-Rahmen, leicht schräg. Clip und Spiel kommen nur von timketterle.github.io/need-for-pete */
+.nfppromo { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 72px); align-items: center; margin-top: clamp(32px, 6vw, 72px); padding: clamp(28px, 4vw, 56px); border-radius: 32px; border: 1px solid var(--line2); background: radial-gradient(120% 120% at 100% 0%, rgb(47 107 255 / .18), transparent 55%), linear-gradient(180deg, rgb(20 28 48 / .82), rgb(8 12 22 / .9)); backdrop-filter: blur(14px) saturate(130%); -webkit-backdrop-filter: blur(14px) saturate(130%); overflow: hidden; }
+.nfppromo .nfp-reel { justify-self: center; width: min(300px, 100%); aspect-ratio: 9 / 16; border-radius: 28px; overflow: hidden; transform: rotate(-4deg); border: 6px solid #0b0f1a; outline: 1px solid rgb(170 195 255 / .25); box-shadow: 0 30px 80px rgb(0 0 0 / .6), 0 0 0 1px rgb(226 184 87 / .25); background: #000; }
+.nfppromo .nfp-reel video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nfppromo .nfp-copy { display: grid; gap: 18px; align-content: center; }
+.nfppromo .nfp-badge { justify-self: start; padding: 6px 12px; border-radius: 999px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--blue2); border: 1px solid rgb(143 176 255 / .45); background: rgb(47 107 255 / .1); }
+.nfppromo h2 { font-size: clamp(44px, 7vw, 92px); font-weight: 650; letter-spacing: -.05em; line-height: .95; margin: 0; }
+.nfppromo h2 em { color: var(--blue2); font-weight: 650; }
+.nfppromo p { font-size: clamp(17px, 1.8vw, 21px); line-height: 1.45; color: rgb(238 242 251 / .88); margin: 0; max-width: 36ch; }
+.nfppromo .nfp-cta { justify-self: start; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 30px; border-radius: 999px; font-size: 19px; font-weight: 700; color: #fff; text-decoration: none; background: linear-gradient(180deg, #4f86ff, #2f6bff); border: 1px solid #8fb0ff; box-shadow: 0 14px 40px rgb(47 107 255 / .35); cursor: pointer; }
+@media (max-width: 800px) {
+  .nfppromo { grid-template-columns: minmax(0, 1fr); padding: 26px 18px; border-radius: 26px; }
+  .nfppromo .nfp-reel { width: min(240px, 70%); }
+  .nfppromo .nfp-cta { justify-self: stretch; justify-content: center; font-size: 17px; padding: 0 16px; white-space: nowrap; }
+}
 </style>
 <script>
 (function () {
@@ -3890,6 +3913,20 @@ ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
   ov.addEventListener('click', e => { if (e.target === ov) close(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
   document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('.js-play'); if (!a) return; e.preventDefault(); e.stopPropagation(); play(); }, true);
+  /* Need For Pete: angemeldet mit Zugangs-Token im #-Teil (nie Refresh-Token), sonst einfache Adresse, NFP zeigt dann selbst die Anmeldung */
+  document.addEventListener('click', async e => {
+    const a = e.target.closest && e.target.closest('.js-nfp'); if (!a) return;
+    e.preventDefault(); e.stopPropagation();
+    const NFP = 'https://timketterle.github.io/need-for-pete/';
+    let url = NFP;
+    try {
+      const c = await client();
+      const { data } = c ? await c.auth.getSession() : { data: null };
+      const s = data && data.session;
+      if (s && s.access_token) url = NFP + '#access_token=' + encodeURIComponent(s.access_token) + '&expires_in=' + Math.max(60, (s.expires_at || 0) - Math.floor(Date.now() / 1000));
+    } catch (x) {}
+    location.href = url;
+  }, true);
   $('bcLogout') && $('bcLogout').addEventListener('click', async () => { const c = await client(); if (c) await c.auth.signOut(); session = null; paint(); });
   client();
 })();
