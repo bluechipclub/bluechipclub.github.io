@@ -292,6 +292,19 @@ body.liarOn:not(.liarSeated) #lHand{display:none}
   <a id="bccNo3d" href="https://blue-chip-game-production.up.railway.app/" style="justify-self:center;display:inline-block;padding:12px 18px;border-radius:12px;border:1px solid #d4af55;color:#f3d98b;text-decoration:none;font-weight:800">🃏 Ohne 3D spielen</a>
  </div>
 </div>
+<script>
+// Protokoll für die Auswertung (Tim 18.11.): Fehler, Abbrüche, Ladezeiten, FPS → POST /api/log, gesammelt alle 10 s, ohne Codes/Tickets/Tokens
+(function(){ const URL_LOG='https://blue-chip-game-production.up.railway.app/api/log'; const Q=[]; const seen={}; let sentMin=0, minT=Date.now(), off=0;
+  const clean=t=>String(t==null?'':t).replace(/(code|ticket|token|key)=([^&\s"']+)/gi,'$1=***').replace(/[A-Za-z0-9_\-\.]{40,}/g,'***').slice(0,1500);
+  window.bccLog=function(typ,msg,extra){ try{ const k=typ+'|'+String(msg||'').slice(0,80); const now=Date.now(); if(seen[k]&&now-seen[k]<60000) return; seen[k]=now; if(Q.length>60) return;
+    let who='',wo='lounge'; try{ const c=window.__logCtx&&window.__logCtx(); if(c){ who=c.who; wo=c.wo; } }catch(_){} const e={typ:String(typ).slice(0,40),msg:clean(msg),wo,wer:clean(who).slice(0,40),ua:(navigator.userAgent||'').slice(0,160)+' '+innerWidth+'x'+innerHeight};
+    if(extra){ if(extra.stack) e.stack=clean(extra.stack).slice(0,800); if(extra.ms!=null) e.ms=Math.round(extra.ms); } Q.push(e); window.__logQ=Q; }catch(_){} };
+  setInterval(async()=>{ if(!Q.length||Date.now()<off) return; if(Date.now()-minT>60000){ minT=Date.now(); sentMin=0; }
+    while(Q.length&&sentMin<25){ const e=Q.shift(); sentMin++; try{ const r=await fetch(URL_LOG,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(e),keepalive:true}); if(r.status===404){ Q.length=0; off=Date.now()+300000; return; } (window.__logSent=window.__logSent||[]).push(e.typ); }catch(_){ return; } } },10000);
+  addEventListener('error',ev=>{ if(ev&&ev.message) bccLog('lounge-fehler',ev.message+(ev.filename?' @'+String(ev.filename).split('/').pop()+':'+ev.lineno:''),{stack:ev.error&&ev.error.stack}); });
+  addEventListener('unhandledrejection',ev=>{ const r=ev&&ev.reason; bccLog('lounge-fehler','Promise: '+(r&&r.message||r),{stack:r&&r.stack}); });
+})();
+</script>
 <script>(function(){ const TOTAL=6046058; try{ const c=localStorage.getItem('bcc-code'); if(c) document.getElementById('bccNo3d').href+='#code='+encodeURIComponent(c); }catch(e){}
  const tick=()=>{ const el=document.getElementById('bccLoad'); if(!el) return; let n=0; document.querySelectorAll('script[data-n]').forEach(s=>n+=+s.dataset.n); const p=Math.min(99,Math.round(n/TOTAL*100)); document.getElementById('bccBar').style.width=Math.max(2,p)+'%'; document.getElementById('bccPct').textContent='Lounge lädt … '+p+' %'; setTimeout(tick,250); }; tick(); })();</script>
 
@@ -1243,7 +1256,7 @@ function rbClips(cb){ if(RB_CLIPS) return cb(RB_CLIPS); rbWait.push(cb); if(rbWa
 const RB_EXT=["tim", "niklas", "manu", "jonny", "benno", "nico", "magg", "domi-c", "oli", "philipp", "zeno", "kevin", "chris", "vijii", "keeper", "Male_Adult_08", "Male_Adult_10"]; const RB_EXT_BUF={};
 function rbExtUrl(k){ return 'p/'+k+'.glb?v=41'; }
 function rbExtFetch(k){ if(!RB_EXT_BUF[k]) RB_EXT_BUF[k]=fetch(rbExtUrl(k)).then(r=>{ if(!r.ok) throw new Error('Figur '+k+' '+r.status); return r.arrayBuffer(); }); return RB_EXT_BUF[k]; }
-function rbBodyFor(person){ if(person.rb) return person.rb; { const pk='p_'+String(person.key).replace(/_double$/,''); if(RB_EXT.includes(pk.slice(2))) return pk; const el=document.getElementById('rb_'+pk); if(el&&el.textContent.length>1000) return pk; } let h=0; for(const ch of person.key) h=(h*31+ch.charCodeAt(0))>>>0; const males=RB_BODIES.filter(b=>!RB_FEMALE.includes(b));
+function rbBodyFor(person){ if(person.rb) return person.rb; { const pk='p_'+String(person.key).replace(/_(double|mini)$/,''); if(RB_EXT.includes(pk.slice(2))) return pk; const el=document.getElementById('rb_'+pk); if(el&&el.textContent.length>1000) return pk; } let h=0; for(const ch of person.key) h=(h*31+ch.charCodeAt(0))>>>0; const males=RB_BODIES.filter(b=>!RB_FEMALE.includes(b));
   const pool=person.female?RB_FEMALE:males; const used=new Set(Object.values(AV).map(a=>a.rb)); for(let k=0;k<pool.length;k++){ const b=pool[(h+k)%pool.length]; if(!used.has(b)) return b; } return pool[h%pool.length]; }
 // Comic-3D-Figuren (eigene Proportionen): nur Drehungen übernehmen, Hüfthöhe skalieren
 const COMIC_CLIPS=new Map();
@@ -1251,7 +1264,7 @@ function comicClip(c,k){ const id=c.uuid+':'+k; if(COMIC_CLIPS.has(id)) return C
   const tr=[]; for(const x of c.tracks){ if(/\.quaternion$/.test(x.name)) tr.push(x); else if(/^Bip01_Pelvis\.position$/.test(x.name)){ const y=x.clone(); for(let i=0;i<y.values.length;i++) y.values[i]*=k; tr.push(y); } }
   const n=new THREE.AnimationClip(c.name,c.duration,tr); COMIC_CLIPS.set(id,n); return n; }
 function makeRbAvatar(a,person){ const bk=rbBodyFor(person); const xk=bk.replace(/^p_/,''), ext=RB_EXT.includes(xk); const buf=ext?null:b64buf('rb_'+bk); if(!buf&&!ext) return false; a.rb=bk;
-  const go=buf=>new THREE.GLTFLoader().parse(buf,'',gl=>{ const m=gl.scene; a.body.add(m);
+  const go=buf=>new THREE.GLTFLoader().parse(buf,'',gl=>{ if(!window.__figLog){ window.__figLog=1; bccLog('metrik-figur-geladen',bk,{ms:performance.now()}); } const m=gl.scene; a.body.add(m);
     m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; o.frustumCulled=false; const mm=o.material; if(mm){ mm.roughness=.82; mm.metalness=0; if(/opacity/i.test(mm.name)){ mm.alphaTest=.35; mm.transparent=false; mm.side=THREE.DoubleSide; } } } });
     const bone=m.getObjectByName('Bip01_Head')||m.getObjectByName('Bip01 Head'); a.bone=bone; if(bone){ a.g.remove(a.head); bone.add(a.head); a.head.position.set(0,0,0); }
     const rootB=m.getObjectByName('Bip01'); const comic=rootB&&rootB.userData&&rootB.userData.comic?rootB.userData.k||1:0;
@@ -1339,7 +1352,7 @@ function stepChippy(a,dt,t){ const C=a.chippy, r=C.root; C.ph+=dt*(a.state==='wa
   if(a.state==='walk'){ const s=Math.sin(C.ph); r.position.y=Math.abs(Math.cos(C.ph))*.05; C.legs.forEach((lp,i)=>lp.rotation.x=(i?-1:1)*s*.7); C.arms.forEach((ap,i)=>{ ap.rotation.x=(i?1:-1)*s*.8; ap.rotation.z=(i?1:-1)*.35; }); r.scale.y=1; }
   else { r.position.y=0; C.legs.forEach(lp=>lp.rotation.x=0); C.arms.forEach((ap,i)=>{ ap.rotation.x=0; ap.rotation.z=(i?1:-1)*(.35+Math.sin(t*1.6+C.ph)*.06); }); r.scale.y=1+Math.sin(t*2.2+C.ph)*.025; }
   if(a.oneShot==='Cheer'){ C.arms.forEach((ap,i)=>ap.rotation.z=(i?1:-1)*2.6); r.position.y=Math.abs(Math.sin(t*9))*.12; } }
-function needsChippy(person){ const k=String(person&&person.key||'').replace(/_double$/,''); return !!(person&&(person.chippy||!byKey[k]||byKey[k].chippy)); }
+function needsChippy(person){ const k=String(person&&person.key||'').replace(/_(double|mini)$/,''); return !!(person&&(person.chippy||!byKey[k]||byKey[k].chippy)); }
 function makeAvatar(person){
   const g=new THREE.Group();
   const body=new THREE.Group(); g.add(body);
@@ -1721,12 +1734,12 @@ async function online3D(){ if(ONL.on||ONL.connecting) return; ONL.connecting=tru
     let room, fixed=false; ONL.turnier=false; if(TURN.on&&!TURN.out){ try{ lobby.leave(); }catch(e){} turnUnwatch(); try{ room=await client.joinById(TURN.id,AUTHO({name})); }catch(e){ console.warn('turnier join',e); toast('Turniertisch lässt dich nicht rein: '+chEsc(e&&e.message||e)+'. Schau auf den TVs zu.',4500); throw {quiet:true}; } ONL.turnier=true; } else if(mine) room=await client.joinById(mine.roomId,AUTHO({name})); else { try{ const platz=await pickTable(); if(!platz){ try{ lobby.leave(); }catch(e){} throw {quiet:true}; } room=await client.joinOrCreate('loungetisch',AUTHO({name,platz})); fixed=true; ONL.platz=platz; }catch(e){ console.warn('loungetisch noch nicht live, nehme Übungstisch',e); room=await client.joinOrCreate('tisch',AUTHO({name})); } } ONL.fixed=fixed; ONL.sitTry=0;
     try{ lobby.leave(); }catch(e){}
     ONL.room=room; ONL.on=true; ONL.practice=!mine&&!ONL.turnier; if(ONL.turnier) room.onMessage('introStart',m=>turnIntro(m)); room.onMessage('uebergang',m=>turnUebergang(m)); turnBindEvents(room); LNG.tableRoom=room; setTimeout(preload2D,1500);
-    room.onMessage('state',v=>onlState(v)); room.onMessage('clip',m=>clipPlay(m)); room.onMessage('fehler',t=>toast(String(t),3000)); room.onMessage('emote',m=>{ if(!m) return; const e=String(m.e||''); if(!/^[a-z0-9]+$/.test(e)) return; const v=ONL.v; let who=null; if(v){ const s=v.seats.find(x=>x&&x.id===m.id); if(s) who=s.id; } who=who||m.id; const mine=who===(v&&v.you); if(mine&&ME.dance===e) return; const a=mine?(SELF||null):AV[who]; const secs=(e==='tanz2'||e==='sonder')?10:6; if(a) startDance(a,e,secs); danceSound(e); });
-    room.onLeave(code=>{ if(!ONL.on) return; const planned=code===1000||code===4000; onlExit(true); if(planned){ toast('Verbindung zum Tisch beendet.'); return; } NET.tab=true; NET.tries=(NET.tries||0)+1; netShow(); if(NET.tries>6){ NET.tab=false; netShow(); toast('Tisch nicht erreichbar. Versuch es gleich nochmal am Tisch.',4000); NET.tries=0; return; } setTimeout(()=>{ online3D(); },2000+NET.tries*1500); });
+    room.onMessage('state',v=>onlState(v)); room.onMessage('clip',m=>clipPlay(m)); room.onMessage('fehler',t=>toast(String(t),3000)); room.onMessage('emote',m=>{ if(!m) return; const e=String(m.e||''); if(!/^[a-z0-9]+$/.test(e)) return; const v=ONL.v; let who=null; if(v){ const s=v.seats.find(x=>x&&x.id===m.id); if(s) who=s.id; } who=who||m.id; const mine=who===(v&&v.you); if(mine&&ME.dance===e) return; const a=mine?(SELF||null):AV[who]; const secs=(e==='tanz2'||e==='sonder')?10:6; if(mine&&ME.seated){ miniDance(byKey[ME.key],e,secs); } else if(a&&seatedAt(a)){ miniDance(a.person,e,secs); } else if(a) startDance(a,e,secs); danceSound(e); });
+    room.onLeave(code=>{ if(!ONL.on) return; const planned=code===1000||code===4000; if(!planned) bccLog('colyseus-abbruch','Tisch getrennt, Code '+code); onlExit(true); if(planned){ toast('Verbindung zum Tisch beendet.'); return; } NET.tab=true; NET.tries=(NET.tries||0)+1; netShow(); if(NET.tries>6){ NET.tab=false; netShow(); toast('Tisch nicht erreichbar. Versuch es gleich nochmal am Tisch.',4000); NET.tries=0; return; } setTimeout(()=>{ online3D(); },2000+NET.tries*1500); });
     Object.assign(TABLE,MAIN_TABLE);
     let bi=0,bd=1e9; SEATS.forEach((s,i)=>{ const d=Math.hypot(ME.pos.x-s.x,ME.pos.z-s.z); if(d<bd){bd=d;bi=i;} }); ONL.base=bi; if(ONL.turnier&&TURN.platz!=null&&SEATS[TURN.platz]) ONL.base=TURN.platz; if(ONL.fixed){ ONL.sitAt=performance.now(); try{ room.send('msg',{t:'sit',seat:bi}); }catch(e){} }
     NET.tab=false; NET.tries=0; netShow(); onlSit(); $('#onl').hidden=false; toast(ONL.turnier||mine?'Du sitzt an deinem Turnierplatz. <b>Tab</b> oder 🖥 wechselt zu 2D.':'Du sitzt am <b>Lounge-Tisch</b>. Sobald ein Zweiter dazukommt, startet die Hand.',3600);
-  }catch(e){ if(e&&e.quiet){ ONL.connecting=false; return; } console.error('online3D',e); toast('Online-Tisch nicht erreichbar: '+(e.message||e),4000); }
+  }catch(e){ if(e&&e.quiet){ ONL.connecting=false; return; } console.error('online3D',e); bccLog('colyseus-abbruch','Tisch-Join: '+(e&&e.message||e)); toast('Online-Tisch nicht erreichbar: '+(e.message||e),4000); }
   ONL.connecting=false; }
 function onlSit(){ const s=SEATS[ONL.base]; ME.seated=true; ME.seat=s; ME.pos.set(s.x,0,s.z); ME.yaw=Math.atan2(s.x-TABLE.x,s.z-TABLE.z); ME.pitch=-.62; if(ONL.room) ONL.room.send('msg',{t:'away',on:false}); ONL.away=false; onlHud(); }
 function onlStand(){ if(!ME.seated) return; const s=ME.seat; ME.seated=false; const p=ringPoint(s.ang,1.0); ME.pos.set(p.x,0,p.z); ME.seat=null; ME.pitch=0; if(ONL.room) ONL.room.send('msg',{t:'away',on:true}); ONL.away=true; toast('Pause: deine Hände werden automatisch gecheckt/gefoldet. Zurück an den Platz mit <b>E</b>.',3200); onlHud(); }
@@ -2328,12 +2341,12 @@ async function lkConnect(url,token,raum){ if(EMBED.open) return; const my=++VOIC
     r.on(L.RoomEvent.TrackUnsubscribed,tr=>{ tr.detach().forEach(e=>e.remove()); voiceUI(); });
     for(const ev of ['ParticipantConnected','ParticipantDisconnected','ActiveSpeakersChanged','TrackMuted','TrackUnmuted','LocalTrackPublished']) if(L.RoomEvent[ev]) r.on(L.RoomEvent[ev],()=>{ voiceUI(); if(CH.open) chRender(); });
     if(L.RoomEvent.ParticipantPermissionsChanged) r.on(L.RoomEvent.ParticipantPermissionsChanged,(prev,part)=>{ if(!part||part===r.localParticipant) chPermCheck(r); });
-    r.on(L.RoomEvent.Disconnected,()=>{ if(VOICE.room===r){ VOICE.room=null; VOICE.raum=null; CH.tokUsed=true; voiceUI(); if(VOICE.want) setTimeout(voiceConnect,3000); } });
+    r.on(L.RoomEvent.Disconnected,(why)=>{ if(VOICE.room===r){ bccLog('livekit-fehler','Getrennt '+(why==null?'':why)); VOICE.room=null; VOICE.raum=null; CH.tokUsed=true; voiceUI(); if(VOICE.want) setTimeout(voiceConnect,3000); } });
     await r.connect(url,token); if(my!==VOICE.seq||EMBED.open||!VOICE.want){ try{ r.disconnect(); }catch(e){} return; }
     VOICE.room=r; VOICE.raum=raum; await r.startAudio().catch(()=>{}); chPermCheck(r);
     if(!VOICE.admMuted) await r.localParticipant.setMicrophoneEnabled(VOICE.mic).catch(()=>{ VOICE.mic=false; toast('Kein Zugriff aufs Mikrofon. Du hörst die anderen trotzdem.',3500); });
     toast(raum==='lounge'?'🎙 Sprachchat Lounge: alle in der Lounge hören dich.':chIsTable(raum)?'🎙 Sprachchat Tisch: nur die Spieler am Tisch hören dich.':chIsDm(raum)?'📞 Privatgespräch: nur ihr zwei hört euch.':`🎧 Kanal „${chEsc(chLabel(raum))}“: nur Mitglieder hören dich.`,2600);
-  }catch(e){ console.warn('voice',e); if(CH.tok&&CH.tok.token===token) CH.tokBad=CH.tok; if(my===VOICE.seq){ toast(chEsc(e.message||'Sprachchat konnte nicht starten'),3000); if(!CH.ok) VOICE.want=false; } }
+  }catch(e){ console.warn('voice',e); bccLog('livekit-fehler','Verbinden: '+(e&&e.message||e)); if(CH.tok&&CH.tok.token===token) CH.tokBad=CH.tok; if(my===VOICE.seq){ toast(chEsc(e.message||'Sprachchat konnte nicht starten'),3000); if(!CH.ok) VOICE.want=false; } }
   finally{ if(my===VOICE.seq){ VOICE.busy=false; voiceUI(); if(CH.open) chRender(); } } }
 async function legacyConnect(){ if(VOICE.busy||!VOICE.want||EMBED.open) return; const raum=voiceRaum(); if(VOICE.room&&VOICE.raum===raum) return; VOICE.busy=true; voiceUI(); let tok=null;
   try{ const r0=await fetch(ONLINE.voice+'?'+AUTHQ()+'&raum='+encodeURIComponent(raum)); if(!r0.ok) throw new Error(r0.status===503?'Sprachchat ist gerade aus':'Sprachchat-Zugang abgelehnt ('+r0.status+')'); tok=await r0.json(); }
@@ -2483,7 +2496,7 @@ async function turnWatch(){ if(!TURN.on||TURN.room||TURN.conn||(ONL.on&&ONL.turn
     try{ r=await c.joinById(TURN.id,{watch:true}); }catch(e){ r=await c.joinById(TURN.id,AUTHO({watch:true,name:ONL.name||LNG.myName})); }
     TURN.room=r; r.onMessage('state',v=>{ TURN.v=v; turnTake(v); }); r.onMessage('uebergang',m=>turnUebergang(m)); r.onMessage('introStart',m=>turnIntro(m)); r.onMessage('clip',m=>clipPlay(m,true)); r.onMessage('fehler',t=>console.warn('turnier zuschauen:',t)); turnBindEvents(r);
     r.onLeave(()=>{ TURN.room=null; }); console.log('turnier: zuschauen verbunden',TURN.id);
-    TURN.fails=0; }catch(e){ console.warn('turnier: zuschauen geht nicht',e); TURN.failT=Date.now(); TURN.fails=(TURN.fails||0)+1; if(TURN.fails>=4&&!TURN.v){ console.warn('turnier: Raum weg, Turniermodus aus'); turnEnd(); } }
+    TURN.fails=0; }catch(e){ console.warn('turnier: zuschauen geht nicht',e); bccLog('colyseus-abbruch','Zuschauen: '+(e&&e.message||e)); TURN.failT=Date.now(); TURN.fails=(TURN.fails||0)+1; if(TURN.fails>=4&&!TURN.v){ console.warn('turnier: Raum weg, Turniermodus aus'); turnEnd(); } }
   TURN.conn=false; }
 function turnEnd(){ TURN.on=false; TURN.id=null; try{ localStorage.removeItem('bcc-turnier'); }catch(e){} turnUnwatch(); turnTvs(); turnUI(); }
 function turnUnwatch(){ const r=TURN.room; TURN.room=null; if(r) try{ r.leave(); }catch(e){} }
@@ -2674,11 +2687,19 @@ function stepDances(){ const now=performance.now(); let gold=null; for(const a o
   if(gold){ if(!GOLD){ GOLD=new THREE.PointLight(0xffc443,0,3.2); scene.add(GOLD); } gold.body.getWorldPosition(GOLD.position); GOLD.position.y+=1.9; GOLD.intensity=2.2+.8*Math.sin(now/90); } else if(GOLD) GOLD.intensity=0; }
 let MY_DANCES=new Set(['tanz2']);
 const DANCE_LIST=[['tanz','Tanz'],['tanz2','Tanzschritte'],['tanz3','Tanz 3'],['winken','Winken'],['jubel','Jubel'],['floss','Floss'],['robot','Robot'],['moonwalk','Moonwalk'],['flex','Flex'],['sonder','⭐ Sondertanz (auf dem Tisch)']];
+// Tanzen am Tisch (Tim 18.11.): wer sitzt, bleibt sitzen, und eine Mini-Figur tanzt in der Tischmitte. Keine Duplikate.
+const MINI={};
+function miniDance(person,name,secs){ if(!person||!person.key) return; const k=String(person.key).replace(/_(double|mini)$/,''); let a=MINI[k];
+  if(!a){ a=makeAvatar(Object.assign({},person,{key:k+'_mini'})); a.mini=true; a.tag.visible=false; a.g.scale.setScalar(.32); MINI[k]=a; }
+  const n=Object.keys(MINI).filter(x=>MINI[x].g.visible&&x!==k).length; const ang=n*1.3; a.pos.set(TABLE.x+Math.cos(ang)*.28*Math.min(1,n),CARD_Y+.005,TABLE.z+Math.sin(ang)*.18*Math.min(1,n)); a.g.position.y=CARD_Y+.005; a.g.visible=true; a.state='idle';
+  if(!a.dance||a.dance.name!==name) startDance(a,name,secs); else a.dance.until=performance.now()+secs*1000; a.miniUntil=performance.now()+secs*1000; }
+setInterval(()=>{ const now=performance.now(); for(const k in MINI){ const a=MINI[k]; if(a.g.visible&&now>(a.miniUntil||0)){ a.g.visible=false; a.dance=null; } else if(a.g.visible){ a.g.rotation.y+=.05; } } },100);
+function seatedAt(a){ return !!(a&&(a.onlSeat||a.state==='seated'&&a.seat&&SEATS.includes(a.seat))); }
 function myDance(id){ const secs=(id==='tanz2'||id==='sonder')?10:6; let sent=false;
   if(ONL.on&&ONL.room){ try{ ONL.room.send('emote',id); sent=true; }catch(e){} }
   if(LNG.room){ try{ LNG.room.send('msg',{t:'emote',id}); sent=true; }catch(e){} }
   ME.dance=id; ME.danceUntil=performance.now()+secs*1000; if(!SELF){ SELF=makeAvatar(byKey[ME.key]); delete AV[ME.key]; SELF.tag.visible=false; SELF.g.visible=false; }
-  if(SELF){ startDance(SELF,id,secs); } danceSound(id); $('#danceMenu').hidden=true;
+  if(ME.seated&&ONL.on){ miniDance(byKey[ME.key],id,secs); } else if(SELF){ startDance(SELF,id,secs); } danceSound(id); $('#danceMenu').hidden=true;
   setTimeout(()=>{ if(ME.dance===id&&performance.now()>=ME.danceUntil-50) ME.dance=null; },secs*1000); }
 $('#volR').value=Math.round(VOL*100); $('#volR').oninput=e=>setVol(e.target.value/100); $('#volBtn').onclick=e=>{ e.currentTarget.blur(); $('#volPop').hidden=!$('#volPop').hidden; $('#danceMenu').hidden=true; };
 $('#danceBtn').onclick=e=>{ e.currentTarget.blur(); danceMenu(); };
@@ -2688,7 +2709,7 @@ function danceSound(id){ const f={sonder:'sondertanz.mp3',tanz2:'tanzschritte.mp
 
 // ---------- Gemeinsame Lounge (Server-Raum 'lounge'): alle, die online sind, sehen sich ----------
 const LNG={room:null,on:false,av:{},sendT:0,last:'',me:null};
-function lngAnim(){ let a='idle'; if(ME.couch) a=BAR_SPOTS.includes(ME.couch)?'bar':'couch'; else if(ME.seated) a='sit'; else if(LNG.moving) a='walk'; if(ME.dance) a='dance:'+ME.dance; if(ME.item==='joint') a+=':j'; return a.slice(0,24); }
+function lngAnim(){ let a='idle'; if(ME.couch) a=BAR_SPOTS.includes(ME.couch)?'bar':'couch'; else if(ME.seated) a='sit'; else if(LNG.moving) a='walk'; if(ME.dance) a=(ME.seated&&ONL.on?'sitdance:':'dance:')+ME.dance; if(ME.item==='joint') a+=':j'; return a.slice(0,24); }
 function lngSeat(){ if(ME.couch){ const b=BAR_SPOTS.indexOf(ME.couch); if(b>=0) return 'bar:'+b; const c=COUCH_SPOTS.indexOf(ME.couch); if(c>=0) return 'couch:'+c; } if(ONL.on&&ME.seated){ return 'poker:'+(ONL.v&&ONL.v.yourSeat>=0?ONL.v.yourSeat:0); } return null; }
 async function lngConnect(){ if(LNG.on||LNG.connecting||!(ME.code||ME.ticket)) return; LNG.connecting=true;
   try{ const r=await fetch(ONLINE.login+'?'+AUTHQ()); if(!r.ok) throw new Error('login '+r.status); const who=await r.json();
@@ -2698,15 +2719,15 @@ async function lngConnect(){ if(LNG.on||LNG.connecting||!(ME.code||ME.ticket)) r
     for(const k of Object.keys(AV)){ const a=AV[k]; if(a.fake){ scene.remove(a.g); delete AV[k]; } }
     room.onMessage('players',list=>lngPlayers(list)); room.onMessage('join',p=>{ if(p&&p.id!==LNG.me) lngLine(null,`${p.name||'Jemand'} ist in der Lounge.`); });
     room.onMessage('leave',p=>{ if(p) lngRemove(p.id); }); room.onMessage('emote',m=>lngEmote(m)); room.onMessage('chat',m=>lngChat(m)); room.onMessage('fehler',t=>toast(String(t),2500)); try{ chBind(room); }catch(e){ console.warn('chBind',e); }
-    room.onLeave(()=>{ LNG.on=false; NET.lng=true; netShow(); for(const id in LNG.av) lngRemove(id); $('#lcount').hidden=true; setTimeout(()=>{ LNG.connecting=false; lngConnect(); },3000); });
+    room.onLeave(code=>{ bccLog('colyseus-abbruch','Lounge getrennt, Code '+code); LNG.on=false; NET.lng=true; netShow(); for(const id in LNG.av) lngRemove(id); $('#lcount').hidden=true; setTimeout(()=>{ LNG.connecting=false; lngConnect(); },3000); });
     NET.lng=false; netShow();
     $('#lchat').hidden=false; $('#lcount').hidden=false; lngLine(null,'Du bist in der Lounge. <b>Enter</b> = Chat.',true);
-  }catch(e){ console.warn('lounge',e); if(LNG.was){ NET.lng=true; netShow(); } setTimeout(()=>{ LNG.connecting=false; lngConnect(); },LNG.was?4000:15000); return; }
+  }catch(e){ console.warn('lounge',e); bccLog('colyseus-abbruch','Lounge-Join: '+(e&&e.message||e)+(LNG.was?' (Reconnect)':'')); if(LNG.was){ NET.lng=true; netShow(); } setTimeout(()=>{ LNG.connecting=false; lngConnect(); },LNG.was?4000:15000); return; }
   LNG.connecting=false; }
 function lngPlayers(list){ const seen=new Set(); let n=0;
   for(const p of list||[]){ n++; if(p.id===LNG.me) continue; seen.add(p.id); let L=LNG.av[p.id];
     if(!L){ const base=byKey[p.key]||{key:p.key||('gast_'+p.id),name:p.name||'Gast',color:'#8a8a8a'}; if(AV[base.key]){ const old=AV[base.key]; if(old.fake||old.lngOwner){ scene.remove(old.g); delete AV[base.key]; } }
-      const a=makeAvatar(Object.assign({},base,{name:p.name||base.name})); delete AV[base.key]; a.lngId=p.id; L=LNG.av[p.id]={a,key:base.key,tx:p.x,tz:p.z,tyaw:p.yaw}; a.pos.set(p.x,0,p.z); LNG_AV.push(a); }
+      const keep=AV[base.key]; const a=makeAvatar(Object.assign({},base,{name:p.name||base.name})); if(keep&&keep!==a) AV[base.key]=keep; else delete AV[base.key]; a.lngId=p.id; L=LNG.av[p.id]={a,key:base.key,tx:p.x,tz:p.z,tyaw:p.yaw}; a.pos.set(p.x,0,p.z); LNG_AV.push(a); }
     L.tx=p.x; L.tz=p.z; L.tyaw=p.yaw; L.anim=String(p.anim||'idle'); L.t=performance.now(); }
   // Server schickt immer die komplette Liste (alle 2 s): wer fehlt, ist weg
   if(Array.isArray(list)){ for(const id in LNG.av) if(!seen.has(id)) lngRemove(id); }
@@ -2714,8 +2735,8 @@ function lngPlayers(list){ const seen=new Set(); let n=0;
 const LNG_AV=[];
 function lngRemove(id){ const L=LNG.av[id]; if(!L) return; setTimeout(()=>{ if($('#lcount')) $('#lcount').textContent='👥 '+(Object.keys(LNG.av).length+1)+' in der Lounge'; },0); scene.remove(L.a.g); if(L.joint) scene.remove(L.joint); const i=LNG_AV.indexOf(L.a); if(i>=0) LNG_AV.splice(i,1); delete LNG.av[id]; }
 function lngUpdate(dt){ if(!LNG.on) return; const now=performance.now(); LNG.moving=Math.hypot(ME.pos.x-(LNG.px||0),ME.pos.z-(LNG.pz||0))>dt*.4; LNG.px=ME.pos.x; LNG.pz=ME.pos.z;
-  for(const id in LNG.av){ const L=LNG.av[id], a=L.a, k=Math.min(1,dt*8); const dx=L.tx-a.pos.x, dz=L.tz-a.pos.z; const dd=Math.hypot(dx,dz); if(dd>6){ a.pos.x=L.tx; a.pos.z=L.tz; } else { a.pos.x+=dx*k; a.pos.z+=dz*k; } a.g.visible=true; a.g.rotation.y=lerpAng(a.g.rotation.y,(L.tyaw||0)+Math.PI,k);
-    const an=L.anim.split(':'); const base=an[0]; a.state=base==='walk'||Math.hypot(dx,dz)>.05?'walk':(base==='sit'||base==='bar'||base==='couch')?'seated':'idle'; a.g.position.y=(base==='bar'&&a.state==='seated')?BAR_SIT_Y:0; if(base==='dance'){ if(!a.dance||a.dance.name!==an[1]) startDance(a,an[1]||'tanz2',3600); a.dance.until=performance.now()+600; }
+  for(const id in LNG.av){ const L=LNG.av[id], a=L.a, k=Math.min(1,dt*8); const dx=L.tx-a.pos.x, dz=L.tz-a.pos.z; const dd=Math.hypot(dx,dz); if(dd>6){ a.pos.x=L.tx; a.pos.z=L.tz; } else { a.pos.x+=dx*k; a.pos.z+=dz*k; } const tav=AV[L.key]; const dup=!!(tav&&tav!==a&&tav.onlSeat); a.g.visible=!dup; a.g.rotation.y=lerpAng(a.g.rotation.y,(L.tyaw||0)+Math.PI,k);
+    const an=L.anim.split(':'); const base=an[0]; a.state=base==='walk'||Math.hypot(dx,dz)>.05?'walk':(base==='sit'||base==='sitdance'||base==='bar'||base==='couch')?'seated':'idle'; if(base==='sitdance'){ if(a.dance){ a.dance=null; } miniDance(a.person,an[1]||'tanz2',2.5); } a.g.position.y=(base==='bar'&&a.state==='seated')?BAR_SIT_Y:0; if(base==='dance'){ if(!a.dance||a.dance.name!==an[1]) startDance(a,an[1]||'tanz2',3600); a.dance.until=performance.now()+600; }
     // Joint in der Hand sichtbar
     const j=an[an.length-1]==='j'; if(j&&!L.joint){ L.joint=HELD.g.clone(); L.joint.visible=true; scene.add(L.joint); } if(!j&&L.joint){ scene.remove(L.joint); L.joint=null; }
     if(L.joint){ const h=a.body.getObjectByName('Bip01_R_Hand'); if(h){ h.getWorldPosition(L.joint.position); a.g.getWorldQuaternion(L.joint.quaternion); } if(Math.random()<.08){ const e=new THREE.Vector3(); L.joint.getWorldPosition(e); puff(e,new THREE.Vector3(),1); } }
@@ -2730,7 +2751,7 @@ function lngBubble(L,text){ if(L.bubble) L.a.g.remove(L.bubble); const t=canvasT
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false})); sp.scale.set(1.2,.225,1); sp.position.y=2.3; sp.renderOrder=5; L.a.g.add(sp); L.bubble=sp; L.bubbleT=performance.now()+5000; }
 function lngLine(name,text,html){ const d=document.createElement('div'); if(name){ const b=document.createElement('b'); b.textContent=name+': '; d.appendChild(b); d.appendChild(document.createTextNode(text)); } else if(html) d.innerHTML=text; else d.textContent=text; const log=$('#lchatLog'); log.appendChild(d); while(log.children.length>6) log.firstChild.remove(); setTimeout(()=>{ d.style.transition='opacity 1s'; d.style.opacity='0'; setTimeout(()=>d.remove(),1000); },20000); }
 function lngChat(m){ if(!m) return; const txt=String(m.text||'').slice(0,200); const nm=(byKey[m.key]&&byKey[m.key].name)||String(m.from||'Gast'); lngLine(nm,txt); for(const id in LNG.av){ if(LNG.av[id].key===m.key) lngBubble(LNG.av[id],txt); } }
-function lngEmote(m){ if(!m||m.id===LNG.me) return; const L=LNG.av[m.id]; if(!L) return; const e=String(m.e||''); if(/^[a-z0-9]+$/.test(e)){ startDance(L.a,e,6); danceSound(e); } else lngBubble(L,e); }
+function lngEmote(m){ if(!m||m.id===LNG.me) return; const L=LNG.av[m.id]; if(!L) return; const e=String(m.e||''); if(/^[a-z0-9]+$/.test(e)){ const tav=AV[L.key]; if((tav&&tav.onlSeat)||String(L.anim||'').startsWith('sit')) miniDance(L.a.person,e,6); else startDance(L.a,e,6); danceSound(e); } else lngBubble(L,e); }
 function lngSay(){ const i=$('#lchatIn'); const v=i.value.trim(); i.value=''; i.hidden=true; i.blur(); if(!v||!LNG.on) return; try{ LNG.room.send('msg',{t:'chat',text:v.slice(0,200)}); }catch(e){} }
 addEventListener('keydown',e=>{ const i=$('#lchatIn'); if(!LNG.on) return; if(document.activeElement===i){ if(e.key==='Enter'){ e.preventDefault(); lngSay(); } else if(e.key==='Escape'){ i.value=''; i.hidden=true; i.blur(); } e.stopImmediatePropagation(); return; }
   if(e.key==='Enter'&&document.activeElement.tagName!=='INPUT'&&S.mode!=='login'){ e.preventDefault(); if(document.pointerLockElement) document.exitPointerLock(); i.hidden=false; i.focus(); } },true);
@@ -2786,7 +2807,10 @@ function updateLife(dt){ const t=T, d=LIFE.dust;
     g.fillStyle='rgba(0,0,0,.45)'; g.fillRect(0,h-30,w,30); g.fillStyle='#f3d98b'; g.font='600 15px sans-serif'; g.textAlign='left'; tv.x=(tv.x-2.2)%600; const msg='Live-Tisch offen  ·  Sit & Go  ·  MTT  ·  Liar’s Bluff  ·  Hardcore Hold’em  ·  '; g.fillText(msg+msg,tv.x,h-10); g.restore();
     tv.t.needsUpdate=true; LIFE.tvLight.intensity=.22+Math.sin(t*1.3)*.05; }
 }
-function loop(){
+renderer.domElement.addEventListener('webglcontextlost',()=>bccLog('webgl-verlust','WebGL-Kontext verloren'),false);
+let LOGF={first:false,n:0,t0:performance.now(),lowAt:0};
+function loop(){ try{ if(!LOGF.first&&S.mode!=='login'){ LOGF.first=true; bccLog('metrik-lounge-geladen','erste Szene',{ms:performance.now()}); } LOGF.n++; const nt=performance.now(); if(nt-LOGF.t0>3000){ const fps=LOGF.n*1000/(nt-LOGF.t0); LOGF.n=0; LOGF.t0=nt; if(fps<20&&!document.hidden&&Date.now()-LOGF.lowAt>60000&&LOGF.first){ LOGF.lowAt=Date.now(); bccLog('metrik-fps-tief',fps.toFixed(1)+' fps',{ms:fps}); } } }catch(e){}
+
   const dt=Math.min(.05,clock.getDelta()); T+=dt;
   if(S.mode!=='login') updateMe(dt); else { camera.position.set(.2+Math.sin(T*.1)*1.2,2.1,1.6); camera.lookAt(TABLE.x,.8,TABLE.z); }
   updateAvatars(dt,T); updateSprites(dt,T); updateDouble(dt); updateTavern(dt); updateLife(dt); stepTweens(dt); stepParts(dt); updateClock(dt);
@@ -2809,6 +2833,7 @@ var RL=null; function roomLights(){ if(!RL){ RL={tav:[],flat:[],st:null}; scene.
   const cz=camera.position.z, nearDoor=Math.abs(cz-WALLZ)<1.6&&BD.ang>.1; const st=nearDoor?'both':(cz<WALLZ?'tav':'flat'); if(st===RL.st) return; RL.st=st;
   RL.tav.forEach(l=>l.visible=st!=='flat'); RL.flat.forEach(l=>l.visible=st!=='tav'); }
 window.__clipState=v=>clipState(v); window.__clipPlay=(m,l)=>clipPlay(m,l);
-window.__bcc={TABLE,VOICE,CH,chToggle,chRender,voiceConnect,online3D,onlExit,open2D,close2D,pickTable,renderer,startDance,myDance,LNG,S,ME,AV,act,B,tableObjs,TABLE,scene,endGame,camera,emote,ONL,onlState,onlSit,onlStand,MAIN_TABLE,KEEP,pourBeer,rollJoint,TBAR,BAR_SPOTS,couchFaceYaw,SEATS};
+window.__logCtx=()=>({who:LNG.myName||ONL.name||'',wo:(TURN.on?'turnier':'lounge')+(ONL.on?'/tisch':'')});
+window.__bcc={MINI,DANCING,TABLE,VOICE,CH,chToggle,chRender,voiceConnect,online3D,onlExit,open2D,close2D,pickTable,renderer,startDance,myDance,LNG,S,ME,AV,act,B,tableObjs,TABLE,scene,endGame,camera,emote,ONL,onlState,onlSit,onlStand,MAIN_TABLE,KEEP,pourBeer,rollJoint,TBAR,BAR_SPOTS,couchFaceYaw,SEATS};
 })();
 </script>
