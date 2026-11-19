@@ -2926,7 +2926,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   }
   /* 19.11. Tim: Banner „Jetzt auch online“ rechts neben „Zehn Stühle. Ein Sieger.“ → neue Online-Lobby (Login wie immer über die Website). ONLINE_LOBBY.on = false blendet ihn aus. */
   /* modes: soon:true zeigt „bald“ – beim Livegang mit dem Lobby-Thread abgleichen und auf false setzen, was fertig ist */
-  const ONLINE_LOBBY = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?lobby=neu', modes: [['Sit & Go', false], ['Turniere', false], ['Heads-up-Duell', true], ['Spin & Go', true]] };
+  const ONLINE_LOBBY = { on: true, url: 'https://blue-chip-game-production.up.railway.app/', modes: [['Sit & Go', false], ['Turniere', false], ['Heads-up-Duell', true], ['Spin & Go', true]] };
   function lobbyBanner() {
     return '<a class="ob-reel js-play" href="#anmelden" data-dest="lobby" tabindex="-1" aria-hidden="true"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 980px) 90vw, 40vw" alt=""></a>';
   }
