@@ -181,6 +181,23 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 @keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 
 /* ---------- tab bar ---------- */
+/* Steuerleiste: erscheint, sobald auf dem Fernseher etwas Großes läuft (Auslosung, Ansage, Bildschirmschoner) */
+.scrb{position:fixed;left:10px;right:10px;bottom:calc(var(--tb) + 10px);z-index:39;max-width:620px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:18px;
+  background:linear-gradient(180deg,rgba(60,66,84,.96),rgba(30,33,44,.97));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(243,214,143,.35),0 12px 30px rgba(0,0,0,.5);
+  animation:scrIn .32s cubic-bezier(.23,1,.32,1)}
+.scrb[hidden]{display:none}
+@keyframes scrIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+body.scron .page{padding-bottom:calc(var(--tb) + 96px)}
+.scrt{flex:1;min-width:0}.scrt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:var(--gold2);letter-spacing:.06em;text-transform:uppercase}
+.scrt b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scrk{display:flex;gap:6px;flex:none}
+.scrk button{height:38px;min-width:38px;padding:0 12px;border-radius:12px;font-size:14px;font-weight:600;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);transition:transform .16s cubic-bezier(.23,1,.32,1)}
+.scrk button:active{transform:scale(.97)}
+.scrk button.pri{background:linear-gradient(180deg,#f7e2a6,#e2b857 55%,#b98d34);color:#1a1307}
+body.arch .scrb{display:none}
+.lob .cell .sw{width:46px;height:28px;border-radius:999px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:background .2s}
+.lob .cell .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .22s cubic-bezier(.23,1,.32,1)}
+.lob .cell .sw.on{background:var(--green)}.lob .cell .sw.on::after{transform:translateX(18px)}
 nav.tb{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px env(safe-area-inset-bottom);height:var(--tb);background:rgba(18,18,20,.78);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border-top:.5px solid rgba(255,255,255,.1)}
 nav.tb button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#7c7c80;padding-top:2px;transition:color .2s}
 nav.tb button svg{width:26px;height:26px;transition:transform .25s var(--ease)}
@@ -340,6 +357,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
   <div id="deck"><p class="note">Lade Clips …</p></div>
 </section>
 
+<div class="scrb" id="scrb" hidden><div class="scrt"><small id="scrE">Auf dem Bildschirm</small><b id="scrT"></b></div><div class="scrk" id="scrK"></div></div>
 <nav class="tb" id="tb">
   <button class="on" data-p="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>Übersicht</button>
   <button data-p="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="7" r="2.6"/><path d="M17.5 12.6c2.3.3 3.8 1.9 4.2 4.4"/></svg>Spieler</button>
@@ -390,6 +408,13 @@ function sheet(title,text,btns,content){
   const B=$("shB");B.innerHTML="";
   (btns||[]).forEach(([t,cls,fn])=>{const b=document.createElement("button");b.className="btn press "+(cls||"");b.textContent=t;b.onclick=()=>{closeSheet();fn();};B.appendChild(b);});
   $("ov").classList.add("on");$("sh").classList.add("on");$("sh").scrollTop=0;buzz(8);}
+function scrBar(){const r=D.scr||{},b=$("scrb"),K=$("scrK");let t="",e="Auf dem Bildschirm",btns=[];
+  if(r.intro){t="Auslosung · Spielerkarten";btns=[["Überspringen","",{op:"skipintro"}],["Nächste ▶","pri",{op:"close"}]];}
+  else if(r.ann){t=r.annT||"Ansage";btns=[["✕","",{op:"close"}],[(r.annB||"Weiter")+" ▶","pri",{op:"annok"}]];}
+  else if(r.lobby){t="Bildschirmschoner";btns=[["◀","",{op:"lobbynav",d:-1}],["▶","",{op:"lobbynav",d:1}],["Aus","pri",{op:"lobbyclose"}]];}
+  const on=!!btns.length&&!ARCH;b.hidden=!on;document.body.classList.toggle("scron",on);if(!on){scrBar.k="";return;}
+  $("scrE").textContent=e;$("scrT").textContent=t;const k=JSON.stringify(btns);if(k===scrBar.k)return;scrBar.k=k;K.innerHTML="";
+  btns.forEach(([l,c,cmd])=>{const x=document.createElement("button");x.className="press "+c;x.textContent=l;x.onclick=()=>{buzz(10);send(cmd,l.replace(/ ▶$/,""));};K.appendChild(x);});}
 function closeSheet(){$("ov").classList.remove("on");$("sh").classList.remove("on");}
 $("shX").onclick=closeSheet;$("ov").onclick=closeSheet;
 /* nach unten wischen schließt */
@@ -429,7 +454,7 @@ function apply(p){
   show(p.S);}
 function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   $("archb").hidden=!ARCH;if(ARCH)$("archT").textContent="📁 "+(S.title||"Turnier")+" · "+archDate(ARCH)+" · Archiv";
-  $("ttl").textContent=S.title||"Blue Chip";
+  $("ttl").textContent=S.title||"Blue Chip";scrBar();
   $("lvl").textContent=D.lvl||"";$("bl").textContent=D.blinds||"";
   $("nx").textContent="Als Nächstes "+(D.next||"–")+" · "+(D.reOpen?"Rebuy offen"+(S.reLvl!=null?" bis Level "+S.reLvl:""):"Freezeout");
   $("play").textContent=S.running?"❚❚ Pause":"▶ Start";$("play").classList.toggle("run",!!S.running);
@@ -559,7 +584,13 @@ $("mTime").onclick=()=>{const W=document.createElement("div");W.innerHTML='<div 
 $("drawBtn").onclick=()=>sheet("Plätze auslosen?",(S&&S.started?"Achtung: Das Turnier läuft schon! ":"")+"Ab 11 Spielern zwei Tische. Tim + Manu am großen Tisch, Jonny Platz 6.",[["🎲 Jetzt auslosen","pri",()=>send({op:"draw"},"Plätze auslosen")]]);
 $("tblBtn").onclick=()=>send({op:"tables"},"Tische prüfen");
 $("ftBtn").onclick=()=>sheet("Final Table jetzt?","Beide Tische werden zusammengelegt und die Plätze neu ausgelost.",[["🏆 Zusammenlegen","red",()=>send({op:"merge"},"Final Table")]]);
-$("lobbyBtn").onclick=()=>sheet("Bildschirmschoner","",[["An","",()=>send({op:"lobby"},"Bildschirmschoner an")],["Aus","",()=>send({op:"lobbyclose"},"Bildschirmschoner aus")]]);
+$("lobbyBtn").onclick=lobbySheet;
+function lobbySheet(){const W=document.createElement("div");W.className="grp lob";W.style.margin="4px 0 0";
+  const L=D.lob||[];if(!L.length){const n=document.createElement("p");n.className="sp";n.style.padding="12px";n.textContent="Die Inhalte laden noch. Gleich nochmal öffnen.";W.appendChild(n);}
+  L.forEach(g=>{const b=document.createElement("button");b.className="cell press";b.innerHTML='<span class="tx"></span><span class="sw'+(g.on?' on':'')+'"></span>';
+    b.querySelector(".tx").innerHTML=esc(g.label)+'<small>'+(g.id==="karten"?g.n+" Spieler":g.n+(g.n===1?" Bild":" Bilder"))+'</small>';
+    b.onclick=()=>{g.on=!g.on;b.querySelector(".sw").classList.toggle("on",g.on);send({op:"lobbyset",id:g.id,on:g.on},(g.on?"An: ":"Aus: ")+g.label);};W.appendChild(b);});
+  sheet("Bildschirmschoner","Was im Bildschirmschoner läuft. Neue Turnierberichte von der Website kommen automatisch dazu.",[["Jetzt starten","pri",()=>send({op:"lobby"},"Bildschirmschoner an")],["Ausschalten","",()=>send({op:"lobbyclose"},"Bildschirmschoner aus")]],W);}
 $("pendOk").onclick=()=>send({op:"pend"},"bestätigt");
 $("pendAlt").onclick=()=>{const q=S&&S.pend;if(!q||q.op!=="move")return;const from=q.to===1?2:1;
   picker("Wer wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2")+"?","",[["",orderOf(active().filter(p=>pinfo(p.name).t===from&&lc(p.name)!=="tim"))]],p=>send({op:"move",name:p.name,to:q.to},p.name+" wechselt"));};
