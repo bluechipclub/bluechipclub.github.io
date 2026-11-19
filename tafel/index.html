@@ -311,6 +311,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .snd{position:fixed;right:1.2vw;bottom:5vh;z-index:25;background:#1b1b1b;border:1px solid var(--gold3);color:var(--gold2);border-radius:999px;padding:6px 14px;font-size:13px}
 .snd[hidden]{display:none}
 .draw{display:grid;grid-template-columns:repeat(5,1fr);gap:1.4vw;margin-top:3vh}
+.draw.two{grid-template-columns:repeat(7,1fr);gap:.8vw;margin-top:1vh}.draw.two .dcard{aspect-ratio:4/5}
 .dcard{aspect-ratio:5/7;border-radius:1vw;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1.4vh 3vh rgba(0,0,0,.7);animation:deal .8s var(--ease) both;animation-delay:calc(var(--k)*.18s);padding:1vh}
 .dcard .s{font-family:var(--mono);font-size:max(10px,.9vw);color:#c8202a}
 .dcard .n{font-size:max(14px,1.6vw);margin-top:.5vh;text-align:center}
@@ -683,7 +684,7 @@ function renderSeats(){
     d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
     const re=p.entries.length-1;
     d.classList.toggle("mw",mw===p);
-    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"")+(S.bounty&&!p.out?'<span class="hd">🎯 '+headOf(p)+' P</span>':"")+(mw===p?'<span class="mwt">Most Wanted</span>':"");
+    d.querySelector(".meta").innerHTML=(S.t2&&S.t2.includes(p.name)?'<span class="re">Tisch 2</span>':"")+(re?'<span class="re">+'+re+' Rebuy</span>':"")+(S.bounty&&!p.out?'<span class="hd">🎯 '+headOf(p)+' P</span>':"")+(mw===p?'<span class="mwt">Most Wanted</span>':"");
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
@@ -1027,17 +1028,26 @@ function drawSeats(){
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
+  /* 19.11. Tim: nur EIN echter Pokertisch. Bei mehr als 10 Spielern wird zuerst ausgelost, wer am großen Tisch sitzt (Tim + 9).
+     Die ersten 9 Anmeldungen (ohne Tim, Reihenfolge der Website-Zusagen) haben doppelte Chance, Manu sitzt immer neben Tim. Der Rest spielt an Tisch 2. */
+  S.t2=null;let t2=[];
+  if(anc&&a.length>10){const lc=x=>String(x).toLowerCase().trim(),ord=(S.syncSeen||[]).map(lc).filter(x=>x!=="tim"),early=new Set(ord.slice(0,9)),w=p=>early.has(lc(p.name))?2:1;
+    const ma=a.find(p=>canonName(p.name)==="manu");let pool=a.filter(p=>p!==anc&&p!==ma);const big=ma?[ma]:[];
+    while(big.length<9&&pool.length){let r=Math.random()*pool.reduce((x,p)=>x+w(p),0),i=0;for(;i<pool.length-1;i++){r-=w(pool[i]);if(r<0)break;}big.push(pool[i]);pool.splice(i,1);}
+    t2=pool;const jo2=t2.find(p=>canonName(p.name)==="jonny");if(jo2&&t2.length>5){t2=t2.filter(p=>p!==jo2);t2.splice(5,0,jo2);}
+    S.t2=t2.map(p=>p.name);a=[...big.sort(()=>Math.random()-.5),anc];}
   /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Jonny immer Platz 6. Rest zufällig. */
   if(anc&&a.length>=3){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
     if(ma)slots[Math.random()<.5?0:n-2]=ma;
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
+  if(t2.length)a=[...t2,...a];
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
   S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
   if(!SIMPLE&&!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
-  S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
+  S.players=a;S.dealer=t2.length+Math.floor(Math.random()*(a.length-t2.length));log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name,t2:S.t2});save();buildSeats();render();
 }
 /* 12.11.: Show nach „Plätze auslosen“: Ansager + alle Karten auf einen Blick, dann jede Karte einzeln in Sitzreihenfolge (Tim zuletzt am Dealer-Platz), dann die Sitzordnung */
 const DRAW_SHOW=true;
@@ -1050,6 +1060,8 @@ function drawShow(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const
 const ANNS_INTRO_NOW=()=>"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a){
   const suits=["♠","♥","♣","♦"];
+  if(S.t2&&S.t2.length){const t2=a.filter(p=>S.t2.includes(p.name)),big=a.filter(p=>!S.t2.includes(p.name)),g=(arr,lbl)=>'<p style="margin:2vh 0 1vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+lbl+'</p><div class="draw two">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
+    announce({eyebrow:"Plätze ausgelost · zwei Tische",title:"Sitzordnung",html:g(big,"Großer Tisch · "+big.length+" Spieler")+g(t2,"Tisch 2 · "+t2.length+" Spieler")+'<p style="margin-top:2vh">Dealer-Button am großen Tisch startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});fanfare();return;}
   announce({eyebrow:"Plätze ausgelost · im Uhrzeigersinn",title:"Sitzordnung",html:'<div class="draw">'+a.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div><p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});
   fanfare();
 }
