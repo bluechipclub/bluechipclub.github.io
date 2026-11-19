@@ -181,6 +181,36 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 @keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 
 /* ---------- tab bar ---------- */
+/* Steuerleiste: erscheint, sobald auf dem Fernseher etwas Großes läuft (Auslosung, Ansage, Bildschirmschoner) */
+.scrb{position:fixed;left:10px;right:10px;bottom:calc(var(--tb) + 10px);z-index:39;max-width:620px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:18px;
+  background:linear-gradient(180deg,rgba(60,66,84,.96),rgba(30,33,44,.97));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(243,214,143,.35),0 12px 30px rgba(0,0,0,.5);
+  animation:scrIn .32s cubic-bezier(.23,1,.32,1)}
+.scrb[hidden]{display:none}
+@keyframes scrIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+body.scron .page{padding-bottom:calc(var(--tb) + 96px)}
+.scrt{flex:1;min-width:0}.scrt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:var(--gold2);letter-spacing:.06em;text-transform:uppercase}
+.scrt b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scrk{display:flex;gap:6px;flex:none}
+.scrk button{height:38px;min-width:38px;padding:0 12px;border-radius:12px;font-size:14px;font-weight:600;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);transition:transform .16s cubic-bezier(.23,1,.32,1)}
+.scrk button:active{transform:scale(.97)}
+.scrk button.pri{background:linear-gradient(180deg,#f7e2a6,#e2b857 55%,#b98d34);color:#1a1307}
+body.arch .scrb{display:none}
+.lob .cell .sw{width:46px;height:28px;border-radius:999px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:background .2s}
+.lob .cell .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .22s cubic-bezier(.23,1,.32,1)}
+.lob .cell .sw.on{background:var(--green)}.lob .cell .sw.on::after{transform:translateX(18px)}
+/* Zugang (Tim 19.11.): 007 = Tim/Turnierleitung, 008 = Tisch-2-Manager. Jeder Befehl trägt den Absender. */
+.login{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,rgba(3,5,11,.35),rgba(3,5,11,.92) 70%),url("pdf/bg.jpg") 50% 0/cover no-repeat,#03050b}
+.login[hidden]{display:none}
+.lgbox{width:100%;max-width:360px;padding:26px 22px 22px;border-radius:24px;text-align:center;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),rgba(10,14,26,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 .5px rgba(243,214,143,.35),0 20px 50px rgba(0,0,0,.5);animation:scrIn .4s cubic-bezier(.23,1,.32,1)}
+.lgchip{width:64px;height:64px;margin:0 auto 2px;filter:drop-shadow(0 6px 16px rgba(47,107,255,.45))}
+.lgbox h2{font-size:24px;font-weight:700;background:linear-gradient(180deg,#fff,#f3d68f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lgbox input{text-align:center;font-size:22px;letter-spacing:.3em;height:54px}
+.lgbox #lgName{letter-spacing:0;font-size:18px}
+.lgerr{color:var(--red);font-size:14px;min-height:18px}
+.who{height:28px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.who.t2{background:rgba(47,107,255,.25);color:var(--blue2)}
+.feed .cell .tx small b{color:var(--gold2);font-weight:600}
 nav.tb{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px env(safe-area-inset-bottom);height:var(--tb);background:rgba(18,18,20,.78);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border-top:.5px solid rgba(255,255,255,.1)}
 nav.tb button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#7c7c80;padding-top:2px;transition:color .2s}
 nav.tb button svg{width:26px;height:26px;transition:transform .25s var(--ease)}
@@ -210,11 +240,44 @@ nav.tb button:active svg{transform:scale(.88)}
 .toast.on{transform:translate(-50%,0)}
 .toast.ok{color:var(--green)}
 .toast.bad{color:var(--red)}
+
+/* ---------- Glas-Look (Tim 19.11., nach Emil-Kowalski-Regeln): Glas über einem festen Hintergrundverlauf statt teurem backdrop-filter auf jedem Kasten.
+   Nur transform/opacity animiert, ease-out, Druck = scale(.97), Hover nur auf Geräten mit Maus. ---------- */
+:root{--ease:cubic-bezier(.23,1,.32,1);
+  --gl:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+  --gl2:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04));
+  --glb:inset 0 1px 0 rgba(255,255,255,.09),inset 0 0 0 .5px rgba(255,255,255,.07),0 8px 24px rgba(0,0,0,.35)}
+html,body{background:#03050b}
+body{background:radial-gradient(120% 60% at 50% -10%,rgba(47,107,255,.20),transparent 60%),radial-gradient(90% 50% at 100% 100%,rgba(226,184,87,.10),transparent 60%),#03050b;background-attachment:fixed}
+.grp,.tblc,.tile,.game,.pc,.stats div,.pays div{background:var(--gl);box-shadow:var(--glb)}
+.ctl button,.ctl2 button,.btn,.chip.mo,.c-grey{background:var(--gl2);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 .5px rgba(255,255,255,.08)}
+.btn.pri{background:linear-gradient(180deg,#f7e2a6,#e2b857 55%,#b98d34);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 20px rgba(226,184,87,.28)}
+.btn.red{background:linear-gradient(180deg,rgba(255,107,94,.2),rgba(255,107,94,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.btn.blue{background:linear-gradient(180deg,rgba(47,107,255,.26),rgba(47,107,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.cell:active,.pr:active{background:rgba(255,255,255,.06)}
+input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)}
+.sh{background:linear-gradient(180deg,rgba(38,42,54,.97),rgba(20,22,30,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 -10px 40px rgba(0,0,0,.5)}
+.sh .grp{background:rgba(255,255,255,.05)}
+.press{transition:transform .16s var(--ease),opacity .16s var(--ease)}
+.press:active,.ctl button:active,.ctl2 button:active,.btn:active{transform:scale(.97)}
+@media (hover:hover){.press:hover,.btn:hover{filter:brightness(1.12)}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
 </style>
 </head>
 <body>
+<div class="login" id="login" hidden>
+  <div class="lgbox">
+    <img src="pdf/chip.png" alt="" class="lgchip">
+    <h2>Blue Chip Tafel</h2>
+    <p class="sp" id="lgP">Code eingeben</p>
+    <input id="lgCode" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Code">
+    <input id="lgName" placeholder="Dein Vorname" maxlength="20" hidden>
+    <button class="btn pri press" id="lgOk">Weiter</button>
+    <p class="lgerr" id="lgErr"></p>
+  </div>
+</div>
 <header class="hdr" id="hdr">
-  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
+  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><button class="who press" id="who"></button><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
   <div class="archb" id="archb" hidden><span id="archT"></span><button class="press" id="archX">Zum Live-Turnier</button></div>
 </header>
 
@@ -286,6 +349,8 @@ nav.tb button:active svg{transform:scale(.88)}
   <div class="row2"><input id="msg" placeholder="z. B. Pizza ist da!"><button class="btn pri press" id="sendMsg">Senden</button></div>
   <div class="grp" style="margin-top:10px"><button class="cell press" data-c='{"op":"clearmsg"}'><span class="tx">Laufschrift leeren</span></button></div>
 
+  <div class="sec">Verlauf · wer hat was gedrückt</div>
+  <div class="grp feed" id="feed"></div>
   <div class="sec">Kasse</div>
   <div class="grp" id="kasse"></div>
   <div class="sec">Abrechnung · wer zahlt wem</div>
@@ -318,6 +383,7 @@ nav.tb button:active svg{transform:scale(.88)}
   <div id="deck"><p class="note">Lade Clips …</p></div>
 </section>
 
+<div class="scrb" id="scrb" hidden><div class="scrt"><small id="scrE">Auf dem Bildschirm</small><b id="scrT"></b></div><div class="scrk" id="scrK"></div></div>
 <nav class="tb" id="tb">
   <button class="on" data-p="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>Übersicht</button>
   <button data-p="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="7" r="2.6"/><path d="M17.5 12.6c2.3.3 3.8 1.9 4.2 4.4"/></svg>Spieler</button>
@@ -349,9 +415,22 @@ const pending=new Map();
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms||12);}catch(e){}};
 
 function toast(t,ms,k){const e=$("toast");e.textContent=t;e.className="toast on"+(k?" "+k:"");clearTimeout(toast.t);toast.t=setTimeout(()=>e.className="toast"+(k?" "+k:""),ms||2000);}
+const CODE="007";
+let USER=(()=>{try{return JSON.parse(localStorage.getItem("bcc-app-user")||"null");}catch(e){return null;}})();
+function setWho(){const w=$("who");if(!w)return;w.hidden=!USER;if(!USER)return;w.textContent="👤 "+USER.name;}
+function showLogin(){$("login").hidden=false;$("lgCode").value="";$("lgCode").hidden=false;$("lgName").value="";$("lgName").hidden=true;$("lgErr").textContent="";$("lgP").textContent="Code eingeben";setTimeout(()=>$("lgCode").focus(),200);}
+function doLogin(){const code=$("lgCode").value.trim();if(code!==CODE){$("lgErr").textContent="Falscher Code";buzz(30);return;}
+  if($("lgName").hidden){$("lgName").hidden=false;$("lgCode").hidden=true;$("lgP").textContent="Wer bist du?";$("lgErr").textContent="";$("lgName").focus();return;}
+  const name=$("lgName").value.trim();if(!name){$("lgErr").textContent="Bitte Vornamen eingeben";return;}
+  USER={name,label:name};try{localStorage.setItem("bcc-app-user",JSON.stringify(USER));}catch(e){}
+  $("login").hidden=true;setWho();buzz(15);toast("Angemeldet: "+USER.label,1800,"ok");}
+$("lgOk").onclick=doLogin;$("lgCode").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});$("lgName").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+$("who").onclick=()=>sheet("Angemeldet als "+USER.name,"Jeder Befehl von diesem Handy zeigt deinen Namen.",[["Abmelden","red",()=>{USER=null;try{localStorage.removeItem("bcc-app-user");}catch(e){}setWho();showLogin();}]]);
+setWho();if(!USER)showLogin();
 function send(c,label){
   if(ARCH)return archOp(c,label);
-  c=Object.assign({},c,{_id:DEV+"-"+(++NC)+"-"+Date.now()});
+  if(!USER){showLogin();return;}
+  c=Object.assign({},c,{_id:DEV+"-"+(++NC)+"-"+Date.now(),_u:USER.label,_l:label||""});
   let via=0;
   if(chan&&chanOk){try{chan.send({type:"broadcast",event:"cmd",payload:{from:DEV,src:"app",c}});via++;}catch(e){}}
   fetch(RELAY+TOPIC+"-cmd",{method:"POST",body:JSON.stringify(c)}).then(r=>{if(!r.ok)throw 0;}).catch(()=>{if(!via)toast("Nicht gesendet. Netz prüfen.",3500,"bad");});
@@ -368,6 +447,17 @@ function sheet(title,text,btns,content){
   const B=$("shB");B.innerHTML="";
   (btns||[]).forEach(([t,cls,fn])=>{const b=document.createElement("button");b.className="btn press "+(cls||"");b.textContent=t;b.onclick=()=>{closeSheet();fn();};B.appendChild(b);});
   $("ov").classList.add("on");$("sh").classList.add("on");$("sh").scrollTop=0;buzz(8);}
+/* Verlauf: die letzten Befehle aus der App mit Absender (kommt von der Haupttafel) */
+function feed(){const F=$("feed");if(!F)return;const L=(S.lastLog||[]).filter(e=>e.cmd&&e.cmd._u).slice(-12).reverse();
+  const k=L.map(e=>e.t).join();if(k===feed.k)return;feed.k=k;
+  F.innerHTML=L.length?L.map(e=>'<div class="cell"><span class="tx">'+esc(e.cmd._l||e.cmd.op)+'<small><b>'+esc(e.cmd._u)+'</b> · '+new Date(e.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+'</small></span></div>').join(""):'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts gedrückt.</span></div>';}
+function scrBar(){const r=D.scr||{},b=$("scrb"),K=$("scrK");let t="",e="Auf dem Bildschirm",btns=[];
+  if(r.intro){t="Auslosung · Spielerkarten";btns=[["Überspringen","",{op:"skipintro"}],["Nächste ▶","pri",{op:"close"}]];}
+  else if(r.ann){t=r.annT||"Ansage";btns=[["✕","",{op:"close"}],[(r.annB||"Weiter")+" ▶","pri",{op:"annok"}]];}
+  else if(r.lobby){t="Bildschirmschoner";btns=[["◀","",{op:"lobbynav",d:-1}],["▶","",{op:"lobbynav",d:1}],["Aus","pri",{op:"lobbyclose"}]];}
+  const on=!!btns.length&&!ARCH;b.hidden=!on;document.body.classList.toggle("scron",on);if(!on){scrBar.k="";return;}
+  $("scrE").textContent=e;$("scrT").textContent=t;const k=JSON.stringify(btns);if(k===scrBar.k)return;scrBar.k=k;K.innerHTML="";
+  btns.forEach(([l,c,cmd])=>{const x=document.createElement("button");x.className="press "+c;x.textContent=l;x.onclick=()=>{buzz(10);send(cmd,l.replace(/ ▶$/,""));};K.appendChild(x);});}
 function closeSheet(){$("ov").classList.remove("on");$("sh").classList.remove("on");}
 $("shX").onclick=closeSheet;$("ov").onclick=closeSheet;
 /* nach unten wischen schließt */
@@ -407,7 +497,7 @@ function apply(p){
   show(p.S);}
 function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   $("archb").hidden=!ARCH;if(ARCH)$("archT").textContent="📁 "+(S.title||"Turnier")+" · "+archDate(ARCH)+" · Archiv";
-  $("ttl").textContent=S.title||"Blue Chip";
+  $("ttl").textContent=S.title||"Blue Chip";scrBar();feed();
   $("lvl").textContent=D.lvl||"";$("bl").textContent=D.blinds||"";
   $("nx").textContent="Als Nächstes "+(D.next||"–")+" · "+(D.reOpen?"Rebuy offen"+(S.reLvl!=null?" bis Level "+S.reLvl:""):"Freezeout");
   $("play").textContent=S.running?"❚❚ Pause":"▶ Start";$("play").classList.toggle("run",!!S.running);
@@ -537,7 +627,13 @@ $("mTime").onclick=()=>{const W=document.createElement("div");W.innerHTML='<div 
 $("drawBtn").onclick=()=>sheet("Plätze auslosen?",(S&&S.started?"Achtung: Das Turnier läuft schon! ":"")+"Ab 11 Spielern zwei Tische. Tim + Manu am großen Tisch, Jonny Platz 6.",[["🎲 Jetzt auslosen","pri",()=>send({op:"draw"},"Plätze auslosen")]]);
 $("tblBtn").onclick=()=>send({op:"tables"},"Tische prüfen");
 $("ftBtn").onclick=()=>sheet("Final Table jetzt?","Beide Tische werden zusammengelegt und die Plätze neu ausgelost.",[["🏆 Zusammenlegen","red",()=>send({op:"merge"},"Final Table")]]);
-$("lobbyBtn").onclick=()=>sheet("Bildschirmschoner","",[["An","",()=>send({op:"lobby"},"Bildschirmschoner an")],["Aus","",()=>send({op:"lobbyclose"},"Bildschirmschoner aus")]]);
+$("lobbyBtn").onclick=lobbySheet;
+function lobbySheet(){const W=document.createElement("div");W.className="grp lob";W.style.margin="4px 0 0";
+  const L=D.lob||[];if(!L.length){const n=document.createElement("p");n.className="sp";n.style.padding="12px";n.textContent="Die Inhalte laden noch. Gleich nochmal öffnen.";W.appendChild(n);}
+  L.forEach(g=>{const b=document.createElement("button");b.className="cell press";b.innerHTML='<span class="tx"></span><span class="sw'+(g.on?' on':'')+'"></span>';
+    b.querySelector(".tx").innerHTML=esc(g.label)+'<small>'+(g.id==="karten"?g.n+" Spieler":g.n+(g.n===1?" Bild":" Bilder"))+'</small>';
+    b.onclick=()=>{g.on=!g.on;b.querySelector(".sw").classList.toggle("on",g.on);send({op:"lobbyset",id:g.id,on:g.on},(g.on?"An: ":"Aus: ")+g.label);};W.appendChild(b);});
+  sheet("Bildschirmschoner","Was im Bildschirmschoner läuft. Neue Turnierberichte von der Website kommen automatisch dazu.",[["Jetzt starten","pri",()=>send({op:"lobby"},"Bildschirmschoner an")],["Ausschalten","",()=>send({op:"lobbyclose"},"Bildschirmschoner aus")]],W);}
 $("pendOk").onclick=()=>send({op:"pend"},"bestätigt");
 $("pendAlt").onclick=()=>{const q=S&&S.pend;if(!q||q.op!=="move")return;const from=q.to===1?2:1;
   picker("Wer wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2")+"?","",[["",orderOf(active().filter(p=>pinfo(p.name).t===from&&lc(p.name)!=="tim"))]],p=>send({op:"move",name:p.name,to:q.to},p.name+" wechselt"));};
@@ -664,9 +760,11 @@ $("trn").onclick=()=>{const a=archAll(),keys=new Set([...Object.keys(a),...Objec
   const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
   const row=(t,sub,on,fn)=>{const b=document.createElement("button");b.className="cell press";b.innerHTML='<span class="ic '+(on?'c-green':'c-grey')+'">'+(on?'●':'📁')+'</span><span class="tx"></span><span class="chev">›</span>';b.querySelector(".tx").innerHTML=esc(t)+'<small>'+esc(sub)+'</small>';b.onclick=()=>{closeSheet();fn();};W.appendChild(b);};
   row((LIVE&&LIVE.title)||"Aktuelles Turnier","Live · steuern"+(chanOk?"":" (gerade offline)"),true,()=>openLive());
-  [...keys].map(k=>[k,a[k]||REMOTE[k]]).sort((x,y)=>String(y[1].date).localeCompare(String(x[1].date))).forEach(([k,e])=>row(e.title||k,archDate(k)+" · Kasse, Abrechnung, PDF",false,()=>openArch(k)));
+  [...keys].map(k=>[k,a[k]||REMOTE[k]]).sort((x,y)=>String(y[1].date).localeCompare(String(x[1].date))).forEach(([k,e])=>e.pdf&&!e.file&&!e.S?row(e.title||k,archDate(k)+" · alte Tafel · Abrechnung als PDF",false,()=>openOldPdf(e)):row(e.title||k,archDate(k)+" · Kasse, Abrechnung, PDF",false,()=>openArch(k)));
   if(!keys.size){const n=document.createElement("p");n.className="sp";n.style.padding="12px";n.textContent="Noch keine früheren Turniere. Ab jetzt wird jedes Turnier hier automatisch gespeichert.";W.appendChild(n);}
   sheet("Turniere","",[],W);};
+/* Turniere von der alten Tafel (bis 14.11.): nur die fertige Abrechnungs-PDF zum Ansehen/Teilen */
+async function openOldPdf(e){try{const b=await (await fetch("archiv/"+e.pdf)).blob();saveBlob(new Blob([b],{type:"application/pdf"}),(e.title||"Turnier").replace(/[^a-z0-9äöüß -]/gi,"").trim().replace(/ +/g,"-")+"-"+e.date+"-Abrechnung.pdf");}catch(x){toast("PDF nicht geladen. Netz prüfen.",2500,"bad");}}
 function openLive(){ARCH=null;if(LIVE)show(LIVE);else{document.body.classList.remove("arch");$("archb").hidden=true;}page(0);}
 async function openArch(k){const e=await archGet(k);if(!e){toast("Turnier nicht gefunden",2500,"bad");return;}ARCH=k;show(e.S);page(2);setTimeout(()=>{const x=$("kasse");if(x)x.scrollIntoView({block:"start"});},80);}
 $("archX").onclick=openLive;
@@ -686,30 +784,85 @@ function saveBlob(blob,name){let f=null;try{f=new File([blob],name,{type:blob.ty
   if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>{});return;}
   const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},2000);}
 function makeExport(){if(!S)return;saveBlob(new Blob([JSON.stringify({event:S.title,date:(S.started||"").slice(0,10),exported:new Date().toISOString(),from:"app",state:S},null,1)],{type:"application/json"}),fname("json"));toast("Export erstellt",1800,"ok");}
+/* PDF-Abrechnung im Blue-Chip-Look (Tim 19.11.): Nacht-Hintergrund, Casino-Bild oben, Glas-Kästen, Gold. Bilder liegen in tafel/pdf/. */
+function imgData(u){return fetch(u).then(r=>r.blob()).then(b=>new Promise(ok=>{const f=new FileReader();f.onload=()=>ok(f.result);f.readAsDataURL(b);})).catch(()=>null);}
 async function makePdf(){if(!S)return;let J;try{J=await loadJsPDF();}catch(e){toast("PDF-Modul nicht geladen. Netz prüfen.",3000,"bad");return;}
-  const doc=new J.jsPDF({unit:"mm",format:"a4"}),W=210,M=16;let y=20;
-  const T=(t,x,yy,o)=>doc.text(String(t).replace(/→/g,"->").replace(/✓/g,"[x]").replace(/[^\x20-\x7E -ÿ]/g,""),x,yy,o);
-  const need=h=>{if(y+h>282){doc.addPage();y=20;}};
-  doc.setFont("helvetica","bold");doc.setFontSize(20);T(S.title||"Turnier",M,y);y+=7;
-  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(110);T("Blue Chip Club · "+archDate(ARCH||KEY)+" · Abrechnung, Stand "+new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),M,y);y+=9;doc.setTextColor(0);
-  const pays=D.pays||[];doc.setFontSize(12);doc.setFont("helvetica","bold");T("Preisgeld "+fmt(D.pot)+" P · "+(D.entries||0)+" Entries"+(D.fee?" · An Veranstalter "+fmt(D.fee)+" P":""),M,y);y+=6;
-  doc.setFont("helvetica","normal");doc.setFontSize(10);T(pays.map((v,k)=>(k+1)+". Platz "+fmt(v)+" P").join("   "),M,y);y+=10;
-  const head=t=>{need(14);doc.setFont("helvetica","bold");doc.setFontSize(12);T(t,M,y);y+=2;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=5;doc.setFont("helvetica","normal");doc.setFontSize(9.5);};
-  head("Spieler");const cols=[M,M+12,M+46,M+62,M+84,M+142,W-M];
-  doc.setFont("helvetica","bold");["Platz","Spieler","Entries","Eingesetzt","Bezahlt wie","Offen","Gewinn"].forEach((h,i)=>T(h,cols[i],y,i===6?{align:"right"}:undefined));doc.setFont("helvetica","normal");y+=5;
-  const PT={bar:"bar",dig:"überw.",offen:"offen"};
+  toast("PDF wird erstellt …",1500);
+  const [BG,CHIP]=await Promise.all([imgData("pdf/bg.jpg"),imgData("pdf/chip.png")]);
+  const doc=new J.jsPDF({unit:"mm",format:"a4"}),W=210,H=297,M=14;let y=0,pg=1;
+  const GOLD=[226,184,87],GOLD2=[243,214,143],FG=[244,244,242],SUB=[150,156,170],RED=[255,107,94],GREEN=[91,210,138],NIGHT=[6,10,20];
+  const A=o=>doc.setGState(new doc.GState({opacity:o}));
+  const col=(c,k)=>k==="f"?doc.setFillColor(...c):k==="d"?doc.setDrawColor(...c):doc.setTextColor(...c);
+  const T=(t,x,yy,o)=>doc.text(String(t).replace(/→/g,"->").replace(/✓/g,"").replace(/€/g,"P").replace(/•/g,"·").replace(/[^\x20-\x7E\xA0-\xFF]/g,""),x,yy,o);
+  const F=(st,sz,c)=>{doc.setFont("helvetica",st);doc.setFontSize(sz);col(c||FG,"t");};
+  const bgPage=()=>{col(NIGHT,"f");doc.rect(0,0,W,H,"F");
+    /* leichter blauer Schein oben, goldener unten (wie die Website) */
+    for(let i=0;i<10;i++){A(.035);col([47,107,255],"f");doc.ellipse(W/2,-10,140-i*12,70-i*6,"F");}
+    for(let i=0;i<8;i++){A(.03);col(GOLD,"f");doc.ellipse(W+10,H+10,110-i*12,80-i*9,"F");}A(1);};
+  const footer=()=>{A(.5);col(GOLD,"d");doc.setLineWidth(.2);doc.line(M,H-12,W-M,H-12);A(1);
+    F("normal",7.5,SUB);T("BLUE CHIP CLUB  ·  THE VOID  ·  "+(S.title||"Turnier")+"  ·  "+archDate(ARCH||KEY),M,H-7.5,{charSpace:.4});T("Seite "+pg,W-M,H-7.5,{align:"right"});};
+  const newPage=()=>{footer();doc.addPage();pg++;bgPage();y=16;};
+  const need=h=>{if(y+h>H-18)newPage();};
+  const glass=(x,yy,w,h,gold)=>{A(.07);col([255,255,255],"f");doc.roundedRect(x,yy,w,h,4,4,"F");A(.06);doc.roundedRect(x,yy,w,h*.45,4,4,"F");
+    A(gold?.55:.14);col(gold?GOLD:[255,255,255],"d");doc.setLineWidth(.25);doc.roundedRect(x,yy,w,h,4,4,"S");A(1);};
+  const label=(t,x,yy,c)=>{F("bold",7.5,c||GOLD);T(t.toUpperCase(),x,yy,{charSpace:.9});};
+  /* Karte: Titel + Inhalt; rows = Höhe des Inhalts */
+  const card=(title,h,fn)=>{need(h+13);glass(M,y,W-2*M,h+11);label(title,M+6,y+7.5);const y0=y+14;fn(y0);y+=h+15;};
+  bgPage();
+  /* ---- Kopf mit Casino-Bild ---- */
+  if(BG){doc.addImage(BG,"JPEG",0,-18,W,W*669/1200,undefined,"FAST");}
+  for(let i=0;i<14;i++){A(.07+i*.02);col(NIGHT,"f");doc.rect(0,40+i*3.2,W,3.3,"F");}A(.35);col(NIGHT,"f");doc.rect(0,0,W,86,"F");A(1);col(NIGHT,"f");doc.rect(0,84,W,18,"F");
+  if(CHIP)doc.addImage(CHIP,"PNG",M,16,20,20);
+  label("Blue Chip Club  ·  Abrechnung",M+25,22,GOLD2);
+  F("bold",26,FG);T(S.title||"Turnier",M+25,33);
+  F("normal",9.5,SUB);T(archDate(ARCH||KEY)+"  ·  The Void  ·  Stand "+new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),M+25,40);
+  /* ---- Preisgeld groß + Podium ---- */
+  y=52;const pays=D.pays||[],k=D.kasse||{},tx=D.tx||[];
   const rows=S.players.map(p=>({p,i:pinfo(p.name)})).sort((a,b)=>(a.i.place||99)-(b.i.place||99));
-  rows.forEach(({p,i})=>{need(6);const how=p.entries.map(e=>PT[e.paid]+(e.to?" an "+e.to:"")).join(", ");const win=i.place&&i.place<=pays.length?pays[i.place-1]:0;
-    T(i.place?i.place+".":"-",cols[0],y);T(p.name,cols[1],y);T(String(p.entries.length),cols[2],y);T(fmt(i.cost)+" P",cols[3],y);
-    T(doc.splitTextToSize(how,56)[0],cols[4],y);if(i.open)doc.setTextColor(200,60,50);T(i.open?fmt(i.open)+" P":"-",cols[5],y);doc.setTextColor(0);T(win?fmt(win)+" P":"-",cols[6],y,{align:"right"});y+=5.4;});
-  y+=4;const k=D.kasse||{};head("Kasse");
-  [["Bargeld (Soll bei "+(S.bank||"Tim")+")",fmt(k.bar)+" P"],k.count?["Gezählt ("+new Date(k.count.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+")",fmt(k.count.amount)+" P"+(k.count.amount!==k.bar?"  (Differenz "+(k.count.amount-k.bar)+" P)":"  stimmt")]:null,k.digBank?["Überwiesen an "+(S.bank||"Tim"),fmt(k.digBank)+" P"]:null].concat((k.other||[]).map(o=>["Überwiesen direkt an "+o.to,fmt(o.v)+" P"])).concat([["Offen",fmt(k.open)+" P"]]).filter(Boolean)
-    .forEach(([a,b])=>{need(6);T(a,M,y);T(b,W-M,y,{align:"right"});y+=5.4;});
-  y+=4;head("Zahlungen (wer zahlt wem)");const tx=D.tx||[];
-  if(!tx.length){T("Keine Zahlungen.",M,y);y+=6;}
-  tx.forEach(t=>{need(6);T((t.done?"[x] ":"[  ] ")+t.from+"  ->  "+t.to,M,y);T(fmt(t.amount)+" P",W-M,y,{align:"right"});y+=5.6;});
-  if((S.notes||[]).length){y+=4;head("Notizen");S.notes.forEach(n=>{doc.splitTextToSize(n.text,W-2*M-4).forEach((l,i)=>{need(6);T((i?"  ":"- ")+l,M,y);y+=5;});});}
-  const open=tx.filter(t=>!t.done);y+=4;need(8);doc.setFont("helvetica","bold");T(open.length?open.length+" Zahlung(en) noch offen":"Alles bezahlt",M,y);
+  const who=pl=>{const r=rows.find(r=>r.i.place===pl);return r?r.p.name:"";};
+  glass(M,y,W-2*M,40,true);label("Preisgeld",M+7,y+9);
+  F("bold",34,GOLD2);T(fmt(D.pot||0),M+7,y+25);const pw=doc.getTextWidth(fmt(D.pot||0));F("bold",14,GOLD);T("P",M+9+pw,y+25);
+  F("normal",8.5,SUB);T((D.entries||0)+" Entries  ·  "+S.players.length+" Spieler"+(D.fee?"  ·  "+fmt(D.fee)+" P an den Veranstalter":""),M+7,y+33);
+  const MED=[[GOLD2,GOLD],[[226,228,235],[160,165,178]],[[232,178,128],[176,112,62]]];
+  const top=pays.slice(0,4),bw=26,gx=W-M-6-top.length*(bw+3)+3;
+  top.forEach((v,j)=>{const x=gx+j*(bw+3),c=MED[j]||[[255,255,255],[150,150,150]];
+    A(j<3?.16:.07);col(c[1],"f");doc.roundedRect(x,y+6,bw,28,3,3,"F");A(.7);col(c[0],"d");doc.setLineWidth(.3);doc.roundedRect(x,y+6,bw,28,3,3,"S");A(1);
+    F("bold",8,c[0]);T((j+1)+". PLATZ",x+bw/2,y+12,{align:"center",charSpace:.4});
+    F("bold",13,FG);T(fmt(v)+" P",x+bw/2,y+21,{align:"center"});
+    const n=who(j+1);F("normal",7.5,SUB);T(n?doc.splitTextToSize(n,bw-3)[0]:"–",x+bw/2,y+29,{align:"center"});});
+  if(pays.length>4){F("normal",7,SUB);T("+ "+pays.slice(4).map((v,j)=>(j+5)+". "+fmt(v)+" P").join("  "),W-M-6,y+38,{align:"right"});}
+  y+=47;
+  /* ---- Spieler ---- */
+  const PT={bar:"bar",dig:"überwiesen",offen:"offen"},rh=rows.length>14?5.4:5.9;
+  card("Spieler · Plätze · Einsätze",rows.length*rh+7,y0=>{const cx=[M+6,M+18,M+60,M+76,M+100,M+150,W-M-6];
+    F("bold",7,SUB);["PLATZ","SPIELER","ENTRIES","EINSATZ","BEZAHLT","OFFEN","GEWINN"].forEach((h,i)=>T(h,cx[i],y0,i===6?{align:"right",charSpace:.5}:{charSpace:.5}));
+    rows.forEach(({p,i},r)=>{const yy=y0+6+r*rh;if(r%2===0){A(.035);col([255,255,255],"f");doc.rect(M+3,yy-4.2,W-2*M-6,rh,"F");A(1);}
+      const win=i.place&&i.place<=pays.length?pays[i.place-1]:0,how=p.entries.map(e=>PT[e.paid]||e.paid).join(", ");
+      F("bold",9,i.place&&i.place<=3?(MED[i.place-1]||[FG])[0]:SUB);T(i.place?i.place+".":"–",cx[0],yy);
+      F(win?"bold":"normal",9.5,FG);T(p.name,cx[1],yy);F("normal",9,FG);T(String(p.entries.length),cx[2],yy);T(fmt(i.cost)+" P",cx[3],yy);
+      F("normal",8,SUB);T(doc.splitTextToSize(how,46)[0],cx[4],yy);
+      if(i.open){F("bold",9,RED);T(fmt(i.open)+" P",cx[5],yy);}else{F("normal",9,SUB);T("–",cx[5],yy);}
+      if(win){F("bold",9.5,GOLD2);T(fmt(win)+" P",cx[6],yy,{align:"right"});}else{F("normal",9,SUB);T("–",cx[6],yy,{align:"right"});}});});
+  /* ---- Kasse ---- */
+  const kl=[["Bargeld (Soll bei "+(S.bank||"Tim")+")",fmt(k.bar||0)+" P",FG]];
+  if(k.count)kl.push(["Gezählt "+new Date(k.count.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),fmt(k.count.amount)+" P"+(k.count.amount!==k.bar?"  (Differenz "+(k.count.amount-k.bar>0?"+":"")+(k.count.amount-k.bar)+" P)":"  · stimmt"),k.count.amount!==k.bar?RED:GREEN]);
+  if(k.digBank)kl.push(["Überwiesen an "+(S.bank||"Tim"),fmt(k.digBank)+" P",FG]);
+  (k.other||[]).forEach(o=>kl.push(["Überwiesen direkt an "+o.to,fmt(o.v)+" P",FG]));
+  kl.push(["Noch offen",fmt(k.open||0)+" P",k.open?RED:GREEN]);
+  card("Kasse",kl.length*6.4,y0=>kl.forEach(([a,b,c],r)=>{const yy=y0+r*6.4;F("normal",9.5,SUB);T(a,M+6,yy);F("bold",10,c);T(b,W-M-6,yy,{align:"right"});}));
+  /* ---- Zahlungen ---- */
+  card("Abrechnung · Wer zahlt wem",Math.max(1,tx.length)*7+2,y0=>{if(!tx.length){F("normal",9.5,SUB);T("Keine Zahlungen nötig.",M+6,y0);return;}
+    tx.forEach((t,r)=>{const yy=y0+r*7;A(t.done?.9:.5);col(t.done?GREEN:SUB,"d");doc.setLineWidth(.35);doc.roundedRect(M+6,yy-3.4,4.2,4.2,1,1,"S");
+      if(t.done){col(GREEN,"f");doc.roundedRect(M+6,yy-3.4,4.2,4.2,1,1,"F");A(1);col(NIGHT,"d");doc.setLineWidth(.6);doc.lines([[1,1.2],[1.9,-2.4]],M+6.9,yy-1.3);}A(1);
+      F("bold",10,FG);T(t.from,M+14,yy);const w1=doc.getTextWidth(t.from);F("normal",9,GOLD);T("  an  ",M+14+w1,yy);const w2=doc.getTextWidth("  an  ");F("bold",10,FG);T(t.to,M+14+w1+w2,yy);
+      F("bold",10,t.done?SUB:GOLD2);T(fmt(t.amount)+" P",W-M-6,yy,{align:"right"});if(t.done){F("normal",7,GREEN);T("bezahlt",W-M-26,yy,{align:"right"});}});});
+  /* ---- Notizen ---- */
+  const nl=[];doc.setFontSize(9.5);(S.notes||[]).forEach(n=>doc.splitTextToSize(n.text,W-2*M-16).forEach((l,i)=>nl.push((i?"   ":"•  ")+l)));
+  if(nl.length)card("Notizen",nl.length*5.4,y0=>nl.forEach((l,r)=>{F("normal",9.5,FG);T(l,M+6,y0+r*5.4);}));
+  /* ---- Schluss ---- */
+  const open=tx.filter(t=>!t.done);need(12);glass(M,y,W-2*M,10,!open.length);F("bold",10.5,open.length?RED:GREEN);
+  T(open.length?open.length+(open.length===1?" Zahlung":" Zahlungen")+" noch offen":"Alles bezahlt · Abend abgeschlossen",W/2,y+6.6,{align:"center"});y+=14;
+  footer();
   saveBlob(doc.output("blob"),fname("pdf"));toast("PDF erstellt",1800,"ok");}
 
 /* ---------- Verbindung ---------- */
@@ -721,7 +874,7 @@ async function connect(){
     chan=sbc.channel(SYNC_CH,{config:{broadcast:{self:false},presence:{key:DEV}}});
     chan.on("broadcast",{event:"state"},({payload})=>apply(payload))
       .on("broadcast",{event:"ack"},({payload})=>{const l=pending.get(payload.id);if(l!=null){pending.delete(payload.id);toast("✓ "+l,1800,"ok");}})
-      .on("broadcast",{event:"fx"},({payload})=>{if(payload.k==="toast")toast("📺 "+payload.t,3500);})
+      .on("broadcast",{event:"fx"},({payload})=>{if(payload.k==="toast")toast("📺 "+payload.t,3500);else if(payload.k==="done"&&payload.dev!==DEV&&payload.u&&payload.l)toast("👤 "+payload.u+": "+payload.l,3500);})
       .on("broadcast",{event:"ping"},({payload})=>{if(payload.role==="haupt"){lastAt=Date.now();if(!S)hello();}})
       .subscribe(st=>{chanOk=st==="SUBSCRIBED";if(chanOk){try{chan.track({kind:"app",at:Date.now()});}catch(e){}hello();}
         if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){chanOk=false;clearTimeout(connect.t);connect.t=setTimeout(connect,4000);}tick();});
