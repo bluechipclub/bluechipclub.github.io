@@ -38,6 +38,11 @@ textarea{font-family:ui-monospace,"SF Mono",monospace;font-size:13px;min-height:
 .conn b{width:8px;height:8px;border-radius:50%;background:var(--red)}
 .conn.on b{background:var(--green);box-shadow:0 0 8px rgba(52,199,89,.7)}
 .mclk{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;color:var(--gold2);opacity:0;transition:opacity .2s}
+.archb{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 12px;border-radius:12px;background:rgba(47,107,255,.16);color:var(--blue2);font-size:13px;font-weight:600}
+.archb[hidden]{display:none}
+.archb span{flex:1}
+.archb button{background:var(--blue);color:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+body.arch .live-only{opacity:.35;pointer-events:none}
 .hdr.sc .mclk{opacity:1}
 h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 .page{display:none;padding:0 0 calc(var(--tb) + 24px)}
@@ -209,7 +214,8 @@ nav.tb button:active svg{transform:scale(.88)}
 </head>
 <body>
 <header class="hdr" id="hdr">
-  <div class="hrow"><div class="brand"><i></i><span id="ttl">Blue Chip</span></div><span class="mclk" id="mclk">–</span><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
+  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
+  <div class="archb" id="archb" hidden><span id="archT"></span><button class="press" id="archX">Zum Live-Turnier</button></div>
 </header>
 
 <!-- =============== 1 ÜBERSICHT =============== -->
@@ -220,8 +226,8 @@ nav.tb button:active svg{transform:scale(.88)}
     <div class="ck p" id="clk">--:--</div>
     <div class="bl" id="bl">–</div>
     <div class="nx" id="nx"></div>
-    <div class="ctl"><button class="press" data-c='{"op":"prev"}'>‹ Level</button><button class="play press" id="play">▶ Start</button><button class="press" data-c='{"op":"next"}'>Level ›</button></div>
-    <div class="ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
+    <div class="live-only ctl"><button class="press" data-c='{"op":"prev"}'>‹ Level</button><button class="play press" id="play">▶ Start</button><button class="press" data-c='{"op":"next"}'>Level ›</button></div>
+    <div class="live-only ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
   </div>
   <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button></div></div>
   <div class="stats"><div><b id="sPot">–</b><span>Preisgeld P</span></div><div><b id="sPl">–</b><span>Spieler</span></div><div><b id="sEn">–</b><span>Entries</span></div></div>
@@ -243,12 +249,13 @@ nav.tb button:active svg{transform:scale(.88)}
 <!-- =============== 3 MANAGEMENT =============== -->
 <section class="page" id="p2">
   <h1 class="lt">Management</h1>
-  <div class="tiles">
+  <div class="live-only tiles">
     <button class="tile press" id="qRebuy"><span class="ti c-gold">↻</span><span><b>Rebuy</b><br><small>Name → Bar / überwiesen</small></span></button>
     <button class="tile press" id="qOut"><span class="ti c-red">✕</span><span><b>Raus</b><br><small>Spieler ausgeschieden</small></span></button>
     <button class="tile press" id="qAdd"><span class="ti c-green">＋</span><span><b>Nachmelden</b><br><small>Neuer Spieler</small></span></button>
     <button class="tile press" id="qPaid"><span class="ti c-blue">P</span><span><b>Bezahlt</b><br><small>Offene Beträge</small></span></button>
     <button class="tile press" id="qDealer"><span class="ti c-grey">D</span><span><b>Dealer</b><br><small id="qDealerS">weiter</small></span></button>
+    <button class="tile press" id="qNote"><span class="ti c-gold">✎</span><span><b>Notizen</b><br><small id="qNoteS">z. B. Kevin 5 P zu viel</small></span></button>
     <button class="tile press" id="qMove"><span class="ti c-purple">⇄</span><span><b>Umsetzen</b><br><small>Tisch wechseln</small></span></button>
   </div>
 
@@ -299,7 +306,7 @@ nav.tb button:active svg{transform:scale(.88)}
 <!-- =============== 4 MINIGAMES =============== -->
 <section class="page" id="p3">
   <h1 class="lt">Minigames</h1>
-  <div class="games" id="games"></div>
+  <div class="live-only games" id="games"></div>
   <div class="grp" style="margin-top:14px"><button class="cell press" data-c='{"op":"endgame"}'><span class="ic c-green">✓</span><span class="tx">Minigame vorbei</span></button></div>
 </section>
 
@@ -337,12 +344,13 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const fmt=n=>Math.round(n||0).toLocaleString("de-DE");
 const lc=x=>String(x||"").toLowerCase().trim();
 const DEV="app-"+Math.random().toString(36).slice(2,8);let NC=0;
-let S=null,D={},OFF=0,lastAt=0,chan=null,chanOk=false,sbc=null;
+let ARCH=null,LIVE=null,S=null,D={},OFF=0,lastAt=0,chan=null,chanOk=false,sbc=null;
 const pending=new Map();
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms||12);}catch(e){}};
 
 function toast(t,ms,k){const e=$("toast");e.textContent=t;e.className="toast on"+(k?" "+k:"");clearTimeout(toast.t);toast.t=setTimeout(()=>e.className="toast"+(k?" "+k:""),ms||2000);}
 function send(c,label){
+  if(ARCH)return archOp(c,label);
   c=Object.assign({},c,{_id:DEV+"-"+(++NC)+"-"+Date.now()});
   let via=0;
   if(chan&&chanOk){try{chan.send({type:"broadcast",event:"cmd",payload:{from:DEV,src:"app",c}});via++;}catch(e){}}
@@ -393,8 +401,12 @@ const pl=n=>S&&S.players.find(p=>p.name===n);
 const active=()=>S?S.players.filter(p=>!p.out):[];
 const orderOf=list=>{const o=D.order||[];return list.slice().sort((a,b)=>{const i=o.indexOf(a.name),j=o.indexOf(b.name);return (i<0?99:i)-(j<0?99:j);});};
 function apply(p){
-  if(!p||!p.S)return;S=p.S;D=S.D||{};lastAt=Date.now();
+  if(!p||!p.S)return;lastAt=Date.now();
   const off=p.now-Date.now();OFF=Math.abs(off-OFF)>1500?off:OFF*.8+off*.2;
+  LIVE=p.S;archSave(KEY,p.S);if(ARCH)return;
+  show(p.S);}
+function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
+  $("archb").hidden=!ARCH;if(ARCH)$("archT").textContent="📁 "+(S.title||"Turnier")+" · "+archDate(ARCH)+" · Archiv";
   $("ttl").textContent=S.title||"Blue Chip";
   $("lvl").textContent=D.lvl||"";$("bl").textContent=D.blinds||"";
   $("nx").textContent="Als Nächstes "+(D.next||"–")+" · "+(D.reOpen?"Rebuy offen"+(S.reLvl!=null?" bis Level "+S.reLvl:""):"Freezeout");
@@ -406,6 +418,7 @@ function apply(p){
   if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
     $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
   const two=!!D.two;$("tblBtn").hidden=!two;$("ftBtn").hidden=!two;$("qMove").style.display=two?"":"none";
+  $("qNoteS").textContent=(S.notes||[]).length?(S.notes.length+" Notiz"+(S.notes.length>1?"en":"")):"z. B. Kevin 5 P zu viel";
   $("qDealerS").textContent=two?"D: "+(D.d1||"–")+" · "+(D.d2||"–"):"D: "+(D.d1||"–");
   $("mLevelS").textContent=(D.lvl||"")+" · "+(D.blinds||"");
   renderMini();renderTables();renderGames();renderKasse();renderDeck();tick();
@@ -470,7 +483,9 @@ function picker(title,text,sections,onPick){
       b.onclick=()=>{closeSheet();setTimeout(()=>onPick(p),220);};W.appendChild(b);});});
   if(!W.children.length)W.innerHTML='<p class="sp" style="grid-column:1/-1">Niemand passend.</p>';
   sheet(title,text,[],W);}
-function payButtons(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["Überwiesen …","blue",()=>setTimeout(()=>toWhom(fn),250)],["Offen (zahlt später)","red",()=>fn("offen")]];}
+/* Tim 19.11.: beim Buchen nur Bar oder Offen. Offen = überweist später, steht rot in Kasse und Tafel. */
+function payButtons(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["Offen (überweist später)","red",()=>fn("offen")]];}
+function payButtonsLater(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["✓ Überwiesen (bezahlt)","blue",()=>fn("dig")],["Offen","red",()=>fn("offen")]];}
 /* Überwiesen: an die Kasse oder direkt an einen Spieler (z. B. PayPal an Niki) */
 function toWhom(fn){const bank=(S&&S.bank)||"Tim";const others=S?S.players.filter(p=>lc(p.name)!==lc(bank)):[];
   const W=document.createElement("div");W.className="pick";
@@ -487,7 +502,7 @@ function rebuyFlow(p){const i=pinfo(p.name),re=p.entries.length-1,warn=[];
 function outFlow(p){
   if(S.bounty){picker("Wer hat "+p.name+" rausgeworfen?","",[["",active().filter(x=>x.name!==p.name)]],x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"));return;}
   sheet(p.name+" ist raus?",D.reOpen&&pinfo(p.name).canRe?"Danach kann "+p.name+" noch einen Rebuy machen.":"",[["Ja, "+p.name+" ist raus","red",()=>send({op:"out",name:p.name},p.name+" raus")]]);}
-function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAYL(e.paid,e.to),e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtons((v,to)=>send({op:"paid",name:p.name,entry:j+1,paid:v,to},p.name+": "+PAYL(v,to))))]);
+function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAYL(e.paid,e.to),e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtonsLater((v,to)=>send({op:"paid",name:p.name,entry:j+1,paid:v,to},p.name+": "+PAYL(v,to))))]);
   sheet(p.name+" · Bezahlung","Antippen zum Ändern",b);}
 /* Name-Eingabe im App-Design (keine Browser-Popups, Tim 19.11.) */
 function nameSheet(title,text,val,okLabel,fn){const W=document.createElement("div");W.innerHTML='<input id="nsIn" autocomplete="off" autocapitalize="words" style="margin-top:16px;text-align:center;font-size:19px;height:52px" placeholder="Name"><button class="btn pri press" id="nsOk" style="margin-top:10px;height:54px;font-size:17px"></button>';
@@ -536,25 +551,45 @@ $("play").onclick=()=>{const run=S&&S.running;send({op:run?"pause":"play"},run?"
 function renderKasse(){if(!S)return;renderKasse2();renderAbr();}
 function renderKasse2(){const k=D.kasse;if(!k){renderKasseOld();return;}const bank=S.bank||"Tim";
   const row=(t,v,col,sub)=>'<div class="cell"><span class="tx">'+t+(sub?'<small>'+sub+'</small>':'')+'</span><span class="val"'+(col?' style="color:'+col+'"':'')+'>'+v+'</span></div>';
-  let h=row("💵 Bargeld in der Kasse",fmt(k.bar)+" P","var(--gold2)","So viel muss bar bei "+esc(bank)+" liegen");
+  const pp=S.buyin-S.fee;
+  let h='<button class="cell press" id="kPrice"><span class="ic c-gold">P</span><span class="tx">Entry '+fmt(S.buyin)+' P · Rebuy '+fmt(S.rebuy)+' P<small>'+fmt(pp)+' P in den Pot + Veranstalter · '+esc(bank)+' zahlt '+fmt(pp)+' P · antippen zum Ändern</small></span><span class="chev">›</span></button>';
+  h+=row("💵 Bargeld in der Kasse",fmt(k.bar)+" P","var(--gold2)","So viel muss bar bei "+esc(bank)+" liegen");
   if(k.count){const d=k.count.amount-k.bar;h+=row("Gezählt",fmt(k.count.amount)+" P",d===0?"var(--green)":"var(--red)",d===0?"Stimmt genau ✓":(d<0?"Es fehlen "+fmt(-d)+" P":fmt(d)+" P zu viel"));}
-  h+=row("Überwiesen an "+esc(bank),fmt(k.digBank)+" P");
+  if(k.digBank)h+=row("Überwiesen an "+esc(bank),fmt(k.digBank)+" P");
   k.other.forEach(o=>h+=row("Überwiesen direkt an "+esc(o.to),fmt(o.v)+" P","var(--blue2)","wird in der Abrechnung verrechnet"));
   h+=row("Offen",k.open?fmt(k.open)+" P":"nichts ✓",k.open?"var(--red)":"var(--green)");
   const open=S.players.filter(p=>pinfo(p.name).open);
   open.forEach(p=>h+='<button class="cell press" data-n="'+esc(p.name)+'"><span class="tx">'+esc(p.name)+'</span><span class="val" style="color:var(--red)">'+pinfo(p.name).open+' P offen</span><span class="chev">›</span></button>');
   h+='<button class="cell press" id="kCnt"><span class="ic c-gold">#</span><span class="tx">Kasse gezählt<small>Echte Summe eintippen, App vergleicht</small></span><span class="chev">›</span></button>';
-  $("kasse").innerHTML=h;$("kasse").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const p=pl(b.dataset.n);if(p)paidFlow(p);});
+  (S.notes||[]).forEach(n=>h+='<div class="cell"><span class="ic c-gold">✎</span><span class="tx" style="font-size:15px">'+esc(n.text)+'<small>'+new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+'</small></span></div>');
+  $("kasse").innerHTML=h;$("kasse").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const p=pl(b.dataset.n);if(p)paidFlow(p);});$("kPrice").onclick=priceSheet;
   $("kCnt").onclick=()=>{const W=document.createElement("div");W.innerHTML='<input id="kIn" type="number" inputmode="numeric" style="margin-top:16px;text-align:center;font-size:24px;height:56px" placeholder="P"><button class="btn pri press" id="kOk" style="margin-top:10px;height:54px;font-size:17px">Vergleichen</button>';
     sheet("Kasse gezählt","Soll: "+fmt(k.bar)+" P Bargeld",[],W);const I=W.querySelector("#kIn");setTimeout(()=>I.focus(),350);
     W.querySelector("#kOk").onclick=()=>{if(I.value==="")return;closeSheet();send({op:"kcount",amount:+I.value},"Kasse gezählt: "+fmt(+I.value)+" P");};};}
+/* Beträge live ändern: Pot pro Entry + Veranstalter-Anteil. Pot rechnet sofort neu. */
+function priceSheet(){if(!S)return;const pp=S.buyin-S.fee,W=document.createElement("div");
+  W.innerHTML='<div class="fg" style="padding:14px 0 0"><label class="full">In den Pot pro Entry (P)<input id="pPot" type="number" inputmode="numeric" value="'+pp+'"></label><label>Veranstalter Buy-in<input id="pFee" type="number" inputmode="numeric" value="'+S.fee+'"></label><label>Veranstalter Rebuy<input id="pFeeRe" type="number" inputmode="numeric" value="'+(S.feeRe||0)+'"></label></div><p class="note" id="pPrev" style="padding:4px 2px 0"></p><button class="btn pri press" id="pOk" style="margin-top:12px;height:54px;font-size:17px">Übernehmen</button>';
+  sheet("Beträge","Gilt für alle Entries des Abends, der Pot rechnet sofort neu.",[],W);
+  const g=id=>Math.max(0,+W.querySelector("#"+id).value||0),prev=()=>{const a=g("pPot"),f=g("pFee"),r=g("pFeeRe");W.querySelector("#pPrev").textContent="Buy-in "+(a+f)+" P · Rebuy "+(a+r)+" P · "+(S.bank||"Tim")+" zahlt nur "+a+" P · Pot dann "+fmt(a*(D.entries||0))+" P";};
+  W.querySelectorAll("input").forEach(i=>i.oninput=prev);prev();
+  W.querySelector("#pOk").onclick=()=>{const a=g("pPot"),f=g("pFee"),r=g("pFeeRe");closeSheet();send({op:"settings",v:{buyin:a+f,fee:f,rebuy:a+r,feeRe:r}},"Beträge: "+a+" P pro Entry");};}
+function noteSheet(){const W=document.createElement("div");
+  W.innerHTML='<textarea id="nTx" style="margin-top:14px;min-height:90px;font-family:var(--sans);font-size:17px" placeholder="z. B. Kevin hat 5 P zu viel in die Kasse gelegt"></textarea><button class="btn pri press" id="nOk" style="margin-top:10px;height:54px;font-size:17px">Notiz speichern</button><div class="grp" id="nList" style="margin:14px 0 0"></div>';
+  sheet("Notizen","Kommen mit in Abrechnung, PDF und Export.",[],W);
+  const L=W.querySelector("#nList");((S&&S.notes)||[]).slice().reverse().forEach(n=>{const r=document.createElement("div");r.className="cell";r.innerHTML='<span class="tx" style="font-size:15px"></span><button class="press" style="color:var(--red);font-size:20px;padding:4px 8px">✕</button>';r.querySelector(".tx").textContent=n.text;
+    r.querySelector("button").onclick=()=>{closeSheet();setTimeout(()=>sheet("Notiz löschen?",n.text,[["Löschen","red",()=>send({op:"notedel",at:n.at},"Notiz gelöscht")]]),250);};L.appendChild(r);});
+  if(!L.children.length)L.remove();
+  W.querySelector("#nOk").onclick=()=>{const t=W.querySelector("#nTx").value.trim();if(!t)return;closeSheet();send({op:"note",text:t},"Notiz gespeichert");};}
+$("qNote").onclick=noteSheet;
+
 function renderAbr(){const A=$("abr"),tx=D.tx||[];
   let h=tx.length?"":'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts zu verteilen</span></div>';
   tx.forEach((t,i)=>h+='<button class="cell press" data-i="'+i+'"><span class="ic '+(t.done?'c-green':'c-grey')+'">'+(t.done?'✓':'○')+'</span><span class="tx" style="'+(t.done?'opacity:.5;text-decoration:line-through':'')+'">'+esc(t.from)+' → '+esc(t.to)+'</span><span class="val" style="color:'+(t.done?'var(--sub)':'var(--gold2)')+'">'+fmt(t.amount)+' P</span></button>');
-  h+='<button class="cell press" id="abrCopy"><span class="ic c-green">⧉</span><span class="tx">WhatsApp-Text kopieren</span></button><button class="cell press" data-c2="result"><span class="ic c-gold">📺</span><span class="tx">Abrechnung auf dem Bildschirm</span></button><button class="cell press" data-c2="export"><span class="ic c-grey">⬇</span><span class="tx">PDF + Export an der Haupttafel</span></button>';
+  h+='<button class="cell press" id="abrCopy"><span class="ic c-green">⧉</span><span class="tx">WhatsApp-Text kopieren</span></button><button class="cell press" data-c2="result"><span class="ic c-gold">📺</span><span class="tx">Abrechnung auf dem Bildschirm</span></button><button class="cell press" id="pdfBtn"><span class="ic c-red">PDF</span><span class="tx">PDF-Abrechnung am Handy<small>Zum Teilen oder Speichern</small></span></button><button class="cell press" id="expBtn"><span class="ic c-grey">⬇</span><span class="tx">Export-Datei am Handy</span></button><button class="cell press live-only" data-c2="export"><span class="ic c-grey">⬇</span><span class="tx">PDF + Export an der Haupttafel</span></button>';
   A.innerHTML=h;
   A.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const t=tx[+b.dataset.i];send({op:"txd",k:t.k,v:!t.done},(t.done?"Wieder offen: ":"Erledigt: ")+t.from+" → "+t.to);});
-  A.querySelectorAll("[data-c2]").forEach(b=>b.onclick=()=>send({op:b.dataset.c2},b.dataset.c2==="result"?"Abrechnung zeigen":"Export"));
+  A.querySelectorAll("[data-c2]").forEach(b=>b.onclick=()=>ARCH?toast("Altes Turnier: dafür PDF/Export am Handy nutzen",2600):send({op:b.dataset.c2},b.dataset.c2==="result"?"Abrechnung zeigen":"Export"));
+  $("pdfBtn").onclick=makePdf;$("expBtn").onclick=makeExport;
   $("abrCopy").onclick=async()=>{const t="```\n"+(D.sum||"")+"\n```";try{await navigator.clipboard.writeText(t);toast("✓ Text kopiert",1800,"ok");}catch(e){const W=document.createElement("div");W.innerHTML='<textarea style="margin-top:14px;min-height:260px" readonly></textarea>';W.querySelector("textarea").value=t;sheet("WhatsApp-Text","Lange drücken → Alles auswählen → Kopieren",[],W);}};}
 function renderKasseOld(){if(!S)return;const ps=S.players.map(p=>[p.name,pinfo(p.name)]),open=ps.filter(x=>x[1].open),tot=ps.reduce((a,x)=>a+x[1].cost,0),op=open.reduce((a,x)=>a+x[1].open,0);
   let h='<div class="cell"><span class="tx">Eingesetzt gesamt</span><span class="val">'+fmt(tot)+' P</span></div><div class="cell"><span class="tx">Davon offen</span><span class="val" style="color:'+(op?"var(--red)":"var(--green)")+'">'+(op?fmt(op)+" P":"alles bezahlt ✓")+'</span></div>';
@@ -565,11 +600,11 @@ function renderKasseOld(){if(!S)return;const ps=S.players.map(p=>[p.name,pinfo(p
 function levelsText(L){return (L||[]).map(l=>l.brk?"Pause "+l.brk+(l.note?" "+l.note:""):l.sb+"/"+l.bb+(l.ante?"/"+l.ante:"")).join("\n");}
 $("setBtn").onclick=()=>{if(!S)return;const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
   const f=(id,lab,v,t,cls,ph)=>'<label class="'+(cls||"")+'">'+lab+'<input id="'+id+'" '+(t==="n"?'type="number" inputmode="numeric"':'')+' value="'+esc(v==null?"":v)+'" placeholder="'+(ph||"")+'"></label>';
-  W.innerHTML='<div class="fg">'+f("fTitle","Turniername",S.title,"","full")+f("fStack","Startstack",S.stack,"n")+f("fEb","Early Bird",S.eb||0,"n")+f("fMin1","Minuten Level 1",S.min1,"n")+f("fMin","Minuten Rebuy-Phase",S.min,"n")+f("fMinLate","Minuten danach",S.minLate,"n")+f("fReLvl","Rebuys bis Level",S.reLvl,"n","","immer")+f("fMaxRe","Max. Rebuys",S.maxRe,"n","","unbegrenzt")+f("fBuyin","Buy-in (P)",S.buyin,"n")+f("fFee","davon Veranstalter",S.fee,"n")+f("fRebuy","Rebuy (P)",S.rebuy,"n")+f("fBounty","Kopfgeld (0 = aus)",S.bounty||0,"n")+f("fBank","Kasse hält",S.bank)
+  W.innerHTML='<div class="fg">'+f("fTitle","Turniername",S.title,"","full")+f("fStack","Startstack",S.stack,"n")+f("fEb","Early Bird",S.eb||0,"n")+f("fMin1","Minuten Level 1",S.min1,"n")+f("fMin","Minuten Rebuy-Phase",S.min,"n")+f("fMinLate","Minuten danach",S.minLate,"n")+f("fReLvl","Rebuys bis Level",S.reLvl,"n","","immer")+f("fMaxRe","Max. Rebuys",S.maxRe,"n","","unbegrenzt")+f("fPot","In den Pot pro Entry",S.buyin-S.fee,"n")+f("fFee","Veranstalter Buy-in",S.fee,"n")+f("fFeeRe","Veranstalter Rebuy",S.feeRe||0,"n")+f("fBounty","Kopfgeld (0 = aus)",S.bounty||0,"n")+f("fBank","Kasse hält",S.bank)
     +'<label>Bezahlte Plätze<select id="fPay"><option value="auto">Automatisch</option><option value="fix">Feste Prozente</option></select></label>'+f("fPcts","Feste Prozente",(S.pay&&S.pay.pcts||[]).join(","),"","","50,30,20")+f("fCash","Bargeldregel",S.cash||"","","full")
     +'<label class="full">Blindstruktur (eine Zeile pro Level, Pause als „Pause 10“)<textarea id="fBlinds" spellcheck="false"></textarea></label></div><p class="note" style="padding:0 16px 14px">Automatisch: bis 7 Spieler Top 2 · 8–12 Top 3 · 13–17 Top 4 · ab 18 Top 5.</p>';
   sheet("Einstellungen","",[["Übernehmen","pri",()=>{const g=id=>W.querySelector("#"+id).value.trim();
-    send({op:"settings",v:{title:g("fTitle"),stack:g("fStack"),eb:g("fEb"),min1:g("fMin1"),min:g("fMin"),minLate:g("fMinLate"),reLvl:g("fReLvl"),maxRe:g("fMaxRe"),buyin:g("fBuyin"),fee:g("fFee"),rebuy:g("fRebuy"),bounty:g("fBounty"),bank:g("fBank"),cash:g("fCash"),payAuto:g("fPay")==="auto",pcts:g("fPcts").split(/[,; ]+/).filter(Boolean).map(Number),blinds:g("fBlinds")}},"Einstellungen");}]],W);
+    send({op:"settings",v:{title:g("fTitle"),stack:g("fStack"),eb:g("fEb"),min1:g("fMin1"),min:g("fMin"),minLate:g("fMinLate"),reLvl:g("fReLvl"),maxRe:g("fMaxRe"),buyin:+g("fPot")+(+g("fFee")),fee:g("fFee"),rebuy:+g("fPot")+(+g("fFeeRe")),feeRe:g("fFeeRe"),bounty:g("fBounty"),bank:g("fBank"),cash:g("fCash"),payAuto:g("fPay")==="auto",pcts:g("fPcts").split(/[,; ]+/).filter(Boolean).map(Number),blinds:g("fBlinds")}},"Einstellungen");}]],W);
   W.querySelector("#fPay").value=S.pay&&S.pay.auto===false?"fix":"auto";W.querySelector("#fBlinds").value=levelsText(S.levels);};
 
 /* ---------- Minigames ---------- */
@@ -612,6 +647,70 @@ function fixClips(a){return a.filter(c=>!CLIP_FIX.drop.includes(c.id)).map(c=>Ob
 const owns=(c,n)=>Array.isArray(c.p)?c.p.some(x=>same(x,n)):same(c.p,n);
 async function loadClips(){try{const j=await (await fetch("clips/clips.json?t="+Date.now(),{cache:"no-store"})).json();CLIPS=fixClips(j.clips||[]);$("deck").dataset.k="";renderDeck();}catch(e){$("deck").innerHTML='<p class="note">Clips nicht geladen. Netz prüfen.</p>';}}
 loadClips();setInterval(loadClips,120000);
+
+/* ---------- Turnier-Archiv: jedes Turnier bleibt auf dem Handy (+ Sicherung auf der Website, tafel/archiv/) ---------- */
+const ARK="bcc-app-archiv";
+function archAll(){try{return JSON.parse(localStorage.getItem(ARK)||"{}");}catch(e){return {};}}
+let REMOTE={};
+function archSave(key,st){archSave.p={key,st};if(archSave.t)return;archSave.t=setTimeout(()=>{archSave.t=null;const {key,st}=archSave.p;const a=archAll();
+  a[key]={title:st.title,date:(st.started||new Date().toISOString()).slice(0,10),saved:Date.now(),S:st};
+  try{localStorage.setItem(ARK,JSON.stringify(a));}catch(e){}},2000);}
+function archDate(k){const a=archAll()[k]||REMOTE[k];const d=a&&a.date;return d?d.slice(8,10)+"."+d.slice(5,7)+"."+d.slice(0,4):"";}
+async function loadRemote(){try{const j=await (await fetch("archiv/index.json?t="+Date.now(),{cache:"no-store"})).json();(j.turniere||[]).forEach(t=>REMOTE[t.key]=t);}catch(e){}}
+loadRemote();
+async function archGet(k){const a=archAll();if(a[k])return a[k];const r=REMOTE[k];if(!r)return null;
+  try{const st=await (await fetch("archiv/"+r.file+"?t="+Date.now(),{cache:"no-store"})).json();const e={title:r.title,date:r.date,saved:Date.now(),S:st};a[k]=e;try{localStorage.setItem(ARK,JSON.stringify(a));}catch(x){}return e;}catch(e){return null;}}
+$("trn").onclick=()=>{const a=archAll(),keys=new Set([...Object.keys(a),...Object.keys(REMOTE)]);keys.delete(KEY);
+  const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
+  const row=(t,sub,on,fn)=>{const b=document.createElement("button");b.className="cell press";b.innerHTML='<span class="ic '+(on?'c-green':'c-grey')+'">'+(on?'●':'📁')+'</span><span class="tx"></span><span class="chev">›</span>';b.querySelector(".tx").innerHTML=esc(t)+'<small>'+esc(sub)+'</small>';b.onclick=()=>{closeSheet();fn();};W.appendChild(b);};
+  row((LIVE&&LIVE.title)||"Aktuelles Turnier","Live · steuern"+(chanOk?"":" (gerade offline)"),true,()=>openLive());
+  [...keys].map(k=>[k,a[k]||REMOTE[k]]).sort((x,y)=>String(y[1].date).localeCompare(String(x[1].date))).forEach(([k,e])=>row(e.title||k,archDate(k)+" · Kasse, Abrechnung, PDF",false,()=>openArch(k)));
+  if(!keys.size){const n=document.createElement("p");n.className="sp";n.style.padding="12px";n.textContent="Noch keine früheren Turniere. Ab jetzt wird jedes Turnier hier automatisch gespeichert.";W.appendChild(n);}
+  sheet("Turniere","",[],W);};
+function openLive(){ARCH=null;if(LIVE)show(LIVE);else{document.body.classList.remove("arch");$("archb").hidden=true;}page(0);}
+async function openArch(k){const e=await archGet(k);if(!e){toast("Turnier nicht gefunden",2500,"bad");return;}ARCH=k;show(e.S);page(2);setTimeout(()=>{const x=$("kasse");if(x)x.scrollIntoView({block:"start"});},80);}
+$("archX").onclick=openLive;
+/* Im Archiv gehen nur Kasse-Sachen: Haken und Gezählt. Gespeichert auf dem Handy. */
+function archOp(c,label){const a=archAll(),e=a[ARCH];if(!e){toast("Archiv nicht gefunden",2500,"bad");return;}const st=e.S,Dd=st.D||{};
+  if(c.op==="txd"){st.txd=st.txd||{};if(c.v)st.txd[c.k]=Date.now();else delete st.txd[c.k];(Dd.tx||[]).forEach(t=>t.done=!!st.txd[t.k]);}
+  else if(c.op==="note"){st.notes=st.notes||[];st.notes.push({at:Date.now(),text:c.text});}
+  else if(c.op==="notedel"){st.notes=(st.notes||[]).filter(n=>n.at!==c.at);}
+  else if(c.op==="kcount"){st.kcount={amount:+c.amount,at:Date.now()};if(Dd.kasse)Dd.kasse.count=st.kcount;}
+  else{toast("Altes Turnier: hier gehen nur Kasse, Abrechnung, PDF und Export",3000);return;}
+  e.local=Date.now();try{localStorage.setItem(ARK,JSON.stringify(a));}catch(x){}
+  buzz(15);toast("✓ "+(label||"gespeichert"),1800,"ok");show(st);}
+/* ---------- PDF + Export am Handy ---------- */
+function loadJsPDF(){return window.jspdf?Promise.resolve(window.jspdf):new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="jspdf.umd.min.js";sc.onload=()=>ok(window.jspdf);sc.onerror=no;document.head.appendChild(sc);});}
+function fname(ext){const e=ARCH&&archAll()[ARCH],d=(e&&e.date)||(S.started||new Date().toISOString()).slice(0,10);return (S.title||"Turnier").replace(/[^a-z0-9äöüß -]/gi,"").trim().replace(/ +/g,"-")+"-"+d+"-Abrechnung."+ext;}
+function saveBlob(blob,name){let f=null;try{f=new File([blob],name,{type:blob.type});}catch(e){}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>{});return;}
+  const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},2000);}
+function makeExport(){if(!S)return;saveBlob(new Blob([JSON.stringify({event:S.title,date:(S.started||"").slice(0,10),exported:new Date().toISOString(),from:"app",state:S},null,1)],{type:"application/json"}),fname("json"));toast("Export erstellt",1800,"ok");}
+async function makePdf(){if(!S)return;let J;try{J=await loadJsPDF();}catch(e){toast("PDF-Modul nicht geladen. Netz prüfen.",3000,"bad");return;}
+  const doc=new J.jsPDF({unit:"mm",format:"a4"}),W=210,M=16;let y=20;
+  const T=(t,x,yy,o)=>doc.text(String(t).replace(/→/g,"->").replace(/✓/g,"[x]").replace(/[^\x20-\x7E -ÿ]/g,""),x,yy,o);
+  const need=h=>{if(y+h>282){doc.addPage();y=20;}};
+  doc.setFont("helvetica","bold");doc.setFontSize(20);T(S.title||"Turnier",M,y);y+=7;
+  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(110);T("Blue Chip Club · "+archDate(ARCH||KEY)+" · Abrechnung, Stand "+new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),M,y);y+=9;doc.setTextColor(0);
+  const pays=D.pays||[];doc.setFontSize(12);doc.setFont("helvetica","bold");T("Preisgeld "+fmt(D.pot)+" P · "+(D.entries||0)+" Entries"+(D.fee?" · An Veranstalter "+fmt(D.fee)+" P":""),M,y);y+=6;
+  doc.setFont("helvetica","normal");doc.setFontSize(10);T(pays.map((v,k)=>(k+1)+". Platz "+fmt(v)+" P").join("   "),M,y);y+=10;
+  const head=t=>{need(14);doc.setFont("helvetica","bold");doc.setFontSize(12);T(t,M,y);y+=2;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=5;doc.setFont("helvetica","normal");doc.setFontSize(9.5);};
+  head("Spieler");const cols=[M,M+12,M+46,M+62,M+84,M+142,W-M];
+  doc.setFont("helvetica","bold");["Platz","Spieler","Entries","Eingesetzt","Bezahlt wie","Offen","Gewinn"].forEach((h,i)=>T(h,cols[i],y,i===6?{align:"right"}:undefined));doc.setFont("helvetica","normal");y+=5;
+  const PT={bar:"bar",dig:"überw.",offen:"offen"};
+  const rows=S.players.map(p=>({p,i:pinfo(p.name)})).sort((a,b)=>(a.i.place||99)-(b.i.place||99));
+  rows.forEach(({p,i})=>{need(6);const how=p.entries.map(e=>PT[e.paid]+(e.to?" an "+e.to:"")).join(", ");const win=i.place&&i.place<=pays.length?pays[i.place-1]:0;
+    T(i.place?i.place+".":"-",cols[0],y);T(p.name,cols[1],y);T(String(p.entries.length),cols[2],y);T(fmt(i.cost)+" P",cols[3],y);
+    T(doc.splitTextToSize(how,56)[0],cols[4],y);if(i.open)doc.setTextColor(200,60,50);T(i.open?fmt(i.open)+" P":"-",cols[5],y);doc.setTextColor(0);T(win?fmt(win)+" P":"-",cols[6],y,{align:"right"});y+=5.4;});
+  y+=4;const k=D.kasse||{};head("Kasse");
+  [["Bargeld (Soll bei "+(S.bank||"Tim")+")",fmt(k.bar)+" P"],k.count?["Gezählt ("+new Date(k.count.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+")",fmt(k.count.amount)+" P"+(k.count.amount!==k.bar?"  (Differenz "+(k.count.amount-k.bar)+" P)":"  stimmt")]:null,k.digBank?["Überwiesen an "+(S.bank||"Tim"),fmt(k.digBank)+" P"]:null].concat((k.other||[]).map(o=>["Überwiesen direkt an "+o.to,fmt(o.v)+" P"])).concat([["Offen",fmt(k.open)+" P"]]).filter(Boolean)
+    .forEach(([a,b])=>{need(6);T(a,M,y);T(b,W-M,y,{align:"right"});y+=5.4;});
+  y+=4;head("Zahlungen (wer zahlt wem)");const tx=D.tx||[];
+  if(!tx.length){T("Keine Zahlungen.",M,y);y+=6;}
+  tx.forEach(t=>{need(6);T((t.done?"[x] ":"[  ] ")+t.from+"  ->  "+t.to,M,y);T(fmt(t.amount)+" P",W-M,y,{align:"right"});y+=5.6;});
+  if((S.notes||[]).length){y+=4;head("Notizen");S.notes.forEach(n=>{doc.splitTextToSize(n.text,W-2*M-4).forEach((l,i)=>{need(6);T((i?"  ":"- ")+l,M,y);y+=5;});});}
+  const open=tx.filter(t=>!t.done);y+=4;need(8);doc.setFont("helvetica","bold");T(open.length?open.length+" Zahlung(en) noch offen":"Alles bezahlt",M,y);
+  saveBlob(doc.output("blob"),fname("pdf"));toast("PDF erstellt",1800,"ok");}
 
 /* ---------- Verbindung ---------- */
 function loadSb(){return window.supabase?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);});}
