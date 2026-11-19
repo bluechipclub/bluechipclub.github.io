@@ -1,1 +1,6 @@
-{"turniere":[]}
+{"turniere":[
+ {"key":"alt-2026-11-14","title":"Saturday Deep Stack","date":"2026-11-14","pdf":"alt/2026-11-14-saturday-deep-stack.pdf"},
+ {"key":"alt-2026-11-12","title":"Thursday Classic","date":"2026-11-12","pdf":"alt/2026-11-12-thursday-classic.pdf"},
+ {"key":"alt-2026-11-01","title":"Midnight Birthday Deepstack","date":"2026-11-01","pdf":"alt/2026-11-01-midnight-birthday.pdf"},
+ {"key":"alt-2026-10-28","title":"Dead Man's Hand Deepstack","date":"2026-10-28","pdf":"alt/2026-10-28-dead-mans-hand.pdf"}
+]}
