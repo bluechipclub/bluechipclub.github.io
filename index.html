@@ -2920,14 +2920,15 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : (nextOk() ? '<button class="op-hero" type="button" data-reserve>Für ' + esc(new Date(nextOk().date).toLocaleDateString('de-DE', { weekday: 'long' })) + ' anmelden <span aria-hidden="true">→</span></button>' : '')) + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div>' + lobbyBanner() + '</section>';
   }
   /* 19.11. Tim: Banner „Jetzt auch online“ rechts neben „Zehn Stühle. Ein Sieger.“ → neue Online-Lobby (Login wie immer über die Website). ONLINE_LOBBY.on = false blendet ihn aus. */
-  const ONLINE_LOBBY = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?lobby=neu' };
+  /* modes: soon:true zeigt „bald“ – beim Livegang mit dem Lobby-Thread abgleichen und auf false setzen, was fertig ist */
+  const ONLINE_LOBBY = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?lobby=neu', modes: [['Sit & Go', false], ['Turniere', false], ['Heads-up-Duell', true], ['Spin & Go', true]] };
   function lobbyBanner() {
     if (!ONLINE_LOBBY.on) return '';
     return '<aside class="onban" aria-label="Blue Chip Online">' +
       '<div class="ob-pic"><img src="img/online-promo-720.webp" alt="Blue Chip Online am PC und am Handy" loading="eager" decoding="async"><span class="ob-badge"><i></i>Neu · Jetzt auch online</span></div>' +
       '<div class="ob-body"><h2>Blue Chip <em>Online.</em></h2>' +
       '<p>Kein Abend kommt zustande? Dann zockt ihr eben online. Eigenes Konto, eigene Bankroll in Blue Chips, deine Jungs am Tisch.</p>' +
-      '<ul class="ob-modes"><li>Sit &amp; Go</li><li>Turniere</li><li class="soon">Heads-up-Duell <small>bald</small></li><li class="soon">Spin &amp; Go <small>bald</small></li></ul>' +
+      '<ul class="ob-modes">' + ONLINE_LOBBY.modes.map(([n, soon]) => '<li' + (soon ? ' class="soon"' : '') + '>' + esc(n) + (soon ? ' <small>bald</small>' : '') + '</li>').join('') + '</ul>' +
       '<a class="ob-cta js-play" href="#anmelden" data-dest="lobby" data-in="Jetzt online spielen" data-out="Konto erstellen &amp; spielen"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Konto erstellen &amp; spielen') + '</span> <span aria-hidden="true">→</span></a>' +
       '<p class="ob-fine">Nur Spielgeld. Am Ende zeigen die Blue Chips, wer der bessere Spieler ist.</p></div></aside>';
   }
