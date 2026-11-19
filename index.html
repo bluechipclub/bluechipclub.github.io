@@ -4044,7 +4044,7 @@ div.hl-tile b { font-size: 16px; line-height: 1.3; }
     if (!s || !s.access_token) { pendingPlay = true; return openAuth('in'); }
     const rest = s.expires_at ? Math.max(60, Math.round(s.expires_at - Date.now() / 1000)) : 3600;
     /* Nur der Zugangs-Token im #-Teil (wird nie an einen Server geschickt), nie der Refresh-Token */
-    const to = playDest === 'lobby' ? ONLINE_LOBBY.url : PLAY; playDest = '';
+    const to = playDest === 'lobby' ? API + '/' : PLAY; playDest = '';
     location.href = to + '#access_token=' + encodeURIComponent(s.access_token) + '&expires_in=' + rest;
   }
   function setMode(m) {
