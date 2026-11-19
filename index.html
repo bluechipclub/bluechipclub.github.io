@@ -1119,10 +1119,12 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   .onpromo .op-pic { order: -1; aspect-ratio: 4 / 4; }
   .onpromo .op-cta { justify-self: stretch; justify-content: center; height: 60px; }
 }
-.op-head { background: linear-gradient(180deg, #f3d68f, #c49a41) !important; color: #111 !important; border: 1px solid #c49a41 !important; text-decoration: none; font-weight: 700; }
+.op-head, .op-head2 { background: linear-gradient(180deg, #f3d68f, #c49a41) !important; color: #111 !important; border: 1px solid #c49a41 !important; text-decoration: none; font-weight: 700; }
 .kino .ctas { display: flex !important; }
 .op-hero { display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 30px; border-radius: 999px; font-size: 19px; font-weight: 700; color: #111 !important; text-decoration: none; background: linear-gradient(180deg, #f3d68f, #c49a41); border: 1px solid #c49a41; box-shadow: 0 14px 40px rgb(226 184 87 / .3); }
-.op-resv { display: none !important; }
+.op-head { display: none !important; }
+@media (max-width: 520px) { .op-lg { display: none; } .op-sm { display: inline !important; } }
+.op-sm { display: none; }
 </style>
 
 <div class="ambient" aria-hidden="true"><span class="photo"></span><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="suits"></span><span class="vig"></span></div><canvas id="dust" aria-hidden="true"></canvas>
@@ -1137,7 +1139,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       <button role="tab" data-view="turniere">Turniere</button>
       <button role="tab" data-view="regeln">Regeln</button>
     </nav>
-    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><button class="btn-cream op-resv" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
+    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><button class="btn-cream op-resv op-head2" type="button" data-reserve><span class="op-lg">Für Freitag anmelden</span><span class="op-sm">Anmelden</span> <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
   </div>
 </header>
 <div class="menu" id="menu" hidden><div class="menu-in">
@@ -1196,13 +1198,13 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "Tobi": "The Fighter"
   },
   "next": {
-   "date": "2026-11-14T19:00",
-   "title": "Saturday Deep Stack",
-   "sub": "Heute · Deep Stack · 25.000 Chips · 25-Minuten-Level · mit Ante",
-   "buyin": 25,
-   "rebuy": 20,
+   "date": "2026-11-20T18:00",
+   "title": "Friday Classic",
+   "sub": "25.000 Chips · 25-Minuten-Level · Anmeldung offen, kein Limit",
+   "buyin": 20,
+   "rebuy": 15,
    "fee": 5,
-   "cards": "A♠ K♠ Q♠ J♠ 10♠",
+   "cards": "A♥ A♠ K♥ K♠ Q♦",
    "facts": [
     {
      "v": "25.000 Chips",
@@ -1210,20 +1212,20 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     },
     {
      "v": "+2.000 Chips",
-     "l": "Early Bird vor 19:00"
+     "l": "Early Bird vor 18:00"
     },
     {
      "v": "25 Min",
-     "l": "Jedes Level"
+     "l": "Jedes Level, den ganzen Abend"
     },
     {
-     "v": "2 Rebuys",
-     "l": "Maximal pro Spieler"
+     "v": "Kein Limit",
+     "l": "Anmeldung offen, evtl. 2 Tische"
     }
    ],
    "program": [
     {
-     "t": "19:00",
+     "t": "18:00",
      "l": "Erste Hand",
      "s": "Early Bird: Wer bei der ersten Hand am Tisch sitzt, bekommt 2.000 Chips extra. Es wird nicht gewartet."
     },
@@ -1235,17 +1237,17 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     {
      "t": "Level 7",
      "l": "Letzte Chance auf den Rebuy",
-     "s": "Maximal 2 Rebuys pro Spieler, möglich bis Ende Level 7 (ungefähr 22:15)"
+     "s": "Maximal 2 Rebuys pro Spieler, möglich bis Ende Level 7 (ungefähr 21:10)"
     },
     {
      "t": "Am Ende",
      "l": "Final Table",
-     "s": "Gespielt wird bis zum Schluss, kein Level wird übersprungen"
+     "s": "Bei mehr als 10 Spielern starten wir mit zwei Tischen und legen sie zum Final Table zusammen"
     }
    ],
-   "trophyTitle": "Saturday Deep Stack",
-   "trophy": "Der Klassiker am Samstagabend: 25.000 Chips, lange Level, mit Ante. Kein Level wird übersprungen.",
-   "info": "Deep Stack mit 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die Blinds starten bei 100/100, ab Level 3 gibt es eine Big-Blind-Ante. Heute wird kein Level übersprungen.\n\nPreise: Der Buy-in kostet 25 P, davon gehen 5 P an den Veranstalter und 20 P in den Pot. Jeder darf maximal 2 Rebuys machen, bis Ende Level 7, also ungefähr bis 22:15. Ein Rebuy kostet 20 P und geht komplett in den Pot.\n\nBargeldregel: Jeder Buy-in und jeder Rebuy wird sofort bezahlt, bar oder per Überweisung direkt am Tisch. Alles wird an der Tafel mitgeschrieben, damit die Abrechnung am Ende genau aufgeht.\n\nSamstag, 14.11.: Die erste Hand wird pünktlich um 19:00 Uhr ausgeteilt. Early Bird: Wer bei der ersten Hand am Tisch sitzt, startet mit 27.000 statt 25.000 Chips. Wer später kommt, bekommt den Bonus nicht und steigt mit dem laufenden Level ein.\n\nDabei: Tim am Dealer-Platz, dazu Manu, Niklas, Nico, Philipp, Jonny, Kevin und Zeno. Die Plätze werden vor der ersten Hand ausgelost.",
+   "trophyTitle": "Friday Classic",
+   "trophy": "Der Klassiker am Freitagabend: 25.000 Chips, 25-Minuten-Level den ganzen Abend, Anmeldung ohne Limit. Vielleicht das erste Turnier mit zwei Tischen.",
+   "info": "Friday Classic mit 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die Blinds starten bei 100/100, ab Level 3 gibt es eine Big-Blind-Ante.\n\nPreise: Der Buy-in kostet 20 P, davon gehen 5 P an den Veranstalter und 15 P in den Pot. Jeder darf maximal 2 Rebuys machen, bis Ende Level 7, also ungefähr bis 21:10. Ein Rebuy kostet 15 P und geht komplett in den Pot.\n\nBargeldregel: Jeder Buy-in und jeder Rebuy wird sofort bezahlt, bar oder per Überweisung direkt am Tisch. Alles wird an der Tafel mitgeschrieben, damit die Abrechnung am Ende genau aufgeht.\n\nFreitag, 20.11.: Die erste Hand wird pünktlich um 18:00 Uhr ausgeteilt. Early Bird: Wer bei der ersten Hand am Tisch sitzt, startet mit 27.000 statt 25.000 Chips. Wer später kommt, bekommt den Bonus nicht und steigt mit dem laufenden Level ein.\n\nDiesmal ist die Anmeldung offen und nicht begrenzt. Kommen mehr als 10 Leute, spielen wir mit zwei Tischen und legen sie zum Final Table zusammen. Dann wird der Parkplatz knapp: Bitte bildet Fahrgemeinschaften. Reservier dir deinen Platz, damit wir dich in die Tafel eintragen können.",
    "blinds": [
     {
      "sb": 100,
@@ -1355,22 +1357,13 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "seats": 0,
    "times": [],
    "votes": {},
-   "signups": [
-    "Tim",
-    "Manu",
-    "Niklas",
-    "Nico",
-    "Philipp",
-    "Jonny",
-    "Kevin",
-    "Zeno"
-   ],
+   "signups": [],
    "tbd": "",
    "dvotes": {},
    "timeLabel": "Erste Hand · pünktlich",
    "hand0": 0,
    "maxRe": 2,
-   "hidden": true
+   "hidden": false
   },
   "extraRecords": [
    {
@@ -2888,7 +2881,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       '<img class="kino-bg" src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, ein blauer Chip vorne im Licht">' +
       '<div class="kino-copy"><h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
       '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
-      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : '') + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
+      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : (nextOk() ? '<button class="op-hero" type="button" data-reserve>Für ' + esc(new Date(nextOk().date).toLocaleDateString('de-DE', { weekday: 'long' })) + ' anmelden <span aria-hidden="true">→</span></button>' : '')) + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div></section>';
   }
   function landStage() {
     if (stageLanded) return; stageLanded = true;
@@ -2921,7 +2914,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     if (b) h += '<section class="scene sc-hand"><span class="sc-kick">Beste Hand ever</span>' + fan(b, true) + '<h2>' + esc(handTitle(b)) + '<em>.</em></h2><p class="sc-sub">' + esc(b.player) + (tById(b.tid) ? ' · ' + esc(tName(tById(b.tid))) : '') + '</p><a class="sc-link" href="#rekorde" data-go="rekorde">Alle Hände und Rekorde ›</a></section>';
     h += '<div class="bento">' + shameCard() + '</div>';
     h += '<section class="scene wallsc"><div class="sc-head"><span class="sc-kick">' + ts.length + (ts.length === 1 ? ' Turnier' : ' Turniere') + '</span><h2>Die <em>Siegerwand.</em></h2></div>' + (ts.length ? '<div class="wall swipe">' + ts.slice().reverse().map((t, k) => { const w = winnerOf(t); return '<button class="wcard' + (k === 0 ? ' cur' : '') + '" style="--k:' + k + '" data-open="' + esc(t.id) + '"><span class="shine"></span>' + (k === 0 ? '<span class="crown">Amtierend</span>' : '') + laurel(k) + '<span class="eyebrow">' + esc(tName(t)) + '</span><span class="n' + (w ? '' : ' open') + '">' + (w ? esc(w) : 'offen') + '</span><span class="d">' + fmtDate(t.date) + '</span><span class="pt">' + (t.pot ? eur(t.pot) + ' Pot' : (t.entries || '–') + ' Spieler') + '</span></button>'; }).join('') + '</div>' : '<p class="empty">Noch keine Turniere.</p>') + '</section>';
-    $('#v-rangliste').innerHTML = onlinePromo() + nfpPromo() + promoCard() + h;
+    $('#v-rangliste').innerHTML = promoCard() + onlinePromo() + nfpPromo() + h;
   }
   function renderRanglisteAlt() {
     ci = 0;
@@ -3225,7 +3218,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   /* Promo Blue Chip Online: Tim 18.11. Nur der 2D-Tisch, kein Wort von 3D/Lounge. ONLINE_PROMO.on = false blendet sie aus. */
   let bcIn = false; /* angemeldet (Supabase-Sitzung), wird vom Login-Skript unten gesetzt */
   window.bcSetIn = v => { bcIn = !!v; };
-  const ONLINE_PROMO = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?turnier=1', badge: 'Heute Abend · Blue Chip Online #1' };
+  const ONLINE_PROMO = { on: false, url: 'https://blue-chip-game-production.up.railway.app/?turnier=1', badge: 'Heute Abend · Blue Chip Online #1' };
   function onlinePromo() {
     if (!ONLINE_PROMO.on) return '';
     return '<section class="onpromo" aria-label="Blue Chip Online"><div class="op-copy">' +
