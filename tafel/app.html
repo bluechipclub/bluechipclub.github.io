@@ -686,9 +686,11 @@ $("trn").onclick=()=>{const a=archAll(),keys=new Set([...Object.keys(a),...Objec
   const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
   const row=(t,sub,on,fn)=>{const b=document.createElement("button");b.className="cell press";b.innerHTML='<span class="ic '+(on?'c-green':'c-grey')+'">'+(on?'●':'📁')+'</span><span class="tx"></span><span class="chev">›</span>';b.querySelector(".tx").innerHTML=esc(t)+'<small>'+esc(sub)+'</small>';b.onclick=()=>{closeSheet();fn();};W.appendChild(b);};
   row((LIVE&&LIVE.title)||"Aktuelles Turnier","Live · steuern"+(chanOk?"":" (gerade offline)"),true,()=>openLive());
-  [...keys].map(k=>[k,a[k]||REMOTE[k]]).sort((x,y)=>String(y[1].date).localeCompare(String(x[1].date))).forEach(([k,e])=>row(e.title||k,archDate(k)+" · Kasse, Abrechnung, PDF",false,()=>openArch(k)));
+  [...keys].map(k=>[k,a[k]||REMOTE[k]]).sort((x,y)=>String(y[1].date).localeCompare(String(x[1].date))).forEach(([k,e])=>e.pdf&&!e.file&&!e.S?row(e.title||k,archDate(k)+" · alte Tafel · Abrechnung als PDF",false,()=>openOldPdf(e)):row(e.title||k,archDate(k)+" · Kasse, Abrechnung, PDF",false,()=>openArch(k)));
   if(!keys.size){const n=document.createElement("p");n.className="sp";n.style.padding="12px";n.textContent="Noch keine früheren Turniere. Ab jetzt wird jedes Turnier hier automatisch gespeichert.";W.appendChild(n);}
   sheet("Turniere","",[],W);};
+/* Turniere von der alten Tafel (bis 14.11.): nur die fertige Abrechnungs-PDF zum Ansehen/Teilen */
+async function openOldPdf(e){try{const b=await (await fetch("archiv/"+e.pdf)).blob();saveBlob(new Blob([b],{type:"application/pdf"}),(e.title||"Turnier").replace(/[^a-z0-9äöüß -]/gi,"").trim().replace(/ +/g,"-")+"-"+e.date+"-Abrechnung.pdf");}catch(x){toast("PDF nicht geladen. Netz prüfen.",2500,"bad");}}
 function openLive(){ARCH=null;if(LIVE)show(LIVE);else{document.body.classList.remove("arch");$("archb").hidden=true;}page(0);}
 async function openArch(k){const e=await archGet(k);if(!e){toast("Turnier nicht gefunden",2500,"bad");return;}ARCH=k;show(e.S);page(2);setTimeout(()=>{const x=$("kasse");if(x)x.scrollIntoView({block:"start"});},80);}
 $("archX").onclick=openLive;
@@ -708,30 +710,85 @@ function saveBlob(blob,name){let f=null;try{f=new File([blob],name,{type:blob.ty
   if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>{});return;}
   const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},2000);}
 function makeExport(){if(!S)return;saveBlob(new Blob([JSON.stringify({event:S.title,date:(S.started||"").slice(0,10),exported:new Date().toISOString(),from:"app",state:S},null,1)],{type:"application/json"}),fname("json"));toast("Export erstellt",1800,"ok");}
+/* PDF-Abrechnung im Blue-Chip-Look (Tim 19.11.): Nacht-Hintergrund, Casino-Bild oben, Glas-Kästen, Gold. Bilder liegen in tafel/pdf/. */
+function imgData(u){return fetch(u).then(r=>r.blob()).then(b=>new Promise(ok=>{const f=new FileReader();f.onload=()=>ok(f.result);f.readAsDataURL(b);})).catch(()=>null);}
 async function makePdf(){if(!S)return;let J;try{J=await loadJsPDF();}catch(e){toast("PDF-Modul nicht geladen. Netz prüfen.",3000,"bad");return;}
-  const doc=new J.jsPDF({unit:"mm",format:"a4"}),W=210,M=16;let y=20;
-  const T=(t,x,yy,o)=>doc.text(String(t).replace(/→/g,"->").replace(/✓/g,"[x]").replace(/[^\x20-\x7E -ÿ]/g,""),x,yy,o);
-  const need=h=>{if(y+h>282){doc.addPage();y=20;}};
-  doc.setFont("helvetica","bold");doc.setFontSize(20);T(S.title||"Turnier",M,y);y+=7;
-  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(110);T("Blue Chip Club · "+archDate(ARCH||KEY)+" · Abrechnung, Stand "+new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),M,y);y+=9;doc.setTextColor(0);
-  const pays=D.pays||[];doc.setFontSize(12);doc.setFont("helvetica","bold");T("Preisgeld "+fmt(D.pot)+" P · "+(D.entries||0)+" Entries"+(D.fee?" · An Veranstalter "+fmt(D.fee)+" P":""),M,y);y+=6;
-  doc.setFont("helvetica","normal");doc.setFontSize(10);T(pays.map((v,k)=>(k+1)+". Platz "+fmt(v)+" P").join("   "),M,y);y+=10;
-  const head=t=>{need(14);doc.setFont("helvetica","bold");doc.setFontSize(12);T(t,M,y);y+=2;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=5;doc.setFont("helvetica","normal");doc.setFontSize(9.5);};
-  head("Spieler");const cols=[M,M+12,M+46,M+62,M+84,M+142,W-M];
-  doc.setFont("helvetica","bold");["Platz","Spieler","Entries","Eingesetzt","Bezahlt wie","Offen","Gewinn"].forEach((h,i)=>T(h,cols[i],y,i===6?{align:"right"}:undefined));doc.setFont("helvetica","normal");y+=5;
-  const PT={bar:"bar",dig:"überw.",offen:"offen"};
+  toast("PDF wird erstellt …",1500);
+  const [BG,CHIP]=await Promise.all([imgData("pdf/bg.jpg"),imgData("pdf/chip.png")]);
+  const doc=new J.jsPDF({unit:"mm",format:"a4"}),W=210,H=297,M=14;let y=0,pg=1;
+  const GOLD=[226,184,87],GOLD2=[243,214,143],FG=[244,244,242],SUB=[150,156,170],RED=[255,107,94],GREEN=[91,210,138],NIGHT=[6,10,20];
+  const A=o=>doc.setGState(new doc.GState({opacity:o}));
+  const col=(c,k)=>k==="f"?doc.setFillColor(...c):k==="d"?doc.setDrawColor(...c):doc.setTextColor(...c);
+  const T=(t,x,yy,o)=>doc.text(String(t).replace(/→/g,"->").replace(/✓/g,"").replace(/€/g,"P").replace(/•/g,"·").replace(/[^\x20-\x7E\xA0-\xFF]/g,""),x,yy,o);
+  const F=(st,sz,c)=>{doc.setFont("helvetica",st);doc.setFontSize(sz);col(c||FG,"t");};
+  const bgPage=()=>{col(NIGHT,"f");doc.rect(0,0,W,H,"F");
+    /* leichter blauer Schein oben, goldener unten (wie die Website) */
+    for(let i=0;i<10;i++){A(.035);col([47,107,255],"f");doc.ellipse(W/2,-10,140-i*12,70-i*6,"F");}
+    for(let i=0;i<8;i++){A(.03);col(GOLD,"f");doc.ellipse(W+10,H+10,110-i*12,80-i*9,"F");}A(1);};
+  const footer=()=>{A(.5);col(GOLD,"d");doc.setLineWidth(.2);doc.line(M,H-12,W-M,H-12);A(1);
+    F("normal",7.5,SUB);T("BLUE CHIP CLUB  ·  THE VOID  ·  "+(S.title||"Turnier")+"  ·  "+archDate(ARCH||KEY),M,H-7.5,{charSpace:.4});T("Seite "+pg,W-M,H-7.5,{align:"right"});};
+  const newPage=()=>{footer();doc.addPage();pg++;bgPage();y=16;};
+  const need=h=>{if(y+h>H-18)newPage();};
+  const glass=(x,yy,w,h,gold)=>{A(.07);col([255,255,255],"f");doc.roundedRect(x,yy,w,h,4,4,"F");A(.06);doc.roundedRect(x,yy,w,h*.45,4,4,"F");
+    A(gold?.55:.14);col(gold?GOLD:[255,255,255],"d");doc.setLineWidth(.25);doc.roundedRect(x,yy,w,h,4,4,"S");A(1);};
+  const label=(t,x,yy,c)=>{F("bold",7.5,c||GOLD);T(t.toUpperCase(),x,yy,{charSpace:.9});};
+  /* Karte: Titel + Inhalt; rows = Höhe des Inhalts */
+  const card=(title,h,fn)=>{need(h+13);glass(M,y,W-2*M,h+11);label(title,M+6,y+7.5);const y0=y+14;fn(y0);y+=h+15;};
+  bgPage();
+  /* ---- Kopf mit Casino-Bild ---- */
+  if(BG){doc.addImage(BG,"JPEG",0,-18,W,W*669/1200,undefined,"FAST");}
+  for(let i=0;i<14;i++){A(.07+i*.02);col(NIGHT,"f");doc.rect(0,40+i*3.2,W,3.3,"F");}A(.35);col(NIGHT,"f");doc.rect(0,0,W,86,"F");A(1);col(NIGHT,"f");doc.rect(0,84,W,18,"F");
+  if(CHIP)doc.addImage(CHIP,"PNG",M,16,20,20);
+  label("Blue Chip Club  ·  Abrechnung",M+25,22,GOLD2);
+  F("bold",26,FG);T(S.title||"Turnier",M+25,33);
+  F("normal",9.5,SUB);T(archDate(ARCH||KEY)+"  ·  The Void  ·  Stand "+new Date().toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),M+25,40);
+  /* ---- Preisgeld groß + Podium ---- */
+  y=52;const pays=D.pays||[],k=D.kasse||{},tx=D.tx||[];
   const rows=S.players.map(p=>({p,i:pinfo(p.name)})).sort((a,b)=>(a.i.place||99)-(b.i.place||99));
-  rows.forEach(({p,i})=>{need(6);const how=p.entries.map(e=>PT[e.paid]+(e.to?" an "+e.to:"")).join(", ");const win=i.place&&i.place<=pays.length?pays[i.place-1]:0;
-    T(i.place?i.place+".":"-",cols[0],y);T(p.name,cols[1],y);T(String(p.entries.length),cols[2],y);T(fmt(i.cost)+" P",cols[3],y);
-    T(doc.splitTextToSize(how,56)[0],cols[4],y);if(i.open)doc.setTextColor(200,60,50);T(i.open?fmt(i.open)+" P":"-",cols[5],y);doc.setTextColor(0);T(win?fmt(win)+" P":"-",cols[6],y,{align:"right"});y+=5.4;});
-  y+=4;const k=D.kasse||{};head("Kasse");
-  [["Bargeld (Soll bei "+(S.bank||"Tim")+")",fmt(k.bar)+" P"],k.count?["Gezählt ("+new Date(k.count.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})+")",fmt(k.count.amount)+" P"+(k.count.amount!==k.bar?"  (Differenz "+(k.count.amount-k.bar)+" P)":"  stimmt")]:null,k.digBank?["Überwiesen an "+(S.bank||"Tim"),fmt(k.digBank)+" P"]:null].concat((k.other||[]).map(o=>["Überwiesen direkt an "+o.to,fmt(o.v)+" P"])).concat([["Offen",fmt(k.open)+" P"]]).filter(Boolean)
-    .forEach(([a,b])=>{need(6);T(a,M,y);T(b,W-M,y,{align:"right"});y+=5.4;});
-  y+=4;head("Zahlungen (wer zahlt wem)");const tx=D.tx||[];
-  if(!tx.length){T("Keine Zahlungen.",M,y);y+=6;}
-  tx.forEach(t=>{need(6);T((t.done?"[x] ":"[  ] ")+t.from+"  ->  "+t.to,M,y);T(fmt(t.amount)+" P",W-M,y,{align:"right"});y+=5.6;});
-  if((S.notes||[]).length){y+=4;head("Notizen");S.notes.forEach(n=>{doc.splitTextToSize(n.text,W-2*M-4).forEach((l,i)=>{need(6);T((i?"  ":"- ")+l,M,y);y+=5;});});}
-  const open=tx.filter(t=>!t.done);y+=4;need(8);doc.setFont("helvetica","bold");T(open.length?open.length+" Zahlung(en) noch offen":"Alles bezahlt",M,y);
+  const who=pl=>{const r=rows.find(r=>r.i.place===pl);return r?r.p.name:"";};
+  glass(M,y,W-2*M,40,true);label("Preisgeld",M+7,y+9);
+  F("bold",34,GOLD2);T(fmt(D.pot||0),M+7,y+25);const pw=doc.getTextWidth(fmt(D.pot||0));F("bold",14,GOLD);T("P",M+9+pw,y+25);
+  F("normal",8.5,SUB);T((D.entries||0)+" Entries  ·  "+S.players.length+" Spieler"+(D.fee?"  ·  "+fmt(D.fee)+" P an den Veranstalter":""),M+7,y+33);
+  const MED=[[GOLD2,GOLD],[[226,228,235],[160,165,178]],[[232,178,128],[176,112,62]]];
+  const top=pays.slice(0,4),bw=26,gx=W-M-6-top.length*(bw+3)+3;
+  top.forEach((v,j)=>{const x=gx+j*(bw+3),c=MED[j]||[[255,255,255],[150,150,150]];
+    A(j<3?.16:.07);col(c[1],"f");doc.roundedRect(x,y+6,bw,28,3,3,"F");A(.7);col(c[0],"d");doc.setLineWidth(.3);doc.roundedRect(x,y+6,bw,28,3,3,"S");A(1);
+    F("bold",8,c[0]);T((j+1)+". PLATZ",x+bw/2,y+12,{align:"center",charSpace:.4});
+    F("bold",13,FG);T(fmt(v)+" P",x+bw/2,y+21,{align:"center"});
+    const n=who(j+1);F("normal",7.5,SUB);T(n?doc.splitTextToSize(n,bw-3)[0]:"–",x+bw/2,y+29,{align:"center"});});
+  if(pays.length>4){F("normal",7,SUB);T("+ "+pays.slice(4).map((v,j)=>(j+5)+". "+fmt(v)+" P").join("  "),W-M-6,y+38,{align:"right"});}
+  y+=47;
+  /* ---- Spieler ---- */
+  const PT={bar:"bar",dig:"überwiesen",offen:"offen"},rh=rows.length>14?5.4:5.9;
+  card("Spieler · Plätze · Einsätze",rows.length*rh+7,y0=>{const cx=[M+6,M+18,M+60,M+76,M+100,M+150,W-M-6];
+    F("bold",7,SUB);["PLATZ","SPIELER","ENTRIES","EINSATZ","BEZAHLT","OFFEN","GEWINN"].forEach((h,i)=>T(h,cx[i],y0,i===6?{align:"right",charSpace:.5}:{charSpace:.5}));
+    rows.forEach(({p,i},r)=>{const yy=y0+6+r*rh;if(r%2===0){A(.035);col([255,255,255],"f");doc.rect(M+3,yy-4.2,W-2*M-6,rh,"F");A(1);}
+      const win=i.place&&i.place<=pays.length?pays[i.place-1]:0,how=p.entries.map(e=>PT[e.paid]||e.paid).join(", ");
+      F("bold",9,i.place&&i.place<=3?(MED[i.place-1]||[FG])[0]:SUB);T(i.place?i.place+".":"–",cx[0],yy);
+      F(win?"bold":"normal",9.5,FG);T(p.name,cx[1],yy);F("normal",9,FG);T(String(p.entries.length),cx[2],yy);T(fmt(i.cost)+" P",cx[3],yy);
+      F("normal",8,SUB);T(doc.splitTextToSize(how,46)[0],cx[4],yy);
+      if(i.open){F("bold",9,RED);T(fmt(i.open)+" P",cx[5],yy);}else{F("normal",9,SUB);T("–",cx[5],yy);}
+      if(win){F("bold",9.5,GOLD2);T(fmt(win)+" P",cx[6],yy,{align:"right"});}else{F("normal",9,SUB);T("–",cx[6],yy,{align:"right"});}});});
+  /* ---- Kasse ---- */
+  const kl=[["Bargeld (Soll bei "+(S.bank||"Tim")+")",fmt(k.bar||0)+" P",FG]];
+  if(k.count)kl.push(["Gezählt "+new Date(k.count.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}),fmt(k.count.amount)+" P"+(k.count.amount!==k.bar?"  (Differenz "+(k.count.amount-k.bar>0?"+":"")+(k.count.amount-k.bar)+" P)":"  · stimmt"),k.count.amount!==k.bar?RED:GREEN]);
+  if(k.digBank)kl.push(["Überwiesen an "+(S.bank||"Tim"),fmt(k.digBank)+" P",FG]);
+  (k.other||[]).forEach(o=>kl.push(["Überwiesen direkt an "+o.to,fmt(o.v)+" P",FG]));
+  kl.push(["Noch offen",fmt(k.open||0)+" P",k.open?RED:GREEN]);
+  card("Kasse",kl.length*6.4,y0=>kl.forEach(([a,b,c],r)=>{const yy=y0+r*6.4;F("normal",9.5,SUB);T(a,M+6,yy);F("bold",10,c);T(b,W-M-6,yy,{align:"right"});}));
+  /* ---- Zahlungen ---- */
+  card("Abrechnung · Wer zahlt wem",Math.max(1,tx.length)*7+2,y0=>{if(!tx.length){F("normal",9.5,SUB);T("Keine Zahlungen nötig.",M+6,y0);return;}
+    tx.forEach((t,r)=>{const yy=y0+r*7;A(t.done?.9:.5);col(t.done?GREEN:SUB,"d");doc.setLineWidth(.35);doc.roundedRect(M+6,yy-3.4,4.2,4.2,1,1,"S");
+      if(t.done){col(GREEN,"f");doc.roundedRect(M+6,yy-3.4,4.2,4.2,1,1,"F");A(1);col(NIGHT,"d");doc.setLineWidth(.6);doc.lines([[1,1.2],[1.9,-2.4]],M+6.9,yy-1.3);}A(1);
+      F("bold",10,FG);T(t.from,M+14,yy);const w1=doc.getTextWidth(t.from);F("normal",9,GOLD);T("  an  ",M+14+w1,yy);const w2=doc.getTextWidth("  an  ");F("bold",10,FG);T(t.to,M+14+w1+w2,yy);
+      F("bold",10,t.done?SUB:GOLD2);T(fmt(t.amount)+" P",W-M-6,yy,{align:"right"});if(t.done){F("normal",7,GREEN);T("bezahlt",W-M-26,yy,{align:"right"});}});});
+  /* ---- Notizen ---- */
+  const nl=[];doc.setFontSize(9.5);(S.notes||[]).forEach(n=>doc.splitTextToSize(n.text,W-2*M-16).forEach((l,i)=>nl.push((i?"   ":"•  ")+l)));
+  if(nl.length)card("Notizen",nl.length*5.4,y0=>nl.forEach((l,r)=>{F("normal",9.5,FG);T(l,M+6,y0+r*5.4);}));
+  /* ---- Schluss ---- */
+  const open=tx.filter(t=>!t.done);need(12);glass(M,y,W-2*M,10,!open.length);F("bold",10.5,open.length?RED:GREEN);
+  T(open.length?open.length+(open.length===1?" Zahlung":" Zahlungen")+" noch offen":"Alles bezahlt · Abend abgeschlossen",W/2,y+6.6,{align:"center"});y+=14;
+  footer();
   saveBlob(doc.output("blob"),fname("pdf"));toast("PDF erstellt",1800,"ok");}
 
 /* ---------- Verbindung ---------- */
