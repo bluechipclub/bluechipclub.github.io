@@ -198,6 +198,19 @@ body.arch .scrb{display:none}
 .lob .cell .sw{width:46px;height:28px;border-radius:999px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:background .2s}
 .lob .cell .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .22s cubic-bezier(.23,1,.32,1)}
 .lob .cell .sw.on{background:var(--green)}.lob .cell .sw.on::after{transform:translateX(18px)}
+/* Zugang (Tim 19.11.): 007 = Tim/Turnierleitung, 008 = Tisch-2-Manager. Jeder Befehl trägt den Absender. */
+.login{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,rgba(3,5,11,.35),rgba(3,5,11,.92) 70%),url("pdf/bg.jpg") 50% 0/cover no-repeat,#03050b}
+.login[hidden]{display:none}
+.lgbox{width:100%;max-width:360px;padding:26px 22px 22px;border-radius:24px;text-align:center;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),rgba(10,14,26,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 .5px rgba(243,214,143,.35),0 20px 50px rgba(0,0,0,.5);animation:scrIn .4s cubic-bezier(.23,1,.32,1)}
+.lgchip{width:64px;height:64px;margin:0 auto 2px;filter:drop-shadow(0 6px 16px rgba(47,107,255,.45))}
+.lgbox h2{font-size:24px;font-weight:700;background:linear-gradient(180deg,#fff,#f3d68f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lgbox input{text-align:center;font-size:22px;letter-spacing:.3em;height:54px}
+.lgbox #lgName{letter-spacing:0;font-size:18px}
+.lgerr{color:var(--red);font-size:14px;min-height:18px}
+.who{height:28px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.who.t2{background:rgba(47,107,255,.25);color:var(--blue2)}
+.feed .cell .tx small b{color:var(--gold2);font-weight:600}
 nav.tb{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px env(safe-area-inset-bottom);height:var(--tb);background:rgba(18,18,20,.78);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border-top:.5px solid rgba(255,255,255,.1)}
 nav.tb button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#7c7c80;padding-top:2px;transition:color .2s}
 nav.tb button svg{width:26px;height:26px;transition:transform .25s var(--ease)}
@@ -252,8 +265,19 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 </style>
 </head>
 <body>
+<div class="login" id="login" hidden>
+  <div class="lgbox">
+    <img src="pdf/chip.png" alt="" class="lgchip">
+    <h2>Blue Chip Tafel</h2>
+    <p class="sp" id="lgP">Code eingeben</p>
+    <input id="lgCode" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Code">
+    <input id="lgName" placeholder="Dein Vorname" maxlength="20" hidden>
+    <button class="btn pri press" id="lgOk">Weiter</button>
+    <p class="lgerr" id="lgErr"></p>
+  </div>
+</div>
 <header class="hdr" id="hdr">
-  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
+  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><button class="who press" id="who"></button><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
   <div class="archb" id="archb" hidden><span id="archT"></span><button class="press" id="archX">Zum Live-Turnier</button></div>
 </header>
 
@@ -325,6 +349,8 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
   <div class="row2"><input id="msg" placeholder="z. B. Pizza ist da!"><button class="btn pri press" id="sendMsg">Senden</button></div>
   <div class="grp" style="margin-top:10px"><button class="cell press" data-c='{"op":"clearmsg"}'><span class="tx">Laufschrift leeren</span></button></div>
 
+  <div class="sec">Verlauf · wer hat was gedrückt</div>
+  <div class="grp feed" id="feed"></div>
   <div class="sec">Kasse</div>
   <div class="grp" id="kasse"></div>
   <div class="sec">Abrechnung · wer zahlt wem</div>
@@ -389,9 +415,22 @@ const pending=new Map();
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms||12);}catch(e){}};
 
 function toast(t,ms,k){const e=$("toast");e.textContent=t;e.className="toast on"+(k?" "+k:"");clearTimeout(toast.t);toast.t=setTimeout(()=>e.className="toast"+(k?" "+k:""),ms||2000);}
+const CODE="007";
+let USER=(()=>{try{return JSON.parse(localStorage.getItem("bcc-app-user")||"null");}catch(e){return null;}})();
+function setWho(){const w=$("who");if(!w)return;w.hidden=!USER;if(!USER)return;w.textContent="👤 "+USER.name;}
+function showLogin(){$("login").hidden=false;$("lgCode").value="";$("lgCode").hidden=false;$("lgName").value="";$("lgName").hidden=true;$("lgErr").textContent="";$("lgP").textContent="Code eingeben";setTimeout(()=>$("lgCode").focus(),200);}
+function doLogin(){const code=$("lgCode").value.trim();if(code!==CODE){$("lgErr").textContent="Falscher Code";buzz(30);return;}
+  if($("lgName").hidden){$("lgName").hidden=false;$("lgCode").hidden=true;$("lgP").textContent="Wer bist du?";$("lgErr").textContent="";$("lgName").focus();return;}
+  const name=$("lgName").value.trim();if(!name){$("lgErr").textContent="Bitte Vornamen eingeben";return;}
+  USER={name,label:name};try{localStorage.setItem("bcc-app-user",JSON.stringify(USER));}catch(e){}
+  $("login").hidden=true;setWho();buzz(15);toast("Angemeldet: "+USER.label,1800,"ok");}
+$("lgOk").onclick=doLogin;$("lgCode").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});$("lgName").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+$("who").onclick=()=>sheet("Angemeldet als "+USER.name,"Jeder Befehl von diesem Handy zeigt deinen Namen.",[["Abmelden","red",()=>{USER=null;try{localStorage.removeItem("bcc-app-user");}catch(e){}setWho();showLogin();}]]);
+setWho();if(!USER)showLogin();
 function send(c,label){
   if(ARCH)return archOp(c,label);
-  c=Object.assign({},c,{_id:DEV+"-"+(++NC)+"-"+Date.now()});
+  if(!USER){showLogin();return;}
+  c=Object.assign({},c,{_id:DEV+"-"+(++NC)+"-"+Date.now(),_u:USER.label,_l:label||""});
   let via=0;
   if(chan&&chanOk){try{chan.send({type:"broadcast",event:"cmd",payload:{from:DEV,src:"app",c}});via++;}catch(e){}}
   fetch(RELAY+TOPIC+"-cmd",{method:"POST",body:JSON.stringify(c)}).then(r=>{if(!r.ok)throw 0;}).catch(()=>{if(!via)toast("Nicht gesendet. Netz prüfen.",3500,"bad");});
@@ -408,6 +447,10 @@ function sheet(title,text,btns,content){
   const B=$("shB");B.innerHTML="";
   (btns||[]).forEach(([t,cls,fn])=>{const b=document.createElement("button");b.className="btn press "+(cls||"");b.textContent=t;b.onclick=()=>{closeSheet();fn();};B.appendChild(b);});
   $("ov").classList.add("on");$("sh").classList.add("on");$("sh").scrollTop=0;buzz(8);}
+/* Verlauf: die letzten Befehle aus der App mit Absender (kommt von der Haupttafel) */
+function feed(){const F=$("feed");if(!F)return;const L=(S.lastLog||[]).filter(e=>e.cmd&&e.cmd._u).slice(-12).reverse();
+  const k=L.map(e=>e.t).join();if(k===feed.k)return;feed.k=k;
+  F.innerHTML=L.length?L.map(e=>'<div class="cell"><span class="tx">'+esc(e.cmd._l||e.cmd.op)+'<small><b>'+esc(e.cmd._u)+'</b> · '+new Date(e.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+'</small></span></div>').join(""):'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts gedrückt.</span></div>';}
 function scrBar(){const r=D.scr||{},b=$("scrb"),K=$("scrK");let t="",e="Auf dem Bildschirm",btns=[];
   if(r.intro){t="Auslosung · Spielerkarten";btns=[["Überspringen","",{op:"skipintro"}],["Nächste ▶","pri",{op:"close"}]];}
   else if(r.ann){t=r.annT||"Ansage";btns=[["✕","",{op:"close"}],[(r.annB||"Weiter")+" ▶","pri",{op:"annok"}]];}
@@ -454,7 +497,7 @@ function apply(p){
   show(p.S);}
 function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   $("archb").hidden=!ARCH;if(ARCH)$("archT").textContent="📁 "+(S.title||"Turnier")+" · "+archDate(ARCH)+" · Archiv";
-  $("ttl").textContent=S.title||"Blue Chip";scrBar();
+  $("ttl").textContent=S.title||"Blue Chip";scrBar();feed();
   $("lvl").textContent=D.lvl||"";$("bl").textContent=D.blinds||"";
   $("nx").textContent="Als Nächstes "+(D.next||"–")+" · "+(D.reOpen?"Rebuy offen"+(S.reLvl!=null?" bis Level "+S.reLvl:""):"Freezeout");
   $("play").textContent=S.running?"❚❚ Pause":"▶ Start";$("play").classList.toggle("run",!!S.running);
@@ -831,7 +874,7 @@ async function connect(){
     chan=sbc.channel(SYNC_CH,{config:{broadcast:{self:false},presence:{key:DEV}}});
     chan.on("broadcast",{event:"state"},({payload})=>apply(payload))
       .on("broadcast",{event:"ack"},({payload})=>{const l=pending.get(payload.id);if(l!=null){pending.delete(payload.id);toast("✓ "+l,1800,"ok");}})
-      .on("broadcast",{event:"fx"},({payload})=>{if(payload.k==="toast")toast("📺 "+payload.t,3500);})
+      .on("broadcast",{event:"fx"},({payload})=>{if(payload.k==="toast")toast("📺 "+payload.t,3500);else if(payload.k==="done"&&payload.dev!==DEV&&payload.u&&payload.l)toast("👤 "+payload.u+": "+payload.l,3500);})
       .on("broadcast",{event:"ping"},({payload})=>{if(payload.role==="haupt"){lastAt=Date.now();if(!S)hello();}})
       .subscribe(st=>{chanOk=st==="SUBSCRIBED";if(chanOk){try{chan.track({kind:"app",at:Date.now()});}catch(e){}hello();}
         if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){chanOk=false;clearTimeout(connect.t);connect.t=setTimeout(connect,4000);}tick();});
