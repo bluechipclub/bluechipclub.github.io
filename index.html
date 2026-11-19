@@ -1935,6 +1935,99 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
      "name": "Tim"
     }
    ]
+  },
+  {
+   "id": "o1",
+   "nr": 10,
+   "date": "2026-11-18",
+   "title": "Blue Chip Online #1",
+   "online": true,
+   "entries": 9,
+   "rebuys": 14,
+   "handsPlayed": 246,
+   "results": [
+    {
+     "place": 1,
+     "name": "Niklas"
+    },
+    {
+     "place": 2,
+     "name": "Philipp"
+    },
+    {
+     "place": 3,
+     "name": "Chris"
+    }
+   ],
+   "places": [
+    {
+     "place": 4,
+     "name": "Tim"
+    },
+    {
+     "place": 5,
+     "name": "Benno"
+    },
+    {
+     "place": 6,
+     "name": "Kevin"
+    },
+    {
+     "place": 7,
+     "name": "Manu"
+    },
+    {
+     "place": 8,
+     "name": "P. Diddy"
+    },
+    {
+     "place": 9,
+     "name": "Jonny"
+    }
+   ],
+   "participants": [
+    "Niklas",
+    "Philipp",
+    "Chris",
+    "Tim",
+    "Benno",
+    "Kevin",
+    "Manu",
+    "P. Diddy",
+    "Jonny"
+   ],
+   "headline": "Vierling in der letzten Hand: Niki gewinnt das erste Online-Turnier",
+   "img": "online1-sieger-niki",
+   "imgCaption": "Niki, der erste Online-Champion des Blue Chip Club",
+   "winHand": "3♠ 3♥",
+   "report": "Neun Spieler, 246 Hände, 14 Rebuys und fast fünf Stunden am Tisch: Das erste Turnier am Online-Tisch des Blue Chip Club war kein Testlauf, sondern ein echter Abend. Gespielt wurde von zu Hause, mit Video und Sprache, mit der Struktur eines richtigen Online-Turniers.\n\nFrüh ging es hin und her. Manu kaufte sich sechsmal nach, so oft wie kein anderer, und hatte an diesem Abend einfach kein Glück in den großen Händen. Den größten Pot des Abends, 575.000 Chips, spielte Philipp mit Assen.\n\nAm Ende saßen Niki und Philipp im Heads-up. Niki hatte vorher drei Spieler selbst rausgenommen und machte es in der letzten Hand perfekt: 3♠ 3♥ und am Ende Vierling Dreier. Philipp wird stark Zweiter, Chris holt Platz drei.\n\nFür Niki ist es nach seinen vier Titeln am echten Tisch der erste Online-Titel. Er ist damit der erste Online-Champion des Blue Chip Club.",
+   "hands": [
+    {
+     "kind": "spot",
+     "hl": "Vierling Dreier in der letzten Hand",
+     "player": "Niklas"
+    },
+    {
+     "kind": "spot",
+     "hl": "3 KOs für Niki",
+     "player": "Niklas"
+    },
+    {
+     "kind": "spot",
+     "hl": "Größter Pot: 575.000 Chips, Philipp mit Assen",
+     "player": "Philipp"
+    },
+    {
+     "kind": "spot",
+     "hl": "6 Rebuys: Manu gibt nie auf",
+     "player": "Manu"
+    },
+    {
+     "kind": "spot",
+     "hl": "246 Hände in fast 5 Stunden",
+     "player": ""
+    }
+   ]
   }
  ],
  "hands": [
@@ -2551,6 +2644,16 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "pics": [
     "mc-finale-magg-niki"
    ]
+  },
+  {
+   "id": "o1-quads",
+   "tid": "o1",
+   "kind": "hand",
+   "cat": 7,
+   "rank": "3",
+   "player": "Niklas",
+   "cards": "3♠ 3♥",
+   "text": "Letzte Hand des ersten Online-Turniers, Vierling Dreier zum Sieg."
   }
  ],
  "specials": []
@@ -2615,12 +2718,14 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   }
   async function loadOnline() {
     const list = [];
-    try { const j = await (await fetch('online.json?v=' + Date.now(), { cache: 'no-store' })).json(); (j.turniere || []).forEach(r => { const t = normOnline(r, 'archiv'); if (t) list.push(t); }); } catch (e) {}
+    /* Online-Turniere mit Bericht stehen in DATA.tournaments (online: true) */
+    DATA.tournaments.filter(t => t.online).forEach(t => list.push({ id: t.id, name: t.title || tName(t), date: t.date, entries: t.entries, res: finishers(t).filter(named).map(r => ({ place: r.place, name: r.name.trim() })).sort((a, b) => a.place - b.place), src: 'data' }));
+    try { const j = await (await fetch('online.json?v=' + Date.now(), { cache: 'no-store' })).json(); (j.turniere || []).forEach(r => { const t = normOnline(r, 'archiv'); if (t && !list.some(x => x.name === t.name)) list.push(t); }); } catch (e) {}
     try {
       const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
       const r = await (await fetch(GAME_API + '/api/turnier/ergebnis?id=online1', { credentials: 'omit', signal: ctl.signal })).json();
       const t = normOnline(r, 'live');
-      if (t && !list.some(x => x.date === t.date && x.name === t.name)) list.push(t);
+      if (t && !list.some(x => x.name === t.name)) list.push(t);
     } catch (e) {}
     list.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     const changed = JSON.stringify(list) !== JSON.stringify(ONLINE);
@@ -2649,7 +2754,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   function standings() {
     const P = pts(), m = new Map();
     const get = n => { if (!m.has(n)) m.set(n, { name: n, points: 0, p1: 0, p2: 0, p3: 0, p4: 0, p5: 0, p6: 0, prize: 0, played: 0 }); return m.get(n); };
-    for (const t of DATA.tournaments) {
+    for (const t of DATA.tournaments) { if (t.online) continue;
       const onPodium = new Set();
       for (const r of finishers(t)) {
         if (!named(r)) continue;
@@ -2799,7 +2904,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       const w = winnerOf(t);
       h += '<section class="scene winner"><div class="sc-head"><span class="sc-kick">' + esc(tName(t)) + '</span><h2>' + (w ? esc(w) + '.' : 'Name folgt.') + ' <em>Sieger.</em></h2></div>' +
         '<figure class="sc-photo"' + (t.img ? ' style="--bg:url(\'' + imgSrc(esc(t.img)) + '\')"' : '') + '>' + (t.img ? '<img src="' + imgSrc(esc(t.img)) + '" alt="' + esc(t.imgCaption || 'Siegerbild') + '" loading="lazy">' : '') + '</figure>' +
-        '<div class="sc-stats"><div><b class="chrome" data-count="' + (Number(t.pot) || 0) + '">' + fmtN(t.pot) + '</b><span>' + esc(unit()) + ' im Pot</span></div><div><b class="chrome">' + (t.entries || '–') + '</b><span>Spieler am Tisch</span></div><div><b class="chrome">' + (t.date ? Number(t.date.split('-')[2]) + '.' + Number(t.date.split('-')[1]) + '.' : '–') + '</b><span>' + fmtDate(t.date) + '</span></div></div>' +
+        '<div class="sc-stats">' + (t.online ? '<div><b class="chrome">' + fmtN(t.handsPlayed) + '</b><span>Hände online</span></div>' : '<div><b class="chrome" data-count="' + (Number(t.pot) || 0) + '">' + fmtN(t.pot) + '</b><span>' + esc(unit()) + ' im Pot</span></div>') + '<div><b class="chrome">' + (t.entries || '–') + '</b><span>Spieler am Tisch</span></div><div><b class="chrome">' + (t.date ? Number(t.date.split('-')[2]) + '.' + Number(t.date.split('-')[1]) + '.' : '–') + '</b><span>' + fmtDate(t.date) + '</span></div></div>' +
         '<div class="sc-pay">' + [1, 2, 3].map(p => { const r = t.results.find(x => x.place === p) || {}; return '<div class="pay"><span class="rank r' + p + '">' + p + '</span><span class="nm">' + (named(r) ? esc(r.name) : 'offen') + '</span><span class="v">' + (r.prize ? eur(r.prize) : '–') + '</span></div>'; }).join('') + '</div></section>';
     }
     h += '<section class="scene board" id="lobby"><div class="sc-head"><span class="sc-kick">Offline · Online · Gesamt</span><h2>Die <em>Punkte-Rangliste.</em></h2></div><div class="lbwrap" style="display:grid;gap:16px">' + boardHtml() + '</div><a class="sc-link" href="#regeln" data-go="regeln">So werden die Punkte vergeben ›</a></section>';
@@ -2964,7 +3069,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       const c = p => { const r = t.results.find(x => x.place === p); return named(r) ? '<span style="color:var(--fg)">' + esc(r.name) + '</span>' + (r.prize ? ' <span class="note">' + eur(r.prize) + '</span>' : '') : '<span class="note">offen' + (r && r.prize ? ' · ' + eur(r.prize) : '') + '</span>'; };
       h += '<tr class="click" data-open="' + esc(t.id) + '" tabindex="0"><td class="player tl">' + esc(tName(t)) + ' <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>' + eur(t.pot) + '</td></tr>';
     }
-    for (const t of ONLINE.slice().reverse()) {
+    for (const t of ONLINE.filter(x => x.src !== 'data').reverse()) {
       const c = p => { const r = t.res.find(x => x.place === p); return r ? '<span style="color:var(--fg)">' + esc(r.name) + '</span>' : '<span class="note">offen</span>'; };
       h += '<tr><td class="player tl">' + esc(t.name) + '<span class="tag-on">Online</span> <span class="note">' + shortDate(t.date) + '</span></td><td class="tl">' + c(1) + '</td><td class="tl">' + c(2) + '</td><td class="tl">' + c(3) + '</td><td>' + (t.entries || '–') + '</td><td>–</td></tr>';
     }
@@ -3811,6 +3916,10 @@ ov.addEventListener('click',e=>{if(e.target===ov)ov.hidden=true;});})();
   .nfppromo .nfp-reel { width: min(240px, 70%); }
   .nfppromo .nfp-cta { justify-self: stretch; justify-content: center; font-size: 17px; padding: 0 16px; white-space: nowrap; }
 }
+
+/* Highlight-Kacheln ohne Foto (Online-Turniere) */
+div.hl-tile { aspect-ratio: 1; align-content: end; padding: 16px; border-radius: 12px; border: 1px solid rgb(226 184 87 / .35); background: radial-gradient(120% 100% at 0% 0%, rgb(226 184 87 / .16), transparent 60%), var(--surface); }
+div.hl-tile b { font-size: 16px; line-height: 1.3; }
 </style>
 <script>
 (function () {
