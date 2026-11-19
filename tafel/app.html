@@ -454,8 +454,8 @@ function playerSheet(p){const i=pinfo(p.name),b=[];
   b.push(["Bezahlung ändern","",()=>paidFlow(p)]);
   if(p.entries.length>1)b.push(["Letzten Rebuy zurücknehmen","red",()=>send({op:"undo",name:p.name},"Rebuy zurück")]);
   if(S.eb)b.push([p.eb?"Early Bird wegnehmen":"Early Bird geben (+"+fmt(S.eb)+")","",()=>send({op:"eb",name:p.name,v:!p.eb},"Early Bird "+p.name)]);
-  b.push(["Umbenennen","",()=>{const n=prompt("Neuer Name für "+p.name,p.name);if(n&&n.trim()&&n.trim()!==p.name)send({op:"rename",from:p.name,to:n.trim()},"umbenannt");}]);
-  b.push(["Entfernen (war nie da)","red",()=>{if(confirm(p.name+" ganz entfernen? Nur wenn er nie gespielt hat."))send({op:"remove",name:p.name},p.name+" entfernt");}]);
+  b.push(["Umbenennen","",()=>nameSheet("Umbenennen","Neuer Name für "+p.name,p.name,"Speichern",n=>{if(n!==p.name)send({op:"rename",from:p.name,to:n},"umbenannt");})]);
+  b.push(["Entfernen (war nie da)","red",()=>sheet(p.name+" ganz entfernen?","Nur wenn er nie gespielt hat.",[["Ja, entfernen","red",()=>send({op:"remove",name:p.name},p.name+" entfernt")]])]);
   const head=document.createElement("div");head.style.cssText="display:flex;justify-content:center;margin-top:12px";head.innerHTML=avHtml(p.name).replace('class="av"','class="av" style="width:72px;height:72px;font-size:26px"');
   sheet(p.name,(i.seat?i.seat+" · ":"")+"eingesetzt "+fmt(i.cost)+" P"+(i.open?" · "+i.open+" P offen":""),b,head);}
 
@@ -478,7 +478,11 @@ function outFlow(p){
   sheet(p.name+" ist raus?",D.reOpen&&pinfo(p.name).canRe?"Danach kann "+p.name+" noch einen Rebuy machen.":"",[["Ja, "+p.name+" ist raus","red",()=>send({op:"out",name:p.name},p.name+" raus")]]);}
 function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAY_TXT[e.paid],e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtons(v=>send({op:"paid",name:p.name,entry:j+1,paid:v},p.name+": "+PAY_TXT[v])))]);
   sheet(p.name+" · Bezahlung","Antippen zum Ändern",b);}
-function addFlow(n){n=(n||"").trim();if(!n){const x=prompt("Name des neuen Spielers");if(!x||!x.trim())return;n=x.trim();}
+/* Name-Eingabe im App-Design (keine Browser-Popups, Tim 19.11.) */
+function nameSheet(title,text,val,okLabel,fn){const W=document.createElement("div");W.innerHTML='<input id="nsIn" autocomplete="off" autocapitalize="words" style="margin-top:16px;text-align:center;font-size:19px;height:52px" placeholder="Name"><button class="btn pri press" id="nsOk" style="margin-top:10px;height:54px;font-size:17px"></button>';
+  sheet(title,text,[],W);const I=W.querySelector("#nsIn"),B=W.querySelector("#nsOk");I.value=val||"";B.textContent=okLabel;
+  const go=()=>{const n=I.value.trim();if(!n){I.focus();return;}closeSheet();setTimeout(()=>fn(n),250);};B.onclick=go;I.onkeydown=e=>{if(e.key==="Enter")go();};setTimeout(()=>I.focus(),350);}
+function addFlow(n){n=(n||"").trim();if(!n){nameSheet("Nachmelden","Name des neuen Spielers","","Weiter",addFlow);return;}
   sheet(n+" nachmelden","Buy-in "+(S?fmt(S.buyin):"")+" P · Bargeldregel: bar an der Kasse",payButtons(v=>send({op:"add",name:n,paid:v},n+" dazu ("+PAY_TXT[v]+")")));}
 const tblSub=p=>D.two?(pinfo(p.name).t===2?"Tisch 2":"Groß"):"";
 
