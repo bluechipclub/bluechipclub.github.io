@@ -1443,7 +1443,7 @@ $("sReset").onclick=()=>ask("Wirklich alles zurücksetzen? Rebuys, Platzierungen
 // live.json: {"cmds":[{"id":1,"op":"msg","text":"…"}]} — each id runs once on this laptop
 let applied=null;try{const a=localStorage.getItem(APPLIED_KEY);applied=a==null?null:+a;}catch(e){}
 /* nur Anzeige: diese Befehle spielt die Spiegel-Tafel mit ab */
-const VIS_OPS=["clip","clipstop","dance","dancestop","close","skipintro","cards","spotlight","entries","result"];
+const VIS_OPS=["lobbynav","clip","clipstop","dance","dancestop","close","skipintro","cards","spotlight","entries","result"];
 function runCmd(c){
   const op=c.op;
   if(isHaupt()&&VIS_OPS.includes(op)&&typeof fx==="function")fx("cmd",{c:Object.assign({},c,{src:undefined})});
@@ -1514,6 +1514,9 @@ function runCmd(c){
     case "lobbyclose":lobbyClose();break;
     case "close":if(typeof clipStop==="function"&&clipStop())break;if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
+    case "lobbyset":S.lobbyOff=(S.lobbyOff||[]).filter(x=>x!==c.id);if(!c.on)S.lobbyOff.push(c.id);break;
+    case "lobbynav":if(lobbyNav)lobbyNav(c.d<0?-1:1);break;
+    case "annok":if(!$("ann").hidden&&$("annOk"))$("annOk").click();break;
     case "dealernext":if(S.mt)dealerNext(c.t===2?2:1);else $("bDealer").click();break;
     case "players":openPlayers();break;
     case "spotlight":spotlight(c);break;
@@ -1698,17 +1701,6 @@ const LOBBY_PICS=[
  {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
  {u:"lobby/referenz-tim-intro-poster.jpg",v:"lobby/referenz-tim-intro.mp4",ey:"Blue Chip Club",t:"Welcome to The Void",p:""},
  {u:"lobby/chip-intro-final-weich-poster.jpg",v:"lobby/chip-intro-final-weich.mp4",ey:"Blue Chip Club",t:"Der Chip fällt",p:""},
- {who:"Tim",u:"../img/mbd-sieger-tim.jpg",ey:"Midnight Birthday Deepstack",t:"Tim holt den Titel",p:"Der amtierende Champion. Wer nimmt ihm die Krone ab?"},
- {who:"Magg",u:"../img/mbd-magg-quad-jacks.jpg",ey:"Midnight Birthday Deepstack",t:"Quad Jacks",p:"Magg mit vier Buben."},
- {who:"Benno",u:"../img/mbd-benno-doppel-ko.jpg",ey:"Midnight Birthday Deepstack",t:"Doppel-Knockout",p:"Benno Boss schickt zwei auf einmal heim."},
- {who:"Kevin,Benno",u:"../img/mbd-kevin-wheel-vs-benno.jpg",ey:"Midnight Birthday Deepstack",t:"Das Wheel",p:"Kevin trifft am Turn."},
- {who:"Tim",u:"../img/mbd-siegerhand.jpg",ey:"Midnight Birthday Deepstack",t:"Die Siegerhand",p:"Könige halten gegen Ass-Dame."},
- {who:"Niklas",u:"../img/dmh-sieger-niklas.jpg",ey:"Dead Man's Hand",t:"Niki holt den Titel",p:""},
- {who:"Tim",u:"../img/dmh-tim-quad-aces.jpg",ey:"Dead Man's Hand",t:"Quad Aces",p:"Tim mit vier Assen."},
- {who:"Oli",u:"../img/dmh-oli-quad-kings-jubel.jpg",ey:"Dead Man's Hand",t:"Quad Kings",p:"Oli dreht durch."},
- {who:"Manu",u:"../img/dmh-manu-double-up.jpg",ey:"Dead Man's Hand",t:"Double Up",p:"Manu verdoppelt."},
- {who:"Niklas,Magg",u:"../img/dmh-bubble-niki-magg.jpg",ey:"Dead Man's Hand",t:"Die Bubble",p:"Niki gegen Magg."},
- {who:"Niklas",u:"../img/dmh-siegerhand.jpg",ey:"Dead Man's Hand",t:"Die Siegerhand",p:""},
  {u:"momente/m1.jpg",ey:"Blue Chip Club",t:"Momente",p:""},
  {u:"momente/m2.jpg",ey:"Blue Chip Club",t:"Momente",p:""}
 ];
@@ -1717,6 +1709,7 @@ let lobbyT=null,lobbyCd=null;
 let LIGA=null;
 /* players with their own clip: it replaces the card on their screensaver slide (portrait 9:16) */
 const LOBBY_VIDS={"benno":"lobby/benno.mp4"};
+setTimeout(()=>{if(!LIGA)ligaLoad().then(()=>{try{syncState();}catch(e){}});},1200);
 /* players with their own picture instead of the card (wide 16:9) */
 const LOBBY_IMGS={"tim":{u:"lobby/tim.jpg",n:"TIM",nick:"The Calculator",tr:["🧮 Extrem gute Mathe-Skills","👀 Liest jeden am Tisch","🧱 Spielt sehr solide","📈 Langfristig immer im Plus","🧊 Bleibt immer ruhig","🎯 Stärkste Disziplin"]}};
 async function ligaLoad(){try{const html=await (await fetch("../index.html?b="+Date.now(),{cache:"no-store"})).text();
@@ -1727,10 +1720,21 @@ function pStats(n){const r={played:0,wins:0,pod:0,pts:0,champ:false,nick:""};if(
   const W=T.filter(t=>(t.results||[]).some(y=>y.place===1&&y.name));r.champ=!!W.length&&W[W.length-1].results.find(y=>y.place===1).name.trim()===n;
   r.nick=(LIGA.settings.nicknames||{})[n]||"";return r;}
 /* only pictures of people who are at the table tonight (pictures without "who" always run) */
-const here=w=>!w||w.split(",").some(n=>S.players.some(p=>p.name.toLowerCase()===n.trim().toLowerCase()));
+const here=w=>!w||w.split(/,| und /).some(n=>S.players.some(p=>p.name.toLowerCase()===n.trim().toLowerCase()));
+/* Bildschirmschoner-Inhalte (Tim 19.11.): Club-Intro + Spielerkarten + JEDER Turnierbericht der Website (Siegerfoto + Hände mit Bild) kommt automatisch rein.
+   In der App pro Gruppe an/aus (S.lobbyOff = ausgeschaltete Gruppen). */
+const shortTx=t=>{t=String(t||"");return t.length>150?t.slice(0,t.lastIndexOf(" ",147))+" …":t;};
+function lobbyGroups(){const G=[{id:"club",label:"Club-Intro, Videos, Momente",slides:LOBBY_PICS.filter(x=>!x.who)}];
+  G.push({id:"karten",label:"Spielerkarten · heute am Tisch",slides:S.players.map(p=>p.name)});
+  if(LIGA)LIGA.tournaments.slice().sort((a,b)=>a.date<b.date?1:-1).forEach(t=>{const sl=[],dt=t.date?t.date.slice(8,10)+"."+t.date.slice(5,7)+".":"";
+    if(t.img)sl.push({u:"../img/"+t.img+".jpg",ey:t.title+" · "+dt,t:t.headline||t.title,p:t.imgCaption||""});
+    (LIGA.hands||[]).filter(h=>h.tid===t.id&&h.pics&&h.pics.length).forEach(h=>sl.push({who:[h.player,h.opponent].filter(Boolean).join(","),u:"../img/"+h.pics[0]+".jpg",ey:t.title,t:h.hl||h.title||"",p:shortTx(h.text)}));
+    if(sl.length)G.push({id:t.id,label:t.title+" · "+dt,slides:sl});});
+  return G;}
+const lobOn=id=>!(S.lobbyOff||[]).includes(id);
 function lobbySlides(){
-  const cards=S.players.map(p=>{const c=cardOf(p.name);const u=c&&(typeof c==="string"?c:c.img);return u?{u,card:1,pl:p.name,ey:"Heute am Tisch",t:p.name,p:""}:null;}).filter(Boolean);
-  const pics=shuf(LOBBY_PICS.filter(x=>here(x.who))),cs=shuf(cards),out=[];
+  const cards=(lobOn("karten")?S.players:[]).map(p=>{const c=cardOf(p.name);const u=c&&(typeof c==="string"?c:c.img);return u?{u,card:1,pl:p.name,ey:"Heute am Tisch",t:p.name,p:""}:null;}).filter(Boolean);
+  const pics=shuf(lobbyGroups().filter(g=>g.id!=="karten"&&lobOn(g.id)).flatMap(g=>g.slides).filter(x=>here(x.who))),cs=shuf(cards),out=[];
   while(cs.length||pics.length){if(cs.length)out.push(cs.shift());if(cs.length)out.push(cs.shift());if(pics.length)out.push(pics.shift());}
   return out;
 }
@@ -1872,8 +1876,13 @@ function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[])
     dur:dur(S.i),d1:S.mt?((dealerOf(1)||{}).name||""):dealerName(),d2:twoT()?((dealerOf(2)||{}).name||""):"",games:Object.keys(GAMES),
     p:Object.fromEntries(allP().map(p=>[p.name,{t:S.mt?tblOf(p):1,place:placeOf(p)||0,cost:costOf(p),open:p.entries.reduce((a,e,j)=>a+(e.paid==="offen"?entPrice(p,j):0),0),canRe:canRebuy(p),seat:seatLabel(p)}])),
     order:S.mt?[...seatOrder(1),...seatOrder(2)].map(p=>p.name):S.players.map(p=>p.name),avg:alive().length?Math.round((totalEntries()*S.stack+allP().filter(p=>p.eb).length*(S.eb||0))/alive().length):0};
+  o.D.scr=scrState();try{o.D.lob=lobbyGroups().map(g=>({id:g.id,label:g.label,n:g.slides.length,on:lobOn(g.id)}));}catch(e){}
   try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.fee=st.feeTotal;}catch(e){}
   return o;}
+/* was gerade groß auf dem Bildschirm läuft (für die Steuerleiste in der App) */
+function scrState(){const a=$("ann"),h=a&&!a.hidden?(a.querySelector("h3")||{}).textContent||"":"",ok=a&&!a.hidden&&$("annOk")?$("annOk").textContent:"";
+  return {ann:!!(a&&!a.hidden),annT:h,annB:ok,intro:!!intro,lobby:!$("lobby").hidden};}
+setInterval(()=>{if(!isHaupt())return;const k=JSON.stringify(scrState());if(k!==scrState.k){scrState.k=k;syncState(true);}},600);
 function syncState(now){if(!isHaupt())return;if(now){clearTimeout(syncState.t);syncState.t=null;bc("state",{seq:++seq,S:stateLite()});return;}
   if(syncState.t)return;syncState.t=setTimeout(()=>{syncState.t=null;bc("state",{seq:++seq,S:stateLite()});},250);}
 let mirrorKey="";
@@ -1903,6 +1912,7 @@ function runVis(c){try{const op=c.op;
   if(op==="lobby")return lobbyShow();if(op==="lobbyclose")return lobbyClose();
   if(op==="close"){if(typeof clipStop==="function"&&clipStop())return;if(danceStop())return;if(intro){intro.next();return;}closeAll();$("ann").hidden=true;return;}
   if(op==="skipintro"){if(intro)intro.stop();return;}
+  if(op==="lobbynav"){if(lobbyNav)lobbyNav(c.d<0?-1:1);return;}
   if(op==="cards"){if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});return;}
   if(op==="spotlight")return spotlight(c);
   if(op==="result")return openResult();
