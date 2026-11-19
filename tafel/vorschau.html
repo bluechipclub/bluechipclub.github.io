@@ -65,7 +65,7 @@ body.two .tcap{display:block}
 .t2 .dbtn{width:1.9vw;height:1.9vw}
 .t2 .seat2.flash .nm2{animation:flash 1.2s var(--ease)}
 .tmove{color:#f3d68f}
-.syncB{position:fixed;right:1vw;bottom:.6vh;z-index:30;font:600 max(10px,.7vw)/1 var(--mono);letter-spacing:.08em;padding:.5vh .8vw;border-radius:999px;background:rgba(10,10,10,.8);border:1px solid #333;color:#9a9a96;cursor:pointer}
+.syncB{position:fixed;right:1vw;bottom:.6vh;z-index:8500;font:600 max(10px,.7vw)/1 var(--mono);letter-spacing:.08em;padding:.5vh .8vw;border-radius:999px;background:rgba(10,10,10,.8);border:1px solid #333;color:#9a9a96;cursor:pointer}
 .syncB.ok::before{content:"● ";color:#5bd28a}.syncB.bad::before{content:"● ";color:#e5675c}
 body.spiegel .ctrl{display:none!important}
 body.spiegel .seat,body.spiegel .seat2{pointer-events:none}
@@ -540,6 +540,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   </div>
 </div></div>
 
+<div class="modal" id="mAsk" hidden style="z-index:9000"><div class="sheet" style="width:min(560px,92vw);text-align:center"><p id="askT" style="font-size:20px;line-height:1.45;white-space:pre-wrap;margin-bottom:20px;user-select:text"></p><div class="row" style="justify-content:center;gap:12px"><button class="b pri" id="askOk">OK</button><button class="b" id="askNo">Abbrechen</button></div></div></div>
 <div class="ann" id="ann" hidden><div class="annBox" id="annBox"></div></div>
 <div class="intro" id="intro" hidden></div>
 <div class="count" id="count" hidden></div>
@@ -1039,7 +1040,7 @@ function openPlayers(focus){if(!isHaupt())return;
     const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;h.appendChild(b);};
     if(S.pend)mk(S.pend.op==="move"?"✓ Wechsel bestätigen":"Final Table auslosen","pri",()=>{$("mPlayers").hidden=true;S.pend.op==="move"?moveP(S.pend.name,S.pend.to):mergeTables();});
     if(two)mk("Tische prüfen","",()=>{$("mPlayers").hidden=true;checkTables(false);});
-    if(two)mk("Jetzt Final Table","red",()=>{if(!confirm("Tische jetzt zum Final Table zusammenlegen?"))return;$("mPlayers").hidden=true;mergeTables();});
+    if(two)mk("Jetzt Final Table","red",()=>ask("Tische jetzt zum Final Table zusammenlegen?","Zusammenlegen",()=>{$("mPlayers").hidden=true;mergeTables();},true));
     L.appendChild(h);}
   list.forEach((p,k)=>{
     const d=document.createElement("div");d.className="pcard"+(p.out?" out":"");
@@ -1051,7 +1052,7 @@ function openPlayers(focus){if(!isHaupt())return;
     const R=d.querySelector(".row");
     const add=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;R.appendChild(b);};
     const canRe=S.maxRe==null||p.entries.length-1<S.maxRe;
-    add("+1 Rebuy",rebuyOpen()&&canRe?"":"",()=>{if(!rebuyOpen()&&!confirm("Rebuy-Phase ist vorbei. Trotzdem eintragen?"))return;if(!canRe&&!confirm("Rebuy-Limit erreicht. Trotzdem?"))return;doRebuy(p.name);openPlayers();});
+    add("+1 Rebuy",rebuyOpen()&&canRe?"":"",()=>{const go=()=>{doRebuy(p.name);openPlayers();};const w=[!rebuyOpen()?"Die Rebuy-Phase ist vorbei.":"",!canRe?"Das Rebuy-Limit ist erreicht.":""].filter(Boolean).join(" ");if(w)ask(w+" Trotzdem eintragen?","Trotzdem eintragen",go,true);else go();});
     if(p.entries.length>1)add("−1","",()=>{p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});save();render();openPlayers();});
     if(!p.out)add("Raus","red",()=>{const fin=by=>{doOut(p.name,by);if(!$("ann").hidden)return;openPlayers();};if(!S.bounty)return fin();pickHunter(p,fin);});
     else add("Zurück ins Spiel","",()=>{doBack(p.name);openPlayers();});
@@ -1195,7 +1196,7 @@ function summaryText(){
     "\n\nZahlungen:\n"+(s.tx.map(t=>t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine");
 }
 $("bExport").onclick=download;$("rExport").onclick=download;
-$("rCopy").onclick=async()=>{const t=summaryText();try{await navigator.clipboard.writeText(t);toast("Text kopiert");}catch(e){prompt("Kopieren:",t);}};
+$("rCopy").onclick=async()=>{const t=summaryText();try{await navigator.clipboard.writeText(t);toast("Text kopiert");}catch(e){ask(t,"OK",()=>{});}};
 $("rClose").onclick=()=>$("mResult").hidden=true;
 
 /* ---------- seat draw ---------- */
@@ -1400,8 +1401,8 @@ function restartTournament(){
   S.lostHeads=0;S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
   save();buildSeats();render();toast("Turnier neu gestartet · Level 1 bereit");
 }
-$("sRestart").onclick=()=>{if(!confirm("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben."))return;restartTournament();$("mSet").hidden=true;};
-$("sReset").onclick=()=>{if(!confirm("Wirklich alles zurücksetzen? Rebuys, Platzierungen und Zeit sind dann weg. Vorher Export machen!"))return;download();S=fresh();LEVELS=S.levels;save();buildSeats();render();$("mSet").hidden=true;};
+$("sRestart").onclick=()=>ask("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben.","Neu starten",()=>{restartTournament();$("mSet").hidden=true;},true);
+$("sReset").onclick=()=>ask("Wirklich alles zurücksetzen? Rebuys, Platzierungen und Zeit sind dann weg. Vorher wird automatisch exportiert.","Alles zurücksetzen",()=>{download();S=fresh();LEVELS=S.levels;save();buildSeats();render();$("mSet").hidden=true;},true);
 
 /* ---------- live commands from Claude ---------- */
 // live.json: {"cmds":[{"id":1,"op":"msg","text":"…"}]} — each id runs once on this laptop
@@ -1566,7 +1567,7 @@ function bkInfo(){const e=$("sCloudInfo");if(e)e.textContent=bkLast?"Letzte Clou
 setInterval(()=>pushBackup(),20*60e3); // refresh before ntfy forgets attachments (3 h)
 $("sCloud").onclick=async()=>{const e=$("sCloudInfo");e.textContent="Lade …";
   try{const b=await fetchBackup();if(!b){e.textContent="Keine Cloud-Sicherung gefunden.";return;}
-    if(!confirm("Stand von "+hm(b.at)+" Uhr laden? Der Stand auf diesem Gerät wird ersetzt."))return;applyBackup(b);$("mSet").hidden=true;toast("Stand von "+hm(b.at)+" Uhr geladen");}
+    e.textContent="";ask("Stand von "+hm(b.at)+" Uhr laden? Der Stand auf diesem Gerät wird ersetzt.","Laden",()=>{applyBackup(b);$("mSet").hidden=true;toast("Stand von "+hm(b.at)+" Uhr geladen");});}
   catch(x){e.textContent="Cloud nicht erreichbar.";}};
 setInterval(()=>{if(S.running)pushState();},60000);
 // sound only works after one click/key on this laptop (browser rule)
@@ -1582,8 +1583,8 @@ $("bMinus").onclick=()=>addTime(-60);$("bPlus").onclick=()=>addTime(60);
 $("bPlayers").onclick=()=>openPlayers();
 $("bDealer").onclick=()=>{if(S.mt)return dealerNext(1);let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++){k=(k+1)%n;if(!S.players[k].out)break;}S.dealer=k;save();render();};
 $("bDealer2").onclick=()=>dealerNext(2);
-$("bTables").onclick=()=>{if(!twoT())return;const q=S.pend;if(q&&q.op==="merge")return checkTables(false);checkTables(false);if(!S.pend){announce({eyebrow:"Zwei Tische",title:"Tische sind ausgeglichen",text:"Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler.",html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annM1">Spieler an Tisch 2 setzen</button> <button class="b" type="button" id="annM2">Spieler an den großen Tisch setzen</button> <button class="b red" type="button" id="annFT">Jetzt Final Table</button></div>',btn:"OK"});$("annM1").onclick=()=>{$("ann").hidden=true;pickMover(1);};$("annM2").onclick=()=>{$("ann").hidden=true;pickMover(2);};$("annFT").onclick=()=>{$("ann").hidden=true;if(confirm("Tische jetzt zum Final Table zusammenlegen?"))mergeTables();};}};
-$("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawShow();};
+$("bTables").onclick=()=>{if(!twoT())return;const q=S.pend;if(q&&q.op==="merge")return checkTables(false);checkTables(false);if(!S.pend){announce({eyebrow:"Zwei Tische",title:"Tische sind ausgeglichen",text:"Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler.",html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annM1">Spieler an Tisch 2 setzen</button> <button class="b" type="button" id="annM2">Spieler an den großen Tisch setzen</button> <button class="b red" type="button" id="annFT">Jetzt Final Table</button></div>',btn:"OK"});$("annM1").onclick=()=>{$("ann").hidden=true;pickMover(1);};$("annM2").onclick=()=>{$("ann").hidden=true;pickMover(2);};$("annFT").onclick=()=>{$("ann").hidden=true;ask("Tische jetzt zum Final Table zusammenlegen?","Zusammenlegen",mergeTables,true);};}};
+$("bDraw").onclick=()=>{if(S.started)ask("Das Turnier läuft schon. Trotzdem neu auslosen?","Neu auslosen",drawShow,true);else drawShow();};
 $("bResult").onclick=openResult;
 $("bSet").onclick=openSettings;
 /* ---------- Floorman: Seat open ---------- */
@@ -1899,10 +1900,13 @@ function mirrorBadge(){const b=$("syncB");if(!b)return;const n=Object.values(pee
   b.className="syncB "+(ok?"ok":"bad");
   b.textContent=(isHaupt()?"Haupttafel":"Spiegel")+" · "+(chanOk?(isHaupt()?(tv>1?(tv-1)+" Spiegel":"kein Spiegel")+" · "+ph+" Handy"+(ph===1?"":"s"):(ok?"verbunden":"wartet auf Haupttafel …")):"offline");}
 document.body.insertAdjacentHTML("beforeend",'<button type="button" class="syncB" id="syncB">…</button>');
-$("syncB").onclick=()=>{if(isHaupt()){if(confirm("Dieses Gerät zur Spiegel-Tafel machen? Es zeigt dann nur noch an, was die Haupttafel schickt."))setRole("spiegel");}else{if(confirm("Dieses Gerät zur HAUPTTAFEL machen? (z. B. wenn der andere Laptop ausgefallen ist) Die andere Tafel wird automatisch zum Spiegel."))setRole("haupt");}};
+$("syncB").onclick=()=>{if(isHaupt())ask("Dieses Gerät zur Spiegel-Tafel machen? Es zeigt dann nur noch an, was die Haupttafel schickt.","Zum Spiegel machen",()=>setRole("spiegel"));else ask("Dieses Gerät zur Haupttafel machen? (z. B. wenn der andere Laptop ausgefallen ist) Die andere Tafel wird automatisch zum Spiegel.","Zur Haupttafel machen",()=>setRole("haupt"));};
 document.body.classList.toggle("spiegel",!isHaupt());
 syncStart();
 
+/* Bestätigung im Tafel-Design (keine Browser-Popups, Tim 19.11.) */
+function ask(text,okLabel,fn,danger){const m=$("mAsk");$("askT").textContent=text;const ok=$("askOk");ok.textContent=okLabel||"OK";ok.className="b "+(danger?"red":"pri");
+  ok.onclick=()=>{m.hidden=true;fn&&fn();};$("askNo").onclick=()=>m.hidden=true;$("askNo").hidden=okLabel==="OK";m.hidden=false;}
 /* ---------- Comic-Tänze (Spieler ohne eigenen Clip): Sprite aus emotes/<figur>_<tanz>.webp ---------- */
 const EMO={"tim":"tim","manu":"manu","niklas":"niki","niki":"niki","nico":"nico","jonny":"jonny","jonas":"jonny","kevin":"kevin","magg":"magg","domi m":"magg","oli":"oli","philipp":"philipp","p. diddy":"p-diddy","alex":"p-diddy","zeno":"zeno","vijii":"vijii","chris":"chris","benno":"benno","domi c":"domi-c"};
 const DANCES={tanz:"Tanz",tanz2:"Tanzschritte",tanz3:"Party",jubel:"Jubel",floss:"Floss",moonwalk:"Moonwalk",robot:"Robot",flex:"Flex",winken:"Winken"};
