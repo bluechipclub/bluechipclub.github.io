@@ -8,7 +8,7 @@
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=Geist:wght@400..800&family=Geist+Mono:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
 :root{
   --bg:#070707;--surface:#111111;--surface2:#171717;--line:#242424;--line2:#333;
@@ -381,6 +381,41 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .box{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),rgba(8,10,16,.82);border-color:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35)}
 .syncB{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),rgba(10,10,10,.75);border-color:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 @media (prefers-reduced-motion:reduce){.b{transition:none}}
+
+/* ===== v5 Nacht (Tim 19.11. abends): Tafel im neuen Website-Look. Casino-bei-Nacht hinter Regen als Hintergrund, Nachtblau,
+   Glasflächen, Gold nur als Akzent, Schrift Outfit. Bewegung nach Emil Kowalski: kurz, ease-out, nur transform/opacity. ===== */
+:root{--bg:#04070e;--surface:rgba(12,18,32,.72);--surface2:rgba(20,28,48,.78);--line:rgba(170,195,255,.13);--line2:rgba(170,195,255,.26);
+  --fg:#eef2fb;--grey:#a3aec6;--grey2:#6c7893;--sans:"Outfit","Geist","Helvetica Neue",Arial,sans-serif}
+html,body{background:#04070e}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:url("../img/bg-casino-regen.webp") 62% 30%/cover no-repeat;opacity:.6}
+.vign{background:linear-gradient(180deg,rgba(4,7,14,.25) 0%,rgba(4,7,14,.55) 45%,rgba(4,7,14,.88) 100%),radial-gradient(120% 100% at 50% 40%,transparent 45%,rgba(0,0,0,.7))}
+.title{font-family:var(--sans);font-weight:700;letter-spacing:-.025em}
+/* Glas statt schwarzer Kästen (ohne backdrop-filter: läuft flüssig auf jedem Laptop) */
+.box{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.015) 40%),rgba(9,14,27,.74);border:1px solid var(--line2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1.6vh 4vh rgba(0,0,0,.45);border-radius:1.2vw}
+.box::after{content:"";position:absolute;left:8%;right:8%;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(243,214,143,.45),transparent);pointer-events:none}
+.stage{box-shadow:inset 0 0 4vw 2vw rgba(4,7,14,.92),0 0 0 1px var(--line);border-radius:1.6vw}
+.stage.img11{background-color:#05080f}
+.seat .nm{background:linear-gradient(180deg,rgba(26,36,62,.94),rgba(10,15,30,.94));border-color:rgba(140,175,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 .6vh 1.6vh rgba(0,0,0,.5)}
+.tcap{background:rgba(9,14,27,.78);border-color:rgba(243,214,143,.35)}
+.t2{background:radial-gradient(ellipse 70% 80% at 50% 50%,rgba(19,33,63,.9) 0%,rgba(11,18,38,.9) 55%,rgba(7,9,15,.9) 100%);border-color:var(--line2)}
+.pay{padding:.35vh 0}
+.pay span{color:var(--grey)}
+.annBox{background:radial-gradient(ellipse at 50% 0%,rgba(47,107,255,.32),rgba(8,12,24,.97) 68%);border:1px solid rgba(243,214,143,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4vh 12vh rgba(0,0,0,.7)}
+.ann{background:rgba(2,4,10,.66)}
+.ann:not([hidden]) .annBox{animation:annIn .45s cubic-bezier(.23,1,.32,1) both}
+@keyframes annIn{from{opacity:0;transform:translateY(2vh) scale(.97)}to{opacity:1;transform:none}}
+.intro{background:radial-gradient(ellipse at 35% 50%,rgba(47,107,255,.32),rgba(3,5,11,.95) 60%)}
+.lobby{background:#04070e}
+.lobby .ltiles div{background:rgba(9,14,27,.6);border-color:rgba(243,214,143,.3)}
+.toast{background:linear-gradient(180deg,rgba(40,48,70,.97),rgba(18,22,34,.97));border-color:rgba(243,214,143,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.6)}
+.modal{background:rgba(2,4,10,.72)}
+.modal>div,.modal .in{background:linear-gradient(180deg,rgba(40,48,70,.97),rgba(14,18,30,.98));border-color:rgba(243,214,143,.35)}
+.potc b{color:#fff}
+#clipUnlock{background:radial-gradient(ellipse at 50% 0%,rgba(47,107,255,.3),transparent 70%),rgba(8,12,24,.97)!important;border:1px solid rgba(243,214,143,.5)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4vh 12vh rgba(0,0,0,.7)!important;font-family:var(--sans)!important}
+.snd{background:rgba(9,14,27,.85);border-color:rgba(243,214,143,.4)}
+@media (prefers-reduced-motion:reduce){.ann:not([hidden]) .annBox{animation:none}}
 </style>
 </head>
 <body>
