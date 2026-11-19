@@ -2811,7 +2811,7 @@ $('#enter').onclick=async()=>{
   ME.code=code||(ME.konto&&ME.konto.code)||''; if(ok&&ok.key&&ok.name) WHO={k:AUTHQ(),j:ok}; if(ok.key&&!byKey[ok.key]){ byKey[ok.key]={key:ok.key,name:ok.name||'Gast',color:'#2a5fd6',chippy:true}; } if(ok.key&&byKey[ok.key]) chosen=ok.key;
   audio(); ME.key=chosen; try{localStorage.setItem('bcc-me',chosen);}catch(e){}
   tutMaybe();
-  try{ if(localStorage.getItem('bcc-voice')==='1'&&(ME.code||ME.ticket)&&ME.code!=='007'){ VOICE.want=true; VOICE.mic=false; setTimeout(voiceConnect,2500); } }catch(e){}
+  try{ if(localStorage.getItem('bcc-voice')!=='0'&&(ME.code||ME.ticket)&&ME.code!=='007'){ VOICE.want=true; VOICE.mic=false; setTimeout(voiceConnect,2500); } }catch(e){}
   $('#login').hidden=true; $('#hudTop').hidden=false; $('#help').hidden=false; setTimeout(()=>$('#help').classList.add('fade'),10000); $('#joy').hidden=false; $('#jumpBtn').hidden=false; $('#viewBtn').hidden=false; setChips(ME.chips); setTimeout(spawnDouble,300);
   S.mode='free'; ME.yaw=0; setTimeout(lngConnect,800);
   if(QS.get('spawn')==='bar'){ ME.pos.set(TBAR.maxx+.6,0,-6.6); setTimeout(()=>sitBar(),400); status(`<div class="gg-goal__t">Ziel</div>Am Tresen läuft der Online-Tisch live.<small>Die Eingangstür führt an den Online-Tisch.</small>`); }
@@ -2895,9 +2895,9 @@ async function lkConnect(url,token,raum){ if(EMBED.open) return; const my=++VOIC
     if(L.RoomEvent.ParticipantPermissionsChanged) r.on(L.RoomEvent.ParticipantPermissionsChanged,(prev,part)=>{ if(!part||part===r.localParticipant) chPermCheck(r); });
     r.on(L.RoomEvent.Disconnected,(why)=>{ if(VOICE.room===r){ bccLog('livekit-fehler','Getrennt '+(why==null?'':why)); VOICE.room=null; VOICE.raum=null; CH.tokUsed=true; voiceUI(); if(VOICE.want) setTimeout(voiceConnect,3000); } });
     await r.connect(url,token); if(my!==VOICE.seq||EMBED.open||!VOICE.want){ try{ r.disconnect(); }catch(e){} return; }
-    VOICE.room=r; VOICE.raum=raum; await r.startAudio().catch(()=>{}); chPermCheck(r);
+    VOICE.room=r; VOICE.raum=raum; await r.startAudio().catch(()=>{}); if(!r.canPlaybackAudio){ const u=()=>{ r.startAudio().catch(()=>{}); if(r.canPlaybackAudio){ removeEventListener('pointerdown',u,true); removeEventListener('keydown',u,true); } }; addEventListener('pointerdown',u,true); addEventListener('keydown',u,true); } chPermCheck(r);
     if(!VOICE.admMuted) { if(VOICE.mic&&VOICE.micOk===null){ await new Promise(res=>{ let n=0; const iv=setInterval(()=>{ if(VOICE.micOk!==null||++n>100){ clearInterval(iv); res(); } },100); }); } if(VOICE.mic&&VOICE.micOk===false) VOICE.mic=false; else await r.localParticipant.setMicrophoneEnabled(VOICE.mic).catch(err=>{ VOICE.mic=false; toast(micWhy(err),5000); }); }
-    if(VOICE.micOk===false&&VOICE.micErr){ toast(VOICE.micErr,7000); VOICE.micErr=null; } else toast(raum==='lounge'?'🎙 Sprachchat Lounge: alle in der Lounge hören dich.':chIsTable(raum)?'🎙 Sprachchat Tisch: nur die Spieler am Tisch hören dich.':chIsDm(raum)?'📞 Privatgespräch: nur ihr zwei hört euch.':`🎧 Kanal „${chEsc(chLabel(raum))}“: nur Mitglieder hören dich.`,2600);
+    if(VOICE.micOk===false&&VOICE.micErr){ toast(VOICE.micErr,7000); VOICE.micErr=null; } else if(!VOICE.mic&&!VOICE.admMuted&&!r.localParticipant.isMicrophoneEnabled) toast(raum==='lounge'?'🎧 Sprachchat Lounge an: du hörst alle. Mikro an mit <b>M</b> oder 🎙.':'🎧 Sprachchat an: du hörst die anderen. Mikro an mit <b>M</b> oder 🎙.',3200); else toast(raum==='lounge'?'🎙 Sprachchat Lounge: alle in der Lounge hören dich.':chIsTable(raum)?'🎙 Sprachchat Tisch: nur die Spieler am Tisch hören dich.':chIsDm(raum)?'📞 Privatgespräch: nur ihr zwei hört euch.':`🎧 Kanal „${chEsc(chLabel(raum))}“: nur Mitglieder hören dich.`,2600);
   }catch(e){ console.warn('voice',e); bccLog('livekit-fehler','Verbinden: '+(e&&e.message||e)); if(CH.tok&&CH.tok.token===token) CH.tokBad=CH.tok; if(my===VOICE.seq){ toast(chEsc(e.message||'Sprachchat konnte nicht starten'),3000); if(!CH.ok) VOICE.want=false; } }
   finally{ if(my===VOICE.seq){ VOICE.busy=false; voiceUI(); if(CH.open) chRender(); } } }
 async function legacyConnect(){ if(VOICE.busy||!VOICE.want||EMBED.open) return; const raum=voiceRaum(); if(VOICE.room&&VOICE.raum===raum) return; VOICE.busy=true; voiceUI(); let tok=null;
@@ -3458,7 +3458,7 @@ var RL=null; function roomLights(){ if(!RL){ RL={tav:[],flat:[],st:null}; scene.
   const st={};
   setInterval(()=>{ try{
     const r=VOICE.room, live=!!(r&&r.localParticipant.isMicrophoneEnabled)&&!VOICE.admMuted, m=$('#ggStumm');
-    if(st.mute!==!live){ const first=st.mute===undefined; st.mute=!live; m.querySelector('.ggI').innerHTML=live?IC_MIC:IC_OFF; if(first) m.classList.toggle('is-on',!live); else GG.toggle(m,!live); }
+    if(st.mute!==!live){ const first=st.mute===undefined; st.mute=!live; m.querySelector('.ggI').innerHTML=live?IC_MIC:IC_OFF; if(first) m.classList.toggle('is-on',!live); else GG.toggle(m,!live); }     { const lb=m.querySelector('.gg-mi__lb'), t=!VOICE.want?'Voice aus':!r?'Verbinde':live?'Mikro an':'Stumm'; if(lb&&lb.textContent!==t) lb.textContent=t; }
     const dn=DANCING.has(SELF)||!$('#danceMenu').hidden, d=$('#ggDance'); if(st.dance!==dn){ st.dance=dn; GG.toggle(d,dn); }
     const lc=$('#lcount'), lb=$('#ggLounge'); if(lb.hidden!==lc.hidden) lb.hidden=lc.hidden; const n=(String(lc.textContent).match(/\d+/)||['1'])[0]; const lt='Lounge · '+n+' online'; if($('#ggLoungeT').textContent!==lt) $('#ggLoungeT').textContent=lt;
     const nm=LNG.myName||ONL.name||ME.name||''; if(nm&&st.nm!==nm){ st.nm=nm; $('#ggName').textContent=nm; $('#ggAv').textContent=nm.trim()[0].toUpperCase(); }
