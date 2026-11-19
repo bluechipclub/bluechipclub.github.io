@@ -102,6 +102,12 @@
    "p": "Alle",
    "t": "🎤 Rap: Tim & Niki",
    "src": "clips/tim-niklas-1.mp4"
+  },
+  {
+   "id": "chris-1",
+   "p": "Chris",
+   "t": "Der Top-Raiser",
+   "src": "clips/chris-1.mp4"
   }
  ]
 }
