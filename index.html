@@ -9,9 +9,23 @@
 .ob-cta { display: inline-flex; align-items: center; gap: 12px; height: 64px; padding: 0 34px; border-radius: 999px; font-size: 20px; font-weight: 700; color: #fff !important; text-decoration: none; background: linear-gradient(180deg, #4f86ff, #2f6bff 55%, #1f4fd0); border: 1px solid #8fb0ff; box-shadow: 0 14px 40px rgb(47 107 255 / .55), 0 1px 0 rgb(255 255 255 / .35) inset; transition: transform .2s, box-shadow .2s; }
 .ob-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 50px rgb(47 107 255 / .7), 0 1px 0 rgb(255 255 255 / .35) inset; }
 .ob-ctas .op-hero { height: 52px; font-size: 17px; padding: 0 26px; }
-.ob-reel { position: absolute; right: max(32px, calc(50vw - 600px)); top: 50%; width: min(500px, 36vw); aspect-ratio: 16 / 10; border-radius: 26px; overflow: hidden; transform: translateY(-55%) rotate(4deg); border: 6px solid #0b0f1a; outline: 1px solid rgb(170 195 255 / .25); box-shadow: 0 30px 80px rgb(0 0 0 / .6), 0 0 60px rgb(47 107 255 / .3); z-index: 1; }
+.ob-reel { position: absolute; right: max(32px, calc(50vw - 600px)); top: 50%; width: min(500px, 36vw); aspect-ratio: 16 / 10; border-radius: 26px; overflow: hidden; transform: translateY(-55%) rotate(4deg); border: 6px solid #0b0f1a; outline: 1px solid rgb(170 195 255 / .25); box-shadow: 0 30px 80px rgb(0 0 0 / .55); z-index: 1; }
 .ob-reel img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @media (max-width: 980px) { .ob-reel { display: none; } .ob-cta { height: 60px; font-size: 19px; } }
+/* Knöpfe ruhig (19.11. Tim: „zu grell“): Emil-Kowalski-Prinzipien – kein Glow, feine Kante, kleine Höhe, Druck-Feedback scale(.97), 160 ms ease-out */
+.ob-ctas { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start !important; gap: 12px; }
+.ob-cta, .ob-ctas .op-hero { height: 50px; padding: 0 24px; border-radius: 999px; font-size: 16px; font-weight: 600; letter-spacing: -.01em; gap: 10px; box-shadow: none; transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 160ms ease, border-color 160ms ease; -webkit-tap-highlight-color: transparent; }
+.ob-cta { color: #0b0f1a !important; background: #f4f4f2; border: 1px solid rgb(255 255 255 / .9); }
+.ob-cta:hover { transform: none; box-shadow: none; background: #fff; }
+.ob-cta span[aria-hidden] { color: #2f6bff; }
+.ob-ctas .op-hero { color: #f4f4f2 !important; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.ob-ctas .op-hero:hover { background: rgb(255 255 255 / .12); border-color: rgb(255 255 255 / .28); }
+.ob-cta:active, .ob-ctas .op-hero:active, .acct:active { transform: scale(.97); }
+.ob-new { font-size: 11px; padding: 6px 12px; color: rgb(244 244 242 / .85); border-color: rgb(255 255 255 / .16); background: rgb(255 255 255 / .05); }
+.acct.op-head2 { height: 38px; padding: 0 16px; font-size: 14px; font-weight: 600; color: #f4f4f2 !important; background: rgb(255 255 255 / .06) !important; border: 1px solid rgb(255 255 255 / .18) !important; box-shadow: none !important; transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 160ms ease; }
+.acct.op-head2:hover { background: rgb(255 255 255 / .12) !important; }
+@media (max-width: 980px) { .ob-cta, .ob-ctas .op-hero { height: 50px; font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .ob-cta, .ob-ctas .op-hero, .acct { transition: none; } }
 /* Login / Konto oben rechts */
 .acct-w { position: relative; display: inline-flex; }
 .acct { display: inline-flex; align-items: center; gap: 8px; }
