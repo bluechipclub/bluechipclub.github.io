@@ -281,6 +281,9 @@ nav.tb button:active svg{transform:scale(.88)}
 
   <div class="sec">Kasse</div>
   <div class="grp" id="kasse"></div>
+  <div class="sec">Abrechnung · wer zahlt wem</div>
+  <div class="grp" id="abr"></div>
+  <p class="note">Rechnet live mit. Haken setzen, sobald bezahlt ist. Was am Ende offen bleibt, steht im Export und landet bei der Auswertung auf dem Galgen der Ehrenschulden.</p>
 
   <div class="sec">Einstellungen</div>
   <div class="grp"><button class="cell press" id="setBtn"><span class="ic c-grey">⚙</span><span class="tx">Turnier-Einstellungen<small>Stack, Level, Buy-in, Auszahlung, Blinds</small></span><span class="chev">›</span></button></div>
@@ -398,7 +401,7 @@ function apply(p){
   $("play").textContent=S.running?"❚❚ Pause":"▶ Start";$("play").classList.toggle("run",!!S.running);
   $("sPot").textContent=fmt(D.pot);$("sPl").textContent=(D.alive||0)+"/"+S.players.length;$("sEn").textContent=D.entries||0;
   $("pays").innerHTML=(D.pays||[]).map((v,k)=>'<div><span>'+(k+1)+'. Platz</span><b>'+fmt(v)+' P</b></div>').join("");
-  $("cash").textContent=S.cash?"💵 "+S.cash:"";
+  $("cash").textContent=(S.cash?"💵 "+S.cash:"")+(D.kasse&&D.kasse.open?" · "+fmt(D.kasse.open)+" P noch offen":"");
   const q=S.pend;$("pend").hidden=!q;
   if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
     $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
@@ -467,23 +470,31 @@ function picker(title,text,sections,onPick){
       b.onclick=()=>{closeSheet();setTimeout(()=>onPick(p),220);};W.appendChild(b);});});
   if(!W.children.length)W.innerHTML='<p class="sp" style="grid-column:1/-1">Niemand passend.</p>';
   sheet(title,text,[],W);}
-function payButtons(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["Überwiesen","blue",()=>fn("dig")],["Offen (zahlt später)","red",()=>fn("offen")]];}
+function payButtons(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["Überwiesen …","blue",()=>setTimeout(()=>toWhom(fn),250)],["Offen (zahlt später)","red",()=>fn("offen")]];}
+/* Überwiesen: an die Kasse oder direkt an einen Spieler (z. B. PayPal an Niki) */
+function toWhom(fn){const bank=(S&&S.bank)||"Tim";const others=S?S.players.filter(p=>lc(p.name)!==lc(bank)):[];
+  const W=document.createElement("div");W.className="pick";
+  const mk=(name,sub,cb)=>{const b=document.createElement("button");b.className="press";b.innerHTML=avHtml(name)+'<span></span>'+(sub?'<small>'+esc(sub)+'</small>':'');b.querySelector("span").textContent=name;b.onclick=()=>{closeSheet();setTimeout(cb,220);};W.appendChild(b);};
+  mk(bank,"Kasse",()=>fn("dig",bank));const h=document.createElement("h4");h.textContent="Direkt an einen Spieler";W.appendChild(h);
+  others.forEach(p=>mk(p.name,"",()=>fn("dig",p.name)));
+  sheet("An wen überwiesen?","Wichtig für die Abrechnung am Ende.",[],W);}
+const PAYL=(v,to)=>v==="dig"?"überwiesen"+(to?" an "+to:""):PAY_TXT[v];
 function rebuyFlow(p){const i=pinfo(p.name),re=p.entries.length-1,warn=[];
   if(!i.canRe)warn.push(p.name+" hat schon "+re+" Rebuy"+(re===1?"":"s")+" (max. "+S.maxRe+").");if(!D.reOpen)warn.push("Die Rebuy-Phase ist vorbei.");
-  const go=(paid,force)=>send({op:"rebuy",name:p.name,paid,force:!!force},p.name+": Rebuy "+PAY_TXT[paid]);
-  if(i.canRe&&D.reOpen)sheet(p.name+" · Rebuy "+fmt(S.rebuy)+" P","Bargeldregel: bar an der Kasse. Zählt nur einmal, auch wenn zwei Handys tippen.",payButtons(go));
+  const go=(paid,force,to)=>send({op:"rebuy",name:p.name,paid,to,force:!!force},p.name+": Rebuy "+PAYL(paid,to));
+  if(i.canRe&&D.reOpen)sheet(p.name+" · Rebuy "+fmt(S.rebuy)+" P","Bargeldregel: bar an der Kasse. Zählt nur einmal, auch wenn zwei Handys tippen.",payButtons((v,to)=>go(v,false,to)));
   else sheet(p.name+" · Rebuy","Achtung: "+warn.join(" "),[["Trotzdem buchen (bar)","red",()=>go("bar",true)],["Trotzdem buchen (offen)","red",()=>go("offen",true)]]);}
 function outFlow(p){
   if(S.bounty){picker("Wer hat "+p.name+" rausgeworfen?","",[["",active().filter(x=>x.name!==p.name)]],x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"));return;}
   sheet(p.name+" ist raus?",D.reOpen&&pinfo(p.name).canRe?"Danach kann "+p.name+" noch einen Rebuy machen.":"",[["Ja, "+p.name+" ist raus","red",()=>send({op:"out",name:p.name},p.name+" raus")]]);}
-function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAY_TXT[e.paid],e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtons(v=>send({op:"paid",name:p.name,entry:j+1,paid:v},p.name+": "+PAY_TXT[v])))]);
+function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAYL(e.paid,e.to),e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtons((v,to)=>send({op:"paid",name:p.name,entry:j+1,paid:v,to},p.name+": "+PAYL(v,to))))]);
   sheet(p.name+" · Bezahlung","Antippen zum Ändern",b);}
 /* Name-Eingabe im App-Design (keine Browser-Popups, Tim 19.11.) */
 function nameSheet(title,text,val,okLabel,fn){const W=document.createElement("div");W.innerHTML='<input id="nsIn" autocomplete="off" autocapitalize="words" style="margin-top:16px;text-align:center;font-size:19px;height:52px" placeholder="Name"><button class="btn pri press" id="nsOk" style="margin-top:10px;height:54px;font-size:17px"></button>';
   sheet(title,text,[],W);const I=W.querySelector("#nsIn"),B=W.querySelector("#nsOk");I.value=val||"";B.textContent=okLabel;
   const go=()=>{const n=I.value.trim();if(!n){I.focus();return;}closeSheet();setTimeout(()=>fn(n),250);};B.onclick=go;I.onkeydown=e=>{if(e.key==="Enter")go();};setTimeout(()=>I.focus(),350);}
 function addFlow(n){n=(n||"").trim();if(!n){nameSheet("Nachmelden","Name des neuen Spielers","","Weiter",addFlow);return;}
-  sheet(n+" nachmelden","Buy-in "+(S?fmt(S.buyin):"")+" P · Bargeldregel: bar an der Kasse",payButtons(v=>send({op:"add",name:n,paid:v},n+" dazu ("+PAY_TXT[v]+")")));}
+  sheet(n+" nachmelden","Buy-in "+(S?fmt(S.buyin):"")+" P · Bargeldregel: bar an der Kasse",payButtons((v,to)=>send({op:"add",name:n,paid:v,to},n+" dazu ("+PAYL(v,to)+")")));}
 const tblSub=p=>D.two?(pinfo(p.name).t===2?"Tisch 2":"Groß"):"";
 
 /* ---------- Management ---------- */
@@ -522,7 +533,30 @@ $("clipStop").onclick=()=>send({op:"clipstop"},"Clip gestoppt");
 $("danceStop").onclick=()=>send({op:"dancestop"},"Tanz gestoppt");
 $("play").onclick=()=>{const run=S&&S.running;send({op:run?"pause":"play"},run?"Pause":"Start");};
 
-function renderKasse(){if(!S)return;const ps=S.players.map(p=>[p.name,pinfo(p.name)]),open=ps.filter(x=>x[1].open),tot=ps.reduce((a,x)=>a+x[1].cost,0),op=open.reduce((a,x)=>a+x[1].open,0);
+function renderKasse(){if(!S)return;renderKasse2();renderAbr();}
+function renderKasse2(){const k=D.kasse;if(!k){renderKasseOld();return;}const bank=S.bank||"Tim";
+  const row=(t,v,col,sub)=>'<div class="cell"><span class="tx">'+t+(sub?'<small>'+sub+'</small>':'')+'</span><span class="val"'+(col?' style="color:'+col+'"':'')+'>'+v+'</span></div>';
+  let h=row("💵 Bargeld in der Kasse",fmt(k.bar)+" P","var(--gold2)","So viel muss bar bei "+esc(bank)+" liegen");
+  if(k.count){const d=k.count.amount-k.bar;h+=row("Gezählt",fmt(k.count.amount)+" P",d===0?"var(--green)":"var(--red)",d===0?"Stimmt genau ✓":(d<0?"Es fehlen "+fmt(-d)+" P":fmt(d)+" P zu viel"));}
+  h+=row("Überwiesen an "+esc(bank),fmt(k.digBank)+" P");
+  k.other.forEach(o=>h+=row("Überwiesen direkt an "+esc(o.to),fmt(o.v)+" P","var(--blue2)","wird in der Abrechnung verrechnet"));
+  h+=row("Offen",k.open?fmt(k.open)+" P":"nichts ✓",k.open?"var(--red)":"var(--green)");
+  const open=S.players.filter(p=>pinfo(p.name).open);
+  open.forEach(p=>h+='<button class="cell press" data-n="'+esc(p.name)+'"><span class="tx">'+esc(p.name)+'</span><span class="val" style="color:var(--red)">'+pinfo(p.name).open+' P offen</span><span class="chev">›</span></button>');
+  h+='<button class="cell press" id="kCnt"><span class="ic c-gold">#</span><span class="tx">Kasse gezählt<small>Echte Summe eintippen, App vergleicht</small></span><span class="chev">›</span></button>';
+  $("kasse").innerHTML=h;$("kasse").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const p=pl(b.dataset.n);if(p)paidFlow(p);});
+  $("kCnt").onclick=()=>{const W=document.createElement("div");W.innerHTML='<input id="kIn" type="number" inputmode="numeric" style="margin-top:16px;text-align:center;font-size:24px;height:56px" placeholder="P"><button class="btn pri press" id="kOk" style="margin-top:10px;height:54px;font-size:17px">Vergleichen</button>';
+    sheet("Kasse gezählt","Soll: "+fmt(k.bar)+" P Bargeld",[],W);const I=W.querySelector("#kIn");setTimeout(()=>I.focus(),350);
+    W.querySelector("#kOk").onclick=()=>{if(I.value==="")return;closeSheet();send({op:"kcount",amount:+I.value},"Kasse gezählt: "+fmt(+I.value)+" P");};};}
+function renderAbr(){const A=$("abr"),tx=D.tx||[];
+  let h=tx.length?"":'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts zu verteilen</span></div>';
+  tx.forEach((t,i)=>h+='<button class="cell press" data-i="'+i+'"><span class="ic '+(t.done?'c-green':'c-grey')+'">'+(t.done?'✓':'○')+'</span><span class="tx" style="'+(t.done?'opacity:.5;text-decoration:line-through':'')+'">'+esc(t.from)+' → '+esc(t.to)+'</span><span class="val" style="color:'+(t.done?'var(--sub)':'var(--gold2)')+'">'+fmt(t.amount)+' P</span></button>');
+  h+='<button class="cell press" id="abrCopy"><span class="ic c-green">⧉</span><span class="tx">WhatsApp-Text kopieren</span></button><button class="cell press" data-c2="result"><span class="ic c-gold">📺</span><span class="tx">Abrechnung auf dem Bildschirm</span></button><button class="cell press" data-c2="export"><span class="ic c-grey">⬇</span><span class="tx">PDF + Export an der Haupttafel</span></button>';
+  A.innerHTML=h;
+  A.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const t=tx[+b.dataset.i];send({op:"txd",k:t.k,v:!t.done},(t.done?"Wieder offen: ":"Erledigt: ")+t.from+" → "+t.to);});
+  A.querySelectorAll("[data-c2]").forEach(b=>b.onclick=()=>send({op:b.dataset.c2},b.dataset.c2==="result"?"Abrechnung zeigen":"Export"));
+  $("abrCopy").onclick=async()=>{const t="```\n"+(D.sum||"")+"\n```";try{await navigator.clipboard.writeText(t);toast("✓ Text kopiert",1800,"ok");}catch(e){const W=document.createElement("div");W.innerHTML='<textarea style="margin-top:14px;min-height:260px" readonly></textarea>';W.querySelector("textarea").value=t;sheet("WhatsApp-Text","Lange drücken → Alles auswählen → Kopieren",[],W);}};}
+function renderKasseOld(){if(!S)return;const ps=S.players.map(p=>[p.name,pinfo(p.name)]),open=ps.filter(x=>x[1].open),tot=ps.reduce((a,x)=>a+x[1].cost,0),op=open.reduce((a,x)=>a+x[1].open,0);
   let h='<div class="cell"><span class="tx">Eingesetzt gesamt</span><span class="val">'+fmt(tot)+' P</span></div><div class="cell"><span class="tx">Davon offen</span><span class="val" style="color:'+(op?"var(--red)":"var(--green)")+'">'+(op?fmt(op)+" P":"alles bezahlt ✓")+'</span></div>';
   open.forEach(x=>h+='<button class="cell press" data-n="'+esc(x[0])+'"><span class="tx">'+esc(x[0])+'</span><span class="val" style="color:var(--red)">'+x[1].open+' P offen</span><span class="chev">›</span></button>');
   $("kasse").innerHTML=h;$("kasse").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const p=pl(b.dataset.n);if(p)paidFlow(p);});}
