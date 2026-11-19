@@ -119,7 +119,7 @@ grid();
 const ov=document.getElementById("ov"),bw=document.getElementById("bigw"),pr=document.getElementById("prof");
 function show(i){cur=(i+real.length)%real.length;bw.innerHTML='<div class="big">'+inner(real[cur])+champBadge(real[cur].n)+'</div>';ov.hidden=false;}
 function stats(n){
- const T=(D?D.tournaments:[]).slice().sort((a,b)=>a.date<b.date?-1:1),pts=(D&&D.settings.points)||{};
+ const T=(D?D.tournaments:[]).filter(t=>!t.online).sort((a,b)=>a.date<b.date?-1:1),pts=(D&&D.settings.points)||{};
  const rows=[];let played=0,wins=0,pod=0,points=0,prize=0;
  for(const t of T){const r=[...(t.results||[]),...(t.places||[])].find(x=>x.name&&x.name.trim()===n),inP=(t.participants||[]).includes(n)||!!r;if(!inP)continue;
   played++;const pl=r?r.place:null,pz=r?Number(r.prize)||0:0;if(pl===1)wins++;if(pl&&pl<=3)pod++;points+=(Number(pts["p"+pl])||0)+(Number(pts.teil)||0);prize+=pz;
@@ -165,7 +165,7 @@ function profile(n){
 function route(){const m=location.hash.match(/^#p=(.+)$/);if(m)profile(decodeURIComponent(m[1]));else pr.hidden=true;}
 addEventListener("hashchange",route);
 fetch("../index.html",{cache:"no-cache"}).then(r=>r.text()).then(h=>{const m=h.match(/<script[^>]*id="liga-data"[^>]*>([\s\S]*?)<\/script>/);if(m)D=JSON.parse(m[1]);
- const T=D.tournaments.filter(t=>(t.results||[]).some(r=>r.place===1&&r.name)).sort((a,b)=>a.date<b.date?-1:1);CH=T.length?T[T.length-1].results.find(r=>r.place===1).name.trim():"";grid();}).catch(()=>{}).finally(route);
+ const T=D.tournaments.filter(t=>!t.online).filter(t=>(t.results||[]).some(r=>r.place===1&&r.name)).sort((a,b)=>a.date<b.date?-1:1);CH=T.length?T[T.length-1].results.find(r=>r.place===1).name.trim():"";grid();}).catch(()=>{}).finally(route);
 document.getElementById("x").onclick=()=>{ov.hidden=true;};
 ov.onclick=e=>{if(e.target===ov)ov.hidden=true;};
 document.getElementById("pl").onclick=e=>{e.stopPropagation();show(cur-1);};
