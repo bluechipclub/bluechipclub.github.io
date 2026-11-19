@@ -1,39 +1,26 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#04070e"><meta name="description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:type" content="website"><meta property="og:title" content="Blue Chip Club"><meta property="og:description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:url" content="https://bluechipclub.github.io/"><meta property="og:image" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:secure_url" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bluechipclub.github.io/og.jpg?v=3"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><style>body{margin:0;padding:0}[hidden]{display:none!important}/* Banner „Jetzt auch online“ im Hero (19.11.) */
-.onban { position: absolute; right: max(24px, calc(50vw - 590px)); bottom: clamp(48px, 9vh, 96px); width: min(400px, 34vw); z-index: 2; border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, rgb(20 32 72 / .82), rgb(9 14 32 / .92)); border: 1px solid rgb(143 176 255 / .35); box-shadow: 0 30px 80px rgb(0 0 0 / .55), 0 0 0 1px rgb(226 184 87 / .12) inset, 0 0 70px rgb(47 107 255 / .35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); animation: obIn .9s cubic-bezier(.2,.8,.2,1) .35s both; }
-.onban::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: conic-gradient(from var(--oba, 0deg), transparent 0 70%, #8fb0ff 80%, #f3d68f 88%, transparent 96%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: obSpin 5s linear infinite; pointer-events: none; }
-@property --oba { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-@keyframes obSpin { to { --oba: 360deg; } }
-@keyframes obIn { from { opacity: 0; transform: translateY(26px) scale(.97); } to { opacity: 1; transform: none; } }
-.ob-pic { position: relative; aspect-ratio: 16 / 8; overflow: hidden; }
-.ob-pic img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; display: block; transform: scale(1.03); }
-.ob-pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgb(9 14 32 / .95)); }
-.ob-badge { position: absolute; left: 16px; top: 14px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px; border-radius: 999px; background: linear-gradient(180deg, #f3d68f, #c49a41); color: #111; font: 700 12px/1 var(--mono, monospace); letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 6px 20px rgb(226 184 87 / .45); }
-.ob-badge i { width: 8px; height: 8px; border-radius: 50%; background: #e5675c; box-shadow: 0 0 0 0 rgb(229 103 92 / .7); animation: obPulse 1.6s infinite; }
-@keyframes obPulse { 70% { box-shadow: 0 0 0 9px rgb(229 103 92 / 0); } 100% { box-shadow: 0 0 0 0 rgb(229 103 92 / 0); } }
-.ob-body { position: relative; padding: 4px 22px 22px; display: grid; gap: 12px; margin-top: -26px; }
-.onban h2 { font-size: clamp(30px, 3vw, 40px); line-height: 1; letter-spacing: -.035em; font-weight: 600; color: #fff; }
-.onban h2 em { font-style: normal; color: var(--gold2, #f3d68f); }
-.onban p { font-size: 15px; line-height: 1.45; color: rgb(232 238 255 / .86); max-width: none; }
-.ob-modes { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; }
-.ob-modes li { padding: 6px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: rgb(47 107 255 / .28); border: 1px solid rgb(143 176 255 / .45); }
-.ob-modes li.soon { color: rgb(232 238 255 / .65); background: transparent; border-style: dashed; border-color: rgb(143 176 255 / .3); }
-.ob-modes small { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
-.ob-cta { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 999px; font-size: 18px; font-weight: 700; color: #fff !important; text-decoration: none; background: linear-gradient(180deg, #4f86ff, #2f6bff 55%, #1f4fd0); border: 1px solid #8fb0ff; box-shadow: 0 12px 34px rgb(47 107 255 / .55), 0 1px 0 rgb(255 255 255 / .35) inset; transition: transform .2s, box-shadow .2s; }
-.ob-cta:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgb(47 107 255 / .7), 0 1px 0 rgb(255 255 255 / .35) inset; }
-.onban .ob-fine { font-size: 12px; color: rgb(232 238 255 / .6); text-align: center; }
-@media (max-width: 980px) {
-  .kino { align-items: end; }
-  .onban { position: relative; right: auto; bottom: auto; width: auto; margin: 0 max(16px, env(safe-area-inset-left)) 40px; }
-  .kino-copy { padding-bottom: 28px; }
-  .kino { padding-top: 22svh; }
-  .ob-pic { aspect-ratio: 16 / 7; }
-  .onban p { font-size: 14.5px; }
-}
-.ob-peek { display: none; align-items: center; gap: 9px; padding: 9px 15px; border-radius: 999px; font: 700 13px/1 inherit; color: #fff; background: rgb(47 107 255 / .35); border: 1px solid rgb(143 176 255 / .6); box-shadow: 0 0 30px rgb(47 107 255 / .45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); cursor: pointer; }
-.ob-peek i { width: 8px; height: 8px; border-radius: 50%; background: #e5675c; animation: obPulse 1.6s infinite; }
-@media (max-width: 980px) { .ob-peek { display: inline-flex; } }
-@media (min-width: 981px) and (max-height: 800px) { .ob-pic { aspect-ratio: 16 / 6; } .onban { bottom: 40px; } }
-@media (prefers-reduced-motion: reduce) { .onban, .onban::before, .ob-badge i { animation: none; } }
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#04070e"><meta name="description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:type" content="website"><meta property="og:title" content="Blue Chip Club"><meta property="og:description" content="Niki gewinnt den Saturday Deep Stack. Bericht, Hände und Rangliste."><meta property="og:url" content="https://bluechipclub.github.io/"><meta property="og:image" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:secure_url" content="https://bluechipclub.github.io/og.jpg?v=3"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bluechipclub.github.io/og.jpg?v=3"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><style>body{margin:0;padding:0}[hidden]{display:none!important}/* Hero „Blue Chip. Jetzt auch online.“ (19.11.) – schlicht wie die NFP-Promo: Titel, ein Knopf, schräges Bild */
+.kino .ob-copy { gap: 22px; }
+.ob-new { display: inline-flex; align-items: center; gap: 9px; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--blue2, #8fb0ff); border: 1px solid rgb(143 176 255 / .5); background: rgb(47 107 255 / .14); }
+.ob-new i { width: 8px; height: 8px; border-radius: 50%; background: #e5675c; animation: obPulse 1.6s infinite; }
+@keyframes obPulse { 0% { box-shadow: 0 0 0 0 rgb(229 103 92 / .7); } 70% { box-shadow: 0 0 0 9px rgb(229 103 92 / 0); } 100% { box-shadow: 0 0 0 0 rgb(229 103 92 / 0); } }
+.kino .ob-copy h1 em { color: var(--blue2, #8fb0ff); }
+.kino .ob-copy h1 { font-size: clamp(52px, min(8vw, 11vh), 100px); max-width: 9.5ch; }
+.ob-ctas { flex-direction: column; align-items: flex-start; gap: 14px; justify-content: flex-start; }
+.ob-cta { display: inline-flex; align-items: center; gap: 12px; height: 64px; padding: 0 34px; border-radius: 999px; font-size: 20px; font-weight: 700; color: #fff !important; text-decoration: none; background: linear-gradient(180deg, #4f86ff, #2f6bff 55%, #1f4fd0); border: 1px solid #8fb0ff; box-shadow: 0 14px 40px rgb(47 107 255 / .55), 0 1px 0 rgb(255 255 255 / .35) inset; transition: transform .2s, box-shadow .2s; }
+.ob-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 50px rgb(47 107 255 / .7), 0 1px 0 rgb(255 255 255 / .35) inset; }
+.ob-ctas .op-hero { height: 52px; font-size: 17px; padding: 0 26px; }
+.ob-reel { position: absolute; right: max(32px, calc(50vw - 600px)); top: 50%; width: min(500px, 36vw); aspect-ratio: 16 / 10; border-radius: 26px; overflow: hidden; transform: translateY(-55%) rotate(4deg); border: 6px solid #0b0f1a; outline: 1px solid rgb(170 195 255 / .25); box-shadow: 0 30px 80px rgb(0 0 0 / .6), 0 0 60px rgb(47 107 255 / .3); z-index: 1; }
+.ob-reel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 980px) { .ob-reel { display: none; } .ob-cta { height: 60px; font-size: 19px; } }
+/* Login / Konto oben rechts */
+.acct-w { position: relative; display: inline-flex; }
+.acct { display: inline-flex; align-items: center; gap: 8px; }
+.acct-d { width: 8px; height: 8px; border-radius: 50%; background: #8c8c88; display: none; }
+.acct.in .acct-d { display: inline-block; background: #3ecf6e; box-shadow: 0 0 8px #3ecf6e; }
+.acct-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; min-width: 220px; padding: 14px; border-radius: 16px; background: rgb(12 18 38 / .96); border: 1px solid rgb(143 176 255 / .35); box-shadow: 0 20px 50px rgb(0 0 0 / .6); display: grid; gap: 10px; }
+.acct-pop[hidden] { display: none; }
+.acct-m { font-size: 13px; color: rgb(232 238 255 / .8); word-break: break-all; }
+.acct-pop button { height: 40px; border-radius: 999px; border: 1px solid rgb(143 176 255 / .45); background: transparent; color: #fff; font-weight: 600; cursor: pointer; }
 </style></head><body><title>Blue Chip Club</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1175,7 +1162,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       <button role="tab" data-view="turniere">Turniere</button>
       <button role="tab" data-view="regeln">Regeln</button>
     </nav>
-    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><button class="btn-cream op-resv op-head2" type="button" data-reserve><span class="op-lg">Für Freitag anmelden</span><span class="op-sm">Anmelden</span> <span aria-hidden="true">→</span></button><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
+    <div class="tools"><a class="btn-cream op-head js-play" href="#anmelden" data-in="Jetzt spielen" data-out="Anmelden"><span class="pl-t">Anmelden</span> <span aria-hidden="true">→</span></a><span class="acct-w"><button class="btn-cream op-head2 acct" id="bcAcct" type="button" aria-haspopup="true"><span class="acct-d" aria-hidden="true"></span><span class="acct-t">Login</span></button><span class="acct-pop" id="acctPop" hidden><span class="acct-m" id="acctMail"></span><button type="button" id="acctOut">Abmelden</button></span></span><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu"><span class="mb-line" aria-hidden="true"></span>Menü</button><button class="edit-btn" id="editBtn" hidden>Eintragen</button></div>
   </div>
 </header>
 <div class="menu" id="menu" hidden><div class="menu-in">
@@ -2915,22 +2902,19 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   function stageHtml() {
     return '<section class="kino' + (stageDone ? ' go landed' : stageLanded ? ' go' : '') + '" aria-label="Willkommen">' +
       '<img class="kino-bg" src="img/the-void.webp" srcset="img/the-void-960.webp 960w, img/the-void.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void, ein blauer Chip vorne im Licht">' +
-      '<div class="kino-copy">' + (ONLINE_LOBBY.on ? '<button class="ob-peek" type="button" onclick="document.querySelector(\'.onban\').scrollIntoView({behavior:\'smooth\',block:\'center\'})"><i></i>Neu: Jetzt auch online <span aria-hidden="true">↓</span></button>' : '') + '<h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
-      '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
-      '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : (nextOk() ? '<button class="op-hero" type="button" data-reserve>Für ' + esc(new Date(nextOk().date).toLocaleDateString('de-DE', { weekday: 'long' })) + ' anmelden <span aria-hidden="true">→</span></button>' : '')) + '<button class="btn-ghost play" type="button" data-intro><span class="pl" aria-hidden="true"></span>Intro ansehen</button></div></div>' + lobbyBanner() + '</section>';
+      (ONLINE_LOBBY.on ?
+        '<div class="kino-copy ob-copy"><span class="ob-new"><i></i>Neu</span><h1><span class="l1">Blue Chip.</span> Jetzt auch <em>online.</em></h1>' +
+        '<div class="ctas ob-ctas"><a class="ob-cta js-play" href="#anmelden" data-dest="lobby"><span aria-hidden="true">♠</span> Jetzt online spielen</a>' + (nextOk() ? '<button class="op-hero" type="button" data-reserve>Für ' + esc(new Date(nextOk().date).toLocaleDateString('de-DE', { weekday: 'long' })) + ' anmelden <span aria-hidden="true">→</span></button>' : '') + '</div></div>' + lobbyBanner()
+      :
+        '<div class="kino-copy"><h1><span class="l1">Zehn Stühle.</span> Ein <em>Sieger.</em></h1>' +
+        '<p>Eine private Pokerliga für Freunde, die eine Leidenschaft teilen.</p>' +
+        '<div class="ctas">' + (ONLINE_PROMO.on ? '<a class="op-cta op-hero js-play" href="#anmelden" data-in="Jetzt online spielen" data-out="Anmelden / Registrieren"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Anmelden / Registrieren') + '</span> <span aria-hidden="true">→</span></a>' : (nextOk() ? '<button class="op-hero" type="button" data-reserve>Für ' + esc(new Date(nextOk().date).toLocaleDateString('de-DE', { weekday: 'long' })) + ' anmelden <span aria-hidden="true">→</span></button>' : '')) + '</div></div>') + '</section>';
   }
   /* 19.11. Tim: Banner „Jetzt auch online“ rechts neben „Zehn Stühle. Ein Sieger.“ → neue Online-Lobby (Login wie immer über die Website). ONLINE_LOBBY.on = false blendet ihn aus. */
   /* modes: soon:true zeigt „bald“ – beim Livegang mit dem Lobby-Thread abgleichen und auf false setzen, was fertig ist */
   const ONLINE_LOBBY = { on: true, url: 'https://blue-chip-game-production.up.railway.app/?lobby=neu', modes: [['Sit & Go', false], ['Turniere', false], ['Heads-up-Duell', true], ['Spin & Go', true]] };
   function lobbyBanner() {
-    if (!ONLINE_LOBBY.on) return '';
-    return '<aside class="onban" aria-label="Blue Chip Online">' +
-      '<div class="ob-pic"><img src="img/online-promo-720.webp" alt="Blue Chip Online am PC und am Handy" loading="eager" decoding="async"><span class="ob-badge"><i></i>Neu · Jetzt auch online</span></div>' +
-      '<div class="ob-body"><h2>Blue Chip <em>Online.</em></h2>' +
-      '<p>Kein Abend kommt zustande? Dann zockt ihr eben online. Eigenes Konto, eigene Bankroll in Blue Chips, deine Jungs am Tisch.</p>' +
-      '<ul class="ob-modes">' + ONLINE_LOBBY.modes.map(([n, soon]) => '<li' + (soon ? ' class="soon"' : '') + '>' + esc(n) + (soon ? ' <small>bald</small>' : '') + '</li>').join('') + '</ul>' +
-      '<a class="ob-cta js-play" href="#anmelden" data-dest="lobby" data-in="Jetzt online spielen" data-out="Konto erstellen &amp; spielen"><span class="pl-t">' + (bcIn ? 'Jetzt online spielen' : 'Konto erstellen &amp; spielen') + '</span> <span aria-hidden="true">→</span></a>' +
-      '<p class="ob-fine">Nur Spielgeld. Am Ende zeigen die Blue Chips, wer der bessere Spieler ist.</p></div></aside>';
+    return '<a class="ob-reel js-play" href="#anmelden" data-dest="lobby" tabindex="-1" aria-hidden="true"><img src="img/online-promo.webp" srcset="img/online-promo-720.webp 720w, img/online-promo.webp 1200w" sizes="(max-width: 980px) 90vw, 40vw" alt=""></a>';
   }
   function landStage() {
     if (stageLanded) return; stageLanded = true;
@@ -3995,6 +3979,9 @@ div.hl-tile b { font-size: 16px; line-height: 1.3; }
     document.querySelectorAll('.js-play').forEach(a => { const t = a.querySelector('.pl-t'); if (t && a.dataset.in) t.textContent = inn ? a.dataset.in : a.dataset.out; });
     document.querySelectorAll('.op-fine').forEach(p => { p.textContent = inn ? 'Du bist angemeldet. Ein Klick und du sitzt am Turnier.' : 'Einmal anmelden, das ist der einzige Login für den ganzen Abend. Noch kein Konto? Hier registrieren.'; });
     const lo = $('bcLogout'); if (lo) lo.hidden = !inn;
+    const ac = $('bcAcct'); if (ac) { ac.classList.toggle('in', inn); ac.querySelector('.acct-t').textContent = inn ? 'Konto' : 'Login'; }
+    const am = $('acctMail'); if (am) am.textContent = inn && session.user ? 'Eingeloggt als ' + (session.user.email || '') : '';
+    if (!inn && $('acctPop')) $('acctPop').hidden = true;
     if (inn && pendingPlay) { pendingPlay = false; play(); }
   }
   async function play(dest) {
@@ -4081,6 +4068,9 @@ div.hl-tile b { font-size: 16px; line-height: 1.3; }
     } catch (x) {}
     location.href = url;
   }, true);
+  $('bcAcct') && $('bcAcct').addEventListener('click', e => { e.stopPropagation(); if (!session) { pendingPlay = false; return openAuth('in'); } const pp = $('acctPop'); pp.hidden = !pp.hidden; });
+  document.addEventListener('click', e => { const pp = $('acctPop'); if (pp && !pp.hidden && !e.target.closest('.acct-w')) pp.hidden = true; });
+  $('acctOut') && $('acctOut').addEventListener('click', async () => { const c = await client(); if (c) await c.auth.signOut(); session = null; paint(); });
   $('bcLogout') && $('bcLogout').addEventListener('click', async () => { const c = await client(); if (c) await c.auth.signOut(); session = null; paint(); });
   client();
 })();
