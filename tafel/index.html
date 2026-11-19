@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Friday Classic · Tafel</title>
+<title>Saturday Deep Stack · Tafel</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,22 +49,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* main */
 .main{display:grid;grid-template-columns:minmax(0,1fr) 27vw;gap:1.6vw;min-height:0}
-.lcol{display:flex;flex-direction:column;gap:1.2vh;min-height:0;min-width:0}
-.lcol>.stage{flex:1 1 auto}
-.t2{position:relative;flex:0 0 37%;min-height:0;border-radius:2vw;background:radial-gradient(ellipse 70% 80% at 50% 50%,#13213f 0%,#0b1226 55%,#07090f 100%);box-shadow:inset 0 0 3vw 1vw #05070c;border:1px solid rgba(110,160,255,.18);overflow:hidden}
-.t2[hidden]{display:none}
-.t2felt{position:absolute;left:16%;right:16%;top:20%;bottom:20%;border-radius:50%;background:radial-gradient(ellipse at 50% 45%,#1d3a7a,#0f2050 70%,#0a1638);border:.5vh solid #2a1d10;box-shadow:0 0 0 .4vh rgba(226,184,87,.35),inset 0 0 3vh rgba(0,0,0,.6);display:grid;place-items:center}
-.t2c{text-align:center;font-family:var(--mono);color:rgba(243,214,143,.75);font-size:max(10px,.8vw);letter-spacing:.3em;text-transform:uppercase;line-height:1.7}
-.t2c b{display:block;font-family:var(--sans);font-size:max(14px,1.4vw);letter-spacing:.05em;color:#f3d68f;text-transform:none}
-.tcap{position:absolute;left:1.2vw;top:1.2vh;z-index:4;font-family:var(--mono);font-size:max(10px,.8vw);letter-spacing:.25em;text-transform:uppercase;color:#f3d68f;background:rgba(8,8,8,.7);border:1px solid rgba(226,184,87,.35);border-radius:999px;padding:.4vh 1vw;display:none}
-body.two .tcap{display:block}
-.t2 .seat2{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:.4vw;z-index:2}
-.t2 .seat2 .av{width:3.6vh;height:3.6vh}
-.t2 .seat2 .nm2{padding:.45vh .8vw;border-radius:999px;background:linear-gradient(180deg,rgba(18,26,48,.95),rgba(8,12,24,.95));border:1px solid rgba(110,160,255,.55);font-weight:650;font-size:max(12px,1.05vw);white-space:nowrap;cursor:pointer}
-.t2 .seat2 .re{font-family:var(--mono);font-size:max(9px,.65vw);color:var(--gold)}
-.t2 .dbtn{width:1.9vw;height:1.9vw}
-.t2 .seat2.flash .nm2{animation:flash 1.2s var(--ease)}
-.tmove{color:#f3d68f}
 .stage{position:relative;min-height:0}
 .felt{position:absolute;left:7%;right:7%;top:9%;bottom:9%;border-radius:50%/50%;
   background:radial-gradient(ellipse at 50% 35%,#1d1d1f 0%,#111 55%,#080808 100%);
@@ -378,9 +362,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   </header>
 
   <main class="main">
-    <div class="lcol">
     <section class="stage" id="stage">
-      <div class="tcap" id="t1cap"></div>
       <div class="felt" id="felt">
         <div class="center">
           <div class="lvl" id="lvl">Level 1</div>
@@ -392,12 +374,6 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
       </div>
       <div class="dbtn" id="dbtn">D</div>
     </section>
-    <section class="t2" id="t2box" hidden>
-      <div class="tcap" id="t2cap">Tisch 2</div>
-      <div class="t2felt"><div class="t2c" id="t2c"></div></div>
-      <div class="dbtn" id="dbtn2">D</div>
-    </section>
-    </div>
     <aside class="side">
       <div class="box">
         <div class="cap">Als Nächstes</div>
@@ -441,8 +417,6 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <button class="b" id="bPlus">+1 Min</button>
   <button class="b" id="bPlayers">Spieler & Rebuys</button>
   <button class="b" id="bDealer">Dealer ▶</button>
-  <button class="b" id="bDealer2" hidden>Dealer Tisch 2 ▶</button>
-  <button class="b" id="bTables" hidden>⇄ Tische</button>
   <button class="b" id="bLobby" style="border-color:rgba(226,184,87,.6);color:#f3d68f">🖼 Bildschirmschoner</button>
   <button class="b" id="bDraw">Plätze auslosen</button>
   <button class="b" id="bGame">Minigame</button>
@@ -498,7 +472,6 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
   <div class="fg" style="margin-top:12px">
     <label class="f">Turniername <input id="sTitle"></label>
     <label class="f">Startstack <input id="sStack" type="number" step="100"></label>
-    <label class="f">Early Bird Bonus (Chips, 0 = aus) <input id="sEb" type="number" step="100"></label>
     <label class="f">Minuten Level 1 <input id="sMin1" type="number"></label>
     <label class="f">Minuten (Rebuy-Phase) <input id="sMin" type="number"></label>
     <label class="f">Minuten danach <input id="sMinLate" type="number"></label>
@@ -537,7 +510,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 
 <script>
 "use strict";
-const KEY="bcc-tafel-fc-2026-11-20";
+const KEY="bcc-tafel-sds-2026-11-14";
 const APPLIED_KEY=KEY+"-applied";
 const LIVE_URL="live.json";
 const POLL_MS=15000;
@@ -567,7 +540,7 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"Saturday Deep Stack",sub:"Blue Chip Club · Deep Stack · 25.000 Chips · mit Ante",bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
   buyin:25,fee:5,rebuy:20,rb15:1,pay:{places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
@@ -590,10 +563,9 @@ const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-Date.now())/1000):(S.le
 /* Spitznamen: „Niki“ findet Niklas, „Alex“/„PDiddy“ findet P. Diddy usw. */
 const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","olli":"oli"};
 const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS[k]||k;};
-let REAL=null;const allP=()=>REAL||S.players; /* REAL: full player list while only one table is being drawn (inView) */
-const pl=n=>allP().find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||allP().find(p=>canonName(p.name)===canonName(n));
-const alive=()=>allP().filter(p=>!p.out);
-const totalEntries=()=>allP().reduce((a,p)=>a+p.entries.length,0);
+const pl=n=>S.players.find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||S.players.find(p=>canonName(p.name)===canonName(n));
+const alive=()=>S.players.filter(p=>!p.out);
+const totalEntries=()=>S.players.reduce((a,p)=>a+p.entries.length,0);
 /* 14.11. Tim: der Veranstalter (S.bank) zahlt sich selbst keine Gebühr, sein erster Entry kostet nur den Pot-Anteil */
 const isBank=p=>String(p.name).toLowerCase().trim()===String(S.bank||"").toLowerCase().trim();
 const entPrice=(p,j)=>j?S.rebuy:S.buyin-(isBank(p)?S.fee:0);
@@ -614,7 +586,7 @@ function payouts(){
   return [a,rest-a,third];
 }
 // places: out order reversed; survivors share the top
-function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().length===1?1:null):allP().length-k;}
+function placeOf(p){const k=S.outOrder.indexOf(p.name);return k<0?(alive().length===1?1:null):S.players.length-k;}
 
 /* ---------- render ---------- */
 const mmss=s=>{s=Math.ceil(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");};
@@ -687,112 +659,7 @@ function imgBox(){const st=$("stage"),W=st.clientWidth||1,H=st.clientHeight||1;l
 function imgToStage(fx,fy){const b=imgBox();return [100*((b.W-b.w)/2+fx*b.w)/b.W,100*((b.H-b.h)/2+fy*b.h)/b.H,b.w];}
 function figKey(name,used){let k=String(name).toLowerCase().trim().replace(/\s+/g,"-");k=FIG_ALIAS[k]||k;if(FIGS[k]&&!used.has(k))return k;return Object.keys(FIGS).find(x=>!used.has(x)&&!S.players.some(p=>{let q=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");return (FIG_ALIAS[q]||q)===x;}))||Object.keys(FIGS).find(x=>!used.has(x));}
 function seatPos(k,n){if(imgMode()){const t=imgSeat(k,n);if(t===DEALER_SEAT)return imgToStage(CUR.dealerTag[0],CUR.dealerTag[1]);const fi=CUR===T10?.17:.16,fj=CUR===T10?.17:.2,[x,y]=imgToStage(t[0]+(.5-t[0])*fi,t[1]+(.5-t[1])*fj);return [x,y];}const a=Math.PI/2+(S.rot||0)*Math.PI+k*2*Math.PI/n;return [50+44*Math.cos(a),50+38*Math.sin(a)];}
-/* ---------- zwei Tische (19.11.2026, ab Friday Classic) ----------
-   Es gibt nur EINEN echten Pokertisch (= Tisch 1, große Bühne). Ab 11 Spielern lost „Plätze auslosen“ zwei Tische aus.
-   S.t2 = Namen an Tisch 2 · S.mt = Turnier mit zwei Tischen (Tische zeigen dann nur aktive Spieler) · S.dn = {1:Name,2:Name} Dealer-Button pro Tisch
-   S.pend = offener Tischwechsel {op:"move",name,to} oder {op:"merge"} (Final Table). Reihenfolge in S.players = Sitzreihenfolge im Uhrzeigersinn je Tisch. */
-const CAP1=10; /* Plätze am großen Tisch: Tim + 9 */
-const lcn=x=>String(x||"").toLowerCase().trim();
-const isT2=p=>!!(S.t2&&S.t2.length&&S.t2.some(n=>lcn(n)===lcn(p.name)));
-const tblOf=p=>isT2(p)?2:1;
-const twoT=()=>!!(S.mt&&S.t2&&S.t2.length);
-const atTbl=t=>allP().filter(p=>!p.out&&tblOf(p)===t);
-/* für den Ausgleich zählen Ausgeschiedene mit, solange sie noch einen Rebuy machen dürfen (ihr Platz bleibt frei) */
-const seatedAt=t=>allP().filter(p=>tblOf(p)===t&&(!p.out||(rebuyOpen()&&canRebuy(p)&&!p.chair)));
-const seatOrder=t=>allP().filter(p=>tblOf(p)===t);
-const isTim=p=>!!p&&lcn(p.name)==="tim";
-/* Dealer am Tisch t: gemerkter Name; ist er raus, der nächste aktive Spieler im Uhrzeigersinn */
-function dealerOf(t){const ord=seatOrder(t),al=ord.filter(p=>!p.out);if(!al.length)return null;
-  const i=ord.findIndex(p=>lcn(p.name)===lcn(S.dn&&S.dn[t]));if(i<0)return al[0];
-  for(let s=0;s<ord.length;s++){const q=ord[(i+s)%ord.length];if(!q.out)return q;}return al[0];}
-function dealerNext(t){const ord=seatOrder(t),d=dealerOf(t);if(!d)return;const i=ord.indexOf(d);
-  for(let s=1;s<=ord.length;s++){const q=ord[(i+s)%ord.length];if(!q.out){S.dn=Object.assign({},S.dn,{[t]:q.name});break;}}save();render();}
-function setDealer(p){if(!p)return;if(S.mt)S.dn=Object.assign({},S.dn,{[tblOf(p)]:p.name});else S.dealer=S.players.indexOf(p);}
-function dealerName(){if(S.mt){const d=dealerOf(1);return d?d.name:"";}const d=S.players[S.dealer];return d?d.name:"";}
-/* Sitzregeln (Tim 14.11.): Tim Dealerplatz (letzter Platz), Manu direkt neben Tim (Platz 1 oder vorletzter), Jonny Platz 6, Rest zufällig */
-function seatRules(a){a=shuf(a);const tim=a.find(isTim);if(tim)a=[...a.filter(p=>p!==tim),tim];
-  const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
-  const slots=new Array(n).fill(null);if(tim)slots[n-1]=tim;
-  if(ma)slots[Math.random()<.5?0:n-2]=ma;
-  if(jo&&jo!==ma){const want=Math.min(5,n-(tim?2:1)),k=[...Array(n).keys()].filter(i=>!slots[i]).sort((x,y)=>Math.abs(x-want)-Math.abs(y-want))[0];slots[k]=jo;}
-  const rest=a.filter(x=>x!==tim&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];return slots;}
-/* draw only one table: S.players = the active players of table t, S.dealer = index of its dealer (restored afterwards) */
-function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.dealer;REAL=keep;
-  const v=keep.filter(p=>!p.out&&tblOf(p)===t),d=dealerOf(t);S.players=v;S.dealer=Math.max(0,v.indexOf(d));
-  try{return fn();}finally{S.players=keep;S.dealer=kd;REAL=null;}}
-function seatLabel(p){if(!S.mt){const k=S.players.indexOf(p);return k<0?"":"Platz "+(k+1);}const t=tblOf(p),k=seatOrder(t).filter(q=>!q.out||q===p).indexOf(p);return (twoT()?(t===1?"Großer Tisch":"Tisch 2")+" · ":"")+"Platz "+(k+1);}
-/* table 2 box under the big table: simple oval, avatar + name per seat, only active players */
-function renderT2(){
-  const on=twoT(),box=$("t2box");
-  if(document.body.classList.contains("two")!==on){document.body.classList.toggle("two",on);box.hidden=!on;requestAnimationFrame(()=>{try{buildSeats();renderSeats();}catch(e){}});}
-  const a1=atTbl(1).length,a2=atTbl(2).length;
-  $("t1cap").textContent="Großer Tisch · "+a1+" Spieler";
-  if(!on){box.querySelectorAll(".seat2").forEach(e=>e.remove());return;}
-  const v=atTbl(2),d=dealerOf(2),n=v.length,pd=S.pend;
-  $("t2cap").textContent="Tisch 2 · "+n+" Spieler";
-  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>Tisch 2</b>Blue Chip Club';
-  const key=v.map(p=>p.name+"|"+(p.entries.length-1)).join(",");
-  if(box.dataset.k!==key){box.dataset.k=key;box.querySelectorAll(".seat2").forEach(e=>e.remove());
-    v.forEach((p,k)=>{const a=Math.PI/2+k*2*Math.PI/n,x=50+41*Math.cos(a),y=50+37*Math.sin(a),e=document.createElement("div");
-      e.className="seat2";e.dataset.n=p.name;e.style.left=x+"%";e.style.top=y+"%";
-      e.innerHTML=avHtml(p.name)+'<div><div class="nm2"></div>'+(p.entries.length>1?'<div class="re">+'+(p.entries.length-1)+' Rebuy</div>':'')+'</div>';
-      e.querySelector(".nm2").textContent=p.name;e.onclick=()=>openPlayers(p.name);box.appendChild(e);});}
-  const di=v.indexOf(d),db=$("dbtn2");db.hidden=di<0;
-  if(di>=0){const a=Math.PI/2+di*2*Math.PI/n;db.style.left=(50+28*Math.cos(a))+"%";db.style.top=(50+24*Math.sin(a))+"%";}
-}
-/* who moves when tables are balanced: the player who gets the big blind next at the fuller table (never Tim, never Manu at Tim's table) */
-function moveCand(t){const v=atTbl(t),d=dealerOf(t);if(!v.length)return null;const i=Math.max(0,v.indexOf(d));
-  for(let s=0;s<v.length;s++){const q=v[(i+3+s)%v.length];if(isTim(q))continue;if(t===1&&canonName(q.name)==="manu"&&v.some(isTim))continue;return q;}return null;}
-/* move a player to table `to`: he takes the chair of the last player who went out there (else next to the dealer seat) */
-function moveP(name,to){const p=pl(name);if(!p||p.out)return;$("ann").hidden=true;const from=tblOf(p);if(from===to){if(S.pend&&lcn(S.pend.name)===lcn(name))S.pend=null;save();render();return;}
-  let arr=S.players.filter(x=>x!==p);
-  S.t2=to===2?(S.t2||[]).concat(p.name):(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));
-  const tgt=arr.filter(x=>tblOf(x)===to);
-  const chair=[...S.outOrder].reverse().map(n=>tgt.find(x=>x.out&&!x.chair&&lcn(x.name)===lcn(n))).find(Boolean);
-  let at;if(chair){chair.chair=1;at=arr.indexOf(chair);}else{const tim=tgt.find(isTim);at=tim?arr.indexOf(tim):(tgt.length?arr.indexOf(tgt[tgt.length-1])+1:arr.length);}
-  arr.splice(at,0,p);S.players=arr;S.mt=true;
-  if(S.pend&&S.pend.op==="move")S.pend=null;
-  log("move",{name:p.name,from,to});save();buildSeats();render();flashSeat(p);
-  toast(p.name+" sitzt jetzt an "+(to===1?"dem großen Tisch":"Tisch 2"));
-  setTimeout(()=>checkTables(true),400);}
-function pickMover(t){closeAll();
-  const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center";
-  const b=document.createElement("div");b.style.cssText="background:#151515;border:1px solid #b8933a;border-radius:14px;padding:22px;max-width:620px;width:92vw";
-  b.innerHTML='<h3 style="margin:0 0 6px">Wer wechselt von '+(t===1?"dem großen Tisch an Tisch 2":"Tisch 2 an den großen Tisch")+'?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">Normal: wer als Nächstes Big Blind wäre.</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
-  const R=b.querySelector(".row"),mk=(tx,cls,fn)=>{const x=document.createElement("button");x.className="b "+cls;x.textContent=tx;x.onclick=()=>{o.remove();fn();};R.appendChild(x);};
-  atTbl(t).filter(q=>!isTim(q)).forEach(q=>mk(q.name,"pri",()=>moveP(q.name,3-t)));mk("Abbrechen","",()=>{});
-  o.appendChild(b);o.onclick=e=>{if(e.target===o)o.remove();};document.body.appendChild(o);}
-/* after every out / rebuy / new player: Final Table when everyone fits at the big table, otherwise balance (difference of 2 or more) */
-function checkTables(quiet){
-  if(!twoT()){if(S.pend){S.pend=null;save();}return;}
-  const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
-  if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
-    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf dem Dealerplatz, Manu daneben, Jonny Platz 6.",btn:"Plätze für den Final Table auslosen"});
-    $("annOk").onclick=()=>{$("ann").hidden=true;mergeTables();};fanfare();return;}
-  const big=a1.length>a2.length?1:2,diff=Math.abs(a1.length-a2.length);
-  if(diff<2||(big===2&&a1.length>=CAP1)){if(S.pend){S.pend=null;save();render();}return;}
-  const p=moveCand(big);if(!p)return;
-  const same=S.pend&&S.pend.op==="move"&&lcn(S.pend.name)===lcn(p.name);
-  S.pend={op:"move",name:p.name,to:3-big};save();render();if(same&&quiet)return;
-  announce({eyebrow:"Tische ausgleichen",title:p.name+" wechselt an "+(big===1?"Tisch 2":"den großen Tisch"),text:"Großer Tisch: "+a1.length+" · Tisch 2: "+a2.length+" Spieler. "+p.name+" nimmt seinen Stack mit und setzt sich auf den freien Platz.",html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annAlt">Anderen Spieler wählen</button> <button class="b" type="button" id="annLater">Später</button></div>',btn:"✓ "+p.name+" sitzt um"});
-  $("annOk").onclick=()=>{$("ann").hidden=true;moveP(p.name,3-big);};
-  $("annAlt").onclick=()=>{$("ann").hidden=true;pickMover(big);};$("annLater").onclick=()=>{$("ann").hidden=true;};}
-/* Final Table: all active players to the big table, seats drawn again with Tim's rules, button random */
-function mergeTables(){const al=S.players.filter(p=>!p.out),outs=S.players.filter(p=>p.out);if(!al.length)return;
-  const a=seatRules(al);S.players=[...outs,...a];S.t2=[];S.mt=true;S.pend=null;S.ft=new Date().toISOString();
-  S.dn={1:a[Math.floor(Math.random()*a.length)].name};
-  log("merge",{order:a.map(p=>p.name),dealer:S.dn[1]});save();buildSeats();render();
-  drawOverview(a,{eyebrow:"Final Table · "+a.length+" Spieler",title:"Sitzordnung Final Table"});}
-/* late registration / new name: goes to the table with fewer players */
-function seatNew(p){if(!twoT()){if(S.mt){const tim=S.players.find(x=>isTim(x)&&!x.out);if(tim){S.players=S.players.filter(x=>x!==p);S.players.splice(S.players.indexOf(tim),0,p);}return;}if(alive().length>CAP1&&!S.started)toast("Mehr als "+CAP1+" Spieler: „Plätze auslosen“ verteilt auf zwei Tische");return;}
-  const a1=atTbl(1).length,a2=atTbl(2).length,to=a1<a2&&a1<CAP1?1:2;S.players=S.players.filter(x=>x!==p);S.t2=S.t2.filter(n=>lcn(n)!==lcn(p.name));
-  if(to===2)S.t2.push(p.name);const tgt=S.players.filter(x=>tblOf(x)===to),tim=tgt.find(isTim);
-  const at=to===1&&tim?S.players.indexOf(tim):(tgt.length?S.players.indexOf(tgt[tgt.length-1])+1:S.players.length);S.players.splice(at,0,p);}
-function addPlayer(name,paid){if(!name||pl(name))return null;const p={name,entries:[{t:S.started?new Date().toISOString():null,lvl:S.started?playNum(S.i):0,paid:paid||"bar"}],out:null};S.players.push(p);seatNew(p);log("add",{name,t:tblOf(p)});return p;}
-
-function buildSeats(){inView(1,buildSeats1);renderT2();}
-function renderSeats(){inView(1,renderSeats1);renderT2();}
-function buildSeats1(){
+function buildSeats(){
   pickCfg();
   document.querySelectorAll(".seat,.fig").forEach(e=>e.remove());
   const st=$("stage"),n=S.players.length,im=imgMode();st.classList.toggle("img11",im);st.classList.toggle("simple",SIMPLE);st.classList.toggle("tim",timIn());st.classList.toggle("tv1",S.timV===1);st.classList.toggle("t10",CUR===T10);const PRE=im?preActive():null;st.style.backgroundImage=PRE?'url("'+PRE.base+'fertig/'+PRE.file+'")':"";const fe=$("felt");if(im){const b=imgBox();st.style.backgroundSize=b.w+"px "+b.h+"px";st.style.setProperty("--ss",Math.min(1,Math.max(.5,b.w/760)).toFixed(3));buildSeats.used=new Set();const ft=CUR===T10?(CUR.feltTop||.47):(timIdx()>=0?.39:OVAL[1]),fb=CUR===T10?(CUR.feltBottom||.66):OVAL[3],[l,t]=imgToStage(OVAL[0],ft),[r,bo]=imgToStage(OVAL[2],fb);fe.style.cssText="left:"+l+"%;top:"+t+"%;right:"+(100-r)+"%;bottom:"+(100-bo)+"%";}else{st.style.backgroundSize="";fe.style.cssText="";}
@@ -800,15 +667,15 @@ function buildSeats1(){
     if(im&&FIG_ON){const used=buildSeats.used||(buildSeats.used=new Set());if(k===0)used.clear();const key=figKey(p.name,used);if(key){used.add(key);const F=FIGS[key],t=imgSeat(k,n),[cx,cy,bw]=imgToStage(t[0],t[1]),b=imgBox(),tx=(.5-t[0])*b.w,ty=(.5-t[1])*b.h,rot=Math.atan2(ty,tx)*180/Math.PI-F[4],fw=F[0]*bw*FIG_SCALE,fh=F[1]*bw*FIG_SCALE,g=document.createElement("div");g.className="fig";g.dataset.k=k;g.style.width=fw+"px";g.style.height=fh+"px";g.style.left="calc("+cx+"% - "+(F[2]*fw)+"px)";g.style.top="calc("+cy+"% - "+(F[3]*fh)+"px)";g.style.transformOrigin=(F[2]*100)+"% "+(F[3]*100)+"%";g.style.transform="rotate("+rot.toFixed(1)+"deg)";g.innerHTML='<img src="figuren/'+key+'.webp?v=1" alt="">';st.appendChild(g);}}
     if(im&&CUR.lib&&!PRE&&!SIMPLE){const SEATLIB=CUR.lib;let key=String(p.name).toLowerCase().trim().replace(/\s+/g,"-");key=FIG_ALIAS[key]||key;const t=imgSeat(k,n),i=IMG_SEATS.indexOf(t),nn=String(i).padStart(2,"0"),r=SEATLIB[key]&&SEATLIB[key][nn];if(i>=0&&r){const b=imgBox(),[lx,ty]=imgToStage(r[0]/1920,r[1]/1072),g=document.createElement("div");g.className="fig s2";g.dataset.k=k;g.style.cssText="left:"+lx+"%;top:"+ty+"%;width:"+(r[2]/1920*b.w)+"px;height:"+(r[3]/1072*b.h)+"px;transform:none";g.innerHTML='<img src="'+CUR.base+'sitze/'+key+'/fig-'+nn+'.webp?v='+SEATLIB_V+'" alt="">';st.appendChild(g);}}
     const [x,y]=seatPos(k,n),d=document.createElement("div");
-    d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;d.dataset.n=p.name;
+    d.className="seat";d.style.left=x+"%";d.style.top=y+"%";d.dataset.k=k;
     d.innerHTML='<div class="avw"></div><div class="nm"></div><div class="meta"></div>';d.querySelector(".avw").onclick=()=>openPlayers(p.name);
     d.querySelector(".nm").onclick=()=>openPlayers(p.name);
     st.appendChild(d);
   });
 }
-function renderSeats1(){
+function renderSeats(){
   const seats=[...document.querySelectorAll(".seat")];
-  if(seats.length!==S.players.length){buildSeats1();return renderSeats1();}
+  if(seats.length!==S.players.length){buildSeats();return renderSeats();}
   const mw=mostWanted();
   S.players.forEach((p,k)=>{
     const d=seats[k],pl_=placeOf(p),open=p.entries.filter(e=>e.paid==="offen").length;
@@ -817,8 +684,7 @@ function renderSeats1(){
     d.querySelector(".nm").innerHTML=esc(p.name)+(p.out&&pl_?'<span class="place">'+pl_+'.</span>':"");
     const re=p.entries.length-1;
     d.classList.toggle("mw",mw===p);
-    if(d.dataset.n!==p.name)d.dataset.n=p.name;
-    d.querySelector(".meta").innerHTML=(re?'<span class="re">+'+re+' Rebuy</span>':"")+(S.bounty&&!p.out?'<span class="hd">🎯 '+headOf(p)+' P</span>':"")+(mw===p?'<span class="mwt">Most Wanted</span>':"");
+    d.querySelector(".meta").innerHTML=(S.t2&&S.t2.includes(p.name)?'<span class="re">Tisch 2</span>':"")+(re?'<span class="re">+'+re+' Rebuy</span>':"")+(S.bounty&&!p.out?'<span class="hd">🎯 '+headOf(p)+' P</span>':"")+(mw===p?'<span class="mwt">Most Wanted</span>':"");
   });
   const n=S.players.length;if(!n)return;
   S.dealer=((S.dealer%n)+n)%n;
@@ -846,23 +712,19 @@ function render(){
   const a=alive().length,te=totalEntries();
   $("plc").innerHTML=a+" <small>/ "+S.players.length+"</small>";
   $("ent").textContent=te;
-  const avg=a?(te*S.stack+allP().filter(p=>p.eb).length*(S.eb||0))/a:0;$("avg").textContent=fmt(avg);$("avgbb").textContent=curBB()?fmt(avg/curBB()):"–";
+  const avg=a?te*S.stack/a:0;$("avg").textContent=fmt(avg);$("avgbb").textContent=curBB()?fmt(avg/curBB()):"–";
   const rb=$("reb");
   if(rebuyOpen()){const n=S.reLvl;rb.textContent=n==null?"Rebuy offen":"Rebuy offen bis Ende Level "+n+" · "+P(S.rebuy);rb.className="full rebuy";}
   else{rb.textContent="Rebuy-Phase vorbei · Freezeout";rb.className="full rebuy closed";}
   const g=S.active&&GAMES[S.active];
   $("gameBox").hidden=!g;if(g){$("gameT").textContent=S.active;$("gameS").textContent=g.short+(g.bb?" · "+stakeTxt(S.active):"");}
   $("bPlay").textContent=S.running?"❚❚ Pause":"▶ Start";
-  $("bDealer2").hidden=!twoT();$("bTables").hidden=!twoT();$("bDealer").textContent=twoT()?"Dealer großer Tisch ▶":"Dealer ▶";
   renderSeats();renderTicker();
 }
 function renderTicker(){
   if(S.active&&S.activeUntil&&Date.now()>S.activeUntil){S.active=null;S.activeUntil=null;save();}
   const parts=[];
   S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
-  if(S.pend&&S.pend.op==="move")parts.push("⇄ "+S.pend.name+" wechselt an "+(S.pend.to===1?"den großen Tisch":"Tisch 2"));
-  if(S.pend&&S.pend.op==="merge")parts.push("🏆 Final Table: alle an den großen Tisch");
-  if(twoT())parts.push("Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler");
   if(rebuyOpen())parts.push("Rebuy "+P(S.rebuy)+" bis Ende Level "+(S.reLvl??"∞"));
   const pays=payouts();parts.push("Preise: "+pays.map((v,k)=>(k+1)+". "+P(v)).join(" · "));
   parts.push("Ein Abend, zehn Plätze, ein Name auf dem Wanderpokal");
@@ -890,8 +752,7 @@ function go(i,silent){
 }
 function advance(){
   if(S.i>=LEVELS.length-1){S.running=false;S.left=0;S.endAt=null;save();render();return;}
-  const carry=S.endAt,reWas=rebuyOpen();S.i++;S.endAt=carry+dur(S.i)*1000;S.left=dur(S.i);
-  if(reWas&&!rebuyOpen()&&twoT())setTimeout(()=>checkTables(false),9000);
+  const carry=S.endAt;S.i++;S.endAt=carry+dur(S.i)*1000;S.left=dur(S.i);
   log("level",{to:LEVELS[S.i].brk?"Pause":"Level "+playNum(S.i)});
   if(S.active&&S.active!=="7-2 Bonus")S.active=null;
   if(LEVEL_SOUND)levelSound();save();
@@ -913,7 +774,7 @@ function tick(){
 function toggle(){if(typeof lobbyClose==="function")lobbyClose();if(typeof bgStop==="function")bgStop();
   ac();
   if(S.running){S.left=leftNow();S.running=false;S.endAt=null;log("pause");}
-  else{if(S.left==null||S.left<=0)S.left=dur(S.i);S.running=true;S.endAt=Date.now()+S.left*1000;if(!S.started){S.started=new Date().toISOString();S.players.forEach(p=>{if(p.eb==null)p.eb=1;});log("start",{earlyBird:S.players.map(p=>p.name)});}else log("weiter");lock();}
+  else{if(S.left==null||S.left<=0)S.left=dur(S.i);S.running=true;S.endAt=Date.now()+S.left*1000;if(!S.started){S.started=new Date().toISOString();log("start");}else log("weiter");lock();}
   lastSec=null;save();render();
 }
 function addTime(sec){const l=Math.max(1,leftNow()+sec);S.left=l;if(S.running)S.endAt=Date.now()+l*1000;save();render();}
@@ -957,9 +818,9 @@ function doRebuy(name,paid){
   const p=pl(name);if(!p)return false;
   p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar"});
   if(S.bounty)p.head=p.out?S.bounty:headOf(p)+S.bounty;
-  if(p.out){p.out=null;delete p.chair;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
+  if(p.out){p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
   log("rebuy",{name:p.name,entry:p.entries.length,paid:paid||"bar"});
-  save();render();flashSeat(p);if(twoT())setTimeout(()=>checkTables(true),300);return true;
+  save();render();flashSeat(p);return true;
 }
 function doOut(name,by){
   const p=pl(name);if(!p||p.out)return;
@@ -979,14 +840,11 @@ function doOut(name,by){
     if(king)burst();}
   if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
   else toast(p.name+" ist raus · Platz "+place);
-  /* zwei Tische: während der Rebuy-Phase erst ausgleichen, wenn keiner mehr nachkauft (Rebuy-Frage), danach sofort */
-  if(twoT())setTimeout(()=>checkTables(false),ko&&ko.by?9500:400);
 }
-const canRebuy=p=>S.maxRe==null||p.entries.length-1<S.maxRe;
 function doBack(name){const p=pl(name);if(!p||!p.out)return;
   const ko=p.out.ko;if(ko){const q=ko.by?pl(ko.by):null;if(q){q.bw=bwOf(q)-ko.cash;q.head=headOf(q)-ko.add;}else S.lostHeads=(S.lostHeads||0)-ko.h;p.head=ko.h;}
-  p.out=null;delete p.chair;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.ended=null;log("back",{name:p.name});save();render();if(twoT())setTimeout(()=>checkTables(true),300);}
-function flashSeat(p){const d=[...document.querySelectorAll(".seat,.seat2")].find(e=>e.dataset.n===p.name);if(d){d.classList.remove("flash");void d.offsetWidth;d.classList.add("flash");}}
+  p.out=null;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.ended=null;log("back",{name:p.name});save();render();}
+function flashSeat(p){const k=S.players.indexOf(p),d=document.querySelectorAll(".seat")[k];if(d){d.classList.remove("flash");void d.offsetWidth;d.classList.add("flash");}}
 function winner(p){
   gong();setTimeout(fanfare,600);
   const pays=payouts();
@@ -1005,19 +863,10 @@ function pickHunter(p,cb){
 }
 function openPlayers(focus){
   const L=$("pList");L.innerHTML="";
-  /* zwei Tische: erst der große Tisch, dann Tisch 2, Ausgeschiedene am Ende */
-  const two=twoT(),list=S.mt?[...S.players.filter(p=>!p.out&&tblOf(p)===1),...S.players.filter(p=>!p.out&&tblOf(p)===2),...S.players.filter(p=>p.out)]:S.players;
-  if(S.mt){const h=document.createElement("div");h.style.cssText="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px";
-    h.innerHTML='<b style="font-size:14px">'+(two?"Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler":"Final Table · "+alive().length+" Spieler")+'</b>'+(S.pend?'<span style="color:#f3d68f;font-size:13px">'+(S.pend.op==="move"?"⇄ offen: "+esc(S.pend.name)+" an "+(S.pend.to===1?"großen Tisch":"Tisch 2"):"🏆 Final Table offen")+'</span>':'');
-    const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;h.appendChild(b);};
-    if(S.pend)mk(S.pend.op==="move"?"✓ Wechsel bestätigen":"Final Table auslosen","pri",()=>{$("mPlayers").hidden=true;S.pend.op==="move"?moveP(S.pend.name,S.pend.to):mergeTables();});
-    if(two)mk("Tische prüfen","",()=>{$("mPlayers").hidden=true;checkTables(false);});
-    if(two)mk("Jetzt Final Table","red",()=>{if(!confirm("Tische jetzt zum Final Table zusammenlegen?"))return;$("mPlayers").hidden=true;mergeTables();});
-    L.appendChild(h);}
-  list.forEach((p,k)=>{
+  S.players.forEach((p,k)=>{
     const d=document.createElement("div");d.className="pcard"+(p.out?" out":"");
     const place=placeOf(p);
-    d.innerHTML='<div class="h"><span></span><span style="font-family:var(--mono);font-size:12px;color:var(--grey)">'+(p.out?"raus · Platz "+place:(two?(tblOf(p)===1?"groß":"Tisch 2"):"im Spiel")+(S.eb&&p.eb?" · EB":""))+'</span></div><div class="e"></div><div class="row" style="margin-top:4px"></div>';
+    d.innerHTML='<div class="h"><span></span><span style="font-family:var(--mono);font-size:12px;color:var(--grey)">'+(p.out?"raus · Platz "+place:"im Spiel")+'</span></div><div class="e"></div><div class="row" style="margin-top:4px"></div>';
     d.querySelector(".h span").textContent=p.name+(S.bounty?"  ·  🎯 "+headOf(p)+" P"+(bwOf(p)?"  ·  kassiert "+bwOf(p)+" P":""):"");
     const E=d.querySelector(".e");
     p.entries.forEach((e,j)=>{const b=document.createElement("button");b.className="ent p-"+e.paid;b.textContent=(j?"Rebuy "+j:"Buy-in")+" · "+PAY_TXT[e.paid];b.title="Antippen: Zahlart wechseln";b.onclick=()=>{e.paid=PAY_NEXT[e.paid];log("paid",{name:p.name,entry:j+1,paid:e.paid});save();render();openPlayers();};E.appendChild(b);});
@@ -1028,15 +877,12 @@ function openPlayers(focus){
     if(p.entries.length>1)add("−1","",()=>{p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});save();render();openPlayers();});
     if(!p.out)add("Raus","red",()=>{const fin=by=>{doOut(p.name,by);if(!$("ann").hidden)return;openPlayers();};if(!S.bounty)return fin();pickHunter(p,fin);});
     else add("Zurück ins Spiel","",()=>{doBack(p.name);openPlayers();});
-    if(two&&!p.out)add(tblOf(p)===1?"→ Tisch 2":"→ großer Tisch","",()=>{moveP(p.name,3-tblOf(p));openPlayers();});
-    if(!p.out)add("Dealer","",()=>{setDealer(p);save();render();toast("Dealer-Button: "+p.name);});
-    if(S.eb)add(p.eb?"Early Bird ✓":"Early Bird ✗","",()=>{p.eb=p.eb?0:1;log("eb",{name:p.name,eb:p.eb});save();render();openPlayers();});
     L.appendChild(d);
   });
   $("pSub").textContent="Pot "+P(potOf())+" · "+totalEntries()+" Entries · Zahlart pro Entry antippen (bar → überwiesen → offen). „Raus“ setzt die Platzierung automatisch.";
   $("mPlayers").hidden=false;
 }
-$("pAdd").onclick=()=>{const n=$("pNew").value.trim();if(!n||pl(n))return;const p=addPlayer(n,"bar");$("pNew").value="";save();buildSeats();render();openPlayers();if(p&&twoT())toast(n+" sitzt an "+(tblOf(p)===1?"dem großen Tisch":"Tisch 2"));};
+$("pAdd").onclick=()=>{const n=$("pNew").value.trim();if(!n||pl(n))return;S.players.push({name:n,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:"bar"}],out:null});log("add",{name:n});$("pNew").value="";save();render();openPlayers();};
 $("pClose").onclick=()=>$("mPlayers").hidden=true;
 
 /* ---------- settlement ---------- */
@@ -1079,7 +925,7 @@ function exportData(){
   return {event:S.title,date:new Date().toISOString().slice(0,10),exported:new Date().toISOString(),started:S.started,ended:S.ended,
     rules:{stack:S.stack,buyin:S.buyin,fee:S.fee,rebuy:S.rebuy,bounty:S.bounty||0,champ:S.champ,lostHeads:S.lostHeads||0,reLvl:S.reLvl,maxRe:S.maxRe,pay:S.pay,bank:S.bank,unit:"P"},
     level:{now:LEVELS[S.i].brk?"Pause":playNum(S.i),blinds:LEVELS[S.i]},pot:s.pot,kasse:s.feeTotal,received:s.received,payouts:s.pays,
-    players:S.players.map((p,k)=>Object.assign({seat:k+1,table:S.mt?tblOf(p):1,seatLabel:seatLabel(p),earlyBird:!!p.eb},s.rows[k],{out:p.out,entryLog:p.entries})),tables:{mt:!!S.mt,t2:S.t2||[],dealer:S.dn,finalTable:S.ft||null},
+    players:S.players.map((p,k)=>Object.assign({seat:k+1},s.rows[k],{out:p.out,entryLog:p.entries})),
     settlementDraft:s.tx,levels:LEVELS,games:S.games,log:S.log};
 }
 function download(){
@@ -1182,45 +1028,41 @@ function drawSeats(){
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
-  /* 19.11. Tim: nur EIN echter Pokertisch. Ab 11 Spielern zwei Tische, möglichst gleich groß (großer Tisch bekommt bei ungerader Zahl einen mehr, max. 10).
-     Wer an den großen Tisch kommt, wird ausgelost: Tim fest, Manu fest (neben Tim), die ersten 9 Anmeldungen (Reihenfolge der Website-Zusagen) haben doppelte Chance. */
-  S.t2=[];S.mt=false;S.pend=null;S.dn=null;S.ft=null;S.draw0=null;S.players.forEach(p=>{delete p.chair;});
-  if(a.length>CAP1){const ord=(S.syncSeen||[]).map(lcn).filter(x=>x!=="tim"),early=new Set(ord.slice(0,9)),w=p=>early.has(lcn(p.name))?2:1;
-    const nBig=Math.min(CAP1,Math.ceil(a.length/2)),ma=a.find(p=>canonName(p.name)==="manu");
-    const big=[anc,ma].filter(Boolean);let pool=a.filter(p=>!big.includes(p));
-    while(big.length<nBig&&pool.length){let r=Math.random()*pool.reduce((x,p)=>x+w(p),0),i=0;for(;i<pool.length-1;i++){r-=w(pool[i]);if(r<0)break;}big.push(pool[i]);pool.splice(i,1);}
-    const t1=seatRules(big),t2=seatRules(pool);
-    S.t2=t2.map(p=>p.name);S.mt=true;S.players=[...t2,...t1];S.forceOld=false;pickCfg();
-    S.dn={1:t1[Math.floor(Math.random()*t1.length)].name,2:t2[Math.floor(Math.random()*t2.length)].name};S.dealer=0;
-    S.draw0={order:S.players.map(p=>p.name),t2:S.t2.slice(),dn:Object.assign({},S.dn)};
-    log("draw",{order:t1.map(p=>p.name),t2:S.t2,dealer:S.dn[1],dealer2:S.dn[2],early:[...early]});save();buildSeats();render();return;}
+  /* 19.11. Tim: nur EIN echter Pokertisch. Bei mehr als 10 Spielern wird zuerst ausgelost, wer am großen Tisch sitzt (Tim + 9).
+     Die ersten 9 Anmeldungen (ohne Tim, Reihenfolge der Website-Zusagen) haben doppelte Chance, Manu sitzt immer neben Tim. Der Rest spielt an Tisch 2. */
+  S.t2=null;let t2=[];
+  if(anc&&a.length>10){const lc=x=>String(x).toLowerCase().trim(),ord=(S.syncSeen||[]).map(lc).filter(x=>x!=="tim"),early=new Set(ord.slice(0,9)),w=p=>early.has(lc(p.name))?2:1;
+    const ma=a.find(p=>canonName(p.name)==="manu");let pool=a.filter(p=>p!==anc&&p!==ma);const big=ma?[ma]:[];
+    while(big.length<9&&pool.length){let r=Math.random()*pool.reduce((x,p)=>x+w(p),0),i=0;for(;i<pool.length-1;i++){r-=w(pool[i]);if(r<0)break;}big.push(pool[i]);pool.splice(i,1);}
+    t2=pool;const jo2=t2.find(p=>canonName(p.name)==="jonny");if(jo2&&t2.length>5){t2=t2.filter(p=>p!==jo2);t2.splice(5,0,jo2);}
+    S.t2=t2.map(p=>p.name);a=[...big.sort(()=>Math.random()-.5),anc];}
   /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Jonny immer Platz 6. Rest zufällig. */
   if(anc&&a.length>=3){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
     if(ma)slots[Math.random()<.5?0:n-2]=ma;
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
+  if(t2.length)a=[...t2,...a];
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
   S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
   if(!SIMPLE&&!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
-  S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
+  S.players=a;S.dealer=t2.length+Math.floor(Math.random()*(a.length-t2.length));log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name,t2:S.t2});save();buildSeats();render();
 }
 /* 12.11.: Show nach „Plätze auslosen“: Ansager + alle Karten auf einen Blick, dann jede Karte einzeln in Sitzreihenfolge (Tim zuletzt am Dealer-Platz), dann die Sitzordnung */
 const DRAW_SHOW=true;
-function drawShow(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
-  const grid='<div class="draw'+(a.length>10?' two':'')+'">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
+function drawShow(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=S.players.slice();
+  const grid='<div class="draw">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
   announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
-  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;introShow(a,()=>drawOverview(S.players),twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
+  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;introShow(a,()=>drawOverview(S.players),{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
   const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
 const ANNS_INTRO_NOW=()=>"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
-function drawOverview(a,o){o=o||{};
-  const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
-  if(twoT()){const t1=seatOrder(1),t2=seatOrder(2),lb=t=>'<p style="margin:1.6vh 0 .8vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+t+'</p>';
-    announce({eyebrow:"Plätze ausgelost · zwei Tische · im Uhrzeigersinn",title:"Sitzordnung",html:lb("Großer Tisch · "+t1.length+" Spieler · Dealer-Button: "+esc((dealerOf(1)||{}).name||"–"))+cards(t1,true)+lb("Tisch 2 · "+t2.length+" Spieler · Dealer-Button: "+esc((dealerOf(2)||{}).name||"–"))+cards(t2,true),btn:"Shuffle up and deal"});fanfare();return;}
-  const list=S.mt?a.filter(p=>!p.out):a;
-  announce({eyebrow:o.eyebrow||"Plätze ausgelost · im Uhrzeigersinn",title:o.title||"Sitzordnung",html:cards(list)+'<p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(dealerName())+'</b></p>',btn:"Shuffle up and deal"});
+function drawOverview(a){
+  const suits=["♠","♥","♣","♦"];
+  if(S.t2&&S.t2.length){const t2=a.filter(p=>S.t2.includes(p.name)),big=a.filter(p=>!S.t2.includes(p.name)),g=(arr,lbl)=>'<p style="margin:2vh 0 1vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+lbl+'</p><div class="draw two">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
+    announce({eyebrow:"Plätze ausgelost · zwei Tische",title:"Sitzordnung",html:g(big,"Großer Tisch · "+big.length+" Spieler")+g(t2,"Tisch 2 · "+t2.length+" Spieler")+'<p style="margin-top:2vh">Dealer-Button am großen Tisch startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});fanfare();return;}
+  announce({eyebrow:"Plätze ausgelost · im Uhrzeigersinn",title:"Sitzordnung",html:'<div class="draw">'+a.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div><p style="margin-top:2vh">Dealer-Button startet bei <b>'+esc(a[S.dealer].name)+'</b></p>',btn:"Shuffle up and deal"});
   fanfare();
 }
 
@@ -1235,7 +1077,7 @@ const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten
 const ANN_INTRO="ansagen/intro.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
 /* 12.11.: Ansagen ohne passende MP3 spricht der Browser (Stimme des Geräts). Eine MP3 mit gleichem Namen in ansagen/ hat Vorrang (z. B. ansagen/jonny.mp3), dann hier eintragen. */
-const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Friday Classic. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
+const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Saturday Deep Stack. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
  "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
  "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
@@ -1285,14 +1127,14 @@ function introShow(list,done,o){o=o||{};
     sv();if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&VIDS[p.name.toLowerCase()];
     const last=k===list.length-1,bd=!o.label&&BDAY_NAMES.includes(p.name.toLowerCase());
-    const place=o.placeFn?esc(o.placeFn(p,k)):o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:last?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
+    const place=o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:last?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
     const cardEl='<div class="inC"'+(img&&img.ar?' style="aspect-ratio:'+img.ar+'"':'')+'>'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>';
     const vidEl=vid?'<div class="inV"><video src="'+vid+'" playsinline preload="auto"></video></div>':'';
     const dots='<div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div>';
     box.classList.toggle("bd",bd);
-    if(bd)box.innerHTML=bdayConfetti()+'<div class="bdh"><div class="eyebrow">🎂 '+place+' 🎂</div><h3>Happy Birthday, Niki!</h3><div class="tag">The Birthday Man'+((o.isDealer?o.isDealer(p):k===S.dealer)?' · startet mit dem Dealer-Button':'')+'</div></div><div class="bdr">'+cardEl+vidEl+'</div>'+dots;
+    if(bd)box.innerHTML=bdayConfetti()+'<div class="bdh"><div class="eyebrow">🎂 '+place+' 🎂</div><h3>Happy Birthday, Niki!</h3><div class="tag">The Birthday Man'+(k===S.dealer?' · startet mit dem Dealer-Button':'')+'</div></div><div class="bdr">'+cardEl+vidEl+'</div>'+dots;
     else box.innerHTML=cardEl+vidEl+
-      '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&p.name.toLowerCase()==="pasi"?'<div class="inD">⭐ Special Guest · Freigeist</div>':'')+(!o.label&&(o.isDealer?o.isDealer(p):k===S.dealer)?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
+      '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&p.name.toLowerCase()==="pasi"?'<div class="inD">⭐ Special Guest · Freigeist</div>':'')+(!o.label&&k===S.dealer?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
     const annU=!o.label&&annFor(p.name),me=k;
     const isNico=p.name.toLowerCase()==="nico";
@@ -1340,7 +1182,7 @@ function parseLevels(t){
 function parseGames(t){const out=[];for(const raw of t.split("\n")){const s=raw.trim();if(!s)continue;const m=s.match(/^(\d+)\s+(.+)$/);if(!m||!GAMES[m[2].trim()])throw new Error("Minigame nicht erkannt: „"+s+"“ (bekannt: "+Object.keys(GAMES).join(", ")+")");out.push({lvl:+m[1],g:m[2].trim()});}return out;}
 function openSettings(){
   closeAll();bkInfo();
-  $("sTitle").value=S.title;$("sStack").value=S.stack;$("sEb").value=S.eb||0;$("sMin1").value=S.min1;$("sMin").value=S.min;$("sMinLate").value=S.minLate;
+  $("sTitle").value=S.title;$("sStack").value=S.stack;$("sMin1").value=S.min1;$("sMin").value=S.min;$("sMinLate").value=S.minLate;
   $("sReLvl").value=S.reLvl??"";$("sMaxRe").value=S.maxRe??"";$("sBuyin").value=S.buyin;$("sFee").value=S.fee;$("sRebuy").value=S.rebuy;$("sBounty").value=S.bounty||0;
   $("sPlaces").value=String(S.pay.places);$("sThird").value=S.pay.third;$("sSplit").value=S.pay.split;$("sBank").value=S.bank;
   $("sBlinds").value=levelsText();$("sGames").value=S.games.map(e=>e.lvl+" "+e.g).join("\n");$("sCode").value="";$("sErr").textContent="";
@@ -1351,7 +1193,7 @@ function applySettings(){
     const lv=parseLevels($("sBlinds").value),gm=parseGames($("sGames").value);
     const num=(id,min)=>{const v=$(id).value.trim();if(v==="")return null;const n=+v;if(!(n>=min))throw new Error("Ungültige Zahl: "+id);return n;};
     const code=$("sCode").value.trim();
-    S.title=$("sTitle").value.trim()||S.title;S.stack=num("sStack",1)||S.stack;S.eb=num("sEb",0)??S.eb;S.min1=num("sMin1",1)||S.min1;S.min=num("sMin",1)||S.min;S.minLate=num("sMinLate",1)||S.minLate;
+    S.title=$("sTitle").value.trim()||S.title;S.stack=num("sStack",1)||S.stack;S.min1=num("sMin1",1)||S.min1;S.min=num("sMin",1)||S.min;S.minLate=num("sMinLate",1)||S.minLate;
     S.reLvl=num("sReLvl",0);S.maxRe=num("sMaxRe",0);S.buyin=num("sBuyin",0)??S.buyin;S.fee=num("sFee",0)??S.fee;S.rebuy=num("sRebuy",0)??S.rebuy;S.bounty=num("sBounty",0)??S.bounty;
     S.pay.places=+$("sPlaces").value;S.pay.third=num("sThird",0)??S.pay.third;S.pay.split=num("sSplit",1)||S.pay.split;S.bank=$("sBank").value.trim()||S.bank;
     const keepLeft=leftNow(),sameLen=lv.length===LEVELS.length;
@@ -1367,9 +1209,7 @@ function restartTournament(){
   // same players, seats and settings; clock, rebuys, eliminations and minigames back to start
   closeAll();if(intro)intro.stop();
   S.i=0;S.running=false;S.endAt=null;S.left=null;S.started=null;S.ended=null;
-  S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;p.head=null;p.bw=0;delete p.chair;delete p.eb;});
-  /* zwei Tische: zurück zur ausgelosten Sitzordnung (vor Tischwechseln und Final Table) */
-  S.pend=null;S.ft=null;if(S.draw0){const d=S.draw0,ord=d.order.map(n=>S.players.find(p=>p.name===n)).filter(Boolean);S.players=[...ord,...S.players.filter(p=>!ord.includes(p))];S.t2=d.t2.slice();S.dn=Object.assign({},d.dn);S.mt=true;}
+  S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;p.head=null;p.bw=0;});
   S.lostHeads=0;S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
   save();buildSeats();render();toast("Turnier neu gestartet · Level 1 bereit");
 }
@@ -1398,18 +1238,13 @@ function runCmd(c){
     case "out":doOut(c.name,c.by);break;
     case "back":doBack(c.name);break;
     case "paid":{const p=pl(c.name);if(p){const e=p.entries[(c.entry||1)-1];if(e)e.paid=c.paid;}break;}
-    case "add":addPlayer(c.name,c.paid);buildSeats();if(twoT())setTimeout(()=>checkTables(true),300);break;
-    case "remove":{const p=pl(c.name);if(p){S.players=S.players.filter(x=>x!==p);S.outOrder=S.outOrder.filter(n=>n!==p.name);S.t2=(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));buildSeats();}break;}
-    case "rename":{const p=pl(c.from);if(p){S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);if(S.t2)S.t2=S.t2.map(n=>lcn(n)===lcn(p.name)?c.to:n);if(S.dn)for(const k in S.dn)if(lcn(S.dn[k])===lcn(p.name))S.dn[k]=c.to;p.name=c.to;}break;}
-    /* zwei Tische: move = Spieler an Tisch 1/2 setzen, merge = Final Table, dealernext {t:2}, tables = Ausgleich prüfen */
-    case "move":moveP(c.name,c.to===2?2:1);break;
-    case "merge":mergeTables();break;
-    case "tables":checkTables(false);break;
-    case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveP(q.name,q.to);else if(q.op==="merge")mergeTables();break;}
+    case "add":if(!pl(c.name))S.players.push({name:c.name,entries:[{t:new Date().toISOString(),lvl:playNum(S.i),paid:c.paid||"bar"}],out:null});buildSeats();break;
+    case "remove":{const p=pl(c.name);if(p){S.players=S.players.filter(x=>x!==p);S.outOrder=S.outOrder.filter(n=>n!==p.name);buildSeats();}break;}
+    case "rename":{const p=pl(c.from);if(p){S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);p.name=c.to;}break;}
     /* 14.11.: place = Spieler zwischen zwei Nachbarn setzen, z. B. {op:"place",name:"Felix",between:["Manu","Tim"]} */
-    case "place":{const p=pl(c.name),x=pl((c.between||[])[0]),y=pl((c.between||[])[1]);if(p&&x&&y&&p!==x&&p!==y){if(S.mt&&tblOf(x)!==tblOf(p)){S.t2=tblOf(x)===2?(S.t2||[]).concat(p.name):(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));}const d=S.players[S.dealer];let a=S.players.filter(q=>q!==p);const i=a.indexOf(x),j=a.indexOf(y),n=a.length;let at=-1;if((i+1)%n===j)at=i+1;else if((j+1)%n===i)at=j+1;if(at>=0){a.splice(at,0,p);S.players=a;S.dealer=Math.max(0,a.indexOf(d));buildSeats();}}break;}
+    case "place":{const p=pl(c.name),x=pl((c.between||[])[0]),y=pl((c.between||[])[1]);if(p&&x&&y&&p!==x&&p!==y){const d=S.players[S.dealer];let a=S.players.filter(q=>q!==p);const i=a.indexOf(x),j=a.indexOf(y),n=a.length;let at=-1;if((i+1)%n===j)at=i+1;else if((j+1)%n===i)at=j+1;if(at>=0){a.splice(at,0,p);S.players=a;S.dealer=Math.max(0,a.indexOf(d));buildSeats();}}break;}
     case "seats":{const m=c.names.map(pl).filter(Boolean);if(m.length===S.players.length){S.players=m;buildSeats();}break;}
-    case "dealer":setDealer(pl(c.name));break;
+    case "dealer":{const p=pl(c.name);if(p)S.dealer=S.players.indexOf(p);break;}
     case "game":if(c.def)GAMES[c.name]=c.def;showGame(c.name,false);break;
     case "gamedef":GAMES[c.name]=c.def;break;
     case "schedule":S.games=c.games;break;
@@ -1427,7 +1262,7 @@ function runCmd(c){
     case "lobbyclose":lobbyClose();break;
     case "close":if(typeof clipStop==="function"&&clipStop())break;if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
-    case "dealernext":if(S.mt)dealerNext(c.t===2?2:1);else $("bDealer").click();break;
+    case "dealernext":$("bDealer").click();break;
     case "players":openPlayers();break;
     case "spotlight":spotlight(c);break;
     case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
@@ -1471,8 +1306,7 @@ function stateSnap(){
   const L=LEVELS[S.i];
   return {v:1,at:Date.now(),title:S.title,lvl:L.brk?"Pause":"Level "+playNum(S.i),blinds:L.brk?(L.note||"Pause"):L.sb+" / "+L.bb+(L.ante?" · A "+L.ante:""),
     running:S.running,endAt:S.endAt,left:Math.round(leftNow()),pot:potOf(),entries:totalEntries(),reOpen:rebuyOpen(),active:S.active,
-    games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length,headOf(p),bwOf(p),S.mt?tblOf(p):0,p.eb?1:0]),bounty:S.bounty||0,
-    tb:{two:twoT(),mt:!!S.mt,n1:atTbl(1).length,n2:atTbl(2).length,d1:(S.mt?(dealerOf(1)||{}).name:dealerName())||"",d2:(twoT()&&dealerOf(2)||{}).name||"",pend:S.pend||null,ft:!!S.ft}};
+    games:Object.keys(GAMES),p:S.players.map(p=>[p.name,p.entries.length,p.out?1:0,placeOf(p)||0,p.entries.filter(e=>e.paid==="offen").length,headOf(p),bwOf(p)]),bounty:S.bounty||0};
 }
 // ntfy.sh limits messages per network: state goes out at most every 10 s
 function pushState(){if(pushState.t)return;const w=Math.max(800,10000-(Date.now()-(pushState.last||0)));pushState.t=setTimeout(()=>{pushState.t=null;pushState.last=Date.now();fetch(RELAY+TOPIC+"-state",{method:"POST",body:JSON.stringify(stateSnap())}).catch(()=>{});},w);}
@@ -1532,9 +1366,7 @@ $("bPlay").onclick=toggle;
 $("bPrev").onclick=()=>go(S.i-1);$("bNext").onclick=()=>go(S.i+1);
 $("bMinus").onclick=()=>addTime(-60);$("bPlus").onclick=()=>addTime(60);
 $("bPlayers").onclick=()=>openPlayers();
-$("bDealer").onclick=()=>{if(S.mt)return dealerNext(1);let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++){k=(k+1)%n;if(!S.players[k].out)break;}S.dealer=k;save();render();};
-$("bDealer2").onclick=()=>dealerNext(2);
-$("bTables").onclick=()=>{if(!twoT())return;const q=S.pend;if(q&&q.op==="merge")return checkTables(false);checkTables(false);if(!S.pend){announce({eyebrow:"Zwei Tische",title:"Tische sind ausgeglichen",text:"Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler.",html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annM1">Spieler an Tisch 2 setzen</button> <button class="b" type="button" id="annM2">Spieler an den großen Tisch setzen</button> <button class="b red" type="button" id="annFT">Jetzt Final Table</button></div>',btn:"OK"});$("annM1").onclick=()=>{$("ann").hidden=true;pickMover(1);};$("annM2").onclick=()=>{$("ann").hidden=true;pickMover(2);};$("annFT").onclick=()=>{$("ann").hidden=true;if(confirm("Tische jetzt zum Final Table zusammenlegen?"))mergeTables();};}};
+$("bDealer").onclick=()=>{let n=S.players.length,k=S.dealer;for(let s=0;s<n;s++){k=(k+1)%n;if(!S.players[k].out)break;}S.dealer=k;save();render();};
 $("bDraw").onclick=()=>{if(S.started&&!confirm("Turnier läuft schon. Trotzdem neu auslosen?"))return;drawShow();};
 $("bResult").onclick=openResult;
 $("bSet").onclick=openSettings;
@@ -1604,7 +1436,7 @@ async function bdayShow(){
 }
 function bdayClose(){clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 /* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
-const LOBBY_AT="2026-11-20T18:00";
+const LOBBY_AT="2026-11-14T19:00";
 /* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
 const LOBBY_PICS=[
  {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
@@ -1661,8 +1493,8 @@ function lobbyShow(){
       const v=$("lst").querySelector("video");let done=false;const go=()=>{if(done)return;done=true;clearTimeout(lobbyT);next();};
       v.addEventListener("ended",go);v.addEventListener("error",go);v.play().catch(()=>{});lobbyT=setTimeout(go,20000);return;}
     if(x.pl){ /* player slide: card + nickname + club record */
-      const st=pStats(x.pl),seat=seatLabel(S.players.find(p=>p.name===x.pl)||{}),lv=LOBBY_VIDS[x.pl.toLowerCase()],li=LOBBY_IMGS[x.pl.toLowerCase()];
-      $("lst").innerHTML='<div class="lsl lpl">'+(lv?'<video class="card pv" src="'+lv+'" poster="'+lv.replace(".mp4","-poster.jpg")+'" muted playsinline autoplay preload="auto"></video>':li?'<div class="pwrap"><img class="pw" src="'+li.u+'" alt=""><div class="ptxt"><b>'+esc(li.n)+'</b>'+(li.nick?'<i>„'+esc(li.nick)+'“</i>':'')+(li.tr||[]).map(t=>'<span>'+esc(t)+'</span>').join("")+'</div></div>':'<img class="card" src="'+x.u+'" alt="">')+'<div class="lcap"><div class="ey">Heute am Tisch'+(S.log.some(l=>l.type==="draw")&&seat?' · '+esc(seat):'')+'</div><h2>'+esc(x.pl)+'</h2>'+
+      const st=pStats(x.pl),seat=S.players.findIndex(p=>p.name===x.pl)+1,lv=LOBBY_VIDS[x.pl.toLowerCase()],li=LOBBY_IMGS[x.pl.toLowerCase()];
+      $("lst").innerHTML='<div class="lsl lpl">'+(lv?'<video class="card pv" src="'+lv+'" poster="'+lv.replace(".mp4","-poster.jpg")+'" muted playsinline autoplay preload="auto"></video>':li?'<div class="pwrap"><img class="pw" src="'+li.u+'" alt=""><div class="ptxt"><b>'+esc(li.n)+'</b>'+(li.nick?'<i>„'+esc(li.nick)+'“</i>':'')+(li.tr||[]).map(t=>'<span>'+esc(t)+'</span>').join("")+'</div></div>':'<img class="card" src="'+x.u+'" alt="">')+'<div class="lcap"><div class="ey">Heute am Tisch'+(S.log.some(l=>l.type==="draw")?' · Platz '+seat:'')+'</div><h2>'+esc(x.pl)+'</h2>'+
         (st.champ||st.nick?'<div class="lnick">'+(st.champ?'♛ Amtierender Champion':'')+(st.champ&&st.nick?' · ':'')+esc(st.nick)+'</div>':'')+
         (st.played?'<div class="ltiles"><div><b>'+st.played+'</b><span>Turniere</span></div><div><b>'+st.wins+'</b><span>Siege</span></div><div><b>'+st.pod+'</b><span>Preisränge</span></div><div><b>'+st.pts+'</b><span>Liga-Punkte</span></div></div>':'<div class="lnick">Erstes Turnier im Club. Willkommen!</div>')+'</div></div>';
       if(lv){const v=$("lst").querySelector("video");let done=false;const go=()=>{if(done)return;done=true;clearTimeout(lobbyT);next();};
@@ -1689,7 +1521,7 @@ async function syncSignups(){
   if(!lc(uniq).includes("tim"))uniq.unshift("Tim");
   const mk=nm=>({name:nm,entries:[{t:null,lvl:0,paid:"bar"}],out:null});let changed=false;
   if(!S.syncSeen){const old=S.players;S.players=uniq.map(nm=>old.find(p=>p.name.toLowerCase()===nm.toLowerCase())||mk(nm));changed=true;}
-  else uniq.forEach(nm=>{if(lc(seen).includes(nm.toLowerCase())||S.players.some(p=>p.name.toLowerCase()===nm.toLowerCase()))return;const p=mk(nm);S.players.push(p);seatNew(p);changed=true;});
+  else uniq.forEach(nm=>{if(lc(seen).includes(nm.toLowerCase())||S.players.some(p=>p.name.toLowerCase()===nm.toLowerCase()))return;S.players.push(mk(nm));changed=true;});
   S.syncSeen=Array.from(new Set(seen.concat(uniq)));
   if(changed){log("signups",{names:S.players.map(p=>p.name)});buildSeats();render();}save();autoSeat();}
 setTimeout(syncSignups,1500);setInterval(syncSignups,180000);
@@ -1741,7 +1573,7 @@ function burst(){for(let k=0;k<160;k++)burstP.push({x:innerWidth/2,y:innerHeight
 (function(){
   const c=$("fx"),x=c.getContext("2d");let W,H;
   function size(){const r=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;c.width=W*r;c.height=H*r;x.setTransform(r,0,0,r,0,0);}
-  size();addEventListener("resize",()=>{size();buildSeats();renderSeats();});
+  size();addEventListener("resize",()=>{size();if(imgMode())buildSeats(),renderSeats();});
   const dust=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),s:.5+Math.random()*1.8,v:.00004+Math.random()*.00012,p:Math.random()*6.28,red:Math.random()<.18}));
   const smoke=Array.from({length:7},(_,k)=>({x:Math.random(),y:.6+Math.random()*.5,r:.25+Math.random()*.25,v:.000012+Math.random()*.00002,p:k}));
   const suits=["♠","♣","♥","♦"],fl=Array.from({length:9},(_,k)=>({x:Math.random(),y:Math.random(),v:.000015+Math.random()*.00002,s:18+Math.random()*30,ch:suits[k%4],p:Math.random()*6}));
