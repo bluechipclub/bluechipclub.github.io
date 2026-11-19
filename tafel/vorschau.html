@@ -66,6 +66,7 @@ body.two .tcap{display:block}
 .t2 .seat2.flash .nm2{animation:flash 1.2s var(--ease)}
 .tmove{color:#f3d68f}
 .syncB{position:fixed;right:1vw;bottom:.6vh;z-index:8500;font:600 max(10px,.7vw)/1 var(--mono);letter-spacing:.08em;padding:.5vh .8vw;border-radius:999px;background:rgba(10,10,10,.8);border:1px solid #333;color:#9a9a96;cursor:pointer}
+.vtB{right:auto;left:1vw;color:#f3d68f;border-color:#9c7a2f}
 .syncB.ok::before{content:"● ";color:#5bd28a}.syncB.bad::before{content:"● ";color:#e5675c}
 body.spiegel .ctrl{display:none!important}
 body.spiegel .seat,body.spiegel .seat2{pointer-events:none}
@@ -369,6 +370,17 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .stage.img11 .state{font-size:max(8px,.62vw)}
 .stage.img11 .felt::after{display:none!important}
 .stage.img11.tim::before{background:radial-gradient(ellipse 25% 14% at 50% 53%,rgba(8,6,4,.72),rgba(8,6,4,.35) 70%,transparent 100%)}
+
+/* ---------- Glas-Look (Tim 19.11., Emil-Kowalski-Regeln): leichte Glasflächen ohne backdrop-filter (läuft flüssig auf jedem Laptop/TV) ---------- */
+.b{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(0,0,0,.3);transition:transform .16s cubic-bezier(.23,1,.32,1),border-color .2s,filter .2s}
+.b:active{transform:scale(.97)}
+@media (hover:hover){.b:hover{border-color:rgba(243,214,143,.55);filter:brightness(1.12)}}
+.b.pri{background:linear-gradient(180deg,#f7e2a6,#e2b857 55%,#b98d34);border-color:#c49a41;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 20px rgba(226,184,87,.25)}
+.b.red{background:linear-gradient(180deg,rgba(229,103,92,.18),rgba(229,103,92,.07))}
+.b.on{background:linear-gradient(180deg,rgba(47,107,255,.45),rgba(23,58,153,.6));border-color:var(--blue)}
+.box{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),rgba(8,10,16,.82);border-color:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35)}
+.syncB{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),rgba(10,10,10,.75);border-color:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+@media (prefers-reduced-motion:reduce){.b{transition:none}}
 </style>
 </head>
 <body>
@@ -564,6 +576,8 @@ const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-fc-2026-11-20";
 /* Rolle dieses Geräts: "haupt" = Haupttafel (rechnet, speichert, führt Befehle aus) · "spiegel" = zeigt nur an, was die Haupttafel schickt */
 let ROLE=(()=>{try{const q=new URLSearchParams(location.search).get("rolle");if(q==="haupt"||q==="spiegel"){localStorage.setItem("bcc-tafel-role",q);return q;}return localStorage.getItem("bcc-tafel-role")||"haupt";}catch(e){return "haupt";}})();
 const isHaupt=()=>ROLE==="haupt";
+/* Ansicht dieses Bildschirms (Tim 19.11.): ein Turnier, aber jeder Fernseher zeigt groß die Spieler SEINES Tisches. ?tisch=2 → Tisch 2 groß, der andere Tisch klein darunter. Nach dem Final Table zeigen alle den großen Tisch. */
+let VT=(()=>{try{const q=new URLSearchParams(location.search).get("tisch");if(q==="1"||q==="2"){localStorage.setItem("bcc-tafel-tisch",q);return +q;}return +(localStorage.getItem("bcc-tafel-tisch")||1)===2?2:1;}catch(e){return 1;}})();
 let CLK_OFF=0; /* Spiegel: Uhrzeit-Abstand zur Haupttafel (ms) */
 const nowMs=()=>Date.now()+CLK_OFF;
 const APPLIED_KEY=KEY+"-applied";
@@ -597,7 +611,7 @@ const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only vi
 
 const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
-  buyin:25,fee:5,rebuy:25,feeRe:5,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
+  buyin:25,fee:5,rebuy:20,feeRe:0,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -730,6 +744,7 @@ const lcn=x=>String(x||"").toLowerCase().trim();
 const isT2=p=>!!(S.t2&&S.t2.length&&S.t2.some(n=>lcn(n)===lcn(p.name)));
 const tblOf=p=>isT2(p)?2:1;
 const twoT=()=>!!(S.mt&&S.t2&&S.t2.length);
+const vt=()=>twoT()?VT:1,ot=()=>3-vt(),tName=t=>t===1?"Großer Tisch":"Tisch 2";
 const atTbl=t=>allP().filter(p=>!p.out&&tblOf(p)===t);
 /* für den Ausgleich zählen Ausgeschiedene mit, solange sie noch einen Rebuy machen dürfen (ihr Platz bleibt frei) */
 const seatedAt=t=>allP().filter(p=>tblOf(p)===t&&(!p.out||(rebuyOpen()&&canRebuy(p)&&!p.chair)));
@@ -759,13 +774,13 @@ function seatLabel(p){if(!S.mt){const k=S.players.indexOf(p);return k<0?"":"Plat
 function renderT2(){
   const on=twoT(),box=$("t2box");
   if(document.body.classList.contains("two")!==on){document.body.classList.toggle("two",on);box.hidden=!on;requestAnimationFrame(()=>{try{buildSeats();renderSeats();}catch(e){}});}
-  const a1=atTbl(1).length,a2=atTbl(2).length;
-  $("t1cap").textContent="Großer Tisch · "+a1+" Spieler";
+  const T1=vt(),T2=ot();
+  $("t1cap").textContent=(on?tName(T1):"Großer Tisch")+" · "+atTbl(on?T1:1).length+" Spieler"+(on&&T1===2?" · dieser Bildschirm":"");
   if(!on){box.querySelectorAll(".seat2").forEach(e=>e.remove());return;}
-  const v=atTbl(2),d=dealerOf(2),n=v.length,pd=S.pend;
-  $("t2cap").textContent="Tisch 2 · "+n+" Spieler";
-  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>Tisch 2</b>Blue Chip Club';
-  const key=v.map(p=>p.name+"|"+(p.entries.length-1)).join(",");
+  const v=atTbl(T2),d=dealerOf(T2),n=v.length,pd=S.pend;
+  $("t2cap").textContent=tName(T2)+" · "+n+" Spieler";
+  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
+  const key=T2+":"+v.map(p=>p.name+"|"+(p.entries.length-1)).join(",");
   if(box.dataset.k!==key){box.dataset.k=key;box.querySelectorAll(".seat2").forEach(e=>e.remove());
     v.forEach((p,k)=>{const a=Math.PI/2+k*2*Math.PI/n,x=50+41*Math.cos(a),y=50+37*Math.sin(a),e=document.createElement("div");
       e.className="seat2";e.dataset.n=p.name;e.style.left=x+"%";e.style.top=y+"%";
@@ -825,8 +840,8 @@ function seatNew(p){if(!twoT()){if(S.mt){const tim=S.players.find(x=>isTim(x)&&!
 const payTo=(paid,to)=>paid==="dig"&&to&&lcn(to)!==lcn(S.bank)?to:undefined;
 function addPlayer(name,paid,to){if(!name||pl(name))return null;const p={name,entries:[{t:S.started?new Date().toISOString():null,lvl:S.started?playNum(S.i):0,paid:paid||"bar",to:payTo(paid,to)}],out:null};S.players.push(p);seatNew(p);log("add",{name,t:tblOf(p)});return p;}
 
-function buildSeats(){inView(1,buildSeats1);renderT2();}
-function renderSeats(){inView(1,renderSeats1);renderT2();}
+function buildSeats(){inView(vt(),buildSeats1);renderT2();}
+function renderSeats(){if(renderSeats.vt!==vt()){renderSeats.vt=vt();return buildSeats();}inView(vt(),renderSeats1);renderT2();}
 function buildSeats1(){
   pickCfg();
   document.querySelectorAll(".seat,.fig").forEach(e=>e.remove());
@@ -1920,11 +1935,13 @@ function setRole(r,quiet){ROLE=r;try{localStorage.setItem("bcc-tafel-role",r);}c
   try{if(chan&&chanOk)chan.track({role:ROLE,kind:"tafel",at:Date.now()});}catch(e){}
   if(r==="haupt"){if(!quiet)bc("takeover",{});save();syncState(true);}else{bc("hello",{});}
   mirrorBadge();render();}
-function mirrorBadge(){const b=$("syncB");if(!b)return;const n=Object.values(peers||{}).flat(),tv=n.filter(x=>x.kind==="tafel").length,ph=n.filter(x=>x.kind==="app").length;
+function mirrorBadge(){vtBadge();const b=$("syncB");if(!b)return;const n=Object.values(peers||{}).flat(),tv=n.filter(x=>x.kind==="tafel").length,ph=n.filter(x=>x.kind==="app").length;
   const ok=isHaupt()?chanOk:(chanOk&&Date.now()-lastHauptAt<20000);
   b.className="syncB "+(ok?"ok":"bad");
   b.textContent=(isHaupt()?"Haupttafel":"Spiegel")+" · "+(chanOk?(isHaupt()?(tv>1?(tv-1)+" Spiegel":"kein Spiegel")+" · "+ph+" Handy"+(ph===1?"":"s"):(ok?"verbunden":"wartet auf Haupttafel …")):"offline");}
-document.body.insertAdjacentHTML("beforeend",'<button type="button" class="syncB" id="syncB">…</button>');
+document.body.insertAdjacentHTML("beforeend",'<button type="button" class="syncB" id="syncB">…</button><button type="button" class="syncB vtB" id="vtB" hidden></button>');
+function vtBadge(){const b=$("vtB");if(!b)return;b.hidden=!twoT();b.textContent="📺 Dieser Bildschirm: "+tName(VT)+" ⇄";}
+$("vtB").onclick=()=>{VT=3-VT;try{localStorage.setItem("bcc-tafel-tisch",String(VT));}catch(e){}vtBadge();buildSeats();render();toast("Dieser Bildschirm zeigt jetzt "+(VT===1?"den großen Tisch":"Tisch 2")+" groß");};
 $("syncB").onclick=()=>{if(isHaupt())ask("Dieses Gerät zur Spiegel-Tafel machen? Es zeigt dann nur noch an, was die Haupttafel schickt.","Zum Spiegel machen",()=>setRole("spiegel"));else ask("Dieses Gerät zur Haupttafel machen? (z. B. wenn der andere Laptop ausgefallen ist) Die andere Tafel wird automatisch zum Spiegel.","Zur Haupttafel machen",()=>setRole("haupt"));};
 document.body.classList.toggle("spiegel",!isHaupt());
 syncStart();

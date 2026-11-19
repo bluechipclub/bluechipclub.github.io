@@ -210,6 +210,28 @@ nav.tb button:active svg{transform:scale(.88)}
 .toast.on{transform:translate(-50%,0)}
 .toast.ok{color:var(--green)}
 .toast.bad{color:var(--red)}
+
+/* ---------- Glas-Look (Tim 19.11., nach Emil-Kowalski-Regeln): Glas über einem festen Hintergrundverlauf statt teurem backdrop-filter auf jedem Kasten.
+   Nur transform/opacity animiert, ease-out, Druck = scale(.97), Hover nur auf Geräten mit Maus. ---------- */
+:root{--ease:cubic-bezier(.23,1,.32,1);
+  --gl:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+  --gl2:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04));
+  --glb:inset 0 1px 0 rgba(255,255,255,.09),inset 0 0 0 .5px rgba(255,255,255,.07),0 8px 24px rgba(0,0,0,.35)}
+html,body{background:#03050b}
+body{background:radial-gradient(120% 60% at 50% -10%,rgba(47,107,255,.20),transparent 60%),radial-gradient(90% 50% at 100% 100%,rgba(226,184,87,.10),transparent 60%),#03050b;background-attachment:fixed}
+.grp,.tblc,.tile,.game,.pc,.stats div,.pays div{background:var(--gl);box-shadow:var(--glb)}
+.ctl button,.ctl2 button,.btn,.chip.mo,.c-grey{background:var(--gl2);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 .5px rgba(255,255,255,.08)}
+.btn.pri{background:linear-gradient(180deg,#f7e2a6,#e2b857 55%,#b98d34);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 20px rgba(226,184,87,.28)}
+.btn.red{background:linear-gradient(180deg,rgba(255,107,94,.2),rgba(255,107,94,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.btn.blue{background:linear-gradient(180deg,rgba(47,107,255,.26),rgba(47,107,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.cell:active,.pr:active{background:rgba(255,255,255,.06)}
+input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)}
+.sh{background:linear-gradient(180deg,rgba(38,42,54,.97),rgba(20,22,30,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 -10px 40px rgba(0,0,0,.5)}
+.sh .grp{background:rgba(255,255,255,.05)}
+.press{transition:transform .16s var(--ease),opacity .16s var(--ease)}
+.press:active,.ctl button:active,.ctl2 button:active,.btn:active{transform:scale(.97)}
+@media (hover:hover){.press:hover,.btn:hover{filter:brightness(1.12)}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
 </style>
 </head>
 <body>
