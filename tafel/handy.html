@@ -75,11 +75,18 @@ details.ctl>summary::-webkit-details-marker{display:none}
 details.ctl>summary span{font-family:var(--mono);font-size:12px;color:var(--grey);font-weight:500}
 details.ctl[open]>summary{border-bottom:1px solid var(--line)}
 details.ctl>.in{padding:12px}
+.pend{background:linear-gradient(180deg,#2a2210,#171208);border:1px solid rgba(226,184,87,.6);border-radius:14px;padding:12px;margin:10px 0}
+.pend[hidden]{display:none}
+.pend b{display:block;color:#f3d68f;font-size:16px;margin-bottom:8px}
+.th{margin:12px 0 6px;font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#f3d68f;display:flex;justify-content:space-between;align-items:center}
+.th button{font-size:12px;padding:6px 10px}
+#tbBox[hidden]{display:none}
 </style>
 </head>
 <body>
 <div class="top"><h1>Stream Deck</h1><div class="dot" id="dot"><i></i><span>verbinde…</span></div></div>
 
+<div class="pend" id="pendTop" hidden><b id="pendT"></b><div class="g g2"><button class="pri" id="pendOk">✓ Erledigt</button><button id="pendAlt">Tische ansehen</button></div></div>
 <div class="deck" id="deck"><p class="note">Lade Clips…</p></div>
 <div class="stopbar"><button id="clipStop">■ Clip stoppen</button></div>
 
@@ -108,8 +115,17 @@ details.ctl>.in{padding:12px}
   <button data-c='{"op":"time","add":60}'>+1 Min</button>
 </div>
 <div class="g g2">
-  <button data-c='{"op":"dealernext"}'>Dealer ▶</button>
+  <button data-c='{"op":"dealernext"}' id="dl1">Dealer ▶</button>
   <button id="drawBtn">Plätze auslosen</button>
+</div>
+<div id="tbBox" hidden>
+<h2>Zwei Tische</h2>
+<p class="note" id="tbInfo"></p>
+<div class="g g2">
+  <button data-c='{"op":"dealernext","t":2}' id="dl2">Dealer Tisch 2 ▶</button>
+  <button data-c='{"op":"tables"}'>Tische prüfen</button>
+  <button id="ftBtn" style="border-color:rgba(229,103,92,.5);color:#e5675c">Jetzt Final Table</button>
+</div>
 </div>
 
 <h2>TV-Bild (nur mit /tafel/tv.html)</h2>
@@ -172,6 +188,9 @@ $("lobbyBtn").onclick=()=>send({op:"lobby"},"Bildschirmschoner an");
 $("lobbyOff").onclick=()=>send({op:"lobbyclose"},"Bildschirmschoner aus");
 $("bdayBtn").onclick=()=>{if(confirm("Geburtstags-Show jetzt starten? (Startet um 0:00 auch automatisch)"))send({op:"bday"},"Geburtstags-Show");};
 $("close").onclick=()=>send({op:"close"},"Einblendung zu");
+$("ftBtn").onclick=()=>{if(confirm("Tische jetzt zum Final Table zusammenlegen? Die Plätze werden neu ausgelost."))send({op:"merge"},"Final Table");};
+$("pendOk").onclick=()=>{const q=st&&st.tb&&st.tb.pend;if(!q)return;send({op:"pend"},q.op==="move"?q.name+" sitzt um":"Final Table");$("pendTop").hidden=true;};
+$("pendAlt").onclick=()=>{$("ctl").open=true;$("tbBox").scrollIntoView({behavior:"smooth"});};
 $("drawBtn").onclick=()=>{if(confirm("Plätze jetzt neu auslosen?"))send({op:"draw"},"Plätze auslosen");};
 $("endGame").onclick=()=>send({op:"endgame"},"Minigame vorbei");
 $("sendMsg").onclick=()=>{const t=$("msg").value.trim();if(!t)return;send({op:"msg",text:t,min:20},"Durchsage");$("msg").value="";};
@@ -184,7 +203,13 @@ function sheet(title,btns){
 }
 function renderPlayers(){
   const L=$("pl");L.innerHTML="";if(!st)return;
-  st.p.forEach(([name,entries,out,place,open,head,bw])=>{
+  const tb=st.tb||{},two=!!tb.two;
+  /* zwei Tische: großer Tisch, dann Tisch 2, Ausgeschiedene zuletzt */
+  const rows=tb.mt?[...st.p.filter(x=>!x[2]&&x[7]!==2),...st.p.filter(x=>!x[2]&&x[7]===2),...st.p.filter(x=>x[2])]:st.p;
+  let lastH=null;
+  rows.forEach(([name,entries,out,place,open,head,bw,tbl,eb])=>{
+    if(tb.mt){const h=out?"Ausgeschieden":two?(tbl===2?"Tisch 2 · "+tb.n2+" Spieler · D: "+tb.d2:"Großer Tisch · "+tb.n1+" Spieler · D: "+tb.d1):"Final Table · "+tb.n1+" Spieler · D: "+tb.d1;
+      if(h!==lastH){lastH=h;const e=document.createElement("div");e.className="th";e.textContent=h;L.appendChild(e);}}
     const r=document.createElement("div");r.className="pr"+(out?" out":"");
     r.innerHTML='<div class="n"></div>';
     r.querySelector(".n").innerHTML='<span></span><small>'+(entries>1?"+"+(entries-1)+" Rebuy":"Buy-in")+(open?' · <b>'+open+' offen</b>':"")+(out?" · Platz "+place:"")+(st.bounty&&!out?" · 🎯 "+head+" P":"")+(st.bounty&&bw?" · kassiert "+bw+" P":"")+'</small>';
@@ -198,7 +223,7 @@ function renderPlayers(){
       ["Buy-in offen (nicht bezahlt)","",()=>send({op:"paid",name,entry:1,paid:"offen"},"Buy-in offen")],
       ["Buy-in bar bezahlt","",()=>send({op:"paid",name,entry:1,paid:"bar"},"Buy-in bar")],
       ["Letzten Rebuy zurücknehmen","red",()=>send({op:"undo",name},"Rebuy zurück")],
-      ["Dealer-Button zu "+name,"",()=>send({op:"dealer",name},"Dealer "+name)]]));
+      ["Dealer-Button zu "+name,"",()=>send({op:"dealer",name},"Dealer "+name)]].concat(two&&!out?[[tbl===2?"→ an den großen Tisch setzen":"→ an Tisch 2 setzen","",()=>send({op:"move",name,to:tbl===2?1:2},name+" wechselt")]]:[])));
     L.appendChild(r);
   });
 }
@@ -222,6 +247,10 @@ function apply(s){
   $("meta").textContent="Pot "+s.pot+" P · "+s.entries+" Entries · "+(s.reOpen?"Rebuy offen":"Freezeout")+(s.active?" · läuft: "+s.active:"");
   $("play").textContent=s.running?"❚❚ Pause":"▶ Start";
   $("sum").textContent=s.lvl+" · "+s.blinds+(s.running?"":" · Pause");
+  const tb=s.tb||{};$("tbBox").hidden=!tb.two;$("dl1").textContent=tb.two?"Dealer großer Tisch ▶":"Dealer ▶";
+  if(tb.two)$("tbInfo").textContent="Großer Tisch "+tb.n1+" Spieler (Dealer "+tb.d1+") · Tisch 2 "+tb.n2+" Spieler (Dealer "+tb.d2+")";
+  const q=tb.pend;$("pendTop").hidden=!q;if(q)$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
+  $("pendOk").textContent=q&&q.op==="merge"?"Plätze auslosen":"✓ "+(q?q.name:"")+" sitzt um";
   renderPlayers();renderGames();renderDeck();tick();
 }
 
