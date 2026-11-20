@@ -138,6 +138,7 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 /* ---------- management tiles ---------- */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 16px 0}
 .qko{display:block;width:auto;margin:14px 16px 4px;height:58px;font-size:18px;font-weight:700;color:#ffd9d4;background:linear-gradient(180deg,rgba(229,103,92,.28),rgba(143,29,29,.32));border:1px solid rgba(229,103,92,.45)}
+.myt{display:flex;align-items:center;gap:8px;margin:6px 16px 4px;font-size:13px;color:var(--grey,#8c8c88)}.myt button{flex:1;height:38px;border-radius:12px;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.14);color:inherit;font:inherit;font-size:14px}.myt button.on{background:rgba(226,184,87,.18);border-color:rgba(226,184,87,.65);color:#f3d68f;font-weight:600}
 .qko small{font-weight:500;opacity:.75;margin-left:6px;font-size:14px}
 .tile{border-radius:18px;padding:14px;text-align:left;background:var(--card);min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
 .tile .ti{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:19px}
@@ -295,7 +296,8 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
     <div class="live-only ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
   </div>
   <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button></div></div>
-  <button class="btn press live-only qko" id="qKo">✕ Knockout <small>Wer ist raus?</small></button>
+  <button class="btn press live-only qko" id="qKo">✕ Knockout <small id="qKoS">Wer ist raus?</small></button>
+  <div class="myt live-only" id="myt" hidden><span>Ich bediene</span><button class="press" data-t="1">Großer Tisch</button><button class="press" data-t="2">Tisch 2</button></div>
   <div class="stats"><div><b id="sPot">–</b><span>Preisgeld P</span></div><div><b id="sPl">–</b><span>Spieler</span></div><div><b id="sEn">–</b><span>Entries</span></div></div>
   <div class="pays" id="pays"></div>
   <div class="cash" id="cash"></div>
@@ -510,7 +512,7 @@ function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   const q=S.pend;$("pend").hidden=!q;
   if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
     $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
-  const two=!!D.two;$("tblBtn").hidden=!two;$("ftBtn").hidden=!two;$("qMove").style.display=two?"":"none";
+  const two=!!D.two;$("tblBtn").hidden=!two;renderMyt();$("ftBtn").hidden=!two;$("qMove").style.display=two?"":"none";
   $("qNoteS").textContent=(S.notes||[]).length?(S.notes.length+" Notiz"+(S.notes.length>1?"en":"")):"z. B. Kevin 5 P zu viel";
   $("qDealerS").textContent=two?"D: "+(D.d1||"–")+" · "+(D.d2||"–"):"D: "+(D.d1||"–");
   $("mLevelS").textContent=(D.lvl||"")+" · "+(D.blinds||"");
@@ -612,8 +614,16 @@ const tblSub=p=>D.two?(pinfo(p.name).t===2?"Tisch 2":"Groß"):"";
 /* ---------- Management ---------- */
 $("qRebuy").onclick=()=>{if(!S)return;const out=S.players.filter(p=>p.out),inn=active();
   picker("Rebuy für wen?",D.reOpen?"Rebuy "+fmt(S.rebuy)+" P":"Achtung: Rebuy-Phase ist vorbei",[["Ausgeschieden",out,p=>pinfo(p.name).canRe?"Platz "+pinfo(p.name).place:"dim"],["Im Spiel",inn,tblSub]],rebuyFlow);};
-$("qOut").onclick=()=>{if(!S)return;const g=D.two?[["Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===2))]]:[["",orderOf(active())]];
-  picker("Wer ist raus?","",g,outFlow);};
+$("qOut").onclick=()=>{if(!S)return;let g=D.two?[["Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===2))]]:[["",orderOf(active())]];
+  /* „Ich bediene“ (Tim 20.11.): eigener Tisch zuerst und ohne Überschrift, der andere Tisch klein darunter */
+  const m=myT();if(m){g=m===1?g:[g[1],g[0]];g[0][0]="";g[1][0]="Anderer Tisch: "+g[1][0];}
+  picker("Wer ist raus?",m?"Dein Tisch: "+(m===1?"Großer Tisch":"Tisch 2"):"",g,outFlow);};
+/* Ich bediene: Tisch-Wahl pro Handy (localStorage), nur bei zwei Tischen sichtbar, nach dem Final Table weg */
+let MYT=(()=>{try{return +localStorage.getItem("bcc-app-tisch")||0;}catch(e){return 0;}})();
+const myT=()=>D&&D.two&&(MYT===1||MYT===2)?MYT:0;
+function renderMyt(){const on=!!(D&&D.two),E=$("myt");E.hidden=!on;E.querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.t===MYT));
+  $("qKoS").textContent=myT()?"Wer ist raus? · "+(MYT===1?"Großer Tisch":"Tisch 2"):"Wer ist raus?";}
+$("myt").querySelectorAll("button").forEach(b=>b.onclick=()=>{const t=+b.dataset.t;MYT=MYT===t?0:t;try{localStorage.setItem("bcc-app-tisch",String(MYT));}catch(e){}buzz(8);renderMyt();toast(MYT?"Du bedienst "+(MYT===1?"den großen Tisch":"Tisch 2"):"Beide Tische");});
 $("qAdd").onclick=()=>addFlow("");
 /* Übersicht: Knockout in 2 Tipps (Opfer, dann Werfer) */
 $("qKo").onclick=()=>$("qOut").onclick();
