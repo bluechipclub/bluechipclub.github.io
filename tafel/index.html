@@ -844,12 +844,11 @@ function swapTables(){if(!twoT())return;$("ann").hidden=true;
   const d1=S.dn&&S.dn[1],d2=S.dn&&S.dn[2];S.dn={1:d2,2:d1};
   S.pend=null;S.swapped=Date.now();log("swap",{t1:newT1.map(p=>p.name),t2:S.t2.slice(),timStays:keepTim});
   save();buildSeats();render();toast("Tische getauscht");setTimeout(()=>checkTables(true),600);}
-/* Sitzregeln (Tim 14.11.): Tim Dealerplatz (letzter Platz), Manu direkt neben Tim (Platz 1 oder vorletzter), Jonny Platz 6, Rest zufällig */
+/* Sitzregeln (Tim 14.11.): Tim Dealerplatz (letzter Platz), Manu direkt neben Tim (Platz 1 oder vorletzter), Rest zufällig (20.11.: Jonny nicht mehr fest) */
 function seatRules(a){a=shuf(a);const tim=a.find(isTim);if(tim)a=[...a.filter(p=>p!==tim),tim];
-  const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
+  const n=a.length,jo=null,ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
   const slots=new Array(n).fill(null);if(tim)slots[n-1]=tim;
   if(ma)slots[Math.random()<.5?0:n-2]=ma;
-  if(jo&&jo!==ma){const want=Math.min(5,n-(tim?2:1)),k=[...Array(n).keys()].filter(i=>!slots[i]).sort((x,y)=>Math.abs(x-want)-Math.abs(y-want))[0];slots[k]=jo;}
   const rest=a.filter(x=>x!==tim&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];return slots;}
 /* draw only one table: S.players = the active players of table t, S.dealer = index of its dealer (restored afterwards) */
 function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.dealer;REAL=keep;
@@ -858,7 +857,7 @@ function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.deale
 function seatLabel(p){if(!S.mt){const k=S.players.indexOf(p);return k<0?"":"Platz "+(k+1);}const t=tblOf(p),k=seatOrder(t).filter(q=>!q.out||q===p).indexOf(p);return (twoT()?(t===1?"Großer Tisch":"Tisch 2")+" · ":"")+"Platz "+(k+1);}
 /* table 2 box under the big table: simple oval, avatar + name per seat, only active players */
 /* Tim 20.11.: zwei Fernseher = jeder zeigt NUR seinen Tisch groß (kein geteiltes Bild). ?geteilt=1 zeigt beide Tische auf einem Bildschirm. */
-const SOLO=(()=>{try{const q=new URLSearchParams(location.search).get("geteilt");if(q!=null){localStorage.setItem("bcc-tafel-solo",q==="1"?"0":"1");}return localStorage.getItem("bcc-tafel-solo")!=="0";}catch(e){return true;}})();
+const SOLO=(()=>{try{localStorage.removeItem("bcc-tafel-solo");return new URLSearchParams(location.search).get("geteilt")!=="1";}catch(e){return true;}})(); /* 20.11.: geteilt nur noch per ?geteilt=1 in der Adresse, nie gespeichert */
 function renderT2(){
   const on=twoT()&&!SOLO,box=$("t2box");
   if(document.body.classList.contains("two")!==on){document.body.classList.toggle("two",on);box.hidden=!on;requestAnimationFrame(()=>{try{buildSeats();renderSeats();}catch(e){}});}
@@ -909,7 +908,7 @@ function checkTables(quiet){
   if(S.pend&&S.pend.op==="swap"&&seatedAt(1).length+seatedAt(2).length>CAP1)return;
   const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
   if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
-    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf dem Dealerplatz, Manu daneben, Jonny Platz 6.",btn:"Plätze für den Final Table auslosen"});
+    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf Platz 10 (Dealerplatz), Manu 50/50 auf Platz 9 oder Platz 1, alle anderen zufällig.",btn:"Plätze für den Final Table auslosen"});
     $("annOk").onclick=()=>{$("ann").hidden=true;mergeTables();};fanfare();return;}
   /* 20.11. (Tim): fair = gleich viele an beiden Tischen. Von Hand „Tische prüfen“ zählt nur, wer wirklich spielt (Ausgeschiedene in der Rebuy-Phase nicht). */
   const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
@@ -1395,8 +1394,8 @@ function drawSeats(){
     S.dn={1:t1[Math.floor(Math.random()*t1.length)].name,2:t2[Math.floor(Math.random()*t2.length)].name};S.dealer=0;
     S.draw0={order:S.players.map(p=>p.name),t2:S.t2.slice(),dn:Object.assign({},S.dn)};
     log("draw",{order:t1.map(p=>p.name),t2:S.t2,dealer:S.dn[1],dealer2:S.dn[2],early:[...early]});save();buildSeats();render();return;}
-  /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Jonny immer Platz 6. Rest zufällig. */
-  if(anc&&a.length>=3){const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=a.find(p=>canonName(p.name)==="manu");
+  /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Rest zufällig (20.11.: Jonny nicht mehr fest). */
+  if(anc&&a.length>=3){const n=a.length,jo=null,ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
     if(ma)slots[Math.random()<.5?0:n-2]=ma;
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
