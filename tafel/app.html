@@ -593,7 +593,7 @@ function prow(p){
 function playerSheet(p){const i=pinfo(p.name),b=[];
   if(!p.out){b.push(["✕ Knockout: "+p.name+" ist raus","red",()=>outFlow(p)]);b.push(["↻ Rebuy eintragen","",()=>rebuyFlow(p)]);b.push(["Dealer-Button zu "+p.name,"",()=>send({op:"dealer",name:p.name},"Dealer: "+p.name)]);
     if(D.two)b.push([i.t===2?"An den großen Tisch setzen":"An Tisch 2 setzen","",()=>send({op:"move",name:p.name,to:i.t===2?1:2},p.name+" wechselt")]);}
-  else{b.push(["Rebuy","pri",()=>rebuyFlow(p)]);b.push(["Zurück ins Spiel (Versehen)","",()=>send({op:"back",name:p.name},p.name+" zurück")]);}
+  else{b.push(["Rebuy","pri",()=>rebuyFlow(p)]);if(D.two&&D.reOpen&&pinfo(p.name).canRe)b.push(["Kein Rebuy (Platz freigeben)","",()=>send({op:"norebuy",name:p.name},p.name+": kein Rebuy")]);b.push(["Zurück ins Spiel (Versehen)","",()=>send({op:"back",name:p.name},p.name+" zurück")]);}
   b.push(["Bezahlung ändern","",()=>paidFlow(p)]);
   if(p.entries.length>1)b.push(["Letzten Rebuy zurücknehmen","red",()=>send({op:"undo",name:p.name},"Rebuy zurück")]);
   if(S.eb)b.push([p.eb?"Early Bird wegnehmen":"Early Bird geben (+"+fmt(S.eb)+")","",()=>send({op:"eb",name:p.name,v:!p.eb},"Early Bird "+p.name)]);
