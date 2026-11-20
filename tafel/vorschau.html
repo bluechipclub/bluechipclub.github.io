@@ -696,7 +696,10 @@ const bwOf=p=>S.bounty?(p.bw||0):0;
    wenige große, viele kleine. Wer jemanden rauswirft, zieht zufällig einen Umschlag. Die Summe aller Umschläge = Topf, der Sieger bekommt, was übrig bleibt. */
 const mysPool=()=>S.bounty&&S.mystery?Math.max(0,totalEntries()*S.bounty-(S.mpaid||0)):0;
 const finalHead=p=>S.mystery?mysPool():headOf(p);
-function mysMake(pool,n){if(n<=0||pool<=0)return [];if(pool%5===0&&pool/5>=n&&!mysMake.u){mysMake.u=1;try{return mysMake(pool/5,n).map(v=>v*5);}finally{mysMake.u=0;}} /* glatte 5er-Beträge */const k=Math.max(0,Math.round(n*.11)),w=[];
+function mysMake(pool,n){if(n<=0||pool<=0)return [];
+  /* Tim 20.11.: möglichst viele 20er, ein paar 10er, Rest 5er. Geht immer genau auf (z. B. 29 Entries: 9×20 · 3×10 · 16×5 = 290). */
+  if(pool%5===0&&!mysMake.u){const U=pool/5,d=U-n;if(d>=0){let x=Math.max(0,Math.floor(d/3)-1),y=d-3*x,z=n-x-y;if(z<0){x=Math.floor(d/3);y=d-3*x;z=n-x-y;}
+    if(z>=0)return [...Array(x).fill(20),...Array(y).fill(10),...Array(z).fill(5)];}}if(pool%5===0&&pool/5>=n&&!mysMake.u){mysMake.u=1;try{return mysMake(pool/5,n).map(v=>v*5);}finally{mysMake.u=0;}} /* glatte 5er-Beträge */const k=Math.max(0,Math.round(n*.11)),w=[];
   if(n===1)return [pool];w.push(8);if(n>1)w.push(5);for(let i=0;i<k&&w.length<n;i++)w.push(3.3);for(let i=0;i<k&&w.length<n;i++)w.push(1.7);while(w.length<n)w.push(1);
   const sw=w.reduce((a,b)=>a+b,0),a=w.map(x=>Math.max(1,Math.floor(pool*x/sw)));let rest=pool-a.reduce((x,y)=>x+y,0);
   for(let i=0;rest>0;i=(i+1)%a.length){a[i]++;rest--;}while(rest<0){const i=a.indexOf(Math.max(...a));a[i]--;rest++;}return a.sort((x,y)=>y-x);}
