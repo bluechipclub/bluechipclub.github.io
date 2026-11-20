@@ -1521,7 +1521,7 @@ $("sReset").onclick=()=>ask("Wirklich alles zurücksetzen? Rebuys, Platzierungen
 // live.json: {"cmds":[{"id":1,"op":"msg","text":"…"}]} — each id runs once on this laptop
 let applied=null;try{const a=localStorage.getItem(APPLIED_KEY);applied=a==null?null:+a;}catch(e){}
 /* nur Anzeige: diese Befehle spielt die Spiegel-Tafel mit ab */
-const VIS_OPS=["lobbynav","clip","clipstop","dance","dancestop","close","skipintro","cards","spotlight","entries","result"];
+const VIS_OPS=["full","lobbynav","clip","clipstop","dance","dancestop","close","skipintro","cards","spotlight","entries","result"];
 function runCmd(c){
   const op=c.op;
   if(isHaupt()&&VIS_OPS.includes(op)&&typeof fx==="function")fx("cmd",{c:Object.assign({},c,{src:undefined})});
@@ -1586,6 +1586,7 @@ function runCmd(c){
     case "sync":break;
     case "tv":try{if(window.parent!==window)window.parent.postMessage({tv:c.f},"*");}catch(e){}return;
     case "seatopen":seatOpen();break;
+    case "full":goFull(c.on);break;
     case "bday":bdayShow();break;
     case "bdayclose":bdayClose();break;
     case "lobby":lobbyShow();break;
@@ -1876,6 +1877,15 @@ setInterval(()=>{if(!isHaupt())return;const at=new Date(BDAY.at).getTime(),now=D
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bday").hidden)bdayClose();});
 $("bSnd").onclick=()=>{ac();minuteBeep();[3,2,1].forEach((n,k)=>setTimeout(()=>countdown(n),1500+k*1000));setTimeout(levelSound,4500);};
 $("bFull").onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
+/* Vollbild von der App (Tim 20.11.). Browser erlauben Vollbild nur nach einer Eingabe am Gerät:
+   klappt es nicht direkt, zeigt die Tafel einen Hinweis und geht beim nächsten Tastendruck/Klick in Vollbild. */
+function fsHint(on){let h=$("fsHint");if(!h){h=document.createElement("div");h.id="fsHint";h.style.cssText="position:fixed;inset:auto 0 6vh 0;margin:0 auto;width:max-content;max-width:90vw;z-index:9999;padding:2vh 3vw;border-radius:2vh;background:rgba(12,16,28,.92);border:1px solid rgba(226,184,87,.6);color:#f3d68f;font:600 3.2vh/1.3 Outfit,Geist,system-ui,sans-serif;text-align:center;box-shadow:0 2vh 6vh rgba(0,0,0,.6)";h.innerHTML="⛶ Vollbild: einmal eine Taste drücken oder klicken<br><small style='font-size:2.2vh;color:#c9c2ae;font-weight:500'>Der Browser verlangt das einmal am Gerät selbst</small>";document.body.appendChild(h);}
+  h.hidden=!on;clearTimeout(fsHint.t);if(!on)return;fsHint.t=setTimeout(()=>{h.hidden=true;},30000);
+  const go=e=>{removeEventListener("keydown",go,true);removeEventListener("pointerdown",go,true);h.hidden=true;if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});};
+  addEventListener("keydown",go,true);addEventListener("pointerdown",go,true);}
+function goFull(on){const want=on==null?!document.fullscreenElement:!!on;
+  if(!want){if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});fsHint(false);return;}
+  if(document.fullscreenElement)return;try{document.documentElement.requestFullscreen().then(()=>fsHint(false)).catch(()=>fsHint(true));}catch(e){fsHint(true);}}
 $("bGame").onclick=()=>{
   closeAll();const L=$("gList");L.innerHTML="";
   Object.keys(GAMES).forEach(g=>{const b=document.createElement("button");b.type="button";b.innerHTML="<b></b><span></span>";b.querySelector("b").textContent=g;b.querySelector("span").textContent=GAMES[g].short;b.onclick=()=>showGame(g,false);L.appendChild(b);});
@@ -1986,7 +1996,7 @@ function onFx(p){if(isHaupt()||p.from===DEV)return;lastHauptAt=Date.now();
 function runVis(c){try{const op=c.op;
   if(op==="clip"||op==="clipstop"){if(typeof clipCmd==="function")clipCmd(c);return;}
   if(op==="dance")return danceShow(c.who,c.d);if(op==="dancestop")return danceStop();
-  if(op==="seatopen")return seatOpen();if(op==="bday")return bdayShow();if(op==="bdayclose")return bdayClose();
+  if(op==="full")return goFull(c.on);if(op==="seatopen")return seatOpen();if(op==="bday")return bdayShow();if(op==="bdayclose")return bdayClose();
   if(op==="lobby")return lobbyShow();if(op==="lobbyclose")return lobbyClose();
   if(op==="close"){if(typeof clipStop==="function"&&clipStop())return;if(danceStop())return;if(intro){intro.next();return;}closeAll();$("ann").hidden=true;return;}
   if(op==="skipintro"){if(intro)intro.stop();return;}
