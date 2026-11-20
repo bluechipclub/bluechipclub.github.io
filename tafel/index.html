@@ -1408,6 +1408,21 @@ function drawSeats(){
   if(!SIMPLE&&!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
 }
+/* 20.11. (Tim): „Plätze neu auslosen“ mitten im Turnier – nur neue Sitzplätze, Stacks/Rebuys/Bounties/Uhr/Level bleiben.
+   Komplett zufällig über beide Tische (gleich groß), feste Regeln: Tim Platz 10 + Dealer-Button am großen Tisch, Manu an Tims Tisch (Platz 9 oder 1), Niki am anderen Tisch. */
+function reseat(){const al=S.players.filter(p=>!p.out),outs=S.players.filter(p=>p.out);if(al.length<2)return;
+  closeAll();$("ann").hidden=true;S.pend=null;al.forEach(p=>{delete p.chair;});
+  const tim=al.find(isTim),rnd=a=>a[Math.floor(Math.random()*a.length)];
+  if(S.mt&&al.length>CAP1){const nBig=Math.min(CAP1,Math.ceil(al.length/2)),ma=tim?al.find(p=>canonName(p.name)==="manu"):null,nk=tim?al.find(p=>canonName(p.name)==="niklas"):null;
+    const big=[tim,ma].filter(Boolean);let pool=shuf(al.filter(p=>!big.includes(p)&&p!==nk));
+    while(big.length<nBig&&pool.length)big.push(pool.shift());if(nk)pool.push(nk);
+    const t1=seatRules(big),t2=seatRules(pool);
+    S.t2=t2.map(p=>p.name);S.players=[...outs,...t2,...t1];
+    S.dn={1:tim?tim.name:rnd(t1).name,2:rnd(t2).name};
+    log("reseat",{order:t1.map(p=>p.name),t2:S.t2,dealer:S.dn[1],dealer2:S.dn[2]});save();buildSeats();render();drawOverview(S.players);return;}
+  const a=seatRules(al);S.players=[...outs,...a];
+  if(S.mt){S.t2=[];S.dn={1:tim?tim.name:rnd(a).name};}else S.dealer=S.players.indexOf(tim||rnd(a));
+  log("reseat",{order:a.map(p=>p.name)});save();buildSeats();render();drawOverview(a);}
 /* 12.11.: Show nach „Plätze auslosen“: Ansager + alle Karten auf einen Blick, dann jede Karte einzeln in Sitzreihenfolge (Tim zuletzt am Dealer-Platz), dann die Sitzordnung */
 const DRAW_SHOW=true;
 /* 20.11.: Bounty-Erklärvideo vor der Auslosung (Datei vom Video-Thread: video/bounty-erklaer.mp4). Spielt einmal pro Turnier (S.bvidDone), abschaltbar (S.bvidOff, Op bvid).
@@ -1653,6 +1668,7 @@ function runCmd(c){
     case "gamedef":GAMES[c.name]=c.def;break;
     case "schedule":S.games=c.games;break;
     case "endgame":S.active=null;break;
+    case "reseat":reseat();break;
     case "draw":if(c.show===false)drawSeats();else drawShow();break;
     case "result":openResult();break;
     case "export":download();break;
