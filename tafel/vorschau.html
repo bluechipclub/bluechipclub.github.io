@@ -868,7 +868,7 @@ function renderT2(){
   if(!on){box.querySelectorAll(".seat2").forEach(e=>e.remove());return;}
   const v=atTbl(T2),d=dealerOf(T2),n=v.length,pd=S.pend;
   $("t2cap").textContent=tName(T2)+" · "+n+" Spieler";
-  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="swap"?'<b class="tmove">⇄ Tischwechsel</b>beide Tische tauschen':pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
+  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc((pd.names||[pd.name]).join(", "))+'</b>'+((pd.names||[]).length>1?"wechseln an ":"wechselt an ")+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="swap"?'<b class="tmove">⇄ Tischwechsel</b>beide Tische tauschen':pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
   const mw2=mostWanted(),key=T2+":"+v.map(p=>p.name+"|"+(p.entries.length-1)+"|"+headOf(p)+"|"+(mw2===p?1:0)).join(",");
   if(box.dataset.k!==key){box.dataset.k=key;box.querySelectorAll(".seat2").forEach(e=>e.remove());
     v.forEach((p,k)=>{const a=Math.PI/2+k*2*Math.PI/n,x=50+41*Math.cos(a),y=50+37*Math.sin(a),e=document.createElement("div");
@@ -879,9 +879,11 @@ function renderT2(){
   if(di>=0){const a=Math.PI/2+di*2*Math.PI/n;db.style.left=(50+28*Math.cos(a))+"%";db.style.top=(50+24*Math.sin(a))+"%";}
 }
 /* who moves when tables are balanced: the player who gets the big blind next at the fuller table (never Tim, never Manu at Tim's table) */
-function moveCand(t){const v=atTbl(t),d=dealerOf(t);if(!v.length)return null;const i=Math.max(0,v.indexOf(d));
-  const timThere=atTbl(3-t).some(isTim);let nk=null;
-  for(let s=0;s<v.length;s++){const q=v[(i+3+s)%v.length];if(isTim(q))continue;if(t===1&&canonName(q.name)==="manu"&&v.some(isTim))continue;if(timThere&&canonName(q.name)==="niklas"){nk=nk||q;continue;}return q;}return nk;}
+function moveCands(t,k){const v=atTbl(t),d=dealerOf(t);if(!v.length)return [];const i=Math.max(0,v.indexOf(d));
+  const timThere=atTbl(3-t).some(isTim),r=[],nk=[];
+  for(let s=0;s<v.length&&r.length<k;s++){const q=v[(i+3+s)%v.length];if(isTim(q))continue;if(t===1&&canonName(q.name)==="manu"&&v.some(isTim))continue;if(timThere&&canonName(q.name)==="niklas"){nk.push(q);continue;}r.push(q);}
+  while(r.length<k&&nk.length)r.push(nk.shift());return r;}
+function moveCand(t){return moveCands(t,1)[0]||null;}
 /* move a player to table `to`: he takes the chair of the last player who went out there (else next to the dealer seat) */
 function moveP(name,to){const p=pl(name);if(!p||p.out)return;$("ann").hidden=true;const from=tblOf(p);if(from===to){if(S.pend&&lcn(S.pend.name)===lcn(name))S.pend=null;save();render();return;}
   let arr=S.players.filter(x=>x!==p);
@@ -909,14 +911,19 @@ function checkTables(quiet){
   if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
     announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf dem Dealerplatz, Manu daneben, Jonny Platz 6.",btn:"Plätze für den Final Table auslosen"});
     $("annOk").onclick=()=>{$("ann").hidden=true;mergeTables();};fanfare();return;}
-  const big=a1.length>a2.length?1:2,diff=Math.abs(a1.length-a2.length);
-  if(diff<2||(big===2&&a1.length>=CAP1)){if(S.pend){S.pend=null;save();render();}return;}
-  const p=moveCand(big);if(!p)return;
-  const same=S.pend&&S.pend.op==="move"&&lcn(S.pend.name)===lcn(p.name);
-  S.pend={op:"move",name:p.name,to:3-big};save();render();if(same&&quiet)return;
-  announce({eyebrow:"Tische ausgleichen",title:p.name+" wechselt an "+(big===1?"Tisch 2":"den großen Tisch"),text:"Großer Tisch: "+a1.length+" · Tisch 2: "+a2.length+" Spieler. "+p.name+" nimmt seinen Stack mit und setzt sich auf den freien Platz.",html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annAlt">Anderen Spieler wählen</button> <button class="b" type="button" id="annLater">Später</button></div>',btn:"✓ "+p.name+" sitzt um"});
-  $("annOk").onclick=()=>{$("ann").hidden=true;moveP(p.name,3-big);};
+  /* 20.11. (Tim): fair = gleich viele an beiden Tischen. Von Hand „Tische prüfen“ zählt nur, wer wirklich spielt (Ausgeschiedene in der Rebuy-Phase nicht). */
+  const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
+  const big=c1>c2?1:2,diff=Math.abs(c1-c2);
+  if(diff<2||(big===2&&c1>=CAP1)){if(S.pend){S.pend=null;save();render();}
+    if(!quiet)announce({eyebrow:"Tische prüfen",title:"Tische sind ausgeglichen",text:"Großer Tisch: "+c1+" · Tisch 2: "+c2+" Spieler. Kein Wechsel nötig.",btn:"OK"});return;}
+  const k=Math.floor(diff/2),ms=moveCands(big,k);if(!ms.length)return;const p=ms[0],nm=ms.map(q=>q.name);
+  const same=S.pend&&S.pend.op==="move"&&(S.pend.names||[S.pend.name]).join("|")===nm.join("|");
+  S.pend={op:"move",name:p.name,names:nm,to:3-big};save();render();if(same&&quiet)return;
+  const who=nm.length>1?nm.slice(0,-1).join(", ")+" und "+nm[nm.length-1]:p.name,dest=big===1?"Tisch 2":"den großen Tisch";
+  announce({eyebrow:"Tische ausgleichen",title:who+(nm.length>1?" wechseln an ":" wechselt an ")+dest,text:"Großer Tisch: "+c1+" · Tisch 2: "+c2+" Spieler. Nach der laufenden Hand: "+(nm.length>1?"die nächsten Big Blinds nehmen ihre Stacks mit und setzen sich auf die freien Plätze.":"der nächste Big Blind nimmt seinen Stack mit und setzt sich auf den freien Platz."),html:'<div style="margin:1.5vh 0"><button class="b" type="button" id="annAlt">Anderen Spieler wählen</button> <button class="b" type="button" id="annLater">Später</button></div>',btn:"✓ "+(nm.length>1?"Alle sitzen um":p.name+" sitzt um")});
+  $("annOk").onclick=()=>{$("ann").hidden=true;moveAll(nm,3-big);};
   $("annAlt").onclick=()=>{$("ann").hidden=true;pickMover(big);};$("annLater").onclick=()=>{$("ann").hidden=true;};}
+function moveAll(nm,to){(nm||[]).forEach(n=>moveP(n,to));}
 /* Final Table: all active players to the big table, seats drawn again with Tim's rules, button random */
 function mergeTables(){const al=S.players.filter(p=>!p.out),outs=S.players.filter(p=>p.out);if(!al.length)return;
   const a=seatRules(al);S.players=[...outs,...a];S.t2=[];S.mt=true;S.pend=null;S.ft=new Date().toISOString();
@@ -1634,7 +1641,7 @@ function runCmd(c){
       toast("Einstellungen übernommen");break;}
     case "merge":mergeTables();break;
     case "tables":checkTables(false);break;
-    case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveP(q.name,q.to);else if(q.op==="merge")mergeTables();else if(q.op==="swap")swapTables();break;}
+    case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveAll(q.names||[q.name],q.to);else if(q.op==="merge")mergeTables();else if(q.op==="swap")swapTables();break;}
     case "swap":{if(c.tim!=null){S.swapTim=!!c.tim;save();}if(c.off!=null){S.swapOff=!!c.off;save();}if(c.now)swapTables();break;}
     /* 14.11.: place = Spieler zwischen zwei Nachbarn setzen, z. B. {op:"place",name:"Felix",between:["Manu","Tim"]} */
     case "place":{const p=pl(c.name),x=pl((c.between||[])[0]),y=pl((c.between||[])[1]);if(p&&x&&y&&p!==x&&p!==y){if(S.mt&&tblOf(x)!==tblOf(p)){S.t2=tblOf(x)===2?(S.t2||[]).concat(p.name):(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));}const d=S.players[S.dealer];let a=S.players.filter(q=>q!==p);const i=a.indexOf(x),j=a.indexOf(y),n=a.length;let at=-1;if((i+1)%n===j)at=i+1;else if((j+1)%n===i)at=j+1;if(at>=0){a.splice(at,0,p);S.players=a;S.dealer=Math.max(0,a.indexOf(d));buildSeats();}}break;}

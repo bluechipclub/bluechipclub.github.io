@@ -544,7 +544,7 @@ function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   $("pays").innerHTML=(D.pays||[]).map((v,k)=>'<div><span>'+(k+1)+'. Platz</span><b>'+fmt(v)+' P</b></div>').join("");
   $("cash").textContent=(S.cash?"💵 "+S.cash:"")+(D.kasse&&D.kasse.open?" · "+fmt(D.kasse.open)+" P noch offen":"");
   const q=S.pend;$("pend").hidden=!q;
-  if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):q.op==="swap"?"⇄ Pause: Großer Tisch und Tisch 2 tauschen komplett als Gruppe":"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
+  if(q){$("pendT").textContent=q.op==="move"?"⇄ "+(q.names&&q.names.length>1?q.names.join(", ")+" wechseln an ":q.name+" wechselt an ")+(q.to===1?"den großen Tisch":"Tisch 2"):q.op==="swap"?"⇄ Pause: Großer Tisch und Tisch 2 tauschen komplett als Gruppe":"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
     $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":q.op==="swap"?"⇄ Tische tauschen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
   const two=!!D.two;$("tblBtn").hidden=!two;renderMyt();$("ftBtn").hidden=!two;$("swBtn").hidden=!two;{const w=D.swap||{};$("swSub").textContent=(w.done?"Schon getauscht · ":w.off?"Automatik aus · ":"Automatisch in der 1. Pause · ")+(w.tim===false?"Tim bleibt am großen Tisch":"Tim wechselt mit");}$("qMove").style.display=two?"":"none";
   $("qNoteS").textContent=(S.notes||[]).length?(S.notes.length+" Notiz"+(S.notes.length>1?"en":"")):"z. B. Kevin 5 P zu viel";
