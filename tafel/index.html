@@ -2076,7 +2076,8 @@ const BOOT_AT=Date.now();
 function warnTwo(other,theirSave){
   /* 20.11.: Ein Gerät, das gerade erst geöffnet wurde und eine laufende Haupttafel findet, wird selbst Spiegel und holt sich den aktuellen Stand.
      So bucht eine zurückkommende alte Tafel nichts doppelt und überschreibt nichts. */
-  if(Date.now()-BOOT_AT<30000&&theirSave&&theirSave>(S.savedAt||0)){setRole("spiegel",true);toastLocal("Es läuft schon eine Haupttafel. Dieses Gerät ist jetzt Spiegel und holt den aktuellen Stand.");return;}
+  /* 20.11. Generalprobe: mit ?rolle=haupt in der Adresse gibt dieses Gerät nie automatisch ab */
+  if(!/[?&]rolle=haupt\b/.test(location.search)&&Date.now()-BOOT_AT<30000&&theirSave&&theirSave>(S.savedAt||0)){setRole("spiegel",true);toastLocal("Es läuft schon eine Haupttafel. Dieses Gerät ist jetzt Spiegel und holt den aktuellen Stand.");return;}
   if(warnTwo.t&&Date.now()-warnTwo.t<60000)return;warnTwo.t=Date.now();toastLocal("⚠ Noch eine Haupttafel ist offen. Eine davon auf „Spiegel“ stellen (⚙).");}
 /* Haupttafel: Ann/Intro zu → auf den Spiegeln auch zu */
 new MutationObserver(()=>{if(isHaupt()&&$("ann").hidden)fx("annhide");}).observe($("ann"),{attributes:true,attributeFilter:["hidden"]});
