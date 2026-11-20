@@ -1723,7 +1723,7 @@ function openRemote(){
     if(Date.now()/1000-m.time>600)return;          // ignore stale commands after a long outage
     let c;try{c=JSON.parse(m.message);}catch(e){return;}
     if(!isHaupt())return;
-    (Array.isArray(c)?c:[c]).forEach(x=>{if(x&&x._id){if(seenCmd(x._id))return;}runCmd(Object.assign({src:"handy",_ts:m.time},x));});
+    (Array.isArray(c)?c:[c]).forEach(x=>{if(x&&x._id){if(seenCmd(x._id))return;}runCmd(Object.assign({src:"handy",_ts:m.time},x));if(x&&x._id&&typeof bc==="function")try{bc("ack",{id:x._id});}catch(e){}});
   };
   es.onerror=()=>{remoteOk=false;};
 }
@@ -2049,7 +2049,7 @@ function onState(p){
   const keepLog=S.log;S=Object.assign(fresh(),p.S,{log:keepLog});LEVELS=S.levels;
   const k=S.players.map(p=>p.name+(p.out?"x":"")).join()+"|"+(S.t2||[]).join()+"|"+S.mt;
   if(k!==mirrorKey){mirrorKey=k;buildSeats();}if(S.running&&!$("lobby").hidden)lobbyClose();render();mirrorBadge();}
-function onCmd(p){if(!isHaupt()||!p||!p.c)return;const c=p.c;if(c._id&&seenCmd(c._id))return;runCmd(Object.assign({src:p.src||"app"},c));if(c._id)bc("ack",{id:c._id});if(c._u&&c._l)bc("fx",{k:"done",u:c._u,l:c._l,dev:p.from});}
+function onCmd(p){if(!isHaupt()||!p||!p.c)return;const c=p.c;if(c._id&&seenCmd(c._id)){bc("ack",{id:c._id});return;}/* 20.11.: schon über ntfy gekommen → trotzdem bestätigen, sonst meldet die App „Keine Bestätigung“ */runCmd(Object.assign({src:p.src||"app"},c));if(c._id)bc("ack",{id:c._id});if(c._u&&c._l)bc("fx",{k:"done",u:c._u,l:c._l,dev:p.from});}
 function onFx(p){if(isHaupt()||p.from===DEV)return;lastHauptAt=Date.now();
   if(p.k==="ann"){announceLocal(p.o);}
   if(p.k==="bvid"){bvidShow(true,null);}
