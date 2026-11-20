@@ -922,7 +922,7 @@ function mergeTables(){const al=S.players.filter(p=>!p.out),outs=S.players.filte
   drawOverview(a,{eyebrow:"Final Table · "+a.length+" Spieler",title:"Sitzordnung Final Table"});}
 /* late registration / new name: goes to the table with fewer players */
 function seatNew(p){if(!twoT()){if(S.mt){const tim=S.players.find(x=>isTim(x)&&!x.out);if(tim){S.players=S.players.filter(x=>x!==p);S.players.splice(S.players.indexOf(tim),0,p);}return;}if(alive().length>CAP1&&!S.started)toast("Mehr als "+CAP1+" Spieler: „Plätze auslosen“ verteilt auf zwei Tische");return;}
-  const a1=atTbl(1).length,a2=atTbl(2).length,to=a1<a2&&a1<CAP1?1:2;S.players=S.players.filter(x=>x!==p);S.t2=S.t2.filter(n=>lcn(n)!==lcn(p.name));
+  const a1=atTbl(1).filter(x=>x!==p).length,a2=atTbl(2).filter(x=>x!==p).length,to=a1<=a2&&a1<CAP1?1:2;S.players=S.players.filter(x=>x!==p);S.t2=S.t2.filter(n=>lcn(n)!==lcn(p.name));
   if(to===2)S.t2.push(p.name);const tgt=S.players.filter(x=>tblOf(x)===to),tim=tgt.find(isTim);
   const at=to===1&&tim?S.players.indexOf(tim):(tgt.length?S.players.indexOf(tgt[tgt.length-1])+1:S.players.length);S.players.splice(at,0,p);}
 const payTo=(paid,to)=>paid==="dig"&&to&&lcn(to)!==lcn(S.bank)?to:undefined;
