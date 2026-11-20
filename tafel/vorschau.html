@@ -903,7 +903,7 @@ function pickMover(t){closeAll();
   atTbl(t).filter(q=>!isTim(q)).forEach(q=>mk(q.name,"pri",()=>moveP(q.name,3-t)));mk("Abbrechen","",()=>{});
   o.appendChild(b);o.onclick=e=>{if(e.target===o)o.remove();};document.body.appendChild(o);}
 /* after every out / rebuy / new player: Final Table when everyone fits at the big table, otherwise balance (difference of 2 or more) */
-function checkTables(quiet){
+function checkTables(quiet,auto){
   if(!twoT()){if(S.pend){S.pend=null;save();}return;}
   if(S.pend&&S.pend.op==="swap"&&seatedAt(1).length+seatedAt(2).length>CAP1)return;
   const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
@@ -914,7 +914,7 @@ function checkTables(quiet){
   const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
   const big=c1>c2?1:2,diff=Math.abs(c1-c2);
   /* 20.11. (Tim): in der Rebuy-Phase nach Knockouts keinen Wechsel von selbst vorschlagen – wer rebuyt, bleibt auf seinem Platz. Nur „Tische prüfen“ von Hand. */
-  if(quiet&&rebuyOpen()&&diff>=2){if(S.pend&&S.pend.op==="move"){S.pend=null;save();render();}return;}
+  if((quiet||auto)&&rebuyOpen()&&diff>=2){if(S.pend&&S.pend.op==="move"){S.pend=null;save();render();}return;}
   if(diff<2||(big===2&&c1>=CAP1)){if(S.pend){S.pend=null;save();render();}
     if(!quiet)announce({eyebrow:"Tische prüfen",title:"Tische sind ausgeglichen",text:"Großer Tisch: "+c1+" · Tisch 2: "+c2+" Spieler. Kein Wechsel nötig.",btn:"OK"});return;}
   const k=Math.floor(diff/2),ms=moveCands(big,k);if(!ms.length)return;const p=ms[0],nm=ms.map(q=>q.name);
@@ -1156,7 +1156,7 @@ function doOut(name,by){
   const rest=alive();
   if(rest.length===1){S.ended=new Date().toISOString();if(S.running){S.left=leftNow();S.running=false;S.endAt=null;}log("winner",{name:rest[0].name});save();render();if(ko&&ko.mys!=null)mysShow(ko,p,()=>winner(rest[0]));else winner(rest[0]);return;}
   save();render();
-  if(ko&&ko.mys!=null){mysShow(ko,p);if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");if(twoT())setTimeout(()=>checkTables(false),9500);return;}
+  if(ko&&ko.mys!=null){mysShow(ko,p);if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");if(twoT())setTimeout(()=>checkTables(false,1),9500);return;}
   if(ko&&ko.by){const q=pl(ko.by),king=S.champ&&p.name.toLowerCase()===String(S.champ).toLowerCase();gong();
     const C=v=>Math.round(v/5); /* 1 Chip = 5 P */
     announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.chips?ko.by+" holt "+C(ko.h)+" "+CE("keep")+"":ko.by+" kassiert "+P(ko.cash),text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+(ko.chips?p.name+" gibt "+ko.by+" seine "+C(ko.h)+" "+CE("keep")+": "+C(ko.cash)+" davon gegen "+CE("cash")+" tauschen, "+C(ko.add)+" "+CE("keep")+" kommen auf seinen Kopf. ":"")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
@@ -1164,7 +1164,7 @@ function doOut(name,by){
   if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
   else toast(p.name+" ist raus · Platz "+place);
   /* zwei Tische: während der Rebuy-Phase erst ausgleichen, wenn keiner mehr nachkauft (Rebuy-Frage), danach sofort */
-  if(twoT())setTimeout(()=>checkTables(false),ko&&ko.by?9500:400);
+  if(twoT())setTimeout(()=>checkTables(false,1),ko&&ko.by?9500:400);
 }
 const canRebuy=p=>S.maxRe==null||p.entries.length-1<S.maxRe;
 function doBack(name){const p=pl(name);if(!p||!p.out)return;
@@ -1611,7 +1611,7 @@ function runCmd(c){
     case "blinds":S.levels=parseLevels(c.text);LEVELS=S.levels;S.i=Math.min(S.i,LEVELS.length-1);break;
     case "setlevel":{const L=LEVELS[c.i];if(L)Object.assign(L,c.v);break;}
     case "set":for(const k of Object.keys(c.v||{}))if(k in S&&!["players","log","levels"].includes(k))S[k]=c.v[k];break;
-    case "norebuy":{const p=pl(c.name);if(!p||!p.out)break;p.noRe=1;log("norebuy",{name:p.name});save();render();toast(p.name+" macht keinen Rebuy, Platz ist frei");if(twoT())setTimeout(()=>checkTables(false),300);break;}
+    case "norebuy":{const p=pl(c.name);if(!p||!p.out)break;p.noRe=1;log("norebuy",{name:p.name});save();render();toast(p.name+" macht keinen Rebuy, Platz ist frei");if(twoT())setTimeout(()=>checkTables(false,1),300);break;}
     case "rebuy":{const p=pl(c.name);if(!p)break;
       /* Schutz gegen doppelte Rebuys von zwei Handys: gleicher Spieler innerhalb von 20 s nur mit force */
       if(!c.force&&c.src!=="claude"){const last=p.entries[p.entries.length-1];if(p.entries.length>1&&last&&last.t&&Date.now()-Date.parse(last.t)<20000){toast("Rebuy für "+p.name+" kam gerade schon an. Nicht doppelt gebucht.");break;}
@@ -1642,6 +1642,7 @@ function runCmd(c){
       toast("Einstellungen übernommen");break;}
     case "merge":mergeTables();break;
     case "tables":checkTables(false);break;
+    case "pendclear":if(S.pend){S.pend=null;save();render();}$("ann").hidden=true;break;
     case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveAll(q.names||[q.name],q.to);else if(q.op==="merge")mergeTables();else if(q.op==="swap")swapTables();break;}
     case "swap":{if(c.tim!=null){S.swapTim=!!c.tim;save();}if(c.off!=null){S.swapOff=!!c.off;save();}if(c.now)swapTables();break;}
     /* 14.11.: place = Spieler zwischen zwei Nachbarn setzen, z. B. {op:"place",name:"Felix",between:["Manu","Tim"]} */
