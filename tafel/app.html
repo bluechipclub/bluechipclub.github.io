@@ -136,6 +136,8 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 .pr .chev{color:var(--sub2);font-size:20px}
 
 /* ---------- management tiles ---------- */
+.big2{display:grid;gap:10px;margin:4px 16px 14px}.big2 button{display:flex;align-items:center;gap:14px;height:84px;padding:0 20px;border-radius:20px;text-align:left;font-size:22px;font-weight:700}.big2 button i{font-style:normal;font-size:30px;width:40px;text-align:center}.big2 button small{display:block;font-size:13px;font-weight:500;opacity:.75;margin-top:2px}.big2 .ko{color:#ffd9d4;background:linear-gradient(180deg,rgba(229,103,92,.30),rgba(143,29,29,.36));border:1px solid rgba(229,103,92,.5)}.big2 .rb{color:#f3d68f;background:linear-gradient(180deg,rgba(226,184,87,.24),rgba(156,122,47,.26));border:1px solid rgba(226,184,87,.55)}
+.tbadge{margin-left:6px;height:28px;padding:0 10px;border-radius:14px;font-size:13px;font-weight:600;color:#f3d68f;background:rgba(226,184,87,.14);border:.5px solid rgba(226,184,87,.55);white-space:nowrap}.tbadge.no{color:#ffd9d4;background:rgba(229,103,92,.16);border-color:rgba(229,103,92,.5)}.tbadge[hidden]{display:none}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 16px 0}
 .qko{display:block;width:auto;margin:14px 16px 4px;height:58px;font-size:18px;font-weight:700;color:#ffd9d4;background:linear-gradient(180deg,rgba(229,103,92,.28),rgba(143,29,29,.32));border:1px solid rgba(229,103,92,.45)}
 .myt{display:flex;align-items:center;gap:8px;margin:6px 16px 4px;font-size:13px;color:var(--grey,#8c8c88)}.myt button{flex:1;height:38px;border-radius:12px;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.14);color:inherit;font:inherit;font-size:14px}.myt button.on{background:rgba(226,184,87,.18);border-color:rgba(226,184,87,.65);color:#f3d68f;font-weight:600}
@@ -280,7 +282,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
   </div>
 </div>
 <header class="hdr" id="hdr">
-  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><button class="who press" id="who"></button><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
+  <div class="hrow"><button class="brand press" id="trn"><i></i><span id="ttl">Blue Chip</span><span style="font-size:11px;color:var(--sub2)">▼</span></button><span class="mclk" id="mclk">–</span><button class="tbadge press" id="tbadge" hidden></button><button class="who press" id="who"></button><div class="conn" id="conn"><b></b><span>verbinde …</span></div></div>
   <div class="archb" id="archb" hidden><span id="archT"></span><button class="press" id="archX">Zum Live-Turnier</button></div>
 </header>
 
@@ -296,7 +298,11 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
     <div class="live-only ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
   </div>
   <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button></div></div>
-  <button class="btn press live-only qko" id="qKo">✕ Knockout <small id="qKoS">Wer ist raus?</small></button>
+  <!-- Tim 20.11.: Knockout und Rebuy groß über die ganze Breite -->
+  <div class="live-only big2" style="margin-top:14px">
+    <button class="press ko" id="qKo"><i>✕</i><span>Knockout<small id="qKoS">Wer ist raus?</small></span></button>
+    <button class="press rb" id="qRe"><i>↻</i><span>Rebuy<small>Name antippen, dann Bar oder Offen</small></span></button>
+  </div>
   <div class="myt live-only" id="myt" hidden><span>Ich bediene</span><button class="press" data-t="1">Großer Tisch</button><button class="press" data-t="2">Tisch 2</button></div>
   <div class="stats"><div><b id="sPot">–</b><span>Preisgeld P</span></div><div><b id="sPl">–</b><span>Spieler</span></div><div><b id="sEn">–</b><span>Entries</span></div></div>
   <div class="pays" id="pays"></div>
@@ -308,7 +314,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 <!-- =============== 2 SPIELER =============== -->
 <section class="page" id="p1">
   <h1 class="lt">Spieler</h1>
-  <div class="note" style="padding:0 34px 12px">Tisch antippen zum Aufklappen, Spieler antippen für alle Aktionen.</div>
+  <div class="note" style="padding:0 34px 12px">Spieler antippen: Knockout, Rebuy, Tisch wechseln und mehr.</div>
   <div id="tbls"></div>
   <div class="sec">Nachmelden</div>
   <div class="row2"><input id="newP" placeholder="Name"><button class="btn pri press" id="addP">Dazu</button></div>
@@ -317,9 +323,12 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 <!-- =============== 3 MANAGEMENT =============== -->
 <section class="page" id="p2">
   <h1 class="lt">Management</h1>
+  <!-- Tim 20.11.: die zwei Knöpfe für den Abend groß ganz oben, alles andere kleiner darunter -->
+  <div class="live-only big2">
+    <button class="press ko" id="qOut"><i>✕</i><span>Knockout<small>Wer ist raus, wer hat ihn rausgeworfen</small></span></button>
+    <button class="press rb" id="qRebuy"><i>↻</i><span>Rebuy<small>Name antippen, dann Bar oder Offen</small></span></button>
+  </div>
   <div class="live-only tiles">
-    <button class="tile press" id="qRebuy"><span class="ti c-gold">↻</span><span><b>Rebuy</b><br><small>Name → Bar / überwiesen</small></span></button>
-    <button class="tile press" id="qOut"><span class="ti c-red">✕</span><span><b>Raus</b><br><small>Spieler ausgeschieden</small></span></button>
     <button class="tile press" id="qAdd"><span class="ti c-green">＋</span><span><b>Nachmelden</b><br><small>Neuer Spieler</small></span></button>
     <button class="tile press" id="qPaid"><span class="ti c-blue">P</span><span><b>Bezahlt</b><br><small>Offene Beträge</small></span></button>
     <button class="tile press" id="qDealer"><span class="ti c-grey">D</span><span><b>Dealer</b><br><small id="qDealerS">weiter</small></span></button>
@@ -542,9 +551,9 @@ function groups(){const g=[];
   if(out.length)g.push(["out","Ausgeschieden",out,""]);return g;}
 function renderTables(){const T=$("tbls");if(!S){T.innerHTML="";return;}T.innerHTML="";
   groups().forEach(([k,title,list,dn])=>{
-    const c=document.createElement("div");c.className="tblc"+(OPEN[k]?" open":"");
+    if(OPEN[k]==null)OPEN[k]=k!=="out";const c=document.createElement("div");c.className="tblc"+(OPEN[k]?" open":"");
     const dots=list.slice(0,8).map(p=>avHtml(p.name,"s")).join("")+(list.length>8?'<span class="more">+'+(list.length-8)+'</span>':"");
-    c.innerHTML='<button class="tblh"><span class="tx"><b>'+esc(title)+'</b><small>'+list.length+' Spieler'+(dn?' · Dealer '+esc(dn):'')+'</small></span><span class="dots">'+dots+'</span><span class="chev">›</span></button><div class="tblb"><div></div></div>';
+    c.innerHTML='<button class="tblh"><span class="tx"><b>'+esc(title)+(myT()&&+k===myT()?' · dein Tisch':'')+'</b><small>'+list.length+' Spieler'+(dn?' · Dealer '+esc(dn):'')+'</small></span><span class="dots">'+dots+'</span><span class="chev">›</span></button><div class="tblb"><div></div></div>';
     c.querySelector(".tblh").onclick=()=>{OPEN[k]=!OPEN[k];c.classList.toggle("open",OPEN[k]);try{localStorage.setItem("bcc-app-open",JSON.stringify(OPEN));}catch(e){}buzz(6);};
     const body=c.querySelector(".tblb>div");
     list.forEach(p=>body.appendChild(prow(p)));
@@ -559,7 +568,7 @@ function prow(p){
   if(S.eb&&p.eb)b.insertAdjacentHTML("beforeend",'<span class="tag e">EB</span>');
   r.onclick=()=>playerSheet(p);return r;}
 function playerSheet(p){const i=pinfo(p.name),b=[];
-  if(!p.out){b.push(["Raus","red",()=>outFlow(p)]);b.push(["Rebuy eintragen","",()=>rebuyFlow(p)]);b.push(["Dealer-Button zu "+p.name,"",()=>send({op:"dealer",name:p.name},"Dealer: "+p.name)]);
+  if(!p.out){b.push(["✕ Knockout: "+p.name+" ist raus","red",()=>outFlow(p)]);b.push(["↻ Rebuy eintragen","",()=>rebuyFlow(p)]);b.push(["Dealer-Button zu "+p.name,"",()=>send({op:"dealer",name:p.name},"Dealer: "+p.name)]);
     if(D.two)b.push([i.t===2?"An den großen Tisch setzen":"An Tisch 2 setzen","",()=>send({op:"move",name:p.name,to:i.t===2?1:2},p.name+" wechselt")]);}
   else{b.push(["Rebuy","pri",()=>rebuyFlow(p)]);b.push(["Zurück ins Spiel (Versehen)","",()=>send({op:"back",name:p.name},p.name+" zurück")]);}
   b.push(["Bezahlung ändern","",()=>paidFlow(p)]);
@@ -610,33 +619,43 @@ function nameSheet(title,text,val,okLabel,fn){const W=document.createElement("di
   const go=()=>{const n=I.value.trim();if(!n){I.focus();return;}closeSheet();setTimeout(()=>fn(n),250);};B.onclick=go;I.onkeydown=e=>{if(e.key==="Enter")go();};setTimeout(()=>I.focus(),350);}
 function addFlow(n){n=(n||"").trim();if(!n){nameSheet("Nachmelden","Name des neuen Spielers","","Weiter",addFlow);return;}
   sheet(n+" nachmelden","Buy-in "+(S?fmt(S.buyin):"")+" P · Bargeldregel: bar an der Kasse",payButtons((v,to)=>send({op:"add",name:n,paid:v,to},n+" dazu ("+PAYL(v,to)+")")));}
+/* Knopf ohne Verbindung zur Haupttafel: sagen, warum nichts passiert (Tim 20.11. „ich kann nichts anklicken“) */
+const noS=()=>{if(S)return false;toast("Noch keine Verbindung zur Haupttafel. Ist die Tafel am Laptop offen?",3500,"bad");return true;};
 const tblSub=p=>D.two?(pinfo(p.name).t===2?"Tisch 2":"Groß"):"";
 
 /* ---------- Management ---------- */
-$("qRebuy").onclick=()=>{if(!S)return;const out=S.players.filter(p=>p.out),inn=active();
+$("qRebuy").onclick=()=>{if(noS())return;const out=S.players.filter(p=>p.out),inn=active();
   picker("Rebuy für wen?",D.reOpen?"Rebuy "+fmt(S.rebuy)+" P":"Achtung: Rebuy-Phase ist vorbei",[["Ausgeschieden",out,p=>pinfo(p.name).canRe?"Platz "+pinfo(p.name).place:"dim"],["Im Spiel",inn,tblSub]],rebuyFlow);};
-$("qOut").onclick=()=>{if(!S)return;let g=D.two?[["Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===2))]]:[["",orderOf(active())]];
+$("qOut").onclick=()=>{if(noS())return;let g=D.two?[["Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===2))]]:[["",orderOf(active())]];
   /* „Ich bediene“ (Tim 20.11.): eigener Tisch zuerst und ohne Überschrift, der andere Tisch klein darunter */
   const m=myT();if(m){g=m===1?g:[g[1],g[0]];g[0][0]="";g[1][0]="Anderer Tisch: "+g[1][0];}
   picker("Wer ist raus?",m?"Dein Tisch: "+(m===1?"Großer Tisch":"Tisch 2"):"",g,outFlow);};
 /* Ich bediene: Tisch-Wahl pro Handy (localStorage), nur bei zwei Tischen sichtbar, nach dem Final Table weg */
 let MYT=(()=>{try{return +localStorage.getItem("bcc-app-tisch")||0;}catch(e){return 0;}})();
 const myT=()=>D&&D.two&&(MYT===1||MYT===2)?MYT:0;
-function renderMyt(){const on=!!(D&&D.two),E=$("myt");E.hidden=!on;E.querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.t===MYT));
+let MYT_ASKED=false;
+function pickMyT(){sheet("Welchen Tisch bedienst du?","Dann siehst du beim Knockout zuerst deine Spieler. Oben rechts steht immer dein Tisch.",[["Großer Tisch","pri",()=>setMyT(1)],["Tisch 2","pri",()=>setMyT(2)],["Beide Tische","",()=>setMyT(0)]]);}
+function setMyT(t){MYT=t;try{localStorage.setItem("bcc-app-tisch",String(MYT));}catch(e){}buzz(8);renderMyt();try{renderTables();}catch(e){}toast(MYT?"Du bedienst "+(MYT===1?"den großen Tisch":"Tisch 2"):"Beide Tische");}
+function renderMyt(){const on=!!(D&&D.two),E=$("myt"),B=$("tbadge");
+  /* Tisch oben im Kopf: immer sichtbar, sobald zwei Tische laufen */
+  B.hidden=!on||!!ARCH;B.textContent=MYT===1?"🪑 Großer Tisch":MYT===2?"🪑 Tisch 2":"🪑 Tisch wählen";B.classList.toggle("no",!MYT);
+  if(on&&!MYT&&!MYT_ASKED&&!ARCH&&$("login").hidden&&!$("sh").classList.contains("on")){MYT_ASKED=true;setTimeout(pickMyT,600);}E.hidden=!on;E.querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.t===MYT));
   $("qKoS").textContent=myT()?"Wer ist raus? · "+(MYT===1?"Großer Tisch":"Tisch 2"):"Wer ist raus?";}
-$("myt").querySelectorAll("button").forEach(b=>b.onclick=()=>{const t=+b.dataset.t;MYT=MYT===t?0:t;try{localStorage.setItem("bcc-app-tisch",String(MYT));}catch(e){}buzz(8);renderMyt();toast(MYT?"Du bedienst "+(MYT===1?"den großen Tisch":"Tisch 2"):"Beide Tische");});
+$("myt").querySelectorAll("button").forEach(b=>b.onclick=()=>{const t=+b.dataset.t;setMyT(MYT===t?0:t);});
+$("tbadge").onclick=pickMyT;
 $("qAdd").onclick=()=>addFlow("");
 /* Übersicht: Knockout in 2 Tipps (Opfer, dann Werfer) */
 $("qKo").onclick=()=>$("qOut").onclick();
-$("qPaid").onclick=()=>{if(!S)return;const open=S.players.filter(p=>pinfo(p.name).open),rest=S.players.filter(p=>!pinfo(p.name).open);
+$("qRe").onclick=()=>$("qRebuy").onclick();
+$("qPaid").onclick=()=>{if(noS())return;const open=S.players.filter(p=>pinfo(p.name).open),rest=S.players.filter(p=>!pinfo(p.name).open);
   picker("Bezahlung ändern",open.length?open.length+" mit offenem Betrag":"Alles bezahlt ✓",[["Offen",open,p=>pinfo(p.name).open+" P"],["Alle",rest]],paidFlow);};
-$("qDealer").onclick=()=>{if(!S)return;const b=[];
+$("qDealer").onclick=()=>{if(noS())return;const b=[];
   if(D.two){b.push(["Großer Tisch: weiter ▶","pri",()=>send({op:"dealernext",t:1},"Dealer großer Tisch")]);b.push(["Tisch 2: weiter ▶","pri",()=>send({op:"dealernext",t:2},"Dealer Tisch 2")]);}
   else b.push(["Dealer weiter ▶","pri",()=>send(S.mt?{op:"dealernext",t:1}:{op:"dealernext"},"Dealer weiter")]);
   b.push(["Dealer direkt wählen","",()=>picker("Wer bekommt den Button?","",[["",orderOf(active()),tblSub]],p=>send({op:"dealer",name:p.name},"Dealer: "+p.name))]);
   sheet("Dealer-Button",D.two?"Großer Tisch: "+(D.d1||"–")+" · Tisch 2: "+(D.d2||"–"):"Jetzt: "+(D.d1||"–"),b);};
 $("qMove").onclick=()=>{if(!S||!D.two)return;picker("Wer wechselt den Tisch?","",[["Großer Tisch → Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2 → Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===2))]],p=>{const to=pinfo(p.name).t===2?1:2;sheet(p.name+" umsetzen?","An "+(to===1?"den großen Tisch":"Tisch 2"),[["Ja, umsetzen","pri",()=>send({op:"move",name:p.name,to},p.name+" wechselt")]]);});};
-$("mLevel").onclick=()=>{if(!S)return;const L=S.levels||[];let n=0;const W=document.createElement("div");W.className="grp";W.style.cssText="margin:14px 0 0";
+$("mLevel").onclick=()=>{if(noS())return;const L=S.levels||[];let n=0;const W=document.createElement("div");W.className="grp";W.style.cssText="margin:14px 0 0";
   L.forEach((l,k)=>{if(!l.brk)n++;const b=document.createElement("button");b.className="cell press";const cur=k===S.i;
     b.innerHTML='<span class="tx">'+(l.brk?"Pause "+l.brk+" Min":"Level "+n)+'<small>'+(l.brk?(l.note||""):fmt(l.sb)+" / "+fmt(l.bb)+(l.ante?" · Ante "+fmt(l.ante):""))+'</small></span>'+(cur?'<span class="val" style="color:var(--gold)">jetzt</span>':'');
     b.onclick=()=>{closeSheet();send({op:"level",i:k},l.brk?"Pause":"Level "+n);};W.appendChild(b);});
@@ -715,7 +734,7 @@ function renderKasseOld(){if(!S)return;const ps=S.players.map(p=>[p.name,pinfo(p
 
 /* ---------- Einstellungen (Sheet) ---------- */
 function levelsText(L){return (L||[]).map(l=>l.brk?"Pause "+l.brk+(l.note?" "+l.note:""):l.sb+"/"+l.bb+(l.ante?"/"+l.ante:"")).join("\n");}
-$("setBtn").onclick=()=>{if(!S)return;const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
+$("setBtn").onclick=()=>{if(noS())return;const W=document.createElement("div");W.className="grp";W.style.margin="14px 0 0";
   const f=(id,lab,v,t,cls,ph)=>'<label class="'+(cls||"")+'">'+lab+'<input id="'+id+'" '+(t==="n"?'type="number" inputmode="numeric"':'')+' value="'+esc(v==null?"":v)+'" placeholder="'+(ph||"")+'"></label>';
   W.innerHTML='<div class="fg">'+f("fTitle","Turniername",S.title,"","full")+f("fStack","Startstack",S.stack,"n")+f("fEb","Early Bird",S.eb||0,"n")+f("fMin1","Minuten Level 1",S.min1,"n")+f("fMin","Minuten Rebuy-Phase",S.min,"n")+f("fMinLate","Minuten danach",S.minLate,"n")+f("fReLvl","Rebuys bis Level",S.reLvl,"n","","immer")+f("fMaxRe","Max. Rebuys",S.maxRe,"n","","unbegrenzt")+f("fPot","Entry = Rebuy (P)",S.buyin,"n")+f("fBounty","davon Bounty (0 = aus)",S.bounty||0,"n")+'<label>Bounty-Art<select id="fMys"><option value="0">Progressiv (halb bar, halb auf den Kopf)</option><option value="1">Mystery (Umschläge)</option><option value="2">Mit Chips 🔵🟡 (Tafel zählt nicht)</option></select></label>'+f("fBank","Kasse hält",S.bank)
     +'<label>Bezahlte Plätze<select id="fPay"><option value="auto">Automatisch</option><option value="fix">Feste Prozente</option></select></label>'+f("fPcts","Feste Prozente",(S.pay&&S.pay.pcts||[]).join(","),"","","50,30,20")+f("fCash","Bargeldregel",S.cash||"","","full")
