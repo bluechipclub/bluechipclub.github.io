@@ -1916,7 +1916,7 @@ $("bLobby").onclick=lobbyShow;
 async function syncSignups(){
   if(S.started||!isHaupt())return;const L=await ligaLoad();if(!L||S.started)return;const n=L.settings.next;if(!n||!n.title)return;
   let names=(n.signups||[]).map(x=>String(typeof x==="string"?x:x.name||"").trim());
-  if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){return;}}
+  if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){/* Google-Tabelle nicht erreichbar: mit den Zusagen von der Website weitermachen */}}
   const DISP={"niklas":"Niklas","p. diddy":"P. Diddy","jonny":"Jonny","philipp":"Philipp","tobi":"Tobi","magg":"Magg","oli":"Oli"};names=names.map(x=>DISP[canonName(x)]||x);
   names=names.filter(x=>x&&!NOT_AT_TABLE.includes(x.toLowerCase()));if(!names.length)return;
   const seen=S.syncSeen||[],lc=a=>a.map(x=>x.toLowerCase()),uniq=[];names.forEach(x=>{if(!lc(uniq).includes(x.toLowerCase()))uniq.push(x);});
