@@ -1413,7 +1413,7 @@ const DRAW_SHOW=true;
 const BVID="video/bounty-erklaer.mp4";
 function bvidShow(muted,done){if(intro)intro.stop();closeAll();$("ann").hidden=true;
   const o=document.createElement("div");o.id="bvid";o.style.cssText="position:fixed;inset:0;z-index:9000;background:#000;display:flex;align-items:center;justify-content:center";
-  const v=document.createElement("video");v.src=BVID+"?v=1";v.poster="video/bounty-erklaer-poster.jpg";v.playsInline=true;v.muted=!!muted||!!window.__noSnd;v.style.cssText="width:100%;height:100%;object-fit:contain";o.appendChild(v);document.body.appendChild(o);
+  const v=document.createElement("video");v.src=BVID+"?v=2";v.poster="video/bounty-erklaer-poster.jpg";v.playsInline=true;v.muted=!!muted||!!window.__noSnd;v.style.cssText="width:100%;height:100%;object-fit:contain";o.appendChild(v);document.body.appendChild(o);
   let fin=false;const end=()=>{if(fin)return;fin=true;try{v.pause();}catch(e){}o.remove();if(intro&&intro.bvid)intro=null;done&&done();};
   intro={bvid:1,next:end,stop:end};v.onended=end;v.onerror=end;
   const pr=v.play();if(pr&&pr.catch)pr.catch(()=>{v.muted=true;v.play().catch(end);});}
@@ -1664,6 +1664,8 @@ function runCmd(c){
     case "lobbyclose":lobbyClose();break;
     case "close":if(typeof clipStop==="function"&&clipStop())break;if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
+    case "shot":{const n=Math.max(5,Math.min(120,+c.s||30));fx("shot",{s:n});shotShow(n);break;}
+    case "shotstop":shotStop();break;
     case "bvid":{if(c.off!=null)S.bvidOff=!!c.off;if(c.again)S.bvidDone=0;save();if(c.play){fx("bvid",{});bvidShow(false,null);}break;}
     case "lobbyset":S.lobbyOff=(S.lobbyOff||[]).filter(x=>x!==c.id);if(!c.on)S.lobbyOff.push(c.id);break;
     case "lobbynav":if(lobbyNav)lobbyNav(c.d<0?-1:1);break;
@@ -2056,9 +2058,16 @@ function onState(p){
   const k=S.players.map(p=>p.name+(p.out?"x":"")).join()+"|"+(S.t2||[]).join()+"|"+S.mt;
   if(k!==mirrorKey){mirrorKey=k;buildSeats();}if(S.running&&!$("lobby").hidden)lobbyClose();render();mirrorBadge();}
 function onCmd(p){if(!isHaupt()||!p||!p.c)return;const c=p.c;if(c._id&&seenCmd(c._id)){bc("ack",{id:c._id});return;}/* 20.11.: schon über ntfy gekommen → trotzdem bestätigen, sonst meldet die App „Keine Bestätigung“ */runCmd(Object.assign({src:p.src||"app"},c));if(c._id)bc("ack",{id:c._id});if(c._u&&c._l)bc("fx",{k:"done",u:c._u,l:c._l,dev:p.from});}
+/* 20.11. (Tim): Shot Clock 30 s – großer Countdown auf beiden Fernsehern, ändert nichts am Turnierstand */
+function shotShow(sec){let o=$("shotO");if(!o){o=document.createElement("div");o.id="shotO";o.style.cssText="position:fixed;inset:0;z-index:9990;display:grid;place-items:center;background:rgba(0,0,0,.82);pointer-events:auto;cursor:pointer";o.innerHTML='<div style="text-align:center"><div style="font:600 3vh var(--mono,monospace);letter-spacing:.4em;color:#e2b857;text-transform:uppercase">Shot Clock</div><div id="shotN" style="font:800 38vh/1 Geist,system-ui,sans-serif;color:#f4f4f2;text-shadow:0 0 6vh rgba(226,184,87,.35)"></div></div>';o.onclick=()=>shotStop();document.body.appendChild(o);}
+  clearInterval(shotShow.t);const end=Date.now()+sec*1000;o.hidden=false;const n=$("shotN");
+  const tick=()=>{const r=Math.max(0,Math.ceil((end-Date.now())/1000));n.textContent=r;n.style.color=r<=5?"#e5675c":"#f4f4f2";if(r<=0){clearInterval(shotShow.t);n.textContent="TIME";setTimeout(()=>{if(Date.now()>=end)shotStop(true);},2500);}};tick();shotShow.t=setInterval(tick,200);}
+function shotStop(local){clearInterval(shotShow.t);const o=$("shotO");if(o)o.hidden=true;if(!local&&isHaupt()&&typeof fx==="function")fx("shotstop",{});}
 function onFx(p){if(isHaupt()||p.from===DEV)return;lastHauptAt=Date.now();
   if(p.k==="ann"){announceLocal(p.o);}
   if(p.k==="bvid"){bvidShow(true,null);}
+  else if(p.k==="shot"){shotShow(p.s||30);}
+  else if(p.k==="shotstop"){shotStop(true);}
   else if(p.k==="annhide"){$("ann").hidden=true;}
   else if(p.k==="toast"){toastLocal(p.t);}
   else if(p.k==="cmd"){runVis(p.c);}
