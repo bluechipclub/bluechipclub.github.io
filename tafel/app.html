@@ -596,10 +596,11 @@ function rebuyFlow(p){const i=pinfo(p.name),re=p.entries.length-1,warn=[];
   else sheet(p.name+" · Rebuy","Achtung: "+warn.join(" "),[["Trotzdem buchen (bar)","red",()=>go("bar",true)],["Trotzdem buchen (offen)","red",()=>go("offen",true)]]);}
 function outFlow(p){
   /* Bounty: 2. Tipp = Werfer. Nur Spieler vom selben Tisch, mit Kopfgeld; Tafel rechnet alles (Tim 20.11.) */
-  if(S.bounty&&!S.bchips){const hd=x=>!x.entries.length?0:(x.head==null?S.bounty:x.head),h=hd(p),bar=S.mystery?0:Math.min(h,Math.ceil(h/10)*5),t=pinfo(p.name).t;
+  /* Chips 🔵🟡 (Tim 20.11.): Werfer auch hier eintragen, Tafel zeigt die Köpfe */
+  if(S.bounty){const hd=x=>!x.entries.length?0:(x.head==null?S.bounty:x.head),h=hd(p),bar=S.mystery?0:Math.min(h,Math.ceil(h/10)*5),t=pinfo(p.name).t;
     const mates=orderOf(active().filter(x=>x.name!==p.name&&(!D.two||pinfo(x.name).t===t)));
-    picker("Wer hat "+p.name+" rausgeworfen?",S.mystery?"Der Werfer zieht einen Mystery-Umschlag.":p.name+"s Kopf: "+h+" P → "+bar+" P bar an den Werfer, "+(h-bar)+" P auf seinen Kopf.",[["",mates,x=>S.mystery?"":"🎯 "+hd(x)+" P"]],
-      x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"),[["Ohne Werfer"+(S.mystery?"":" (Kopf in den Pot)"),"",()=>send({op:"out",name:p.name},p.name+" raus")]]);return;}
+    picker("Wer hat "+p.name+" rausgeworfen?",S.mystery?"Der Werfer zieht einen Mystery-Umschlag.":S.bchips?p.name+" gibt "+Math.round(h/5)+" 🔵 ab → "+Math.round(bar/5)+" gegen 🟡 tauschen, "+Math.round((h-bar)/5)+" 🔵 auf den Kopf.":p.name+"s Kopf: "+h+" P → "+bar+" P bar an den Werfer, "+(h-bar)+" P auf seinen Kopf.",[["",mates,x=>S.mystery?"":"🎯 "+hd(x)+" P"]],
+      x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"),[["Ohne Werfer"+(S.mystery?"":S.bchips?"":" (Kopf in den Pot)"),"",()=>send({op:"out",name:p.name},p.name+" raus")]]);return;}
   sheet(p.name+" ist raus?",D.reOpen&&pinfo(p.name).canRe?"Danach kann "+p.name+" noch einen Rebuy machen.":"",[["Ja, "+p.name+" ist raus","red",()=>send({op:"out",name:p.name},p.name+" raus")]]);}
 function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAYL(e.paid,e.to),e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtonsLater((v,to)=>send({op:"paid",name:p.name,entry:j+1,paid:v,to},p.name+": "+PAYL(v,to))))]);
   sheet(p.name+" · Bezahlung","Antippen zum Ändern",b);}
