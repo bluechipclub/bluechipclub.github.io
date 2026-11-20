@@ -638,7 +638,7 @@ function rebuyFlow(p){const i=pinfo(p.name),re=p.entries.length-1,warn=[];
 function outFlow(p){
   /* Bounty: 2. Tipp = Werfer. Nur Spieler vom selben Tisch, mit Kopfgeld; Tafel rechnet alles (Tim 20.11.) */
   /* Chips 🔵🟡 (Tim 20.11.): Werfer auch hier eintragen, Tafel zeigt die Köpfe */
-  if(S.bounty){const hd=x=>!x.entries.length?0:(x.head==null?S.bounty:x.head),h=hd(p),bar=S.mystery?0:Math.min(h,Math.ceil(h/10)*5),t=pinfo(p.name).t;
+  if(S.bounty){const hd=x=>!x.entries.length?0:(x.head==null?S.bounty:x.head),h=hd(p),bar=S.mystery?0:Math.floor(h/10)*5,t=pinfo(p.name).t;
     const mates=orderOf(active().filter(x=>x.name!==p.name&&(!D.two||pinfo(x.name).t===t)));
     picker("Wer hat "+p.name+" rausgeworfen?",S.mystery?"Der Werfer zieht einen Mystery-Umschlag.":S.bchips?p.name+" gibt "+Math.round(h/5)+" "+BCE("keep")+" ab → "+Math.round(bar/5)+" gegen "+BCE("cash")+" tauschen, "+Math.round((h-bar)/5)+" "+BCE("keep")+" auf den Kopf.":p.name+"s Kopf: "+h+" P → "+bar+" P bar an den Werfer, "+(h-bar)+" P auf seinen Kopf.",[["",mates,x=>S.mystery?"":"🎯 "+hd(x)+" P"]],
       x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"),[["Ohne Werfer"+(S.mystery?"":S.bchips?"":" (Kopf in den Pot)"),"",()=>send({op:"out",name:p.name},p.name+" raus")]]);return;}

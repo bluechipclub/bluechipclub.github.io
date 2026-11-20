@@ -1106,7 +1106,7 @@ function checkGames(){
 const CHIPC={blau:["🔵","Blau"],gelb:["🟡","Gelb"],rot:["🔴","Rot"],gruen:["🟢","Grün"],weiss:["⚪","Weiß"],schwarz:["⚫","Schwarz"],lila:["🟣","Lila"],orange:["🟠","Orange"],braun:["🟤","Braun"]};
 const bcol=()=>Object.assign({keep:"blau",cash:"gelb"},S.bcol||{});
 const CE=k=>(CHIPC[bcol()[k]]||CHIPC[k==="keep"?"blau":"gelb"])[0],CN=k=>(CHIPC[bcol()[k]]||CHIPC[k==="keep"?"blau":"gelb"])[1];
-function bRuleText(){return "🎯 Bounty-Chips: "+CE("cash")+" "+CN("cash")+" = auszahlbar, sofort in die Tasche (am Ende 5 P pro Chip)  ·  "+CE("keep")+" "+CN("keep")+" = dein Kopfgeld, bleibt vor dir auf dem Tisch  ·  Rauswurf: Wer rausfliegt, gibt dem Werfer alle "+CE("keep")+". Die Hälfte tauscht der Werfer bei "+(S.bank||"Tim")+" gegen "+CE("cash")+", der Rest bleibt als "+CE("keep")+" auf seinem Kopf  ·  Rebuy = neuer Kopf mit 2 "+CE("keep");}
+function bRuleText(){return "🎯 Bounty-Chips: "+CE("cash")+" "+CN("cash")+" = auszahlbar, sofort in die Tasche (am Ende 5 P pro Chip)  ·  "+CE("keep")+" "+CN("keep")+" = dein Kopfgeld, bleibt vor dir auf dem Tisch  ·  Rauswurf: Wer rausfliegt, gibt dem Werfer alle "+CE("keep")+". Die Hälfte tauscht der Werfer bei "+(S.bank||"Tim")+" gegen "+CE("cash")+", die andere Hälfte bleibt als "+CE("keep")+" auf seinem Kopf. Geht es nicht auf: die größere Hälfte bleibt auf dem Kopf, die kleinere wird ausgezahlt  ·  Rebuy = neuer Kopf mit 2 "+CE("keep");}
 function announce(o){if(isHaupt()&&typeof fx==="function")fx("ann",{o:{eyebrow:o.eyebrow,title:o.title,text:o.text,stake:o.stake,stakesub:o.stakesub,html:o.html,btn:o.btn,sec:o.sec}});
   const b=$("annBox");
   b.innerHTML='<div class="eyebrow">'+esc(o.eyebrow||"")+'</div><h3>'+esc(o.title||"")+'</h3>'+(o.text?'<p>'+esc(o.text)+'</p>':"")+(o.stake?'<div class="stake">'+esc(o.stake)+'</div>':"")+(o.stakesub?'<div class="stakesub">'+esc(o.stakesub)+'</div>':"")+(o.html||"")+'<div><button class="b pri" type="button" id="annOk">'+esc(o.btn||"OK")+'</button></div>';
@@ -1147,7 +1147,7 @@ function doOut(name,by){
     if(q&&q!==p&&!q.out){const pool=mysPool(),amt=Math.min(pool,mysDraw());q.bw=bwOf(q)+amt;S.mpaid=(S.mpaid||0)+amt;ko={by:q.name,mys:amt,pool};}
     p.out.ko=ko;}
   else if(S.bounty){const h=headOf(p),q=by?pl(by):null;
-    if(q&&q!==p&&!q.out){const cash=Math.min(h,Math.ceil(h/10)*5),add=h-cash; /* Hälfte bar, auf 5 aufgerundet (10→5/5, 15→10/5, 20→10/10) */if(!S.bchips)q.bw=bwOf(q)+cash;q.head=headOf(q)+add;ko={by:q.name,h,cash,add};}
+    if(q&&q!==p&&!q.out){const cash=Math.floor(h/10)*5,add=h-cash; /* Tim 20.11. 22:03: Hälfte bar an den Werfer; geht es nicht auf, bleibt die größere Hälfte am Tisch (Kopf), die kleinere wird ausgezahlt (10→5/5, 15→5/10, 20→10/10, 25→10/15) */if(!S.bchips)q.bw=bwOf(q)+cash;q.head=headOf(q)+add;ko={by:q.name,h,cash,add};}
     else{if(!S.bchips)S.lostHeads=(S.lostHeads||0)+h;ko={by:null,h};}
     if(S.bchips)ko.chips=1; /* Chips: Werfer tauscht selbst blau gegen gelb, Tafel spiegelt nur den Kopf */
     p.head=0;p.out.ko=ko;}
@@ -1159,7 +1159,7 @@ function doOut(name,by){
   if(ko&&ko.mys!=null){mysShow(ko,p);if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");if(twoT())setTimeout(()=>checkTables(false,1),9500);return;}
   if(ko&&ko.by){const q=pl(ko.by),king=S.champ&&p.name.toLowerCase()===String(S.champ).toLowerCase();gong();
     const C=v=>Math.round(v/5); /* 1 Chip = 5 P */
-    announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.chips?ko.by+" holt "+C(ko.h)+" "+CE("keep")+"":ko.by+" kassiert "+P(ko.cash),text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+(ko.chips?p.name+" gibt "+ko.by+" seine "+C(ko.h)+" "+CE("keep")+": "+C(ko.cash)+" davon gegen "+CE("cash")+" tauschen, "+C(ko.add)+" "+CE("keep")+" kommen auf seinen Kopf. ":"")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
+    announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.by+" bekommt "+P(ko.cash)+" Bounty",text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+(ko.chips?p.name+" gibt "+ko.by+" seine "+C(ko.h)+" "+CE("keep")+": "+C(ko.cash)+" davon gegen "+CE("cash")+" tauschen, "+C(ko.add)+" "+CE("keep")+" kommen auf seinen Kopf. ":p.name+"s Kopfgeld "+P(ko.h)+": "+P(ko.cash)+" bar an "+ko.by+", "+P(ko.add)+" auf seinen Kopf. ")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
     if(king)burst();}
   if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
   else toast(p.name+" ist raus · Platz "+place);
@@ -1181,7 +1181,7 @@ function winner(p){
 function pickHunter(p,cb){
   const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center";
   const b=document.createElement("div");b.style.cssText="background:#151515;border:1px solid #b8933a;border-radius:14px;padding:22px;max-width:560px;width:92vw";
-  b.innerHTML='<h3 style="margin:0 0 6px">Wer hat '+esc(p.name)+' rausgeworfen?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">'+(S.mystery?'Der Werfer zieht einen Mystery-Umschlag (Topf gerade '+P(mysPool())+').':S.bchips?esc(p.name)+' gibt seine '+Math.round(headOf(p)/5)+' '+CE("keep")+' ab: Hälfte gegen '+CE("cash")+' tauschen, Rest auf den Kopf des Werfers.':'Kopfgeld '+P(headOf(p))+': die Hälfte bar, die andere Hälfte auf den Kopf des Werfers.')+'</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
+  b.innerHTML='<h3 style="margin:0 0 6px">Wer hat '+esc(p.name)+' rausgeworfen?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">'+(S.mystery?'Der Werfer zieht einen Mystery-Umschlag (Topf gerade '+P(mysPool())+').':S.bchips?esc(p.name)+' gibt seine '+Math.round(headOf(p)/5)+' '+CE("keep")+' ab: Hälfte gegen '+CE("cash")+' tauschen, Rest auf den Kopf des Werfers.':'Kopfgeld '+P(headOf(p))+': '+P(Math.floor(headOf(p)/10)*5)+' bar an den Werfer, '+P(headOf(p)-Math.floor(headOf(p)/10)*5)+' auf seinen Kopf.')+'</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
   const R=b.querySelector(".row"),mk=(t,cls,fn)=>{const x=document.createElement("button");x.className="b "+cls;x.textContent=t;x.onclick=()=>{o.remove();fn();};R.appendChild(x);};
   alive().filter(q=>q!==p).forEach(q=>mk(S.mystery?q.name+" ✉️":q.name+" · 🎯 "+headOf(q),"pri",()=>cb(q.name)));
   mk(S.mystery?"Ohne Werfer (kein Umschlag)":S.bchips?"Ohne Werfer":"Ohne Werfer (Kopf in den Pot)","",()=>cb(null));mk("Abbrechen","",()=>{});
