@@ -26,17 +26,6 @@
    "src": "clips/benno-1.mp4"
   },
   {
-   "id": "manu-sf",
-   "p": "Manu",
-   "t": "🏆 Straight Flush",
-   "src": "clips/manu-1.mp4",
-   "rekord": {
-    "ey": "🏆 Neuer Hausrekord",
-    "title": "Straight Flush",
-    "text": "6♦ 2♦ · 2 bis 6 Karo · der erste im Club"
-   }
-  },
-  {
    "id": "manu-1",
    "p": "Manu",
    "t": "Money Rain",
@@ -45,7 +34,7 @@
   {
    "id": "manu-2",
    "p": "Manu",
-   "t": "Manu Clip",
+   "t": "Manu Car",
    "src": "clips/manu-2.mp4"
   },
   {
@@ -111,7 +100,7 @@
   },
   {
    "id": "rap-tim-niki",
-   "p": "Alle",
+   "p": "Tim & Niki",
    "t": "🎤 Rap: Tim & Niki",
    "src": "clips/tim-niklas-1.mp4"
   },
@@ -128,6 +117,18 @@
    "p": "Magg",
    "t": "Peaky Blinders",
    "src": "clips/magg-1.mp4",
+   "raus": "20.11.2026 Tim"
+  },
+  {
+   "id": "manu-sf",
+   "p": "Manu",
+   "t": "🏆 Straight Flush",
+   "src": "clips/manu-1.mp4",
+   "rekord": {
+    "ey": "🏆 Neuer Hausrekord",
+    "title": "Straight Flush",
+    "text": "6♦ 2♦ · 2 bis 6 Karo · der erste im Club"
+   },
    "raus": "20.11.2026 Tim"
   }
  ]
