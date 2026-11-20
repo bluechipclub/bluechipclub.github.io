@@ -365,6 +365,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 
   <div class="sec">Tische</div>
   <div class="grp">
+    <button class="cell press" id="dfreeBtn"><span class="ic c-gold">🃏</span><span class="tx">Dealerplatz leer<small>Jemand anderes teilt aus, Tim auf Platz 10</small></span><span class="chev">›</span></button>
     <button class="cell press" id="reseatBtn"><span class="ic c-gold">🔀</span><span class="tx">Plätze neu auslosen<small>Mitten im Turnier, Spielstand bleibt</small></span><span class="chev">›</span></button>
     <button class="cell press" id="drawBtn"><span class="ic c-gold">🎲</span><span class="tx">Plätze auslosen<small>Ab 11 Spielern zwei Tische</small></span><span class="chev">›</span></button>
     <button class="cell press" id="tblBtn" hidden><span class="ic c-purple">⇄</span><span class="tx">Tische prüfen<small>Ausgleich vorschlagen</small></span><span class="chev">›</span></button>
@@ -695,6 +696,7 @@ $("mLevel").onclick=()=>{if(noS())return;const L=S.levels||[];let n=0;const W=do
 $("mTime").onclick=()=>{const W=document.createElement("div");W.innerHTML='<div class="row2" style="margin:14px 0 0"><input id="tSet" type="number" inputmode="numeric" placeholder="Minuten im Level"><button class="btn pri press" id="tSetOk">Setzen</button></div>';
   sheet("Zeit einstellen","",[["+ 5 Min","",()=>send({op:"time",add:300},"+5 Min")],["+ 1 Min","",()=>send({op:"time",add:60},"+1 Min")],["− 1 Min","",()=>send({op:"time",add:-60},"−1 Min")],["− 5 Min","",()=>send({op:"time",add:-300},"−5 Min")]],W);
   $("tSetOk").onclick=()=>{const m=+$("tSet").value;if(m>0){closeSheet();send({op:"time",set:Math.round(m*60)},"Uhr auf "+m+" Min");}};};
+$("dfreeBtn").onclick=()=>sheet("Dealerplatz","Leer = ein Ausgeschiedener teilt aus, Tim sitzt auf Platz 10 links neben dem Dealerplatz.",[["Dealerplatz leer","pri",()=>send({op:"dealerfree",v:1},"Dealerplatz leer")],["Tim wieder auf dem Dealerplatz","",()=>send({op:"dealerfree",v:0},"Tim auf Dealerplatz")]]);
 $("reseatBtn").onclick=()=>sheet("Plätze neu auslosen?","Nur neue Sitzplätze, komplett zufällig: jeder hat die gleiche Chance auf jeden Platz und Tisch, auch Tim. Dealer-Button zufällig. Stacks, Rebuys, Bounties, Uhr und Level bleiben.",[["🔀 Jetzt neu auslosen","pri",()=>send({op:"reseat"},"Plätze neu auslosen")]]);
 $("drawBtn").onclick=()=>sheet("Plätze auslosen?",(S&&S.started?"Achtung: Das Turnier läuft schon! ":"")+"Ab 11 Spielern zwei Tische. Tim Platz 10, Manu 50/50 Platz 9 oder 1, Niki am anderen Tisch.",[["🎲 Jetzt auslosen","pri",()=>send({op:"draw"},"Plätze auslosen")]]);
 $("tblBtn").onclick=()=>send({op:"tables"},"Tische prüfen");
