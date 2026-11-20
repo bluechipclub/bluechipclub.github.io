@@ -137,6 +137,8 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 
 /* ---------- management tiles ---------- */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 16px 0}
+.qko{display:block;width:auto;margin:14px 16px 4px;height:58px;font-size:18px;font-weight:700;color:#ffd9d4;background:linear-gradient(180deg,rgba(229,103,92,.28),rgba(143,29,29,.32));border:1px solid rgba(229,103,92,.45)}
+.qko small{font-weight:500;opacity:.75;margin-left:6px;font-size:14px}
 .tile{border-radius:18px;padding:14px;text-align:left;background:var(--card);min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
 .tile .ti{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:19px}
 .tile b{font-size:17px;font-weight:600;margin-top:10px}
@@ -293,6 +295,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
     <div class="live-only ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
   </div>
   <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button></div></div>
+  <button class="btn press live-only qko" id="qKo">✕ Knockout <small>Wer ist raus?</small></button>
   <div class="stats"><div><b id="sPot">–</b><span>Preisgeld P</span></div><div><b id="sPl">–</b><span>Spieler</span></div><div><b id="sEn">–</b><span>Entries</span></div></div>
   <div class="pays" id="pays"></div>
   <div class="cash" id="cash"></div>
@@ -566,13 +569,13 @@ function playerSheet(p){const i=pinfo(p.name),b=[];
   sheet(p.name,(i.seat?i.seat+" · ":"")+"eingesetzt "+fmt(i.cost)+" P"+(i.open?" · "+i.open+" P offen":""),b,head);}
 
 /* ---------- Namen wählen ---------- */
-function picker(title,text,sections,onPick){
+function picker(title,text,sections,onPick,btns){
   const W=document.createElement("div");W.className="pick";
   sections.forEach(([h,list,sub])=>{if(!list.length)return;if(h){const x=document.createElement("h4");x.textContent=h;W.appendChild(x);}
     list.forEach(p=>{const b=document.createElement("button");b.className="press"+(sub&&sub(p)==="dim"?" dim":"");b.innerHTML=avHtml(p.name)+'<span></span>'+(sub&&sub(p)&&sub(p)!=="dim"?'<small>'+esc(sub(p))+'</small>':"");b.querySelector("span").textContent=p.name;
       b.onclick=()=>{closeSheet();setTimeout(()=>onPick(p),220);};W.appendChild(b);});});
   if(!W.children.length)W.innerHTML='<p class="sp" style="grid-column:1/-1">Niemand passend.</p>';
-  sheet(title,text,[],W);}
+  sheet(title,text,btns||[],W);}
 /* Tim 19.11.: beim Buchen nur Bar oder Offen. Offen = überweist später, steht rot in Kasse und Tafel. */
 function payButtons(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["Offen (überweist später)","red",()=>fn("offen")]];}
 function payButtonsLater(fn){return [["💵 Bar bezahlt","pri",()=>fn("bar")],["✓ Überwiesen (bezahlt)","blue",()=>fn("dig")],["Offen","red",()=>fn("offen")]];}
@@ -590,7 +593,11 @@ function rebuyFlow(p){const i=pinfo(p.name),re=p.entries.length-1,warn=[];
   if(i.canRe&&D.reOpen)sheet(p.name+" · Rebuy "+fmt(S.rebuy)+" P","Bargeldregel: bar an der Kasse. Zählt nur einmal, auch wenn zwei Handys tippen.",payButtons((v,to)=>go(v,false,to)));
   else sheet(p.name+" · Rebuy","Achtung: "+warn.join(" "),[["Trotzdem buchen (bar)","red",()=>go("bar",true)],["Trotzdem buchen (offen)","red",()=>go("offen",true)]]);}
 function outFlow(p){
-  if(S.bounty){picker("Wer hat "+p.name+" rausgeworfen?","",[["",active().filter(x=>x.name!==p.name)]],x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"));return;}
+  /* Bounty: 2. Tipp = Werfer. Nur Spieler vom selben Tisch, mit Kopfgeld; Tafel rechnet alles (Tim 20.11.) */
+  if(S.bounty){const hd=x=>!x.entries.length?0:(x.head==null?S.bounty:x.head),h=hd(p),bar=S.mystery?0:Math.min(h,Math.ceil(h/10)*5),t=pinfo(p.name).t;
+    const mates=orderOf(active().filter(x=>x.name!==p.name&&(!D.two||pinfo(x.name).t===t)));
+    picker("Wer hat "+p.name+" rausgeworfen?",S.mystery?"Der Werfer zieht einen Mystery-Umschlag.":p.name+"s Kopf: "+h+" P → "+bar+" P bar an den Werfer, "+(h-bar)+" P auf seinen Kopf.",[["",mates,x=>S.mystery?"":"🎯 "+hd(x)+" P"]],
+      x=>send({op:"out",name:p.name,by:x.name},x.name+" wirft "+p.name+" raus"),[["Ohne Werfer"+(S.mystery?"":" (Kopf in den Pot)"),"",()=>send({op:"out",name:p.name},p.name+" raus")]]);return;}
   sheet(p.name+" ist raus?",D.reOpen&&pinfo(p.name).canRe?"Danach kann "+p.name+" noch einen Rebuy machen.":"",[["Ja, "+p.name+" ist raus","red",()=>send({op:"out",name:p.name},p.name+" raus")]]);}
 function paidFlow(p){const b=p.entries.map((e,j)=>[(j?"Rebuy "+j:"Buy-in")+": "+PAYL(e.paid,e.to),e.paid==="offen"?"red":"",()=>sheet((j?"Rebuy "+j:"Buy-in")+" · "+p.name,"Wie wurde bezahlt?",payButtonsLater((v,to)=>send({op:"paid",name:p.name,entry:j+1,paid:v,to},p.name+": "+PAYL(v,to))))]);
   sheet(p.name+" · Bezahlung","Antippen zum Ändern",b);}
@@ -608,6 +615,8 @@ $("qRebuy").onclick=()=>{if(!S)return;const out=S.players.filter(p=>p.out),inn=a
 $("qOut").onclick=()=>{if(!S)return;const g=D.two?[["Großer Tisch",orderOf(active().filter(p=>pinfo(p.name).t===1))],["Tisch 2",orderOf(active().filter(p=>pinfo(p.name).t===2))]]:[["",orderOf(active())]];
   picker("Wer ist raus?","",g,outFlow);};
 $("qAdd").onclick=()=>addFlow("");
+/* Übersicht: Knockout in 2 Tipps (Opfer, dann Werfer) */
+$("qKo").onclick=()=>$("qOut").onclick();
 $("qPaid").onclick=()=>{if(!S)return;const open=S.players.filter(p=>pinfo(p.name).open),rest=S.players.filter(p=>!pinfo(p.name).open);
   picker("Bezahlung ändern",open.length?open.length+" mit offenem Betrag":"Alles bezahlt ✓",[["Offen",open,p=>pinfo(p.name).open+" P"],["Alle",rest]],paidFlow);};
 $("qDealer").onclick=()=>{if(!S)return;const b=[];
