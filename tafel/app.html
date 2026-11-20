@@ -744,6 +744,7 @@ $("qNote").onclick=noteSheet;
 function renderAbr(){const A=$("abr"),tx=D.tx||[];
   let h=tx.length?"":'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts zu verteilen</span></div>';
   tx.forEach((t,i)=>h+='<button class="cell press" data-i="'+i+'"><span class="ic '+(t.done?'c-green':'c-grey')+'">'+(t.done?'✓':'○')+'</span><span class="tx" style="'+(t.done?'opacity:.5;text-decoration:line-through':'')+'">'+esc(t.from)+' → '+esc(t.to)+'</span><span class="val" style="color:'+(t.done?'var(--sub)':'var(--gold2)')+'">'+fmt(t.amount)+' P</span></button>');
+  if(tx.length&&(D.why||[]).concat(D.how||[]).length)h+='<div class="cell"><span class="tx" style="font-size:13px;color:var(--sub);line-height:1.45;white-space:normal">'+(D.why||[]).concat(D.how?[D.how]:[]).map(esc).join("<br>")+'</span></div>';
   h+='<button class="cell press" id="abrCopy"><span class="ic c-green">⧉</span><span class="tx">WhatsApp-Text kopieren</span></button><button class="cell press" data-c2="result"><span class="ic c-gold">📺</span><span class="tx">Abrechnung auf dem Bildschirm</span></button><button class="cell press" id="pdfBtn"><span class="ic c-red">PDF</span><span class="tx">PDF-Abrechnung am Handy<small>Zum Teilen oder Speichern</small></span></button><button class="cell press" id="expBtn"><span class="ic c-grey">⬇</span><span class="tx">Export-Datei am Handy</span></button><button class="cell press live-only" data-c2="export"><span class="ic c-grey">⬇</span><span class="tx">PDF + Export an der Haupttafel</span></button>';
   A.innerHTML=h;
   A.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const t=tx[+b.dataset.i];send({op:"txd",k:t.k,v:!t.done},(t.done?"Wieder offen: ":"Erledigt: ")+t.from+" → "+t.to);});
@@ -930,6 +931,9 @@ async function makePdf(){if(!S)return;let J;try{J=await loadJsPDF();}catch(e){to
       if(t.done){col(GREEN,"f");doc.roundedRect(M+6,yy-3.4,4.2,4.2,1,1,"F");A(1);col(NIGHT,"d");doc.setLineWidth(.6);doc.lines([[1,1.2],[1.9,-2.4]],M+6.9,yy-1.3);}A(1);
       F("bold",10,FG);T(t.from,M+14,yy);const w1=doc.getTextWidth(t.from);F("normal",9,GOLD);T("  an  ",M+14+w1,yy);const w2=doc.getTextWidth("  an  ");F("bold",10,FG);T(t.to,M+14+w1+w2,yy);
       F("bold",10,t.done?SUB:GOLD2);T(fmt(t.amount)+" P",W-M-6,yy,{align:"right"});if(t.done){F("normal",7,GREEN);T("bezahlt",W-M-26,yy,{align:"right"});}});});
+  /* ---- Warum + wohin (Tim 20.11.: jeder muss wissen, wohin) ---- */
+  {const wl=[];doc.setFontSize(9);(D.why||[]).concat(D.how&&tx.length?[D.how]:[]).forEach(x=>doc.splitTextToSize(x,W-2*M-16).forEach((l,i)=>wl.push((i?"   ":"•  ")+l)));
+   if(wl.length)card("So wird bezahlt",wl.length*5.2,y0=>wl.forEach((l,r)=>{F("normal",9,SUB);T(l,M+6,y0+r*5.2);}));}
   /* ---- Notizen ---- */
   const nl=[];doc.setFontSize(9.5);(S.notes||[]).forEach(n=>doc.splitTextToSize(n.text,W-2*M-16).forEach((l,i)=>nl.push((i?"   ":"•  ")+l)));
   if(nl.length)card("Notizen",nl.length*5.4,y0=>nl.forEach((l,r)=>{F("normal",9.5,FG);T(l,M+6,y0+r*5.4);}));

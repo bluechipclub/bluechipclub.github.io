@@ -721,7 +721,7 @@ const PAY_TIERS=[{min:0,p:[65,35]},{min:8,p:[50,30,20]},{min:13,p:[45,27,17,11]}
 function payPcts(){const n=allP().filter(p=>p.entries.length).length;let t=PAY_TIERS[0];PAY_TIERS.forEach(x=>{if(n>=x.min)t=x;});return t.p;}
 function payouts(){
   const pot=potOf(),c=S.pay,r=c.round||1;
-  if(c.auto!==false){const pc=payPcts(),a=pc.map(x=>Math.floor(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;}
+  if(c.auto!==false){const pc=payPcts(),a=pc.map(x=>Math.round(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;} /* 20.11.: auf 5 runden statt abrunden, damit die hinteren Plätze nicht zu kurz kommen */
   // percentage split, e.g. pcts [50,30,20]; rounding remainder goes to 1st
   if(Array.isArray(c.pcts)&&c.pcts.length&&S.players.length>=8){const a=c.pcts.map(x=>Math.floor(pot*x/100/r)*r);a[0]+=pot-a.reduce((x,y)=>x+y,0);return a;}
   if(c.places<3||S.players.length<8){const a=Math.round(pot*c.split/100/r)*r;return [a,pot-a];}
@@ -750,7 +750,7 @@ function preFor(){if(!(CUR.pre&&S.pre&&S.pre.base===CUR.base))return null;if(!CU
 function preActive(){const e=preFor();return e&&!S.players.some(p=>p.out)&&timIn()?e:null;}
 function pickPre(a){S.pre=null;if(SIMPLE||!CUR.pre||!a.some(p=>/^tim$/i.test(String(p.name).trim())))return a;const want=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join(),c=CUR.pre.filter(e=>e&&e.seats&&Object.values(e.seats).map(pKey).sort().join()===want);if(!c.length)return a;const e=c[Math.floor(Math.random()*c.length)];S.pre=Object.assign({base:CUR.base},e);S.timV=e.tim==="hoodie"?1:0;const tim=a.find(p=>/^tim$/i.test(String(p.name).trim())),ord=Object.keys(e.seats).sort((x,y)=>x-y).map(n=>a.find(p=>pKey(p.name)===pKey(e.seats[n])));return [...ord,tim];}
 /* Jan kommt nicht mehr an den Tisch (Liga/Profile bleiben). Steht er noch in einem alten Stand, fliegt er raus. */
-const NOT_AT_TABLE=["jan"];
+const NOT_AT_TABLE=[]; /* 20.11.: war ["jan"] (altes Turnier) und hat Jan beim Neuladen der Tafel gelöscht. Leer lassen. */
 function dropNotAtTable(){const n=S.players.length;S.players=S.players.filter(p=>!NOT_AT_TABLE.includes(String(p.name).trim().toLowerCase()));if(S.players.length!==n){if(S.dealer>=S.players.length)S.dealer=0;S.pre=null;return true;}return false;}
 /* Nie leere Namensschilder ohne Figuren: wurde für genau diese Spieler noch nicht ausgelost, wird einmal automatisch ausgelost. */
 function autoSeat(){try{if(SIMPLE||!T10||!T10.pre||!T10.lib)return;const n=S.players.length,tim=S.players.some(p=>/^tim$/i.test(String(p.name).trim()));if(n<2||n>T10.seats.length+1||!tim||S.players.some(p=>p.out))return;
@@ -1079,9 +1079,16 @@ function toast(t){if(isHaupt()&&typeof fx==="function")fx("toast",{t});const e=$
 /* ---------- players ---------- */
 const PAY_NEXT={bar:"dig",dig:"offen",offen:"bar"};
 const PAY_TXT={bar:"bar",dig:"überwiesen",offen:"offen"};
+function undoRebuy(p){if(!p||p.entries.length<2)return false;const e=p.entries.pop(),wo=e.wo;
+  if(wo){if(wo.h==null)delete p.head;else p.head=wo.h;
+    if(wo.out&&!p.out){p.out=wo.out;delete p.chair;S.outOrder=S.outOrder.filter(n=>n!==p.name);S.outOrder.splice(Math.max(0,Math.min(wo.i,S.outOrder.length)),0,p.name);}}
+  else if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty); /* alte Einträge ohne Merker */
+  log("rebuy-undo",{name:p.name});if(twoT())setTimeout(()=>checkTables(true),300);return true;}
 function doRebuy(name,paid,to){
   const p=pl(name);if(!p)return false;
-  p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar",to:payTo(paid,to)});
+  /* wo = Stand vor dem Rebuy, damit „−1“ einen versehentlichen Rebuy sauber zurücknimmt (Spieler wieder raus, gleicher Platz, gleicher Kopf) */
+  const wo=p.out?{out:p.out,i:S.outOrder.indexOf(p.name),h:p.head==null?null:p.head}:{h:p.head==null?null:p.head};
+  p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar",to:payTo(paid,to),wo});
   potPop(S.rebuy-feeRe()-(S.bounty||0));
   if(S.bounty&&!S.mystery)p.head=p.out?S.bounty:headOf(p)+S.bounty;
   if(p.out){p.out=null;delete p.chair;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
@@ -1158,7 +1165,7 @@ function openPlayers(focus){if(!isHaupt())return;
     const add=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;R.appendChild(b);};
     const canRe=S.maxRe==null||p.entries.length-1<S.maxRe;
     add("+1 Rebuy",rebuyOpen()&&canRe?"":"",()=>{const go=()=>{doRebuy(p.name);openPlayers();};const w=[!rebuyOpen()?"Die Rebuy-Phase ist vorbei.":"",!canRe?"Das Rebuy-Limit ist erreicht.":""].filter(Boolean).join(" ");if(w)ask(w+" Trotzdem eintragen?","Trotzdem eintragen",go,true);else go();});
-    if(p.entries.length>1)add("−1","",()=>{p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});save();render();openPlayers();});
+    if(p.entries.length>1)add("−1","",()=>{undoRebuy(p);save();render();openPlayers();});
     if(!p.out)add("Raus","red",()=>{const fin=by=>{doOut(p.name,by);if(!$("ann").hidden)return;openPlayers();};if(!S.bounty)return fin();pickHunter(p,fin);});
     else add("Zurück ins Spiel","",()=>{doBack(p.name);openPlayers();});
     if(two&&!p.out)add(tblOf(p)===1?"→ Tisch 2":"→ großer Tisch","",()=>{moveP(p.name,3-tblOf(p));openPlayers();});
@@ -1210,7 +1217,7 @@ function openResult(){
   order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win)+(r.bounty?' <small style="color:#999">(🎯 '+r.bounty+')</small>':''):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
   h+='</tbody>';$("rTable").innerHTML=h;
   $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+P(s.feeTotal):"")+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ")+(S.bounty?(S.bchips?" · Bounty-Kasse "+P(totalEntries()*S.bounty)+" bleibt bei "+S.bank+", wird gegen 🟡-Chips ausgezahlt (5 P pro Chip, Sieger auch seine 🔵)":S.mystery?" · Mystery Bounty "+P(totalEntries()*S.bounty)+" (im Gewinn enthalten)":" · Kopfgelder "+P(totalEntries()*S.bounty-(S.lostHeads||0))+" (im Gewinn enthalten)"):"");
-  $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. Claude prüft das nach dem Export noch mal.";
+  $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. "+txWhy().join(" ")+" "+payHow();
   $("sTable").innerHTML=s.tx.length?'<tbody>'+s.tx.map(t=>'<tr style="'+(t.done?'opacity:.45':'')+'"><td>'+esc(t.from)+'</td><td>→</td><td>'+esc(t.to)+'</td><td class="num"><b>'+P(t.amount)+'</b></td><td>'+(t.done?'✓ erledigt':'offen')+'</td></tr>').join("")+'</tbody>':'<tbody><tr><td>Noch nichts zu verteilen.</td></tr></tbody>';
   $("mResult").hidden=false;
 }
@@ -1301,12 +1308,21 @@ function pdfPrint(){
     '<h2>Alle Spieler</h2><table><tr><th>Platz</th><th>Spieler</th><th>Entries</th><th>Eingesetzt</th><th>Bezahlt</th><th>Offen</th><th>Gewinn</th><th class="r">+/-</th></tr>'+order.map(r=>'<tr><td>'+(r.place||"-")+'</td><td>'+esc(r.name)+'</td><td>'+r.entries+'</td><td>'+r.cost+'</td><td>'+r.paid+'</td><td>'+(r.open||"-")+'</td><td>'+(r.win||"-")+'</td><td class="r">'+r.net+'</td></tr>').join("")+'</table>');
   w.document.close();setTimeout(()=>w.print(),400);
 }
+/* Tim 20.11.: Jeder muss wissen, wohin er zahlt. PayPal/Bank von Tim hier eintragen, sobald Tim sie schickt (z. B. "PayPal: name@mail"). */
+const KASSE_PAY="";
+function payHow(){return "So wird bezahlt: Bar am Abend direkt an den Empfänger. Wer überweist, fragt den Empfänger nach PayPal/Kontodaten. „"+S.bank+" (Kasse)“ heißt: an "+S.bank+(KASSE_PAY?" ("+KASSE_PAY+")":"")+".";}
+/* Erklärt, warum jemand zahlt oder bekommt, z. B. wenn Geld per Überweisung direkt bei einem Spieler gelandet ist */
+function txWhy(){const s=settlement(),L=[];
+  S.players.forEach(q=>q.entries.forEach((e,j)=>{if(e.paid==="dig"&&e.to&&pl(e.to)&&!isBank(pl(e.to)))L.push(e.to+" hat "+entPrice(q,j)+" P von "+q.name+" direkt überwiesen bekommen und gibt das weiter.");}));
+  s.rows.forEach(r=>{if(r.open&&r.win)L.push(r.name+": "+r.win+" P Gewinn minus "+r.open+" P offener Einsatz"+(r.held?" minus "+r.held+" P direkt erhalten":"")+" = "+(r.bal>=0?"bekommt "+r.bal+" P":"zahlt "+(-r.bal)+" P")+".");
+    else if(r.open)L.push(r.name+": zahlt seinen offenen Einsatz von "+r.open+" P.");});
+  return L;}
 function summaryText(){
   const s=settlement();
   const order=s.rows.slice().sort((a,b)=>(a.place||99)-(b.place||99));
   return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+s.feeTotal+" P":"")+(S.bounty&&S.mystery?" · Mystery Bounty "+totalEntries()*S.bounty+" P":"")+(S.bounty&&S.bchips?" · Bounty-Kasse "+totalEntries()*S.bounty+" P (gegen 🟡-Chips, 5 P pro Chip)":"")+"\n\n"+
     order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win+(r.bounty?" (davon Kopfgeld "+r.bounty+")":""):"")).join("\n")+
-    "\n\nZahlungen:\n"+(s.tx.map(t=>(t.done?"✓ ":"")+t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine")+((S.notes||[]).length?"\n\nNotizen:\n"+S.notes.map(n=>"- "+n.text).join("\n"):"");
+    "\n\nZahlungen:\n"+(s.tx.map(t=>(t.done?"✓ ":"")+t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine")+(s.tx.length?(txWhy().length?"\n\nWarum:\n"+txWhy().map(x=>"- "+x).join("\n"):"")+"\n\n"+payHow():"")+((S.notes||[]).length?"\n\nNotizen:\n"+S.notes.map(n=>"- "+n.text).join("\n"):"");
 }
 $("bExport").onclick=download;$("rExport").onclick=download;
 $("rCopy").onclick=async()=>{const t=summaryText();try{await navigator.clipboard.writeText(t);toast("Text kopiert");}catch(e){ask(t,"OK",()=>{});}};
@@ -1602,7 +1618,7 @@ function runCmd(c){
     case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
     case "entries":{const te=totalEntries(),re=te-S.players.length;announce({eyebrow:"Heute Abend",title:te+" Entries",text:S.players.length+" Buy-ins + "+re+(re===1?" Rebuy":" Rebuys")+" · Preisgeld "+P(potOf()),sec:c.sec||25});break;}
     case "restart":restartTournament();break;
-    case "undo":{const p=pl(c.name);if(p&&p.entries.length>1){p.entries.pop();if(S.bounty)p.head=Math.max(0,headOf(p)-S.bounty);log("rebuy-undo",{name:p.name});}break;}
+    case "undo":{const p=pl(c.name);if(p)undoRebuy(p);break;}
     default:return;
   }}catch(e){console.warn("cmd",c,e);}
   log(c.src||"claude",{op,cmd:c});save();render();pushState();
@@ -1952,8 +1968,9 @@ const SB_URL="https://zquwffzeracrvpemlgtc.supabase.co",SB_KEY="sb_publishable_E
 const SYNC_CH="tafel-"+KEY.replace(/[^a-z0-9-]/gi,"");
 const DEV=(()=>{try{let d=sessionStorage.getItem("bcc-dev");if(!d){d=Math.random().toString(36).slice(2,9);sessionStorage.setItem("bcc-dev",d);}return d;}catch(e){return Math.random().toString(36).slice(2,9);}})();
 let sbc=null,chan=null,chanOk=false,seq=0,lastHauptAt=0,lastHauptDev=null,peers={};
-const SEEN=new Set(),seenList=[];
-function seenCmd(id){if(SEEN.has(id))return true;SEEN.add(id);seenList.push(id);if(seenList.length>500)SEEN.delete(seenList.shift());return false;}
+/* 20.11.: gesehene Befehle auch nach Neuladen merken, damit ein nachgeholter Befehl (ntfy) nicht doppelt gebucht wird */
+const seenList=(()=>{try{return JSON.parse(localStorage.getItem(KEY+"-seen")||"[]").slice(-300);}catch(e){return [];}})(),SEEN=new Set(seenList);
+function seenCmd(id){if(SEEN.has(id))return true;SEEN.add(id);seenList.push(id);if(seenList.length>300)SEEN.delete(seenList.shift());clearTimeout(seenCmd.t);seenCmd.t=setTimeout(()=>{try{localStorage.setItem(KEY+"-seen",JSON.stringify(seenList));}catch(e){}},400);return false;}
 function bc(ev,payload){if(!chan||!chanOk)return;try{chan.send({type:"broadcast",event:ev,payload:Object.assign({from:DEV,role:ROLE,now:Date.now()},payload)});}catch(e){}}
 function fx(k,d){if(!isHaupt())return;bc("fx",Object.assign({k},d||{}));}
 function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[]).length;o.lastLog=(S.log||[]).slice(-30);
@@ -1965,7 +1982,7 @@ function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[])
     p:Object.fromEntries(allP().map(p=>[p.name,{t:S.mt?tblOf(p):1,place:placeOf(p)||0,cost:costOf(p),open:p.entries.reduce((a,e,j)=>a+(e.paid==="offen"?entPrice(p,j):0),0),canRe:canRebuy(p),seat:seatLabel(p)}])),
     order:S.mt?[...seatOrder(1),...seatOrder(2)].map(p=>p.name):S.players.map(p=>p.name),avg:alive().length?Math.round((totalEntries()*S.stack+allP().filter(p=>p.eb).length*(S.eb||0))/alive().length):0};
   o.D.scr=scrState();try{o.D.lob=lobbyGroups().map(g=>({id:g.id,label:g.label,n:g.slides.length,on:lobOn(g.id)}));}catch(e){}
-  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
+  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.why=txWhy();o.D.how=payHow();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
   return o;}
 /* was gerade groß auf dem Bildschirm läuft (für die Steuerleiste in der App) */
 function scrState(){const a=$("ann"),h=a&&!a.hidden?(a.querySelector("h3")||{}).textContent||"":"",ok=a&&!a.hidden&&$("annOk")?$("annOk").textContent:"";
@@ -1976,7 +1993,7 @@ function syncState(now){if(!isHaupt())return;if(now){clearTimeout(syncState.t);s
 let mirrorKey="";
 function onState(p){
   if(p.from===DEV)return;
-  if(isHaupt()){ /* zweite Haupttafel im Kanal */ if(p.role==="haupt")warnTwo(p.from);return;}
+  if(isHaupt()){ /* zweite Haupttafel im Kanal */ if(p.role==="haupt"){warnTwo(p.from,p.S&&p.S.savedAt);if(isHaupt()&&!(onState.r&&Date.now()-onState.r<10000)){onState.r=Date.now();syncState(true);}}return;}
   lastHauptAt=Date.now();lastHauptDev=p.from;
   const off=p.now-Date.now();CLK_OFF=Math.abs(off-CLK_OFF)>1500?off:CLK_OFF*.8+off*.2;
   const keepLog=S.log;S=Object.assign(fresh(),p.S,{log:keepLog});LEVELS=S.levels;
@@ -2007,7 +2024,12 @@ function runVis(c){try{const op=c.op;
 }catch(e){}}
 function announceLocal(o){const was=ROLE;ROLE="__";try{announce(o);}finally{ROLE=was;}}
 function toastLocal(t){const was=ROLE;ROLE="__";try{toast(t);}finally{ROLE=was;}}
-function warnTwo(other){if(warnTwo.t&&Date.now()-warnTwo.t<60000)return;warnTwo.t=Date.now();toastLocal("⚠ Noch eine Haupttafel ist offen. Eine davon auf „Spiegel“ stellen (⚙).");}
+const BOOT_AT=Date.now();
+function warnTwo(other,theirSave){
+  /* 20.11.: Ein Gerät, das gerade erst geöffnet wurde und eine laufende Haupttafel findet, wird selbst Spiegel und holt sich den aktuellen Stand.
+     So bucht eine zurückkommende alte Tafel nichts doppelt und überschreibt nichts. */
+  if(Date.now()-BOOT_AT<30000&&theirSave&&theirSave>(S.savedAt||0)){setRole("spiegel",true);toastLocal("Es läuft schon eine Haupttafel. Dieses Gerät ist jetzt Spiegel und holt den aktuellen Stand.");return;}
+  if(warnTwo.t&&Date.now()-warnTwo.t<60000)return;warnTwo.t=Date.now();toastLocal("⚠ Noch eine Haupttafel ist offen. Eine davon auf „Spiegel“ stellen (⚙).");}
 /* Haupttafel: Ann/Intro zu → auf den Spiegeln auch zu */
 new MutationObserver(()=>{if(isHaupt()&&$("ann").hidden)fx("annhide");}).observe($("ann"),{attributes:true,attributeFilter:["hidden"]});
 new MutationObserver(()=>{if(isHaupt()&&$("intro").hidden)fx("introhide");}).observe($("intro"),{attributes:true,attributeFilter:["hidden"]});
