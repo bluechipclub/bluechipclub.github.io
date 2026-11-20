@@ -913,6 +913,8 @@ function checkTables(quiet){
   /* 20.11. (Tim): fair = gleich viele an beiden Tischen. Von Hand „Tische prüfen“ zählt nur, wer wirklich spielt (Ausgeschiedene in der Rebuy-Phase nicht). */
   const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
   const big=c1>c2?1:2,diff=Math.abs(c1-c2);
+  /* 20.11. (Tim): in der Rebuy-Phase nach Knockouts keinen Wechsel von selbst vorschlagen – wer rebuyt, bleibt auf seinem Platz. Nur „Tische prüfen“ von Hand. */
+  if(quiet&&rebuyOpen()&&diff>=2){if(S.pend&&S.pend.op==="move"){S.pend=null;save();render();}return;}
   if(diff<2||(big===2&&c1>=CAP1)){if(S.pend){S.pend=null;save();render();}
     if(!quiet)announce({eyebrow:"Tische prüfen",title:"Tische sind ausgeglichen",text:"Großer Tisch: "+c1+" · Tisch 2: "+c2+" Spieler. Kein Wechsel nötig.",btn:"OK"});return;}
   const k=Math.floor(diff/2),ms=moveCands(big,k);if(!ms.length)return;const p=ms[0],nm=ms.map(q=>q.name);
