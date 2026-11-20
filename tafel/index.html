@@ -1399,7 +1399,17 @@ function drawSeats(){
 }
 /* 12.11.: Show nach „Plätze auslosen“: Ansager + alle Karten auf einen Blick, dann jede Karte einzeln in Sitzreihenfolge (Tim zuletzt am Dealer-Platz), dann die Sitzordnung */
 const DRAW_SHOW=true;
-function drawShow(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
+/* 20.11.: Bounty-Erklärvideo vor der Auslosung (Datei vom Video-Thread: video/bounty-erklaer.mp4). Spielt einmal pro Turnier (S.bvidDone), abschaltbar (S.bvidOff, Op bvid).
+   Fehlt die Datei oder bricht sie ab, geht es sofort mit der Auslosung weiter. „Überspringen“ in der App = skipintro. */
+const BVID="video/bounty-erklaer.mp4";
+function bvidShow(muted,done){if(intro)intro.stop();closeAll();$("ann").hidden=true;
+  const o=document.createElement("div");o.id="bvid";o.style.cssText="position:fixed;inset:0;z-index:9000;background:#000;display:flex;align-items:center;justify-content:center";
+  const v=document.createElement("video");v.src=BVID+"?v=1";v.poster="video/bounty-erklaer-poster.jpg";v.playsInline=true;v.muted=!!muted||!!window.__noSnd;v.style.cssText="width:100%;height:100%;object-fit:contain";o.appendChild(v);document.body.appendChild(o);
+  let fin=false;const end=()=>{if(fin)return;fin=true;try{v.pause();}catch(e){}o.remove();if(intro&&intro.bvid)intro=null;done&&done();};
+  intro={bvid:1,next:end,stop:end};v.onended=end;v.onerror=end;
+  const pr=v.play();if(pr&&pr.catch)pr.catch(()=>{v.muted=true;v.play().catch(end);});}
+function drawShow(){if(isHaupt()&&!S.bvidOff&&!S.bvidDone&&S.bounty&&!S.mystery){S.bvidDone=Date.now();save();fx("bvid",{});bvidShow(false,drawShow2);return;}drawShow2();}
+function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
   const grid='<div class="draw'+(a.length>10?' two':'')+'">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
   announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
   let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>drawOverview(S.players),twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
@@ -1645,6 +1655,7 @@ function runCmd(c){
     case "lobbyclose":lobbyClose();break;
     case "close":if(typeof clipStop==="function"&&clipStop())break;if(intro){intro.next();break;}closeAll();$("ann").hidden=true;break;
     case "skipintro":if(intro)intro.stop();break;
+    case "bvid":{if(c.off!=null)S.bvidOff=!!c.off;if(c.again)S.bvidDone=0;save();if(c.play){fx("bvid",{});bvidShow(false,null);}break;}
     case "lobbyset":S.lobbyOff=(S.lobbyOff||[]).filter(x=>x!==c.id);if(!c.on)S.lobbyOff.push(c.id);break;
     case "lobbynav":if(lobbyNav)lobbyNav(c.d<0?-1:1);break;
     case "annok":if(!$("ann").hidden&&$("annOk"))$("annOk").click();break;
@@ -2022,7 +2033,7 @@ function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[])
   return o;}
 /* was gerade groß auf dem Bildschirm läuft (für die Steuerleiste in der App) */
 function scrState(){const a=$("ann"),h=a&&!a.hidden?(a.querySelector("h3")||{}).textContent||"":"",ok=a&&!a.hidden&&$("annOk")?$("annOk").textContent:"";
-  return {ann:!!(a&&!a.hidden),annT:h,annB:ok,intro:!!intro,lobby:!$("lobby").hidden};}
+  return {ann:!!(a&&!a.hidden),annT:h,annB:ok,intro:!!intro&&!intro.bvid,bvid:!!(intro&&intro.bvid),lobby:!$("lobby").hidden};}
 setInterval(()=>{if(!isHaupt())return;const k=JSON.stringify(scrState());if(k!==scrState.k){scrState.k=k;syncState(true);}},600);
 function syncState(now){if(!isHaupt())return;if(now){clearTimeout(syncState.t);syncState.t=null;bc("state",{seq:++seq,S:stateLite()});return;}
   if(syncState.t)return;syncState.t=setTimeout(()=>{syncState.t=null;bc("state",{seq:++seq,S:stateLite()});},250);}
@@ -2038,6 +2049,7 @@ function onState(p){
 function onCmd(p){if(!isHaupt()||!p||!p.c)return;const c=p.c;if(c._id&&seenCmd(c._id))return;runCmd(Object.assign({src:p.src||"app"},c));if(c._id)bc("ack",{id:c._id});if(c._u&&c._l)bc("fx",{k:"done",u:c._u,l:c._l,dev:p.from});}
 function onFx(p){if(isHaupt()||p.from===DEV)return;lastHauptAt=Date.now();
   if(p.k==="ann"){announceLocal(p.o);}
+  if(p.k==="bvid"){bvidShow(true,null);}
   else if(p.k==="annhide"){$("ann").hidden=true;}
   else if(p.k==="toast"){toastLocal(p.t);}
   else if(p.k==="cmd"){runVis(p.c);}
