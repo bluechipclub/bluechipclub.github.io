@@ -959,7 +959,7 @@ function render(){
   $("brkCap").textContent=L.brk?"Weiter in":"Nächste Pause";
   $("brk").textContent=L.brk?mmss(left):found===null?"keine mehr":"in "+Math.round(found/60)+" Min";
   const pot=potOf(),pays=payouts();
-  $("pot").innerHTML=fmt(pot)+" <small>P</small>"+(S.bounty?'<small style="display:block;font-size:.32em;letter-spacing:.06em;color:var(--gold2,#f0d48a);margin-top:.4vh">+ '+(S.bchips?fmt(totalEntries()*S.bounty)+' P Bounty-Kasse 🔵🟡':S.mystery?fmt(mysPool())+' P Mystery Bounty ✉️':fmt(totalEntries()*S.bounty-(S.lostHeads||0))+' P Kopfgelder 🎯')+'</small>':"");
+  $("pot").innerHTML=fmt(pot)+" <small>P</small>"+(S.bounty?'<small style="display:block;font-size:.32em;letter-spacing:.06em;color:var(--gold2,#f0d48a);margin-top:.4vh">+ '+(S.bchips?fmt(totalEntries()*S.bounty)+' P Bounty-Kasse '+CE("keep")+''+CE("cash")+'':S.mystery?fmt(mysPool())+' P Mystery Bounty ✉️':fmt(totalEntries()*S.bounty-(S.lostHeads||0))+' P Kopfgelder 🎯')+'</small>':"");
   {const k=kasse();$("potc").innerHTML='Preisgeld <b>'+fmt(pot)+' P</b>'+(k.open?' <span>· '+fmt(k.open)+' P offen</span>':'');
    if(render.lastPot!=null&&pot>render.lastPot&&!isHaupt())potPop(pot-render.lastPot,true);render.lastPot=pot;}
   $("pays").innerHTML=pays.map((v,k)=>'<div class="pay"><span>'+(k+1)+'. PLATZ</span><b>'+P(v)+'</b></div>').join("");
@@ -978,7 +978,8 @@ function render(){
 }
 function renderTicker(){
   if(S.active&&S.activeUntil&&Date.now()>S.activeUntil){S.active=null;S.activeUntil=null;save();}
-  const parts=[];
+  const parts=[],rule=S.bounty&&!S.mystery&&!S.bRuleOff?bRuleText():null;
+  if(rule)parts.push(rule);
   S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
   if(S.pend&&S.pend.op==="move")parts.push("⇄ "+S.pend.name+" wechselt an "+(S.pend.to===1?"den großen Tisch":"Tisch 2"));
   if(S.pend&&S.pend.op==="merge")parts.push("🏆 Final Table: alle an den großen Tisch");
@@ -987,9 +988,10 @@ function renderTicker(){
   if(S.cash)parts.push("💵 "+S.cash);
   {const op=allP().filter(p=>p.entries.some(e=>e.paid==="offen")).map(p=>p.name);if(op.length)parts.push("Noch offen an der Kasse: "+op.join(", "));}
   const pays=payouts();parts.push("Preise: "+pays.map((v,k)=>(k+1)+". "+P(v)).join(" · "));
+  if(rule&&parts.length>3)parts.splice(Math.ceil(parts.length/2),0,rule); /* Regel kommt pro Durchlauf zweimal */
   parts.push("Ein Abend, zehn Plätze, ein Name auf dem Wanderpokal");
   const txt=parts.join("      ◆      ");
-  const sp=$("tick");if(sp.textContent!==txt)sp.textContent=txt;
+  const sp=$("tick");if(sp.textContent!==txt){sp.textContent=txt;sp.style.animationDuration=Math.max(38,Math.round(txt.length*.18))+"s";} /* langsam und gleichmäßig, egal wie lang */
 }
 
 /* ---------- sound ---------- */
@@ -1066,6 +1068,11 @@ function checkGames(){
 }
 
 /* ---------- announcements ---------- */
+/* Bounty-Chipfarben (Tim 20.11.: Farben noch offen, in der App einstellbar). keep = Kopf-Chip, bleibt auf dem Tisch · cash = auszahlbar, in die Tasche */
+const CHIPC={blau:["🔵","Blau"],gelb:["🟡","Gelb"],rot:["🔴","Rot"],gruen:["🟢","Grün"],weiss:["⚪","Weiß"],schwarz:["⚫","Schwarz"],lila:["🟣","Lila"],orange:["🟠","Orange"],braun:["🟤","Braun"]};
+const bcol=()=>Object.assign({keep:"blau",cash:"gelb"},S.bcol||{});
+const CE=k=>(CHIPC[bcol()[k]]||CHIPC[k==="keep"?"blau":"gelb"])[0],CN=k=>(CHIPC[bcol()[k]]||CHIPC[k==="keep"?"blau":"gelb"])[1];
+function bRuleText(){return "🎯 Bounty-Chips: "+CE("cash")+" "+CN("cash")+" = auszahlbar, sofort in die Tasche (am Ende 5 P pro Chip)  ·  "+CE("keep")+" "+CN("keep")+" = dein Kopfgeld, bleibt vor dir auf dem Tisch  ·  Rauswurf: Wer rausfliegt, gibt dem Werfer alle "+CE("keep")+". Die Hälfte tauscht der Werfer bei "+(S.bank||"Tim")+" gegen "+CE("cash")+", der Rest bleibt als "+CE("keep")+" auf seinem Kopf  ·  Rebuy = neuer Kopf mit 2 "+CE("keep");}
 function announce(o){if(isHaupt()&&typeof fx==="function")fx("ann",{o:{eyebrow:o.eyebrow,title:o.title,text:o.text,stake:o.stake,stakesub:o.stakesub,html:o.html,btn:o.btn,sec:o.sec}});
   const b=$("annBox");
   b.innerHTML='<div class="eyebrow">'+esc(o.eyebrow||"")+'</div><h3>'+esc(o.title||"")+'</h3>'+(o.text?'<p>'+esc(o.text)+'</p>':"")+(o.stake?'<div class="stake">'+esc(o.stake)+'</div>':"")+(o.stakesub?'<div class="stakesub">'+esc(o.stakesub)+'</div>':"")+(o.html||"")+'<div><button class="b pri" type="button" id="annOk">'+esc(o.btn||"OK")+'</button></div>';
@@ -1118,7 +1125,7 @@ function doOut(name,by){
   if(ko&&ko.mys!=null){mysShow(ko,p);if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");if(twoT())setTimeout(()=>checkTables(false),9500);return;}
   if(ko&&ko.by){const q=pl(ko.by),king=S.champ&&p.name.toLowerCase()===String(S.champ).toLowerCase();gong();
     const C=v=>Math.round(v/5); /* 1 Chip = 5 P */
-    announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.chips?ko.by+" holt "+C(ko.h)+" 🔵":ko.by+" kassiert "+P(ko.cash),text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+(ko.chips?p.name+" gibt "+ko.by+" seine "+C(ko.h)+" blauen Chips: "+C(ko.cash)+" davon gegen 🟡 tauschen, "+C(ko.add)+" 🔵 kommen auf seinen Kopf. ":"")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
+    announce({eyebrow:king?"👑 Kingslayer":"🎯 Knockout",title:ko.chips?ko.by+" holt "+C(ko.h)+" "+CE("keep")+"":ko.by+" kassiert "+P(ko.cash),text:(king?ko.by+" wirft den Champion "+p.name+" raus! ":p.name+" ist raus. ")+(ko.chips?p.name+" gibt "+ko.by+" seine "+C(ko.h)+" "+CE("keep")+": "+C(ko.cash)+" davon gegen "+CE("cash")+" tauschen, "+C(ko.add)+" "+CE("keep")+" kommen auf seinen Kopf. ":"")+ko.by+"s Kopf ist jetzt "+P(headOf(q))+" wert.",sec:9});
     if(king)burst();}
   if(rebuyOpen())toast(p.name+" ist raus. Rebuy? Unter „Spieler & Rebuys“ +1 tippen.");
   else toast(p.name+" ist raus · Platz "+place);
@@ -1140,7 +1147,7 @@ function winner(p){
 function pickHunter(p,cb){
   const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center";
   const b=document.createElement("div");b.style.cssText="background:#151515;border:1px solid #b8933a;border-radius:14px;padding:22px;max-width:560px;width:92vw";
-  b.innerHTML='<h3 style="margin:0 0 6px">Wer hat '+esc(p.name)+' rausgeworfen?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">'+(S.mystery?'Der Werfer zieht einen Mystery-Umschlag (Topf gerade '+P(mysPool())+').':S.bchips?esc(p.name)+' gibt seine '+Math.round(headOf(p)/5)+' 🔵 ab: Hälfte gegen 🟡 tauschen, Rest auf den Kopf des Werfers.':'Kopfgeld '+P(headOf(p))+': die Hälfte bar, die andere Hälfte auf den Kopf des Werfers.')+'</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
+  b.innerHTML='<h3 style="margin:0 0 6px">Wer hat '+esc(p.name)+' rausgeworfen?</h3><p style="margin:0 0 14px;color:#999;font-size:14px">'+(S.mystery?'Der Werfer zieht einen Mystery-Umschlag (Topf gerade '+P(mysPool())+').':S.bchips?esc(p.name)+' gibt seine '+Math.round(headOf(p)/5)+' '+CE("keep")+' ab: Hälfte gegen '+CE("cash")+' tauschen, Rest auf den Kopf des Werfers.':'Kopfgeld '+P(headOf(p))+': die Hälfte bar, die andere Hälfte auf den Kopf des Werfers.')+'</p><div class="row" style="flex-wrap:wrap;gap:8px"></div>';
   const R=b.querySelector(".row"),mk=(t,cls,fn)=>{const x=document.createElement("button");x.className="b "+cls;x.textContent=t;x.onclick=()=>{o.remove();fn();};R.appendChild(x);};
   alive().filter(q=>q!==p).forEach(q=>mk(S.mystery?q.name+" ✉️":q.name+" · 🎯 "+headOf(q),"pri",()=>cb(q.name)));
   mk(S.mystery?"Ohne Werfer (kein Umschlag)":S.bchips?"Ohne Werfer":"Ohne Werfer (Kopf in den Pot)","",()=>cb(null));mk("Abbrechen","",()=>{});
@@ -1219,7 +1226,7 @@ function openResult(){
   let h='<thead><tr><th>Platz</th><th>Spieler</th><th class="num">Entries</th><th class="num">Eingesetzt</th><th class="num">Bezahlt</th><th class="num">Offen</th><th class="num">Gewinn</th><th class="num">+/−</th></tr></thead><tbody>';
   order.forEach(r=>{h+='<tr><td>'+(r.place?r.place+".":"im Spiel")+'</td><td>'+esc(r.name)+'</td><td class="num">'+r.entries+'</td><td class="num">'+P(r.cost)+'</td><td class="num">'+P(r.paid)+'</td><td class="num '+(r.open?"neg":"")+'">'+(r.open?P(r.open):"–")+'</td><td class="num">'+(r.win?P(r.win)+(r.bounty?' <small style="color:#999">(🎯 '+r.bounty+')</small>':''):"–")+'</td><td class="num '+(r.net>0?"pos":r.net<0?"neg":"")+'">'+(r.net>0?"+":"")+P(r.net)+'</td></tr>';});
   h+='</tbody>';$("rTable").innerHTML=h;
-  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+P(s.feeTotal):"")+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ")+(S.bounty?(S.bchips?" · Bounty-Kasse "+P(totalEntries()*S.bounty)+" bleibt bei "+S.bank+", wird gegen 🟡-Chips ausgezahlt (5 P pro Chip, Sieger auch seine 🔵)":S.mystery?" · Mystery Bounty "+P(totalEntries()*S.bounty)+" (im Gewinn enthalten)":" · Kopfgelder "+P(totalEntries()*S.bounty-(S.lostHeads||0))+" (im Gewinn enthalten)"):"");
+  $("rSub").textContent=(done?"Fertig. ":"Zwischenstand, "+alive().length+" Spieler noch drin. ")+"Pot "+P(s.pot)+" aus "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+P(s.feeTotal):"")+" · Preise "+s.pays.map((v,k)=>(k+1)+". "+P(v)).join(" / ")+(S.bounty?(S.bchips?" · Bounty-Kasse "+P(totalEntries()*S.bounty)+" bleibt bei "+S.bank+", wird gegen "+CE("cash")+"-Chips ausgezahlt (5 P pro Chip, Sieger auch seine "+CE("keep")+")":S.mystery?" · Mystery Bounty "+P(totalEntries()*S.bounty)+" (im Gewinn enthalten)":" · Kopfgelder "+P(totalEntries()*S.bounty-(S.lostHeads||0))+" (im Gewinn enthalten)"):"");
   $("sSub").textContent="Wer offen hat, zahlt direkt an einen Gewinner. Den Rest zahlt die Kasse ("+S.bank+") aus. "+txWhy().join(" ")+" "+payHow();
   $("sTable").innerHTML=s.tx.length?'<tbody>'+s.tx.map(t=>'<tr style="'+(t.done?'opacity:.45':'')+'"><td>'+esc(t.from)+'</td><td>→</td><td>'+esc(t.to)+'</td><td class="num"><b>'+P(t.amount)+'</b></td><td>'+(t.done?'✓ erledigt':'offen')+'</td></tr>').join("")+'</tbody>':'<tbody><tr><td>Noch nichts zu verteilen.</td></tr></tbody>';
   $("mResult").hidden=false;
@@ -1311,9 +1318,8 @@ function pdfPrint(){
     '<h2>Alle Spieler</h2><table><tr><th>Platz</th><th>Spieler</th><th>Entries</th><th>Eingesetzt</th><th>Bezahlt</th><th>Offen</th><th>Gewinn</th><th class="r">+/-</th></tr>'+order.map(r=>'<tr><td>'+(r.place||"-")+'</td><td>'+esc(r.name)+'</td><td>'+r.entries+'</td><td>'+r.cost+'</td><td>'+r.paid+'</td><td>'+(r.open||"-")+'</td><td>'+(r.win||"-")+'</td><td class="r">'+r.net+'</td></tr>').join("")+'</table>');
   w.document.close();setTimeout(()=>w.print(),400);
 }
-/* Tim 20.11.: Jeder muss wissen, wohin er zahlt. PayPal/Bank von Tim hier eintragen, sobald Tim sie schickt (z. B. "PayPal: name@mail"). */
-const KASSE_PAY="";
-function payHow(){return "So wird bezahlt: Bar am Abend direkt an den Empfänger. Wer überweist, fragt den Empfänger nach PayPal/Kontodaten. „"+S.bank+" (Kasse)“ heißt: an "+S.bank+(KASSE_PAY?" ("+KASSE_PAY+")":"")+".";}
+/* Tim 20.11.: Jeder muss wissen, wohin. Keine Zahlungsdaten nötig (nur P). */
+function payHow(){return "So wird ausgeglichen: am Abend direkt beim Empfänger. „"+S.bank+" (Kasse)“ heißt: bei "+S.bank+".";}
 /* Erklärt, warum jemand zahlt oder bekommt, z. B. wenn Geld per Überweisung direkt bei einem Spieler gelandet ist */
 function txWhy(){const s=settlement(),L=[];
   S.players.forEach(q=>q.entries.forEach((e,j)=>{if(e.paid==="dig"&&e.to&&pl(e.to)&&!isBank(pl(e.to)))L.push(e.to+" hat "+entPrice(q,j)+" P von "+q.name+" direkt überwiesen bekommen und gibt das weiter.");}));
@@ -1323,7 +1329,7 @@ function txWhy(){const s=settlement(),L=[];
 function summaryText(){
   const s=settlement();
   const order=s.rows.slice().sort((a,b)=>(a.place||99)-(b.place||99));
-  return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+s.feeTotal+" P":"")+(S.bounty&&S.mystery?" · Mystery Bounty "+totalEntries()*S.bounty+" P":"")+(S.bounty&&S.bchips?" · Bounty-Kasse "+totalEntries()*S.bounty+" P (gegen 🟡-Chips, 5 P pro Chip)":"")+"\n\n"+
+  return S.title+" · "+new Date().toLocaleDateString("de-DE")+"\nPot "+s.pot+" P · "+totalEntries()+" Entries"+(s.feeTotal?" · An Veranstalter "+s.feeTotal+" P":"")+(S.bounty&&S.mystery?" · Mystery Bounty "+totalEntries()*S.bounty+" P":"")+(S.bounty&&S.bchips?" · Bounty-Kasse "+totalEntries()*S.bounty+" P (gegen "+CE("cash")+"-Chips, 5 P pro Chip)":"")+"\n\n"+
     order.map(r=>(r.place?r.place+". ":"– ")+r.name+": "+r.entries+(r.entries===1?" Entry":" Entries")+", eingesetzt "+r.cost+", bezahlt "+r.paid+(r.open?", OFFEN "+r.open:"")+(r.win?", Gewinn "+r.win+(r.bounty?" (davon Kopfgeld "+r.bounty+")":""):"")).join("\n")+
     "\n\nZahlungen:\n"+(s.tx.map(t=>(t.done?"✓ ":"")+t.from+" → "+t.to+": "+t.amount+" P").join("\n")||"keine")+(s.tx.length?(txWhy().length?"\n\nWarum:\n"+txWhy().map(x=>"- "+x).join("\n"):"")+"\n\n"+payHow():"")+((S.notes||[]).length?"\n\nNotizen:\n"+S.notes.map(n=>"- "+n.text).join("\n"):"");
 }
@@ -1582,7 +1588,7 @@ function runCmd(c){
     /* alle Einstellungen vom Handy auf einmal (wie ⚙ an der Tafel) */
     case "settings":{const v=c.v||{},nm=k=>v[k]==null||v[k]===""?null:+v[k];
       if(v.title)S.title=String(v.title);if(v.sub!=null)S.sub=String(v.sub);
-      ["stack","min1","min","minLate","buyin","fee","rebuy","feeRe","bounty","eb"].forEach(k=>{const x=nm(k);if(x!=null&&x>=0)S[k]=x;});if("mystery" in v){S.mystery=v.mystery?1:0;S.mdeck=null;}if("bchips" in v)S.bchips=v.bchips?1:0;
+      ["stack","min1","min","minLate","buyin","fee","rebuy","feeRe","bounty","eb"].forEach(k=>{const x=nm(k);if(x!=null&&x>=0)S[k]=x;});if("mystery" in v){S.mystery=v.mystery?1:0;S.mdeck=null;}if("bchips" in v)S.bchips=v.bchips?1:0;if(v.bcolKeep&&CHIPC[v.bcolKeep]||v.bcolCash&&CHIPC[v.bcolCash])S.bcol=Object.assign(bcol(),v.bcolKeep&&CHIPC[v.bcolKeep]?{keep:v.bcolKeep}:{},v.bcolCash&&CHIPC[v.bcolCash]?{cash:v.bcolCash}:{});if("bRuleOff" in v)S.bRuleOff=v.bRuleOff?1:0;
       if("reLvl" in v)S.reLvl=nm("reLvl");if("maxRe" in v)S.maxRe=nm("maxRe");
       if(v.bank)S.bank=String(v.bank);if(v.cash!=null)S.cash=String(v.cash);
       if(v.payAuto!=null)S.pay.auto=!!v.payAuto;if(v.pcts&&Array.isArray(v.pcts)&&v.pcts.length)S.pay.pcts=v.pcts.map(Number);
@@ -1986,7 +1992,7 @@ function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[])
     p:Object.fromEntries(allP().map(p=>[p.name,{t:S.mt?tblOf(p):1,place:placeOf(p)||0,cost:costOf(p),open:p.entries.reduce((a,e,j)=>a+(e.paid==="offen"?entPrice(p,j):0),0),canRe:canRebuy(p),seat:seatLabel(p)}])),
     order:S.mt?[...seatOrder(1),...seatOrder(2)].map(p=>p.name):S.players.map(p=>p.name),avg:alive().length?Math.round((totalEntries()*S.stack+allP().filter(p=>p.eb).length*(S.eb||0))/alive().length):0};
   o.D.scr=scrState();try{o.D.lob=lobbyGroups().map(g=>({id:g.id,label:g.label,n:g.slides.length,on:lobOn(g.id)}));}catch(e){}
-  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.why=txWhy();o.D.how=payHow();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
+  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.bc={keep:[CE("keep"),CN("keep"),bcol().keep],cash:[CE("cash"),CN("cash"),bcol().cash]};o.D.brule=S.bounty&&!S.mystery?bRuleText():"";o.D.why=txWhy();o.D.how=payHow();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
   return o;}
 /* was gerade groß auf dem Bildschirm läuft (für die Steuerleiste in der App) */
 function scrState(){const a=$("ann"),h=a&&!a.hidden?(a.querySelector("h3")||{}).textContent||"":"",ok=a&&!a.hidden&&$("annOk")?$("annOk").textContent:"";
