@@ -136,6 +136,10 @@ h1.lt{font-size:34px;font-weight:800;letter-spacing:-.02em;padding:6px 18px 4px}
 .pr .chev{color:var(--sub2);font-size:20px}
 
 /* ---------- management tiles ---------- */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px 14px}.tg button{min-height:72px;border-radius:16px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12.5px;font-weight:600;color:var(--fg);padding:6px 4px;line-height:1.15;text-align:center}.tg button i{font-style:normal;font-size:22px;line-height:1}.tg button.fs{grid-column:1/-1;flex-direction:row;min-height:56px;font-size:17px;gap:10px;color:#1a1307;background:linear-gradient(180deg,#f3d68f,#d4a443)}
+.ptl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px 12px}.ptl button{border-radius:16px;background:var(--card);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--fg);min-width:0}.ptl button .av{width:46px;height:46px}.ptl button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ptl button small{font-size:11px;color:var(--sub);font-weight:500}.ptl button.no{opacity:.55}
+.bk{display:flex;align-items:center;gap:6px;margin:0 16px 10px;height:44px;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.08);font-size:16px;font-weight:600;color:var(--blue2)}
+.sh .shbk{position:absolute;left:12px;top:12px;height:34px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--blue2);font-size:15px;font-weight:600}
 .big2{display:grid;gap:10px;margin:4px 16px 14px}.big2 button{display:flex;align-items:center;gap:14px;height:84px;padding:0 20px;border-radius:20px;text-align:left;font-size:22px;font-weight:700}.big2 button i{font-style:normal;font-size:30px;width:40px;text-align:center}.big2 button small{display:block;font-size:13px;font-weight:500;opacity:.75;margin-top:2px}.big2 .ko{color:#ffd9d4;background:linear-gradient(180deg,rgba(229,103,92,.30),rgba(143,29,29,.36));border:1px solid rgba(229,103,92,.5)}.big2 .rb{color:#f3d68f;background:linear-gradient(180deg,rgba(226,184,87,.24),rgba(156,122,47,.26));border:1px solid rgba(226,184,87,.55)}
 .tbadge{margin-left:6px;height:28px;padding:0 10px;border-radius:14px;font-size:13px;font-weight:600;color:#f3d68f;background:rgba(226,184,87,.14);border:.5px solid rgba(226,184,87,.55);white-space:nowrap}.tbadge.no{color:#ffd9d4;background:rgba(229,103,92,.16);border-color:rgba(229,103,92,.5)}.tbadge[hidden]{display:none}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 16px 0}
@@ -307,6 +311,8 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
   <div class="stats"><div><b id="sPot">–</b><span>Preisgeld P</span></div><div><b id="sPl">–</b><span>Spieler</span></div><div><b id="sEn">–</b><span>Entries</span></div></div>
   <div class="pays" id="pays"></div>
   <div class="cash" id="cash"></div>
+  <div class="sec live-only">Tafel steuern</div>
+  <div class="tg live-only" id="tg"></div>
   <div class="sec">Tafel</div>
   <div class="mini" id="mini"></div>
 </section>
@@ -393,7 +399,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 <section class="page" id="p4">
   <h1 class="lt">Clips &amp; Tänze</h1>
   <div class="seg"><button class="btn red press" id="clipStop">■ Clip stoppen</button><button class="btn press" id="danceStop">■ Tanz stoppen</button></div>
-  <div class="sec">Heute am Tisch</div>
+  <div class="sec" id="deckH">Heute am Tisch</div>
   <div id="deck"><p class="note">Lade Clips …</p></div>
 </section>
 
@@ -407,7 +413,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 </nav>
 
 <div class="ov" id="ov"></div>
-<div class="sh" id="sh"><div class="grab"></div><h3 id="shT"></h3><p class="sp" id="shP"></p><div id="shC"></div><div class="sb" id="shB"></div><button class="btn x press" id="shX">Abbrechen</button></div>
+<div class="sh" id="sh"><button class="shbk press" id="shBk" hidden>‹ Zurück</button><div class="grab"></div><h3 id="shT"></h3><p class="sp" id="shP"></p><div id="shC"></div><div class="sb" id="shB"></div><button class="btn x press" id="shX">Abbrechen</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -454,8 +460,10 @@ function send(c,label){
 document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>send(JSON.parse(b.dataset.c),(b.querySelector(".tx")||b).firstChild.textContent.trim()));
 
 /* ---------- sheet ---------- */
-let shStack=[];
+let shStack=[],shCur=null,shFlow=null;
 function sheet(title,text,btns,content){
+  if(sheet.back)sheet.back=0;else if(shFlow&&Date.now()-shFlow.t<1500&&shFlow.a)shStack.push(shFlow.a);else shStack=[];
+  shFlow=null;shCur=[title,text,btns,content];$("shBk").hidden=!shStack.length;
   $("shT").textContent=title;$("shP").textContent=text||"";$("shP").hidden=!text;
   const C=$("shC");C.innerHTML="";if(content)C.appendChild(content);
   const B=$("shB");B.innerHTML="";
@@ -472,12 +480,14 @@ function scrBar(){const r=D.scr||{},b=$("scrb"),K=$("scrK");let t="",e="Auf dem 
   const on=!!btns.length&&!ARCH;b.hidden=!on;document.body.classList.toggle("scron",on);if(!on){scrBar.k="";return;}
   $("scrE").textContent=e;$("scrT").textContent=t;const k=JSON.stringify(btns);if(k===scrBar.k)return;scrBar.k=k;K.innerHTML="";
   btns.forEach(([l,c,cmd])=>{const x=document.createElement("button");x.className="press "+c;x.textContent=l;x.onclick=()=>{buzz(10);send(cmd,l.replace(/ ▶$/,""));};K.appendChild(x);});}
-function closeSheet(){$("ov").classList.remove("on");$("sh").classList.remove("on");}
-$("shX").onclick=closeSheet;$("ov").onclick=closeSheet;
+function closeSheet(){if($("sh").classList.contains("on"))shFlow={a:shCur,t:Date.now()};$("ov").classList.remove("on");$("sh").classList.remove("on");}
+function hardClose(){closeSheet();shFlow=null;shStack=[];}
+$("shX").onclick=hardClose;$("ov").onclick=hardClose;
+$("shBk").onclick=()=>{const a=shStack.pop();if(!a)return;sheet.back=1;sheet(...a);};
 /* nach unten wischen schließt */
 (()=>{let y0=null;const sh=$("sh");sh.addEventListener("touchstart",e=>{y0=sh.scrollTop<=0?e.touches[0].clientY:null;},{passive:true});
   sh.addEventListener("touchmove",e=>{if(y0==null)return;const d=e.touches[0].clientY-y0;if(d>0){sh.style.transition="none";sh.style.transform="translateY("+d+"px)";}},{passive:true});
-  sh.addEventListener("touchend",e=>{if(y0==null)return;const d=(e.changedTouches[0].clientY-y0);sh.style.transition="";sh.style.transform="";if(d>110)closeSheet();y0=null;});})();
+  sh.addEventListener("touchend",e=>{if(y0==null)return;const d=(e.changedTouches[0].clientY-y0);sh.style.transition="";sh.style.transform="";if(d>110)hardClose();y0=null;});})();
 
 /* ---------- tabs ---------- */
 function page(i){document.querySelectorAll(".page").forEach((p,k)=>p.classList.toggle("on",k===i));document.querySelectorAll("nav.tb button").forEach((b,k)=>b.classList.toggle("on",k===i));
@@ -743,6 +753,15 @@ $("setBtn").onclick=()=>{if(noS())return;const W=document.createElement("div");W
     send({op:"settings",v:{title:g("fTitle"),stack:g("fStack"),eb:g("fEb"),min1:g("fMin1"),min:g("fMin"),minLate:g("fMinLate"),reLvl:g("fReLvl"),maxRe:g("fMaxRe"),buyin:g("fPot"),fee:0,rebuy:g("fPot"),feeRe:0,bounty:g("fBounty"),mystery:g("fMys")==="1"&&+g("fBounty")>0?1:0,bchips:g("fMys")==="2"&&+g("fBounty")>0?1:0,bank:g("fBank"),cash:g("fCash"),payAuto:g("fPay")==="auto",pcts:g("fPcts").split(/[,; ]+/).filter(Boolean).map(Number),blinds:g("fBlinds")}},"Einstellungen");}]],W);
   W.querySelector("#fPay").value=S.pay&&S.pay.auto===false?"fix":"auto";W.querySelector("#fMys").value=S.bchips?"2":S.mystery?"1":"0";W.querySelector("#fBlinds").value=levelsText(S.levels);};
 
+/* ---------- Übersicht: Tafel steuern (Tim 20.11.: alles von der App aus) ---------- */
+(()=>{const G=$("tg");const T=[
+  ["⛶","Vollbild an der Tafel",()=>send({op:"full"},"Vollbild"),"fs"],
+  ["⏱","Level wählen",()=>$("mLevel").onclick()],["±","Zeit einstellen",()=>$("mTime").onclick()],["D","Dealer",()=>$("qDealer").onclick()],
+  ["🎲","Plätze auslosen",()=>$("drawBtn").onclick()],["🃏","Spieler&shy;karten",()=>send({op:"cards"},"Spielerkarten")],["📊","Entries zeigen",()=>send({op:"entries"},"Entries zeigen")],
+  ["💰","Abrechnung zeigen",()=>send({op:"result"},"Abrechnung zeigen")],["🖼","Bildschirm&shy;schoner",()=>$("lobbyBtn").onclick()],["🪑","Seat open",()=>send({op:"seatopen"},"Seat open")],
+  ["📣","Durchsage",()=>nameSheet("Durchsage","Läuft 20 Minuten unten auf der Tafel","","Senden",t=>send({op:"msg",text:t,min:20},"Durchsage"))],["✕","Einblendung schließen",()=>send({op:"close"},"Einblendung schließen")],["⚙","Alle Einstellungen",()=>$("setBtn").onclick()]];
+  T.forEach(([i,t,fn,cls])=>{const b=document.createElement("button");b.className="press"+(cls?" "+cls:"");b.innerHTML="<i>"+i+"</i><span>"+t+"</span>";b.onclick=()=>{buzz(8);fn();};G.appendChild(b);});})();
+
 /* ---------- Minigames ---------- */
 function renderGames(){const G=$("games"),k=(D.games||[]).join()+"|"+(S&&S.active);if(G.dataset.k===k)return;G.dataset.k=k;G.innerHTML="";
   (D.games||[]).forEach(g=>{const b=document.createElement("button");b.className="game press"+(S&&S.active===g?" on":"");b.textContent=g;b.onclick=()=>send({op:"game",name:g},g);G.appendChild(b);});
@@ -754,13 +773,22 @@ const MORE=[["tanz2","Tanzschritte"],["tanz3","Party"],["jubel","Jubel"],["floss
 let CLIPS=[];
 const same=(a,b)=>lc(a)===lc(b)||(AV[lc(a)]&&AV[lc(a)]===AV[lc(b)]);
 function hit(b){b.classList.add("hit");setTimeout(()=>b.classList.remove("hit"),600);}
+let CSEL=null;
+function deckOpen(n){CSEL=n;$("deck").dataset.k="";renderDeck();scrollTo(0,0);buzz(6);}
 function renderDeck(){
   const D2=$("deck"),names=S?S.players.map(p=>p.name):[];
-  const k=JSON.stringify([CLIPS.map(c=>c.id+c.t),names]);if(D2.dataset.k===k)return;D2.dataset.k=k;D2.innerHTML="";
+  const k=JSON.stringify([CLIPS.map(c=>c.id+c.t),names,CSEL]);if(D2.dataset.k===k)return;D2.dataset.k=k;D2.innerHTML="";
   const all=[...names];CLIPS.forEach(c=>{if(c.p==="Alle")return;(Array.isArray(c.p)?c.p:[c.p]).forEach(x=>{if(!all.some(n=>same(n,x)))all.push(x);});});
-  const today=new Set(names.map(lc));let shownOther=false;
-  all.forEach(n=>{
-    if(!today.has(lc(n))&&!shownOther){shownOther=true;const s=document.createElement("div");s.className="sec";s.textContent="Weitere Clips";D2.appendChild(s);}
+  const today=new Set(names.map(lc));const al=CLIPS.filter(c=>c.p==="Alle");
+  $("deckH").textContent="Heute am Tisch";$("deckH").hidden=CSEL!=null;
+  if(CSEL==null){
+    const grid=(list,h)=>{if(!list.length)return;if(h){const s=document.createElement("div");s.className="sec";s.textContent=h;D2.appendChild(s);}
+      const G=document.createElement("div");G.className="ptl";list.forEach(n=>{const cl=CLIPS.filter(c=>owns(c,n)).length,b=document.createElement("button");b.className="press"+(cl||EMO[lc(n)]?"":" no");
+        b.innerHTML=(n==="*"?'<div class="av">🎬</div>':avHtml(n))+'<span></span><small>'+(n==="*"?al.length+" Clips":cl?cl+" Clip"+(cl>1?"s":""):"Tanz")+'</small>';b.querySelector("span").textContent=n==="*"?"Für alle":n;b.onclick=()=>deckOpen(n);G.appendChild(b);});D2.appendChild(G);};
+    grid(all.filter(n=>today.has(lc(n))));grid(all.filter(n=>!today.has(lc(n))).concat(al.length?["*"]:[]),"Weitere Clips");
+    if(!all.length&&!al.length)D2.innerHTML='<p class="note">Keine Clips geladen.</p>';return;}
+  const bk=document.createElement("button");bk.className="bk press";bk.textContent="‹ Zurück zu allen";bk.onclick=()=>deckOpen(null);D2.appendChild(bk);
+  all.filter(n=>CSEL!=="*"&&same(n,CSEL)).slice(0,1).forEach(n=>{
     const cl=CLIPS.filter(c=>owns(c,n)),em=EMO[lc(n)];
     const r=document.createElement("div");r.className="pc";
     r.innerHTML='<div class="hd">'+avHtml(n)+'<span class="tx"><b></b><small>'+(cl.length?cl.length+" Clip"+(cl.length>1?"s":""):"kein eigener Clip")+'</small></span></div><div class="acts"></div><div class="ext"><div><div class="acts"></div><div class="bar"></div></div></div>';
@@ -773,7 +801,7 @@ function renderDeck(){
       MORE.forEach(([d,t])=>XA.appendChild(chip(t,"dn",()=>{send({op:"dance",who:n,d},n+": "+t);clearTimeout(tm);tm=setTimeout(()=>ext.classList.remove("open"),5000);ext.classList.remove("open");void ext.offsetWidth;ext.classList.add("open");})));}
     else{if(!cl.length||today.has(lc(n)))A.appendChild(chip("🎉 Profilbild-Party","dn",()=>send({op:"dance",who:n,d:"tanz"},n+" Party")));ext.remove();}
     D2.appendChild(r);});
-  const al=CLIPS.filter(c=>c.p==="Alle");if(al.length){const s=document.createElement("div");s.className="sec";s.textContent="Für alle";D2.appendChild(s);
+  if(CSEL==="*"&&al.length){const s=document.createElement("div");s.className="sec";s.textContent="Für alle";D2.appendChild(s);
     const r=document.createElement("div");r.className="pc";r.innerHTML='<div class="acts" style="margin:0"></div>';
     al.forEach(c=>{const b=document.createElement("button");b.className="chip press";b.textContent="▶ "+c.t;b.onclick=()=>{hit(b);send({op:"clip",id:c.id},"▶ "+c.t);};r.firstChild.appendChild(b);});D2.appendChild(r);}
 }
