@@ -814,7 +814,8 @@ const twoT=()=>!!(S.mt&&S.t2&&S.t2.length);
 const vt=()=>twoT()?VT:1,ot=()=>3-vt(),tName=t=>t===1?"Großer Tisch":"Tisch 2";
 const atTbl=t=>allP().filter(p=>!p.out&&tblOf(p)===t);
 /* für den Ausgleich zählen Ausgeschiedene mit, solange sie noch einen Rebuy machen dürfen (ihr Platz bleibt frei) */
-const seatedAt=t=>allP().filter(p=>tblOf(p)===t&&(!p.out||(rebuyOpen()&&canRebuy(p)&&!p.chair)));
+/* noRe = hat auf Rebuy verzichtet (App „Kein Rebuy“), dann ist sein Platz sofort frei (Nacht-Check 20.11.) */
+const seatedAt=t=>allP().filter(p=>tblOf(p)===t&&(!p.out||(rebuyOpen()&&canRebuy(p)&&!p.chair&&!p.noRe)));
 const seatOrder=t=>allP().filter(p=>tblOf(p)===t);
 const isTim=p=>!!p&&lcn(p.name)==="tim";
 /* Dealer am Tisch t: gemerkter Name; ist er raus, der nächste aktive Spieler im Uhrzeigersinn */
@@ -1005,9 +1006,11 @@ function countdown(n){const c=$("count");c.hidden=false;c.textContent=n;c.classL
 /* ---------- clock ---------- */
 let lastSec=null;
 function go(i,silent){
-  const was=S.running;S.i=Math.max(0,Math.min(LEVELS.length-1,i));
+  const was=S.running,reWas=rebuyOpen();S.i=Math.max(0,Math.min(LEVELS.length-1,i));
   S.left=dur(S.i);if(was)S.endAt=Date.now()+S.left*1000;
   lastSec=null;save();render();
+  /* Rebuy-Phase gerade zu: freigehaltene Plätze fallen weg, Tische sofort neu prüfen */
+  if(reWas&&!rebuyOpen()&&twoT())setTimeout(()=>checkTables(false),400);
 }
 function advance(){
   if(S.i>=LEVELS.length-1){S.running=false;S.left=0;S.endAt=null;save();render();return;}
@@ -1088,7 +1091,7 @@ function doRebuy(name,paid,to){
   const p=pl(name);if(!p)return false;
   /* wo = Stand vor dem Rebuy, damit „−1“ einen versehentlichen Rebuy sauber zurücknimmt (Spieler wieder raus, gleicher Platz, gleicher Kopf) */
   const wo=p.out?{out:p.out,i:S.outOrder.indexOf(p.name),h:p.head==null?null:p.head}:{h:p.head==null?null:p.head};
-  p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar",to:payTo(paid,to),wo});
+  p.entries.push({t:new Date().toISOString(),lvl:playNum(S.i),paid:paid||"bar",to:payTo(paid,to),wo});delete p.noRe;
   potPop(S.rebuy-feeRe()-(S.bounty||0));
   if(S.bounty&&!S.mystery)p.head=p.out?S.bounty:headOf(p)+S.bounty;
   if(p.out){p.out=null;delete p.chair;S.outOrder=S.outOrder.filter(n=>n!==p.name);}
@@ -1556,6 +1559,7 @@ function runCmd(c){
     case "blinds":S.levels=parseLevels(c.text);LEVELS=S.levels;S.i=Math.min(S.i,LEVELS.length-1);break;
     case "setlevel":{const L=LEVELS[c.i];if(L)Object.assign(L,c.v);break;}
     case "set":for(const k of Object.keys(c.v||{}))if(k in S&&!["players","log","levels"].includes(k))S[k]=c.v[k];break;
+    case "norebuy":{const p=pl(c.name);if(!p||!p.out)break;p.noRe=1;log("norebuy",{name:p.name});save();render();toast(p.name+" macht keinen Rebuy, Platz ist frei");if(twoT())setTimeout(()=>checkTables(false),300);break;}
     case "rebuy":{const p=pl(c.name);if(!p)break;
       /* Schutz gegen doppelte Rebuys von zwei Handys: gleicher Spieler innerhalb von 20 s nur mit force */
       if(!c.force&&c.src!=="claude"){const last=p.entries[p.entries.length-1];if(p.entries.length>1&&last&&last.t&&Date.now()-Date.parse(last.t)<20000){toast("Rebuy für "+p.name+" kam gerade schon an. Nicht doppelt gebucht.");break;}
