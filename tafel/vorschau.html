@@ -1571,7 +1571,7 @@ function restartTournament(){
   S.players.forEach(p=>{p.entries=[Object.assign({},p.entries[0]||{paid:"bar"},{t:null,lvl:0})];p.out=null;p.head=null;p.bw=0;delete p.chair;delete p.eb;});
   /* zwei Tische: zurück zur ausgelosten Sitzordnung (vor Tischwechseln und Final Table) */
   S.pend=null;S.ft=null;if(S.draw0){const d=S.draw0,ord=d.order.map(n=>S.players.find(p=>p.name===n)).filter(Boolean);S.players=[...ord,...S.players.filter(p=>!ord.includes(p))];S.t2=d.t2.slice();S.dn=Object.assign({},d.dn);S.mt=true;}
-  S.lostHeads=0;S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
+  S.swapped=0;S.bvidDone=0;S.txd={};S.mpaid=0;S.lostHeads=0;S.outOrder=[];S.fired={};S.fireAt={};S.active=null;S.activeUntil=null;S.msgs=[];S.log=[];log("restart");
   save();buildSeats();render();toast("Turnier neu gestartet · Level 1 bereit");
 }
 $("sRestart").onclick=()=>ask("Turnier neu starten? Uhr auf Level 1, alle Rebuys und Ausgeschiedenen weg. Spieler und Plätze bleiben.","Neu starten",()=>{restartTournament();$("mSet").hidden=true;},true);
