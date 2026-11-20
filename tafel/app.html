@@ -314,7 +314,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
     <div class="live-only ctl"><button class="press" data-c='{"op":"prev"}'>‹ Level</button><button class="play press" id="play">▶ Start</button><button class="press" data-c='{"op":"next"}'>Level ›</button></div>
     <div class="live-only ctl2"><button class="press" data-c='{"op":"time","add":-60}'>− 1 Min</button><button class="press" data-c='{"op":"time","add":60}'>+ 1 Min</button></div>
   </div>
-  <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button></div></div>
+  <div class="pend" id="pend" hidden><b id="pendT"></b><div class="r"><button class="btn pri press" id="pendOk">✓ Erledigt</button><button class="btn press" id="pendAlt">Anderen wählen</button><button class="btn press" id="pendNo">Bleibt sitzen</button></div></div>
   <!-- Tim 20.11.: Knockout und Rebuy groß über die ganze Breite -->
   <div class="live-only big2" style="margin-top:14px">
     <button class="press ko" id="qKo"><i>✕</i><span>Knockout<small id="qKoS">Wer ist raus?</small></span></button>
@@ -706,6 +706,7 @@ function lobbySheet(){const W=document.createElement("div");W.className="grp lob
     b.onclick=()=>{g.on=!g.on;b.querySelector(".sw").classList.toggle("on",g.on);send({op:"lobbyset",id:g.id,on:g.on},(g.on?"An: ":"Aus: ")+g.label);};W.appendChild(b);});
   sheet("Bildschirmschoner","Was im Bildschirmschoner läuft. Neue Turnierberichte von der Website kommen automatisch dazu.",[["Jetzt starten","pri",()=>send({op:"lobby"},"Bildschirmschoner an")],["Ausschalten","",()=>send({op:"lobbyclose"},"Bildschirmschoner aus")]],W);}
 $("pendOk").onclick=()=>send({op:"pend"},"bestätigt");
+$("pendNo").onclick=()=>send({op:"pendclear"},"Kein Wechsel");
 $("pendAlt").onclick=()=>{const q=S&&S.pend;if(!q||q.op!=="move")return;const from=q.to===1?2:1;
   picker("Wer wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2")+"?","",[["",orderOf(active().filter(p=>pinfo(p.name).t===from&&lc(p.name)!=="tim"))]],p=>send({op:"move",name:p.name,to:q.to},p.name+" wechselt"));};
 $("addP").onclick=()=>{addFlow($("newP").value);$("newP").value="";};
