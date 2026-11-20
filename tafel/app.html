@@ -365,6 +365,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
   <div class="grp">
     <button class="cell press" id="drawBtn"><span class="ic c-gold">🎲</span><span class="tx">Plätze auslosen<small>Ab 11 Spielern zwei Tische</small></span><span class="chev">›</span></button>
     <button class="cell press" id="tblBtn" hidden><span class="ic c-purple">⇄</span><span class="tx">Tische prüfen<small>Ausgleich vorschlagen</small></span><span class="chev">›</span></button>
+    <button class="cell press" id="swBtn" hidden><span class="ic c-purple">⇆</span><span class="tx">Tische tauschen<small id="swSub">Beide Tische wechseln als Gruppe</small></span><span class="chev">›</span></button>
     <button class="cell press" id="ftBtn" hidden><span class="ic c-red">🏆</span><span class="tx">Jetzt Final Table<small>Tische zusammenlegen</small></span><span class="chev">›</span></button>
   </div>
 
@@ -542,9 +543,9 @@ function show(st){S=st;D=S.D||{};document.body.classList.toggle("arch",!!ARCH);
   $("pays").innerHTML=(D.pays||[]).map((v,k)=>'<div><span>'+(k+1)+'. Platz</span><b>'+fmt(v)+' P</b></div>').join("");
   $("cash").textContent=(S.cash?"💵 "+S.cash:"")+(D.kasse&&D.kasse.open?" · "+fmt(D.kasse.open)+" P noch offen":"");
   const q=S.pend;$("pend").hidden=!q;
-  if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
-    $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
-  const two=!!D.two;$("tblBtn").hidden=!two;renderMyt();$("ftBtn").hidden=!two;$("qMove").style.display=two?"":"none";
+  if(q){$("pendT").textContent=q.op==="move"?"⇄ "+q.name+" wechselt an "+(q.to===1?"den großen Tisch":"Tisch 2"):q.op==="swap"?"⇄ Pause: Großer Tisch und Tisch 2 tauschen komplett als Gruppe":"🏆 Final Table: alle an den großen Tisch, Plätze neu auslosen";
+    $("pendOk").textContent=q.op==="merge"?"🎲 Final Table auslosen":q.op==="swap"?"⇄ Tische tauschen":"✓ "+q.name+" sitzt um";$("pendAlt").hidden=q.op!=="move";}
+  const two=!!D.two;$("tblBtn").hidden=!two;renderMyt();$("ftBtn").hidden=!two;$("swBtn").hidden=!two;{const w=D.swap||{};$("swSub").textContent=(w.done?"Schon getauscht · ":w.off?"Automatik aus · ":"Automatisch in der 1. Pause · ")+(w.tim===false?"Tim bleibt am großen Tisch":"Tim wechselt mit");}$("qMove").style.display=two?"":"none";
   $("qNoteS").textContent=(S.notes||[]).length?(S.notes.length+" Notiz"+(S.notes.length>1?"en":"")):"z. B. Kevin 5 P zu viel";
   $("qDealerS").textContent=two?"D: "+(D.d1||"–")+" · "+(D.d2||"–"):"D: "+(D.d1||"–");
   $("mLevelS").textContent=(D.lvl||"")+" · "+(D.blinds||"");
@@ -688,6 +689,7 @@ $("mTime").onclick=()=>{const W=document.createElement("div");W.innerHTML='<div 
   $("tSetOk").onclick=()=>{const m=+$("tSet").value;if(m>0){closeSheet();send({op:"time",set:Math.round(m*60)},"Uhr auf "+m+" Min");}};};
 $("drawBtn").onclick=()=>sheet("Plätze auslosen?",(S&&S.started?"Achtung: Das Turnier läuft schon! ":"")+"Ab 11 Spielern zwei Tische. Tim + Manu am großen Tisch, Jonny Platz 6.",[["🎲 Jetzt auslosen","pri",()=>send({op:"draw"},"Plätze auslosen")]]);
 $("tblBtn").onclick=()=>send({op:"tables"},"Tische prüfen");
+$("swBtn").onclick=()=>{const w=(D&&D.swap)||{};sheet("Tische tauschen","Großer Tisch und Tisch 2 wechseln komplett als Gruppe. Passiert automatisch in der ersten Pause, hier auch sofort.",[["⇆ Jetzt tauschen","pri",()=>send({op:"swap",now:1},"Tische tauschen")],[w.tim===false?"Tim wechselt mit":"Tim bleibt am großen Tisch","",()=>send({op:"swap",tim:w.tim===false?1:0},w.tim===false?"Tim wechselt mit":"Tim bleibt")],[w.off?"Automatik in der Pause an":"Automatik in der Pause aus","",()=>send({op:"swap",off:w.off?0:1},"Tischwechsel-Automatik")]]);};
 $("ftBtn").onclick=()=>sheet("Final Table jetzt?","Beide Tische werden zusammengelegt und die Plätze neu ausgelost.",[["🏆 Zusammenlegen","red",()=>send({op:"merge"},"Final Table")]]);
 $("lobbyBtn").onclick=lobbySheet;
 function lobbySheet(){const W=document.createElement("div");W.className="grp lob";W.style.margin="4px 0 0";

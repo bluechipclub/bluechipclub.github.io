@@ -637,7 +637,7 @@ const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const DEFAULT_LEVELS=[ /* Tim 20.11.: 20.000 Stack, BB-Ante ab Level 3 (Ante = BB), Rebuys bis Ende Level 8 */
- {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{brk:10,note:"Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
+ {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{sb:300,bb:600,ante:600},{brk:10,note:"Tischwechsel · Rebuys an der Kasse"},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
 const NAMES=["Tim"]; /* rest comes automatically from the sign-ups on the website (syncSignups) */
 // minigames: bb = stake in big blinds of the current level
@@ -664,7 +664,7 @@ const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 20.000 Chips
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
 let HAD_LOCAL=false;
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;if(!S.fee20){S.fee20=1;if(S.buyin===25&&S.fee===5){S.buyin=20;S.fee=0;}}if(!S.fc20k){S.fc20k=1;if(!S.started){S.levels=DEFAULT_LEVELS.map(l=>Object.assign({},l));S.stack=20000;S.reLvl=8;S.sub=String(S.sub||"").replace("25.000","20.000");}}if(!S.pko20){S.pko20=1;if(!S.started&&!S.bounty){S.bounty=10;S.mystery=0;}}}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;if(!S.fee20){S.fee20=1;if(S.buyin===25&&S.fee===5){S.buyin=20;S.fee=0;}}if(!S.fc20k){S.fc20k=1;if(!S.started){S.levels=DEFAULT_LEVELS.map(l=>Object.assign({},l));S.stack=20000;S.reLvl=8;S.sub=String(S.sub||"").replace("25.000","20.000");}}if(!S.brk5){S.brk5=1;if(!S.started){S.levels=DEFAULT_LEVELS.map(l=>Object.assign({},l));}}if(!S.pko20){S.pko20=1;if(!S.started&&!S.bounty){S.bounty=10;S.mystery=0;}}}}catch(e){}
 if(!AUTO_GAMES){S.games=[];}
 /* 12.11.: Rebuy kostet heute 15 P (nicht 25) */
 function fixRebuy(){if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;return true;}return false;}
@@ -826,6 +826,24 @@ function dealerNext(t){const ord=seatOrder(t),d=dealerOf(t);if(!d)return;const i
   for(let s=1;s<=ord.length;s++){const q=ord[(i+s)%ord.length];if(!q.out){S.dn=Object.assign({},S.dn,{[t]:q.name});break;}}save();render();}
 function setDealer(p){if(!p)return;if(S.mt)S.dn=Object.assign({},S.dn,{[tblOf(p)]:p.name});else S.dealer=S.players.indexOf(p);}
 function dealerName(){if(S.mt){const d=dealerOf(1);return d?d.name:"";}const d=S.players[S.dealer];return d?d.name:"";}
+/* Tim 20.11.: die ersten 10 Anmeldungen auf der Website (Reihenfolge der Zusagen) haben doppelte Lose für den großen Tisch. Tim sitzt immer auf Platz 10 (Dealerplatz), Platz 1 links von ihm. */
+/* Tim 20.11.: in der ersten Pause tauschen beide Tische komplett als Gruppe, damit jeder mal am Nebentisch war.
+   S.swapTim: true = Tim wechselt mit seiner Gruppe (sitzt dort wieder auf dem letzten Platz), false = Tim bleibt am großen Tisch. */
+function firstBreak(){return LEVELS.findIndex(l=>l.brk);}
+function swapCheck(){if(!isHaupt()||!twoT()||S.swapped||S.swapOff||S.i!==firstBreak())return;
+  if(seatedAt(1).length+seatedAt(2).length<=CAP1)return;
+  S.pend={op:"swap"};save();render();
+  announce({eyebrow:"Pause · Tischwechsel",title:"Die Tische tauschen",text:"Großer Tisch und Tisch 2 wechseln komplett als Gruppe. Jeder nimmt seinen Stack mit und setzt sich in derselben Reihenfolge an den anderen Tisch."+(S.swapTim===false?" Tim bleibt am großen Tisch.":""),btn:"Tische tauschen",sec:30});$("annOk").onclick=()=>{$("ann").hidden=true;swapTables();};}
+function swapTables(){if(!twoT())return;$("ann").hidden=true;
+  const keepTim=S.swapTim===false,tim=S.players.find(isTim);
+  const g1=S.players.filter(p=>tblOf(p)===1&&!(keepTim&&p===tim)),g2=S.players.filter(p=>tblOf(p)===2&&!(keepTim&&p===tim));
+  const tim2=!keepTim&&tim&&g1.includes(tim),tim1=!keepTim&&tim&&g2.includes(tim);
+  const end=(g,t)=>t?[...g.filter(p=>p!==tim),tim]:g;
+  const newT1=end(keepTim&&tim?[...g2,tim]:g2,tim1),newT2=end(g1,tim2);
+  S.t2=newT2.map(p=>p.name);S.players=[...newT2,...newT1];S.players.forEach(p=>{delete p.chair;});
+  const d1=S.dn&&S.dn[1],d2=S.dn&&S.dn[2];S.dn={1:d2,2:d1};
+  S.pend=null;S.swapped=Date.now();log("swap",{t1:newT1.map(p=>p.name),t2:S.t2.slice(),timStays:keepTim});
+  save();buildSeats();render();toast("Tische getauscht");setTimeout(()=>checkTables(true),600);}
 /* Sitzregeln (Tim 14.11.): Tim Dealerplatz (letzter Platz), Manu direkt neben Tim (Platz 1 oder vorletzter), Jonny Platz 6, Rest zufällig */
 function seatRules(a){a=shuf(a);const tim=a.find(isTim);if(tim)a=[...a.filter(p=>p!==tim),tim];
   const n=a.length,jo=a.find(p=>canonName(p.name)==="jonny"),ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
@@ -847,7 +865,7 @@ function renderT2(){
   if(!on){box.querySelectorAll(".seat2").forEach(e=>e.remove());return;}
   const v=atTbl(T2),d=dealerOf(T2),n=v.length,pd=S.pend;
   $("t2cap").textContent=tName(T2)+" · "+n+" Spieler";
-  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
+  $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="swap"?'<b class="tmove">⇄ Tischwechsel</b>beide Tische tauschen':pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
   const mw2=mostWanted(),key=T2+":"+v.map(p=>p.name+"|"+(p.entries.length-1)+"|"+headOf(p)+"|"+(mw2===p?1:0)).join(",");
   if(box.dataset.k!==key){box.dataset.k=key;box.querySelectorAll(".seat2").forEach(e=>e.remove());
     v.forEach((p,k)=>{const a=Math.PI/2+k*2*Math.PI/n,x=50+41*Math.cos(a),y=50+37*Math.sin(a),e=document.createElement("div");
@@ -859,7 +877,8 @@ function renderT2(){
 }
 /* who moves when tables are balanced: the player who gets the big blind next at the fuller table (never Tim, never Manu at Tim's table) */
 function moveCand(t){const v=atTbl(t),d=dealerOf(t);if(!v.length)return null;const i=Math.max(0,v.indexOf(d));
-  for(let s=0;s<v.length;s++){const q=v[(i+3+s)%v.length];if(isTim(q))continue;if(t===1&&canonName(q.name)==="manu"&&v.some(isTim))continue;return q;}return null;}
+  const timThere=atTbl(3-t).some(isTim);let nk=null;
+  for(let s=0;s<v.length;s++){const q=v[(i+3+s)%v.length];if(isTim(q))continue;if(t===1&&canonName(q.name)==="manu"&&v.some(isTim))continue;if(timThere&&canonName(q.name)==="niklas"){nk=nk||q;continue;}return q;}return nk;}
 /* move a player to table `to`: he takes the chair of the last player who went out there (else next to the dealer seat) */
 function moveP(name,to){const p=pl(name);if(!p||p.out)return;$("ann").hidden=true;const from=tblOf(p);if(from===to){if(S.pend&&lcn(S.pend.name)===lcn(name))S.pend=null;save();render();return;}
   let arr=S.players.filter(x=>x!==p);
@@ -882,6 +901,7 @@ function pickMover(t){closeAll();
 /* after every out / rebuy / new player: Final Table when everyone fits at the big table, otherwise balance (difference of 2 or more) */
 function checkTables(quiet){
   if(!twoT()){if(S.pend){S.pend=null;save();}return;}
+  if(S.pend&&S.pend.op==="swap"&&seatedAt(1).length+seatedAt(2).length>CAP1)return;
   const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
   if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
     announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf dem Dealerplatz, Manu daneben, Jonny Platz 6.",btn:"Plätze für den Final Table auslosen"});
@@ -983,6 +1003,7 @@ function renderTicker(){
   S.msgs.filter(m=>!m.until||m.until>Date.now()).forEach(m=>parts.push("📣 "+m.text));
   if(S.pend&&S.pend.op==="move")parts.push("⇄ "+S.pend.name+" wechselt an "+(S.pend.to===1?"den großen Tisch":"Tisch 2"));
   if(S.pend&&S.pend.op==="merge")parts.push("🏆 Final Table: alle an den großen Tisch");
+  if(S.pend&&S.pend.op==="swap")parts.push("⇄ Tischwechsel: großer Tisch und Tisch 2 tauschen komplett");
   if(twoT())parts.push("Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler");
   if(rebuyOpen())parts.push("Rebuy "+P(S.rebuy)+" bis Ende Level "+(S.reLvl??"∞")+(S.maxRe!=null?" · max. "+S.maxRe:""));
   if(S.cash)parts.push("💵 "+S.cash);
@@ -1013,6 +1034,7 @@ function go(i,silent){
   lastSec=null;save();render();
   /* Rebuy-Phase gerade zu: freigehaltene Plätze fallen weg, Tische sofort neu prüfen */
   if(reWas&&!rebuyOpen()&&twoT())setTimeout(()=>checkTables(false),400);
+  if(LEVELS[S.i]&&LEVELS[S.i].brk)setTimeout(swapCheck,600);
 }
 function advance(){
   if(S.i>=LEVELS.length-1){S.running=false;S.left=0;S.endAt=null;save();render();return;}
@@ -1023,6 +1045,7 @@ function advance(){
   if(LEVEL_SOUND)levelSound();save();
   const L=LEVELS[S.i];
   announce({eyebrow:L.brk?"Pause":"Neues Level",title:L.brk?(L.note||"Pause"):"Level "+playNum(S.i),text:L.brk?L.brk+" Minuten. Rebuys jetzt an der Kasse.":"Blinds jetzt "+fmt(L.sb)+" / "+fmt(L.bb)+(L.ante?", Big-Blind-Ante "+fmt(L.ante):"")+".",sec:8});
+  if(L.brk)setTimeout(swapCheck,9000);
 }
 function tick(){
   const d=new Date();$("now").textContent=d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
@@ -1160,7 +1183,7 @@ function openPlayers(focus){if(!isHaupt())return;
   if(S.mt){const h=document.createElement("div");h.style.cssText="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px";
     h.innerHTML='<b style="font-size:14px">'+(two?"Großer Tisch "+atTbl(1).length+" · Tisch 2 "+atTbl(2).length+" Spieler":"Final Table · "+alive().length+" Spieler")+'</b>'+(S.pend?'<span style="color:#f3d68f;font-size:13px">'+(S.pend.op==="move"?"⇄ offen: "+esc(S.pend.name)+" an "+(S.pend.to===1?"großen Tisch":"Tisch 2"):"🏆 Final Table offen")+'</span>':'');
     const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className="b sm "+cls;b.textContent=t;b.onclick=fn;h.appendChild(b);};
-    if(S.pend)mk(S.pend.op==="move"?"✓ Wechsel bestätigen":"Final Table auslosen","pri",()=>{$("mPlayers").hidden=true;S.pend.op==="move"?moveP(S.pend.name,S.pend.to):mergeTables();});
+    if(S.pend)mk(S.pend.op==="move"?"✓ Wechsel bestätigen":S.pend.op==="swap"?"⇄ Tische tauschen":"Final Table auslosen","pri",()=>{$("mPlayers").hidden=true;S.pend.op==="move"?moveP(S.pend.name,S.pend.to):S.pend.op==="swap"?swapTables():mergeTables();});
     if(two)mk("Tische prüfen","",()=>{$("mPlayers").hidden=true;checkTables(false);});
     if(two)mk("Jetzt Final Table","red",()=>ask("Tische jetzt zum Final Table zusammenlegen?","Zusammenlegen",()=>{$("mPlayers").hidden=true;mergeTables();},true));
     L.appendChild(h);}
@@ -1349,13 +1372,15 @@ function drawSeats(){
   const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
   if(anc)a=[...a.filter(p=>p!==anc),anc];
   /* 19.11. Tim: nur EIN echter Pokertisch. Ab 11 Spielern zwei Tische, möglichst gleich groß (großer Tisch bekommt bei ungerader Zahl einen mehr, max. 10).
-     Wer an den großen Tisch kommt, wird ausgelost: Tim fest, Manu fest (neben Tim), die ersten 9 Anmeldungen (Reihenfolge der Website-Zusagen) haben doppelte Chance. */
+     Wer an den großen Tisch kommt, wird ausgelost: Tim fest, Manu fest (neben Tim), die ersten 10 Anmeldungen (Reihenfolge der Website-Zusagen) haben doppelte Chance. */
   S.t2=[];S.mt=false;S.pend=null;S.dn=null;S.ft=null;S.draw0=null;S.players.forEach(p=>{delete p.chair;});
-  if(a.length>CAP1){const ord=(S.syncSeen||[]).map(lcn).filter(x=>x!=="tim"),early=new Set(ord.slice(0,9)),w=p=>early.has(lcn(p.name))?2:1;
+  if(a.length>CAP1){const ord=(S.syncSeen||[]).map(canonName).filter(x=>x!=="tim"),early=new Set(ord.slice(0,10)),w=p=>early.has(canonName(p.name))?2:1;
     const nBig=Math.min(CAP1,Math.ceil(a.length/2)),ma=a.find(p=>canonName(p.name)==="manu");
     const big=[anc,ma].filter(Boolean);let pool=a.filter(p=>!big.includes(p));
+    /* Tim 20.11. (fest, bei jedem Auslosen): Niki startet immer am anderen Tisch als Tim */
+    const nk=anc?pool.find(p=>canonName(p.name)==="niklas"):null;if(nk)pool=pool.filter(p=>p!==nk);
     while(big.length<nBig&&pool.length){let r=Math.random()*pool.reduce((x,p)=>x+w(p),0),i=0;for(;i<pool.length-1;i++){r-=w(pool[i]);if(r<0)break;}big.push(pool[i]);pool.splice(i,1);}
-    const t1=seatRules(big),t2=seatRules(pool);
+    if(nk)pool.push(nk);const t1=seatRules(big),t2=seatRules(pool);
     S.t2=t2.map(p=>p.name);S.mt=true;S.players=[...t2,...t1];S.forceOld=false;pickCfg();
     S.dn={1:t1[Math.floor(Math.random()*t1.length)].name,2:t2[Math.floor(Math.random()*t2.length)].name};S.dealer=0;
     S.draw0={order:S.players.map(p=>p.name),t2:S.t2.slice(),dn:Object.assign({},S.dn)};
@@ -1596,7 +1621,8 @@ function runCmd(c){
       toast("Einstellungen übernommen");break;}
     case "merge":mergeTables();break;
     case "tables":checkTables(false);break;
-    case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveP(q.name,q.to);else if(q.op==="merge")mergeTables();break;}
+    case "pend":{const q=S.pend;if(!q)break;if(q.op==="move")moveP(q.name,q.to);else if(q.op==="merge")mergeTables();else if(q.op==="swap")swapTables();break;}
+    case "swap":{if(c.tim!=null){S.swapTim=!!c.tim;save();}if(c.off!=null){S.swapOff=!!c.off;save();}if(c.now)swapTables();break;}
     /* 14.11.: place = Spieler zwischen zwei Nachbarn setzen, z. B. {op:"place",name:"Felix",between:["Manu","Tim"]} */
     case "place":{const p=pl(c.name),x=pl((c.between||[])[0]),y=pl((c.between||[])[1]);if(p&&x&&y&&p!==x&&p!==y){if(S.mt&&tblOf(x)!==tblOf(p)){S.t2=tblOf(x)===2?(S.t2||[]).concat(p.name):(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));}const d=S.players[S.dealer];let a=S.players.filter(q=>q!==p);const i=a.indexOf(x),j=a.indexOf(y),n=a.length;let at=-1;if((i+1)%n===j)at=i+1;else if((j+1)%n===i)at=j+1;if(at>=0){a.splice(at,0,p);S.players=a;S.dealer=Math.max(0,a.indexOf(d));buildSeats();}}break;}
     case "seats":{const m=c.names.map(pl).filter(Boolean);if(m.length===S.players.length){S.players=m;buildSeats();}break;}
@@ -1992,7 +2018,7 @@ function stateLite(){const o=Object.assign({},S);delete o.log;o.logN=(S.log||[])
     p:Object.fromEntries(allP().map(p=>[p.name,{t:S.mt?tblOf(p):1,place:placeOf(p)||0,cost:costOf(p),open:p.entries.reduce((a,e,j)=>a+(e.paid==="offen"?entPrice(p,j):0),0),canRe:canRebuy(p),seat:seatLabel(p)}])),
     order:S.mt?[...seatOrder(1),...seatOrder(2)].map(p=>p.name):S.players.map(p=>p.name),avg:alive().length?Math.round((totalEntries()*S.stack+allP().filter(p=>p.eb).length*(S.eb||0))/alive().length):0};
   o.D.scr=scrState();try{o.D.lob=lobbyGroups().map(g=>({id:g.id,label:g.label,n:g.slides.length,on:lobOn(g.id)}));}catch(e){}
-  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.bc={keep:[CE("keep"),CN("keep"),bcol().keep],cash:[CE("cash"),CN("cash"),bcol().cash]};o.D.brule=S.bounty&&!S.mystery?bRuleText():"";o.D.why=txWhy();o.D.how=payHow();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
+  try{const st=settlement();o.D.tx=st.tx;o.D.kasse=kasse();o.D.sum=summaryText();o.D.swap={tim:S.swapTim!==false,done:!!S.swapped,off:!!S.swapOff};o.D.bc={keep:[CE("keep"),CN("keep"),bcol().keep],cash:[CE("cash"),CN("cash"),bcol().cash]};o.D.brule=S.bounty&&!S.mystery?bRuleText():"";o.D.why=txWhy();o.D.how=payHow();o.D.fee=st.feeTotal;if(S.bounty&&S.mystery){o.D.mpool=mysPool();o.D.mdeck=mysTxt(mysDeck());}}catch(e){}
   return o;}
 /* was gerade groß auf dem Bildschirm läuft (für die Steuerleiste in der App) */
 function scrState(){const a=$("ann"),h=a&&!a.hidden?(a.querySelector("h3")||{}).textContent||"":"",ok=a&&!a.hidden&&$("annOk")?$("annOk").textContent:"";
