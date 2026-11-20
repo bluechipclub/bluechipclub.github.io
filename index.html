@@ -1428,7 +1428,20 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
    "seats": 0,
    "times": [],
    "votes": {},
-   "signups": [],
+   "signups": [
+    "Tim",
+    "Magg",
+    "Niklas",
+    "Zeno",
+    "Viji",
+    "Philipp",
+    "Benno",
+    "Manu",
+    "Kevin",
+    "Jonny",
+    "Chris",
+    "Felix"
+   ],
    "tbd": "",
    "dvotes": {},
    "timeLabel": "Erste Hand · pünktlich",
@@ -3903,7 +3916,12 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   }
   (async () => {
     const n = DATA.settings.next, api = DATA.settings.api; if (!n || !api) return;
-    try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title), { credentials: 'omit' })).json(); if (j.ok) { merge(n, j.signups || []); refreshEvent(); } } catch (e) {}
+    /* Google-Tabelle antwortet manchmal sehr langsam: mit Zeitlimit mehrmals versuchen (Zusagen von oben bleiben sichtbar) */
+    for (let i = 0; i < 4; i++) {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
+      try { const j = await (await fetch(api + '?event=' + encodeURIComponent(n.title) + '&r=' + Date.now(), { credentials: 'omit', signal: ctl.signal })).json(); clearTimeout(to); if (j.ok) { merge(n, j.signups || []); refreshEvent(); return; } } catch (e) { clearTimeout(to); }
+      await new Promise(r => setTimeout(r, 3000 * (i + 1)));
+    }
   })();
   startFx();
   let start = location.hash.slice(1);
