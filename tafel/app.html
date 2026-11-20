@@ -488,7 +488,8 @@ function feed(){const F=$("feed");if(!F)return;const L=(S.lastLog||[]).filter(e=
   const k=L.map(e=>e.t).join();if(k===feed.k)return;feed.k=k;
   F.innerHTML=L.length?L.map(e=>'<div class="cell"><span class="tx">'+esc(e.cmd._l||e.cmd.op)+'<small><b>'+esc(e.cmd._u)+'</b> · '+new Date(e.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+'</small></span></div>').join(""):'<div class="cell"><span class="tx" style="color:var(--sub)">Noch nichts gedrückt.</span></div>';}
 function scrBar(){const r=D.scr||{},b=$("scrb"),K=$("scrK");let t="",e="Auf dem Bildschirm",btns=[];
-  if(r.intro){t="Auslosung · Spielerkarten";btns=[["Überspringen","",{op:"skipintro"}],["Nächste ▶","pri",{op:"close"}]];}
+  if(r.bvid){t="Bounty-Erklärvideo";btns=[["Überspringen ▶","pri",{op:"skipintro"}]];}
+  else if(r.intro){t="Auslosung · Spielerkarten";btns=[["Überspringen","",{op:"skipintro"}],["Nächste ▶","pri",{op:"close"}]];}
   else if(r.ann){t=r.annT||"Ansage";btns=[["✕","",{op:"close"}],[(r.annB||"Weiter")+" ▶","pri",{op:"annok"}]];}
   else if(r.lobby){t="Bildschirmschoner";btns=[["◀","",{op:"lobbynav",d:-1}],["▶","",{op:"lobbynav",d:1}],["Aus","pri",{op:"lobbyclose"}]];}
   const on=!!btns.length&&!ARCH;b.hidden=!on;document.body.classList.toggle("scron",on);if(!on){scrBar.k="";return;}
