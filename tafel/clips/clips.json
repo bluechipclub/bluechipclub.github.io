@@ -74,12 +74,6 @@
    "stumm": true
   },
   {
-   "id": "magg-1",
-   "p": "Magg",
-   "t": "Peaky Blinders",
-   "src": "clips/magg-1.mp4"
-  },
-  {
    "id": "magg-2",
    "p": "Magg",
    "t": "Money Magg",
@@ -120,6 +114,15 @@
    "p": "Chris",
    "t": "Der Top-Raiser",
    "src": "clips/chris-1.mp4"
+  }
+ ],
+ "archiv": [
+  {
+   "id": "magg-1",
+   "p": "Magg",
+   "t": "Peaky Blinders",
+   "src": "clips/magg-1.mp4",
+   "raus": "20.11.2026 Tim"
   }
  ]
 }
