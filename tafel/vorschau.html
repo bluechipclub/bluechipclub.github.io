@@ -427,6 +427,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 @keyframes mysSeal{to{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
 @keyframes mysUp{from{opacity:0;transform:translateY(4vh) scale(.6)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.mysEnv,.mysFlap,.mysSeal,.mysAmt{animation:none}}
+.seat2.mw .av,.seat2.mw img{box-shadow:0 0 0 3px #e2b857,0 0 22px rgba(226,184,87,.6)}
+.seat2 .hd2{color:#f3d68f}
 </style>
 </head>
 <body>
@@ -655,14 +657,14 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:10,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:7,maxRe:2,
   buyin:20,fee:0,rebuy:20,feeRe:0,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
 let HAD_LOCAL=false;
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;if(!S.fee20){S.fee20=1;if(S.buyin===25&&S.fee===5){S.buyin=20;S.fee=0;}}}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;if(!S.fee20){S.fee20=1;if(S.buyin===25&&S.fee===5){S.buyin=20;S.fee=0;}}if(!S.pko20){S.pko20=1;if(!S.started&&!S.bounty){S.bounty=10;S.mystery=0;}}}}catch(e){}
 if(!AUTO_GAMES){S.games=[];}
 /* 12.11.: Rebuy kostet heute 15 P (nicht 25) */
 function fixRebuy(){if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;return true;}return false;}
@@ -842,11 +844,11 @@ function renderT2(){
   const v=atTbl(T2),d=dealerOf(T2),n=v.length,pd=S.pend;
   $("t2cap").textContent=tName(T2)+" · "+n+" Spieler";
   $("t2c").innerHTML=pd&&pd.op==="move"?'<b class="tmove">⇄ '+esc(pd.name)+'</b>wechselt an '+(pd.to===1?"den großen Tisch":"Tisch 2"):pd&&pd.op==="merge"?'<b class="tmove">Final Table</b>alle an den großen Tisch':'<b>'+tName(T2)+'</b>Blue Chip Club';
-  const key=T2+":"+v.map(p=>p.name+"|"+(p.entries.length-1)).join(",");
+  const mw2=mostWanted(),key=T2+":"+v.map(p=>p.name+"|"+(p.entries.length-1)+"|"+headOf(p)+"|"+(mw2===p?1:0)).join(",");
   if(box.dataset.k!==key){box.dataset.k=key;box.querySelectorAll(".seat2").forEach(e=>e.remove());
     v.forEach((p,k)=>{const a=Math.PI/2+k*2*Math.PI/n,x=50+41*Math.cos(a),y=50+37*Math.sin(a),e=document.createElement("div");
-      e.className="seat2";e.dataset.n=p.name;e.style.left=x+"%";e.style.top=y+"%";
-      e.innerHTML=avHtml(p.name)+'<div><div class="nm2"></div>'+(p.entries.length>1?'<div class="re">+'+(p.entries.length-1)+' Rebuy</div>':'')+'</div>';
+      e.className="seat2"+(mw2===p?" mw":"");e.dataset.n=p.name;e.style.left=x+"%";e.style.top=y+"%";
+      e.innerHTML=avHtml(p.name)+'<div><div class="nm2"></div>'+(p.entries.length>1?'<div class="re">+'+(p.entries.length-1)+' Rebuy</div>':'')+(S.bounty&&!S.mystery?'<div class="re hd2">🎯 '+headOf(p)+' P'+(mw2===p?' · Most Wanted':'')+'</div>':'')+'</div>';
       e.querySelector(".nm2").textContent=p.name;e.onclick=()=>openPlayers(p.name);box.appendChild(e);});}
   const di=v.indexOf(d),db=$("dbtn2");db.hidden=di<0;
   if(di>=0){const a=Math.PI/2+di*2*Math.PI/n;db.style.left=(50+28*Math.cos(a))+"%";db.style.top=(50+24*Math.sin(a))+"%";}
@@ -1091,7 +1093,7 @@ function doOut(name,by){
     if(q&&q!==p&&!q.out){const pool=mysPool(),amt=Math.min(pool,mysDraw());q.bw=bwOf(q)+amt;S.mpaid=(S.mpaid||0)+amt;ko={by:q.name,mys:amt,pool};}
     p.out.ko=ko;}
   else if(S.bounty){const h=headOf(p),q=by?pl(by):null;
-    if(q&&q!==p&&!q.out){const cash=Math.ceil(h/2),add=h-cash;q.bw=bwOf(q)+cash;q.head=headOf(q)+add;ko={by:q.name,h,cash,add};}
+    if(q&&q!==p&&!q.out){const cash=Math.min(h,Math.ceil(h/10)*5),add=h-cash; /* Hälfte bar, auf 5 aufgerundet (10→5/5, 15→10/5, 20→10/10) */q.bw=bwOf(q)+cash;q.head=headOf(q)+add;ko={by:q.name,h,cash,add};}
     else{S.lostHeads=(S.lostHeads||0)+h;ko={by:null,h};}
     p.head=0;p.out.ko=ko;}
   S.outOrder.push(p.name);
