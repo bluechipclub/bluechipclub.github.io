@@ -57,7 +57,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .t2c{text-align:center;font-family:var(--mono);color:rgba(243,214,143,.75);font-size:max(10px,.8vw);letter-spacing:.3em;text-transform:uppercase;line-height:1.7}
 .t2c b{display:block;font-family:var(--sans);font-size:max(14px,1.4vw);letter-spacing:.05em;color:#f3d68f;text-transform:none}
 .tcap{position:absolute;left:1.2vw;top:1.2vh;z-index:4;font-family:var(--mono);font-size:max(10px,.8vw);letter-spacing:.25em;text-transform:uppercase;color:#f3d68f;background:rgba(8,8,8,.7);border:1px solid rgba(226,184,87,.35);border-radius:999px;padding:.4vh 1vw;display:none}
-body.two .tcap{display:block}
+body.two .tcap,body.solo2 .tcap{display:block}
 .t2 .seat2{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:.4vw;z-index:2}
 .t2 .seat2 .av{width:3.6vh;height:3.6vh}
 .t2 .seat2 .nm2{padding:.45vh .8vw;border-radius:999px;background:linear-gradient(180deg,rgba(18,26,48,.95),rgba(8,12,24,.95));border:1px solid rgba(110,160,255,.55);font-weight:650;font-size:max(12px,1.05vw);white-space:nowrap;cursor:pointer}
@@ -857,11 +857,14 @@ function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.deale
   try{return fn();}finally{S.players=keep;S.dealer=kd;REAL=null;}}
 function seatLabel(p){if(!S.mt){const k=S.players.indexOf(p);return k<0?"":"Platz "+(k+1);}const t=tblOf(p),k=seatOrder(t).filter(q=>!q.out||q===p).indexOf(p);return (twoT()?(t===1?"Großer Tisch":"Tisch 2")+" · ":"")+"Platz "+(k+1);}
 /* table 2 box under the big table: simple oval, avatar + name per seat, only active players */
+/* Tim 20.11.: zwei Fernseher = jeder zeigt NUR seinen Tisch groß (kein geteiltes Bild). ?geteilt=1 zeigt beide Tische auf einem Bildschirm. */
+const SOLO=(()=>{try{const q=new URLSearchParams(location.search).get("geteilt");if(q!=null){localStorage.setItem("bcc-tafel-solo",q==="1"?"0":"1");}return localStorage.getItem("bcc-tafel-solo")!=="0";}catch(e){return true;}})();
 function renderT2(){
-  const on=twoT(),box=$("t2box");
+  const on=twoT()&&!SOLO,box=$("t2box");
   if(document.body.classList.contains("two")!==on){document.body.classList.toggle("two",on);box.hidden=!on;requestAnimationFrame(()=>{try{buildSeats();renderSeats();}catch(e){}});}
+  document.body.classList.toggle("solo2",twoT()&&SOLO);
   const T1=vt(),T2=ot();
-  $("t1cap").textContent=(on?tName(T1):"Großer Tisch")+" · "+atTbl(on?T1:1).length+" Spieler"+(on&&T1===2?" · dieser Bildschirm":"");
+  $("t1cap").textContent=(twoT()?tName(T1):"Großer Tisch")+" · "+atTbl(twoT()?T1:1).length+" Spieler";
   if(!on){box.querySelectorAll(".seat2").forEach(e=>e.remove());return;}
   const v=atTbl(T2),d=dealerOf(T2),n=v.length,pd=S.pend;
   $("t2cap").textContent=tName(T2)+" · "+n+" Spieler";
