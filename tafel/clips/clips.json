@@ -108,6 +108,12 @@
    "p": "Chris",
    "t": "Der Top-Raiser",
    "src": "clips/chris-1.mp4"
+  },
+  {
+   "id": "magg-2",
+   "p": "Magg",
+   "t": "Money Magg",
+   "src": "clips/magg-2.mp4"
   }
  ]
 }
