@@ -270,6 +270,19 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 .press{transition:transform .16s var(--ease),opacity .16s var(--ease)}
 .press:active,.ctl button:active,.ctl2 button:active,.btn:active{transform:scale(.97)}
 @media (hover:hover){.press:hover,.btn:hover{filter:brightness(1.12)}}
+.dtop{margin:12px 16px 4px}.dtop .bk{margin:0;display:inline-flex;width:auto}
+.dhd{display:flex;flex-direction:column;align-items:center;gap:4px;margin:4px 16px 6px;text-align:center}.dhd .av.big{width:84px;height:84px;font-size:34px;margin-bottom:6px;box-shadow:0 0 0 2px rgba(226,184,87,.55),0 10px 30px rgba(0,0,0,.45)}.dhd b{font-size:24px;font-weight:700;letter-spacing:-.01em}.dhd small{font-size:13px;color:var(--sub)}
+.clist{margin:0 16px 6px;border-radius:18px;overflow:hidden;background:var(--gl);box-shadow:var(--glb)}
+.crow{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:10px 16px;text-align:left;position:relative}
+.crow+.crow::before{content:"";position:absolute;top:0;left:66px;right:0;height:.5px;background:rgba(255,255,255,.08)}
+.crow .ci{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:15px;color:#1a1307;background:linear-gradient(180deg,#f7e2a6,#d4a443);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.crow.dn .ci{background:linear-gradient(180deg,rgba(143,176,255,.35),rgba(47,107,255,.3));color:#fff;font-size:18px}
+.crow .ct{flex:1;min-width:0}.crow .ct b{display:block;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.crow .ct small{display:block;font-size:12.5px;color:var(--sub);margin-top:1px}
+.crow .cgo{font-size:12px;color:var(--gold);opacity:.7}
+.crow.hit{background:rgba(226,184,87,.18)}
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 16px 14px}.dgrid button{height:48px;border-radius:14px;background:var(--gl2);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 .5px rgba(255,255,255,.08);font-size:15px;font-weight:600;color:var(--blue2)}.dgrid button.hit{background:rgba(47,107,255,.35);color:#fff}
+.ptl button{background:var(--gl);box-shadow:var(--glb)}.ptl button .av{box-shadow:0 0 0 1.5px rgba(226,184,87,.35)}
+.seg .btn{height:46px;font-size:15px;border-radius:14px}
 @media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
 </style>
 </head>
@@ -781,29 +794,22 @@ function renderDeck(){
   const all=[...names];CLIPS.forEach(c=>{if(c.p==="Alle")return;(Array.isArray(c.p)?c.p:[c.p]).forEach(x=>{if(!all.some(n=>same(n,x)))all.push(x);});});
   const today=new Set(names.map(lc));const al=CLIPS.filter(c=>c.p==="Alle");
   $("deckH").textContent="Heute am Tisch";$("deckH").hidden=CSEL!=null;
+  const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
   if(CSEL==null){
-    const grid=(list,h)=>{if(!list.length)return;if(h){const s=document.createElement("div");s.className="sec";s.textContent=h;D2.appendChild(s);}
-      const G=document.createElement("div");G.className="ptl";list.forEach(n=>{const cl=CLIPS.filter(c=>owns(c,n)).length,b=document.createElement("button");b.className="press"+(cl||EMO[lc(n)]?"":" no");
+    const grid=(list,h)=>{if(!list.length)return;if(h)D2.appendChild(el("div","sec",esc(h)));
+      const G=el("div","ptl");list.forEach(n=>{const cl=CLIPS.filter(c=>owns(c,n)).length,b=el("button","press"+(cl||EMO[lc(n)]?"":" no"));
         b.innerHTML=(n==="*"?'<div class="av">🎬</div>':avHtml(n))+'<span></span><small>'+(n==="*"?al.length+" Clips":cl?cl+" Clip"+(cl>1?"s":""):"Tanz")+'</small>';b.querySelector("span").textContent=n==="*"?"Für alle":n;b.onclick=()=>deckOpen(n);G.appendChild(b);});D2.appendChild(G);};
     grid(all.filter(n=>today.has(lc(n))));grid(all.filter(n=>!today.has(lc(n))).concat(al.length?["*"]:[]),"Weitere Clips");
     if(!all.length&&!al.length)D2.innerHTML='<p class="note">Keine Clips geladen.</p>';return;}
-  const bk=document.createElement("button");bk.className="bk press";bk.textContent="‹ Zurück zu allen";bk.onclick=()=>deckOpen(null);D2.appendChild(bk);
-  all.filter(n=>CSEL!=="*"&&same(n,CSEL)).slice(0,1).forEach(n=>{
-    const cl=CLIPS.filter(c=>owns(c,n)),em=EMO[lc(n)];
-    const r=document.createElement("div");r.className="pc";
-    r.innerHTML='<div class="hd">'+avHtml(n)+'<span class="tx"><b></b><small>'+(cl.length?cl.length+" Clip"+(cl.length>1?"s":""):"kein eigener Clip")+'</small></span></div><div class="acts"></div><div class="ext"><div><div class="acts"></div><div class="bar"></div></div></div>';
-    r.querySelector(".hd b").textContent=n;
-    const A=r.querySelector(".acts"),ext=r.querySelector(".ext"),XA=ext.querySelector(".acts");
-    const chip=(t,cls,fn)=>{const b=document.createElement("button");b.className="chip press "+(cls||"");b.textContent=t;b.onclick=()=>{hit(b);fn();};return b;};
-    cl.forEach(c=>A.appendChild(chip("▶ "+c.t+(c.stumm?" (ohne Ton)":""),"",()=>send({op:"clip",id:c.id},"▶ "+c.t))));
-    if(em){A.appendChild(chip("💃 Tanz","dn",()=>send({op:"dance",who:n,d:"tanz"},n+" tanzt")));
-      let tm=null;const tog=chip("Online-Tänze","mo",()=>{const o=!ext.classList.contains("open");ext.classList.remove("open");void ext.offsetWidth;ext.classList.toggle("open",o);clearTimeout(tm);if(o)tm=setTimeout(()=>ext.classList.remove("open"),5000);});A.appendChild(tog);
-      MORE.forEach(([d,t])=>XA.appendChild(chip(t,"dn",()=>{send({op:"dance",who:n,d},n+": "+t);clearTimeout(tm);tm=setTimeout(()=>ext.classList.remove("open"),5000);ext.classList.remove("open");void ext.offsetWidth;ext.classList.add("open");})));}
-    else{if(!cl.length||today.has(lc(n)))A.appendChild(chip("🎉 Profilbild-Party","dn",()=>send({op:"dance",who:n,d:"tanz"},n+" Party")));ext.remove();}
-    D2.appendChild(r);});
-  if(CSEL==="*"&&al.length){const s=document.createElement("div");s.className="sec";s.textContent="Für alle";D2.appendChild(s);
-    const r=document.createElement("div");r.className="pc";r.innerHTML='<div class="acts" style="margin:0"></div>';
-    al.forEach(c=>{const b=document.createElement("button");b.className="chip press";b.textContent="▶ "+c.t;b.onclick=()=>{hit(b);send({op:"clip",id:c.id},"▶ "+c.t);};r.firstChild.appendChild(b);});D2.appendChild(r);}
+  /* Detail: ein Spieler. Tim 20.11.: jeder Clip eine eigene große Zeile, sauber statt viele kleine Pillen */
+  const n=CSEL==="*"?null:(all.find(x=>same(x,CSEL))||CSEL),cl=n?CLIPS.filter(c=>owns(c,n)):al,em=n&&EMO[lc(n)];
+  const top=el("div","dtop");const bk=el("button","bk press","‹ Alle");bk.onclick=()=>deckOpen(null);top.appendChild(bk);D2.appendChild(top);
+  const hd=el("div","dhd",(n?avHtml(n,"big"):'<div class="av big">🎬</div>')+'<b></b><small>'+(cl.length?cl.length+" Clip"+(cl.length>1?"s":""):"kein eigener Clip")+'</small>');hd.querySelector("b").textContent=n||"Für alle";D2.appendChild(hd);
+  const row=(ic,t,sub,cls,fn)=>{const b=el("button","crow press"+(cls?" "+cls:""),'<span class="ci">'+ic+'</span><span class="ct"><b></b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span><span class="cgo">▶</span>');b.querySelector("b").textContent=t;b.onclick=()=>{hit(b);buzz(10);fn();};return b;};
+  if(cl.length){D2.appendChild(el("div","sec","Clips"));const G=el("div","clist");cl.forEach(c=>G.appendChild(row("▶",c.t,c.stumm?"ohne Ton":"",'',()=>send({op:"clip",id:c.id},"▶ "+c.t))));D2.appendChild(G);}
+  if(n){D2.appendChild(el("div","sec","Tanzen"));const G=el("div","clist");
+    G.appendChild(row("💃",em?"Tanz":"Profilbild-Party",em?"Sein Tanz auf der Tafel":"Sein Bild feiert auf der Tafel","dn",()=>send({op:"dance",who:n,d:"tanz"},n+(em?" tanzt":" Party"))));D2.appendChild(G);
+    if(em){const M=el("div","dgrid");MORE.forEach(([d,t])=>{const b=el("button","press",esc(t));b.onclick=()=>{hit(b);buzz(10);send({op:"dance",who:n,d},n+": "+t);};M.appendChild(b);});D2.appendChild(el("div","sec","Weitere Tänze"));D2.appendChild(M);}}
 }
 /* Tims Clip-Wünsche 19.11. (erst in der Vorschau; beim finalen Update in clips.json übernehmen) */
 const CLIP_FIX={drop:["manu-sf"],rename:{"manu-2":"Manu Car","rap-tim-niki":"🎤 Rap: Tim & Niki"},owners:{"rap-tim-niki":["Tim","Niki"]}};
