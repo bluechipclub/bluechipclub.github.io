@@ -174,7 +174,7 @@ nav button.on{color:var(--sun)}
       <label class="fl">Startzeit<input data-k="start"></label>
     </div>
   </div>
-  <div class="card"><h4>Ergebnis & Auszahlung</h4><div id="res"></div></div>
+  <div class="card"><h4>Ergebnis & Auszahlung</h4><div id="res"></div><button class="btn sun mt" id="bRep" style="width:100%">📄 Auswertung herunterladen</button></div>
   <div class="card"><h4>Blind-Struktur</h4><table><thead><tr><th>#</th><th>SB</th><th>BB</th><th>Ante</th><th>Pause</th></tr></thead><tbody id="lvT"></tbody></table></div>
   <div class="card"><h4>Neues Turnier</h4>
     <div class="g2"><button class="btn" id="bNew1">Gleiche Spieler</button><button class="btn red" id="bNew2">Alles leer</button></div>
@@ -190,7 +190,7 @@ nav button.on{color:var(--sun)}
 <div id="sh"><div id="shc"></div></div>
 <div id="toast"></div>
 
-<script src="core.js"></script>
+<script src="core.js?v=5"></script>
 <script>
 (function(){
 "use strict";
@@ -357,6 +357,7 @@ $("swAuto").onclick=function(){ send({op:"set",k:"auto",v:S.auto?0:1},S.auto?"Zu
 $("swPause").onclick=function(){ send({op:"set",k:"pauseParty",v:S.pauseParty?0:1},"Gespeichert"); };
 $("iEvMin").onchange=function(){ send({op:"set",k:"evMin",v:+this.value},"Gespeichert"); };
 $("iEvMax").onchange=function(){ send({op:"set",k:"evMax",v:+this.value},"Gespeichert"); };
+$("bRep").onclick=function(){ if(S) P.download(S); };
 $("bNew1").onclick=function(){ armed(this,"Sicher? Nochmal",function(){ send({op:"reset",keepPlayers:true},"Neues Turnier"); }); };
 $("bNew2").onclick=function(){ armed(this,"Sicher? Nochmal",function(){ send({op:"reset"},"Neues Turnier"); }); };
 setInterval(function(){ if(S){ var l=S.levels[S.li]; $("cT").textContent=fmt(curLeft()); $("evNext").textContent=S.auto? "nächste in "+fmt(curEv()) : "nur per Knopf"; } status(); },500);
