@@ -261,7 +261,9 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <button id="bEv">🎰 Mission jetzt</button>
   <button id="bDone">✓ Mission erledigt</button>
   <button id="bSkip">⏭ Mission skip</button>
+  <button id="bSong" title="GTA-Song nur auf diesem Laptop laden">🎵 GTA-Sound laden</button>
 </div>
+<input type="file" id="songIn" accept="audio/*" style="display:none">
 <div id="toast"></div>
 
 <script src="core.js"></script>
@@ -340,7 +342,7 @@ function op(o){
     case "back": if(p&&p.out){ snap(p.name+" doch nicht raus"); p.out=false; p.outTs=0; if(!p.seat||seatHolder(p.seat)&&seatHolder(p.seat)!==p) p.seat=freeSeat(); toast(p.name+" ist wieder drin"); } break;
     case "rebuy": if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
         snap(p.name+" Rebuy"); p.buys++; p.out=false; p.outTs=0; if(!p.seat||(seatHolder(p.seat)&&seatHolder(p.seat)!==p)) p.seat=freeSeat();
-        potPop(); fx("respawn","REBUY",p.name.toUpperCase()+" IST ZURÜCK"); sfx("chip"); } break;
+        potPop(); fx("respawn","REBUY",p.name.toUpperCase()+" IST ZURÜCK"); sfx("rebuy"); } break;
     case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy von "+p.name+" zurückgenommen"); } break;
     case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast(old+" → "+p.name); } break;
     case "seat": if(p&&o.seat>=1&&o.seat<=S.seats){ snap("Platz geändert"); var h=seatHolder(o.seat); if(h&&h!==p){ h.seat=p.seat; } p.seat=o.seat; toast(p.name+" → Platz "+o.seat); } break;
@@ -348,6 +350,8 @@ function op(o){
     case "draw": drawSeats(); break;
     case "undo": { var L=S.log.pop(); if(L){ S.players=JSON.parse(L.pl); S.nextId=L.n; toast("↶ Rückgängig: "+L.l); } else msg="Nichts zum Zurücknehmen"; break; }
     case "photo": showPhoto(); break;
+    case "slide": slideStart(); break;
+    case "slidestop": slideStop(); break;
     case "bday": startBday(false); break;
     case "bdaystop": endBday(); break;
     case "bdayauto": S.bday=S.bday||{}; S.bday.auto=S.bday.auto===0?1:0; break;
@@ -412,7 +416,7 @@ function undoPlayed(){ if(!S.ev) return; S.played[S.ev.id]=Math.max(0,(S.played[
 function doneEvent(){
   if(!S.ev) return; var r=S.ev.resume; S.ev=null;
   var run=S.running; setRun(false); rollEv(); if(r) run=true; setRun(run);
-  fx("passed","MISSION PASSED","RESPECT +"+(50+Math.floor(Math.random()*9)*25)); sfx("tada");
+  fx("passed","MISSION PASSED","RESPECT +"+(50+Math.floor(Math.random()*9)*25)); sfx("done");
 }
 var shownEv=null;
 function renderEvent(){
@@ -420,7 +424,7 @@ function renderEvent(){
   if(!S.ev){ o.classList.remove("on"); shownEv=null; return; }
   if(shownEv===S.ev.ts) return; shownEv=S.ev.ts;
   var ev=S.ev, all=P.EVENTS.concat([P.FULLPORT]), byid={}; all.forEach(function(x){byid[x.id]=x});
-  o.classList.add("on"); $("evBg").style.backgroundImage="url("+ev.img+")";
+  slideStop(); o.classList.add("on"); $("evBg").style.backgroundImage="url("+ev.img+")";
   $("evDesc").classList.remove("show"); $("evHint").classList.remove("show");
   $("evTag").textContent= ev.id==="fullport"? "★★★★★ SONDERMISSION ★★★★★" : "★ NEUE MISSION ★";
   var strip=$("strip"); strip.innerHTML="";
@@ -441,7 +445,7 @@ function renderEvent(){
       else dd.appendChild(document.createTextNode(part));
     });
     dd.classList.add("show"); $("evHint").classList.add("show");
-    if(dur>500){ confetti(); sfx("tada"); }
+    if(dur>500){ confetti(); if(!song) sfx("tada"); }
   },dur+150);
 }
 
@@ -453,8 +457,14 @@ function nextPhoto(){ phEls[phIdx].classList.remove("on"); phIdx=(phIdx+1)%phEls
 setInterval(nextPhoto,11000);
 var bgI=0; setInterval(function(){ var b=document.querySelectorAll("#bgph i"); b[bgI].classList.remove("on"); bgI=(bgI+1)%b.length; b[bgI].classList.add("on"); },60000);
 var showT=null, lastShow=Date.now();
+var slideOn=false, slideT=null, slideLast=-1;
+function slideStep(){ var i; do{ i=Math.floor(Math.random()*P.IMGS.length); }while(P.IMGS.length>1&&i===slideLast); slideLast=i;
+  var c=CAPS[Math.floor(Math.random()*CAPS.length)], im=$("showIm"); im.style.animation="none"; void im.offsetWidth; im.style.animation=""; im.style.backgroundImage="url("+P.IMGS[i]+")";
+  $("showB").textContent=c[0]; $("showS").textContent=c[1]; }
+function slideStart(){ if(S.ev) return; clearTimeout(showT); slideOn=true; slideStep(); $("show").classList.add("on"); clearInterval(slideT); slideT=setInterval(slideStep,7000); lastShow=Date.now(); broadcast(); }
+function slideStop(){ var w=slideOn; slideOn=false; clearInterval(slideT); clearTimeout(showT); $("show").classList.remove("on"); lastShow=Date.now(); if(w) broadcast(); }
 function showPhoto(){
-  if(S.ev) return; var i=Math.floor(Math.random()*P.IMGS.length), c=CAPS[Math.floor(Math.random()*CAPS.length)];
+  if(S.ev||slideOn) return; var i=Math.floor(Math.random()*P.IMGS.length), c=CAPS[Math.floor(Math.random()*CAPS.length)];
   var im=$("showIm"); im.style.animation="none"; void im.offsetWidth; im.style.animation=""; im.style.backgroundImage="url("+P.IMGS[i]+")";
   $("showB").textContent=c[0]; $("showS").textContent=c[1]; $("show").classList.add("on"); lastShow=Date.now();
   clearTimeout(showT); showT=setTimeout(function(){ $("show").classList.remove("on"); },8000);
@@ -516,7 +526,7 @@ function showDraw(){
   var o=$("seatov"), g=$("seatGrid"), act=S.players.filter(function(p){return !p.out&&p.seat}).sort(function(a,b){return a.seat-b.seat});
   var names=act.map(function(p){return p.name}); g.innerHTML="";
   act.forEach(function(p){ var d=document.createElement("div"); d.innerHTML="<b></b><span class='spin'></span>"; d.children[0].textContent=p.seat; g.appendChild(d); });
-  o.classList.add("on"); sfx("spin");
+  o.classList.add("on"); sfx("spin2");
   var spans=g.querySelectorAll("span"), t0=Date.now();
   clearInterval(seatT); seatT=setInterval(function(){
     var el=Date.now()-t0;
@@ -604,7 +614,21 @@ function dc(){ cx.clearRect(0,0,cv.width,cv.height); parts=parts.filter(function
   parts.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; p.vy+=.04; p.r+=p.vr; cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c; cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); cx.restore(); });
   anim=parts.length? requestAnimationFrame(dc):null; }
 var AC=null;
-function sfx(k){ try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); var n=AC.currentTime;
+/* GTA-Song: nur lokal auf diesem Laptop (IndexedDB), wird nie hochgeladen. Ausschnitte in Sekunden [von, bis]. */
+var song=null, songSrc=null, CLIP={spin:[44.8,53.5],spin2:[44.8,51],done:[163.3,168],level:[60.4,64.6],wasted:[139.2,143.5],rebuy:[75.4,79],tada:[163.3,168]};
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
+function playClip(c){ var a=ac(), n=a.currentTime, d=c[1]-c[0]; try{ if(songSrc) songSrc.stop(); }catch(e){}
+  var src=a.createBufferSource(), g=a.createGain(); src.buffer=song; g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(.9,n+.08); g.gain.setValueAtTime(.9,n+d-.7); g.gain.linearRampToValueAtTime(0,n+d);
+  src.connect(g); g.connect(a.destination); src.start(n,c[0],d); songSrc=src; }
+function idb(fn){ try{ var r=indexedDB.open("bcparty-song",1); r.onupgradeneeded=function(){ r.result.createObjectStore("f"); }; r.onsuccess=function(){ fn(r.result); }; }catch(e){} }
+function useSong(ab,silent){ ac().decodeAudioData(ab.slice(0),function(b){ song=b; $("bSong").style.display="none"; if(!silent) toast("🎵 GTA-Sound aktiv (nur auf diesem Laptop)"); },function(){ toast("Datei ging nicht"); }); }
+function loadSongFile(f){ if(!f) return; f.arrayBuffer().then(function(ab){ useSong(ab); idb(function(db){ try{ db.transaction("f","readwrite").objectStore("f").put(ab,"song"); }catch(e){} }); }); }
+$("songIn").onchange=function(){ loadSongFile(this.files[0]); this.value=""; };
+$("bSong").onclick=function(){ $("songIn").click(); };
+document.addEventListener("dragover",function(e){ e.preventDefault(); });
+document.addEventListener("drop",function(e){ e.preventDefault(); var f=e.dataTransfer.files[0]; if(f&&/audio|mp3/.test(f.type+f.name)) loadSongFile(f); });
+idb(function(db){ try{ var q=db.transaction("f").objectStore("f").get("song"); q.onsuccess=function(){ if(q.result) useSong(q.result,true); }; }catch(e){} });
+function sfx(k){ try{ if(song&&CLIP[k]){ playClip(CLIP[k]); return; } if(k==="done"||k==="rebuy") k=k==="done"?"tada":"chip"; if(k==="spin2") k="spin"; ac(); var n=AC.currentTime;
   var T=function(f,t,d,ty,v){ var o=AC.createOscillator(),g=AC.createGain(); o.type=ty||"sine"; o.frequency.value=f; g.gain.setValueAtTime(0,n+t); g.gain.linearRampToValueAtTime(v||.16,n+t+.02); g.gain.exponentialRampToValueAtTime(.001,n+t+d); o.connect(g); g.connect(AC.destination); o.start(n+t); o.stop(n+t+d+.05); };
   if(k==="beep") T(880,0,.15,"square",.05);
   else if(k==="chip"){ T(1400,0,.06,"triangle",.12); T(1900,.05,.08,"triangle",.1); }
@@ -620,7 +644,7 @@ var SY=P.sync("tafel",function(ev,p){
   else if(ev==="hello") broadcast();
 },function(ok){ $("conn").classList.toggle("ok",ok); });
 SY.onUp=broadcast;
-function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.bdayDone=bdKey(); o.bdayOn=bdOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
+function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
 function ack(id,dup,msg){ SY.send("ack",{id:id,msg:msg||""}); }
 setInterval(broadcast,5000);
 
@@ -636,9 +660,10 @@ document.addEventListener("keydown",function(e){ var k=e.key.toLowerCase();
   if(k===" "){ e.preventDefault(); if(S.ev){ if(Date.now()-S.ev.ts>4000) op({op:"evdone"}); } else op({op:"toggle"}); }
   else if(k==="arrowright") op({op:"lvl",d:1}); else if(k==="arrowleft") op({op:"lvl",d:-1});
   else if(k==="e") op({op:"ev"}); else if(k==="f") fs(); else if(k==="p") showPhoto();
-  else if(k==="escape"){ $("show").classList.remove("on"); if(bdOn) endBday(); }
+  else if(k==="m") $("songIn").click();
+  else if(k==="escape"){ slideStop(); if(bdOn) endBday(); }
 });
-$("show").onclick=function(){ $("show").classList.remove("on"); };
+$("show").onclick=function(){ slideStop(); };
 
 if(!S.evAt&&!S.running) rollEv();
 if(S.running&&S.endsAt<Date.now()-8*3600*1000) S.running=false;

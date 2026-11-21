@@ -126,7 +126,8 @@ nav button.on{color:var(--sun)}
   <button class="btn pri big" id="bPlay" style="width:100%">▶ Start</button>
   <div class="g2 mt"><button class="btn" data-op="lvl" data-d="-1">◀ Level</button><button class="btn" data-op="lvl" data-d="1">Level ▶</button></div>
   <div class="g2 mt"><button class="btn" data-op="time" data-d="-60">− 1 Min</button><button class="btn" data-op="time" data-d="60">+ 1 Min</button></div>
-  <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn" data-op="photo">📸 Alex-Foto</button></div>
+  <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn pri" id="bRb">♻️ Rebuy</button></div>
+  <button class="btn mt" id="bSlide" style="width:100%">🖼 Alex Dia-Show</button>
   <div class="g2 mt"><button class="btn sun" id="bBd">🎂 Geburtstagsvideo</button><button class="btn" id="bBdS">⏹ Video stoppen</button></div>
   <button class="btn red mt" id="bFp" style="width:100%">🚀 Fullport-Runde jetzt (nur 1×)</button>
   <div class="card mt">
@@ -252,6 +253,16 @@ function addSheet(seat){
   });
 }
 $("bAdd").onclick=function(){ if(S) addSheet(0); };
+/* Rebuy: wer? dann OK oder Abbrechen */
+$("bRb").onclick=function(){ if(!S) return; var ro=P.rebuyOpen(S), pick=null;
+  sheet("Rebuy – wer?", ro? S.rebuy+" "+S.unit+" in den Pot" : "Achtung: Rebuy-Phase ist eigentlich vorbei", function(c){
+    var g=document.createElement("div"); g.className="g2 mt"; c.appendChild(g);
+    S.players.slice().sort(function(a,b){ return (b.out-a.out)||a.name.localeCompare(b.name); }).forEach(function(p){
+      var b=B(g,(p.out?"💀 ":"")+p.name+(p.buys>1?" ★"+(p.buys-1):""),"",function(){ pick=p; g.querySelectorAll("button").forEach(function(x){ x.classList.remove("pri"); }); b.classList.add("pri"); ok.textContent="OK · "+p.name; }); });
+    var g2=grid(c); B(g2,"Abbrechen","",close); var ok=B(g2,"OK","pri",function(){ if(!pick) return; send({op:"rebuy",id:pick.id,force:!ro},"Rebuy "+pick.name); close(); });
+  });
+};
+$("bSlide").onclick=function(){ send({op:S&&S.slideOn?"slidestop":"slide"},S&&S.slideOn?"Dia-Show aus":"Dia-Show an"); };
 function playerSheet(p){
   var stars=p.buys>1? " · "+(p.buys-1)+" Rebuy"+(p.buys>2?"s":"") : "";
   sheet(p.name, "Platz "+(p.seat||"–")+" · "+(p.out?"ausgeschieden":"im Spiel")+stars, function(c){
@@ -287,6 +298,7 @@ function render(){
   var nx=S.levels[S.li+1];
   $("cM").textContent=(nx? (nx.brk? "Danach Pause" : "Nächstes: "+num(nx.sb)+" / "+num(nx.bb)) : "Letztes Level")+" · Mission in "+(S.auto? fmt(curEv()) : "– (aus)");
   $("bPlay").textContent= S.running? "⏸ Pause" : "▶ Start";
+  $("bSlide").textContent= S.slideOn? "⏹ Dia-Show beenden" : "🖼 Alex Dia-Show";
   $("bFp").disabled=!!(S.fp&&S.fp.done);
   if(S.ev){ $("evCard").hidden=false; $("evT").textContent=S.ev.e+" "+S.ev.t; $("evD").textContent=S.ev.d.replace(/[\u0001\u0002]/g,""); } else $("evCard").hidden=true;
   $("pot").textContent=num(P.pot(S))+" "+S.unit;
