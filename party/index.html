@@ -261,6 +261,7 @@ var S=load();
 function load(){
   var s=null; try{ s=JSON.parse(localStorage.getItem(P.KEY)||"null"); }catch(e){}
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
+  if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
   return o;
 }
 function save(){ try{ localStorage.setItem(P.KEY,JSON.stringify(S)); }catch(e){} }

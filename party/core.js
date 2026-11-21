@@ -42,7 +42,7 @@ P.defaults = function(){
   return {
     v:1, title:"BLUE CHIP PARTY", sub:"Alex' Birthday Edition", start:"19:00",
     entry:5, rebuy:5, bonus:50, unit:"P", stack:20000, rebuyLvl:6, min:20, seats:10,
-    evMin:12, evMax:20, auto:1, pauseParty:1, off:{muenze:1},
+    evMin:15, evMax:25, auto:1, pauseParty:1, off:{muenze:1},
     levels:JSON.parse(JSON.stringify(P.LEVELS)),
     li:0, left:20*60, running:false, endsAt:0,
     evLeft:15*60, evAt:0, played:{}, hist:[], ev:null,
