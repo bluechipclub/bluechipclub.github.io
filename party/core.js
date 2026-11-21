@@ -36,7 +36,7 @@ P.EVENTS = [
 /* Fullport: genau EINMAL, früh (Level 2 bis 4), solange Rebuys noch lohnen. */
 P.FULLPORT = {id:"fullport",k:"poker",e:"🚀",t:"FULLPORT-RUNDE",d:"Nächste Hand gehen ALLE automatisch all-in. Keiner darf folden. Rebuy ist ja noch offen!"};
 
-P.IMGS = ["img/ki-allin.jpg","img/ki-pokal.jpg","img/ki-headsup-jonny.jpg","img/ki-torte.jpg","img/ki-vegas-jonny.jpg","img/ki-jubel-jonny.jpg","img/ki-fold.jpg","img/karte.jpg"];
+P.IMGS = ["img/gta-portrait.jpg","img/gta-strasse.jpg","img/gta-thron.jpg","img/gta-collage.jpg","img/gta-karten.jpg","img/gta-yacht-torte.jpg","img/gta-allin.jpg","img/gta-cabrio.jpg","img/ki-allin.jpg","img/ki-pokal.jpg","img/ki-headsup-jonny.jpg","img/ki-torte.jpg","img/ki-vegas-jonny.jpg","img/ki-jubel-jonny.jpg","img/ki-fold.jpg","img/karte.jpg"];
 
 P.defaults = function(){
   return {
