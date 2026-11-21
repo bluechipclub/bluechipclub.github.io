@@ -127,6 +127,7 @@ nav button.on{color:var(--sun)}
   <div class="g2 mt"><button class="btn" data-op="lvl" data-d="-1">◀ Level</button><button class="btn" data-op="lvl" data-d="1">Level ▶</button></div>
   <div class="g2 mt"><button class="btn" data-op="time" data-d="-60">− 1 Min</button><button class="btn" data-op="time" data-d="60">+ 1 Min</button></div>
   <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn" data-op="photo">📸 Alex-Foto</button></div>
+  <div class="g2 mt"><button class="btn sun" id="bBd">🎂 Geburtstagsvideo</button><button class="btn" id="bBdS">⏹ Video stoppen</button></div>
   <button class="btn red mt" id="bFp" style="width:100%">🚀 Fullport-Runde jetzt (nur 1×)</button>
   <div class="card mt">
     <div class="potl"><div><h4 style="margin:0">Preisgeld</h4><b id="pot">50 P</b></div><span id="potS"></span></div>
@@ -151,6 +152,7 @@ nav button.on{color:var(--sun)}
     <div class="row"><div class="x">Party-Games halten die Uhr an</div><button class="sw" id="swPause"></button></div>
     <div class="g2 mt"><label class="fl">Frühestens nach (Min)<input type="number" inputmode="numeric" id="iEvMin"></label><label class="fl">Spätestens nach (Min)<input type="number" inputmode="numeric" id="iEvMax"></label></div>
   </div>
+  <div class="card"><h4>Geburtstagsvideo</h4><div class="row"><div class="x">Um 00:00 automatisch abspielen<small id="bdInfo"></small></div><button class="sw" id="swBd"></button></div></div>
   <div class="card"><h4>Fullport-Runde</h4><div class="note" id="fpInfo"></div></div>
   <div class="card"><h4>Welche Missionen dürfen kommen</h4><div id="evList"></div></div>
   <div class="card"><h4>Heute schon gelaufen</h4><div class="hist" id="hist"></div></div>
@@ -221,6 +223,9 @@ try{ var pg=+localStorage.getItem("bcparty-fb-page"); if(pg>0&&pg<4) page(pg); }
 document.querySelectorAll("[data-op]").forEach(function(b){ b.onclick=function(){ var o={op:b.dataset.op}; if(b.dataset.d) o.d=+b.dataset.d; send(o,b.textContent.trim()); }; });
 $("bPlay").onclick=function(){ send({op:S&&S.running?"pause":"play"},S&&S.running?"Pause":"Läuft"); };
 $("bFp").onclick=function(){ if(S&&S.fp&&S.fp.done){ toast("Fullport war schon","err"); return; } armed(this,"Wirklich jetzt? Nochmal tippen",function(){ send({op:"fullport"},"Fullport!"); }); };
+$("bBd").onclick=function(){ armed(this,"Jetzt abspielen? Nochmal",function(){ send({op:"bday"},"Video startet"); }); };
+$("bBdS").onclick=function(){ send({op:"bdaystop"},"Video gestoppt"); };
+$("swBd").onclick=function(){ send({op:"bdayauto"},"Gespeichert"); };
 $("bUndo").onclick=function(){ send({op:"undo"},"Rückgängig"); };
 
 function armed(btn,txt,fn){ if(btn._arm){ btn._arm=false; btn.textContent=btn._txt; fn(); return; } btn._txt=btn.textContent; btn._arm=true; btn.textContent=txt; setTimeout(function(){ if(btn._arm){ btn._arm=false; btn.textContent=btn._txt; } },3500); }
@@ -288,7 +293,7 @@ function render(){
   $("potS").innerHTML=P.entries(S)+" Entries<br>"+P.rebuys(S)+" Rebuys<br>+ "+S.bonus+" von Alex";
   var po=P.payout(S); $("payS").textContent= S.players.length? po.map(function(v,i){return (i+1)+". Platz "+num(v)+" "+S.unit}).join(" · ") : "Noch keine Spieler";
   $("evNext").textContent= S.auto? "nächste in "+fmt(curEv()) : "nur per Knopf";
-  var sig=JSON.stringify([S.players,S.li,S.off,S.hist.length,S.auto,S.pauseParty,S.evMin,S.evMax,S.fp,S.levels,S.entry,S.rebuy,S.bonus,S.unit,S.rebuyLvl,S.min,S.stack,S.start,S.canUndo,S.seats]);
+  var sig=JSON.stringify([S.players,S.li,S.off,S.hist.length,S.auto,S.pauseParty,S.evMin,S.evMax,S.fp,S.levels,S.entry,S.rebuy,S.bonus,S.unit,S.rebuyLvl,S.min,S.stack,S.start,S.canUndo,S.seats,S.bday,S.bdayDone]);
   if(sig===lastSig) return; lastSig=sig;
   /* Crew */
   var ro=P.rebuyOpen(S), al=P.alive(S).length, h="";
@@ -308,6 +313,7 @@ function render(){
   $("outList").querySelectorAll(".seat").forEach(function(el){ el.onclick=function(){ var id=+el.dataset.pid; var pp=S.players.filter(function(x){return x.id===id})[0]; if(pp) playerSheet(pp); }; });
   $("bUndo").disabled=!S.canUndo; $("bUndo").textContent= S.canUndo? "↶ Rückgängig: "+S.canUndo : "↶ Rückgängig";
   /* Missionen */
+  var bda=!(S.bday&&S.bday.auto===0); $("swBd").classList.toggle("on",bda); $("bdInfo").textContent=(S.bdayDone?"Lief schon ✓ (Knopf auf der Uhr-Seite = nochmal) · ":"")+"10 Sekunden Countdown, dann Video mit Ton";
   $("swAuto").classList.toggle("on",!!S.auto); $("swPause").classList.toggle("on",!!S.pauseParty);
   if(document.activeElement!==$("iEvMin")) $("iEvMin").value=S.evMin; if(document.activeElement!==$("iEvMax")) $("iEvMax").value=S.evMax;
   $("fpInfo").textContent= S.fp.done? "Ist schon gelaufen ✓" : "Kommt genau einmal, zufällig in Level "+S.fp.lvl+" (solange Rebuy offen ist). Alle gehen automatisch all-in. Oder oben auf der Uhr-Seite selbst auslösen.";
