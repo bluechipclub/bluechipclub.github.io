@@ -167,7 +167,7 @@ nav button.on{color:var(--sun)}
     <div class="g2">
       <label class="fl">Entry<input type="number" inputmode="numeric" data-k="entry"></label>
       <label class="fl">Rebuy<input type="number" inputmode="numeric" data-k="rebuy"></label>
-      <label class="fl">Alex legt dazu<input type="number" inputmode="numeric" data-k="bonus"></label>
+      
       <label class="fl">Einheit<input data-k="unit"></label>
       <label class="fl">Rebuy bis Ende Level<input type="number" inputmode="numeric" data-k="rebuyLvl"></label>
       <label class="fl">Minuten pro Level<input type="number" inputmode="numeric" data-k="min"></label>
@@ -191,7 +191,7 @@ nav button.on{color:var(--sun)}
 <div id="sh"><div id="shc"></div></div>
 <div id="toast"></div>
 
-<script src="core.js?v=5"></script>
+<script src="core.js?v=6"></script>
 <script>
 (function(){
 "use strict";
@@ -202,7 +202,7 @@ var tt; function toast(m,cls){ var t=$("toast"); t.textContent=m; t.className="o
 
 var SY=P.sync("fb",function(ev,p){
   if(ev==="state"&&p){ off=Date.now()-p.now; S=p; lastState=Date.now(); render(); }
-  else if(ev==="ack"&&p&&pending[p.id]){ var l=pending[p.id]; delete pending[p.id]; clearTimeout(l.t); if(p.msg) toast(p.msg,"err"); else toast("✓ "+l.l,"ok"); }
+  else if(ev==="ack"&&p&&pending[p.id]){ var l=pending[p.id]; delete pending[p.id]; clearTimeout(l.t); if(p.msg) toast(p.msg,"err"); else toast("✓ "+(p.ok||l.l),"ok"); }
 },function(ok){ status(); });
 SY.onUp=function(){ SY.send("hello",{from:SY.dev}); };
 setTimeout(function(){ SY.send("hello",{from:SY.dev}); },300);
@@ -271,19 +271,17 @@ function playerSheet(p){
   var stars=p.buys>1? " · "+(p.buys-1)+" Rebuy"+(p.buys>2?"s":"") : "";
   sheet(p.name, "Platz "+(p.seat||"–")+" · "+(p.out?"ausgeschieden":"im Spiel")+stars, function(c){
     var ro=P.rebuyOpen(S);
-    if(!p.out){
-      B(c,"💀 Raus","red big",function(){ send({op:"out",id:p.id},p.name+" raus"); close(); }).style.width="100%";
-    } else {
-      var g0=grid(c);
-      B(g0,ro?"♻️ Rebuy ("+S.rebuy+" "+S.unit+")":"Rebuy (Phase vorbei)",ro?"pri":"",function(){ send({op:"rebuy",id:p.id,force:!ro},"Rebuy "+p.name); close(); });
-      B(g0,"↩ Doch nicht raus","",function(){ send({op:"back",id:p.id},p.name+" wieder drin"); close(); });
-    }
+    var g0=grid(c);
+    /* Rebuy immer anbieten, egal ob drin oder raus (Tim 21.11.) */
+    B(g0,"♻️ Rebuy ("+S.rebuy+" "+S.unit+")","pri",function(){ send({op:"rebuy",id:p.id,name:p.name,force:true},"Rebuy "+p.name); close(); });
+    if(!p.out) B(g0,"💀 Raus","red",function(){ send({op:"out",id:p.id,name:p.name},p.name+" raus"); close(); });
+    else B(g0,"↩ Doch nicht raus","",function(){ send({op:"back",id:p.id,name:p.name},p.name+" wieder drin"); close(); });
     var l=document.createElement("div"); l.className="note mt"; l.textContent="Platz ändern (besetzter Platz = tauschen):"; c.appendChild(l);
     seatPicker(c,p.seat,function(s){ if(s!==p.seat){ send({op:"seat",id:p.id,seat:s},"Platz "+s); close(); } });
     var inp=document.createElement("input"); inp.value=p.name; inp.className="mt"; inp.style.marginTop="12px"; c.appendChild(inp);
     var g=grid(c);
     B(g,"Umbenennen","",function(){ var n=inp.value.trim(); if(n&&n!==p.name){ send({op:"rename",id:p.id,name:n},"Umbenannt"); } close(); });
-    if(p.buys>1) B(g,"Rebuy zurücknehmen","",function(){ send({op:"unbuy",id:p.id},"Rebuy weg"); close(); });
+    if(p.buys>1) B(g,"Rebuy zurücknehmen","",function(){ send({op:"unbuy",id:p.id,name:p.name},"Rebuy weg"); close(); });
     else { var d=B(g,"Spieler löschen","red",function(){ armed(d,"Sicher? Nochmal",function(){ send({op:"del",id:p.id},p.name+" gelöscht"); close(); }); }); }
     var g2=grid(c); B(g2,"Schließen","",close).style.gridColumn="1 / -1";
   });
@@ -307,7 +305,7 @@ function render(){
   $("bFp").disabled=!!(S.fp&&S.fp.done);
   if(S.ev){ $("evCard").hidden=false; $("evT").textContent=S.ev.e+" "+S.ev.t; $("evD").textContent=S.ev.d.replace(/[\u0001\u0002]/g,""); } else $("evCard").hidden=true;
   $("pot").textContent=num(P.pot(S))+" "+S.unit;
-  $("potS").innerHTML=P.entries(S)+" Entries<br>"+P.rebuys(S)+" Rebuys<br>+ "+S.bonus+" von Alex";
+  $("potS").innerHTML=P.entries(S)+" Entries<br>"+P.rebuys(S)+" Rebuys<br>Entries zahlt Alex";
   var po=P.payout(S); $("payS").textContent= S.players.length? po.map(function(v,i){return (i+1)+". Platz "+num(v)+" "+S.unit}).join(" · ") : "Noch keine Spieler";
   $("evNext").textContent= S.auto? "nächste in "+fmt(curEv()) : "nur per Knopf";
   var sig=JSON.stringify([S.players,S.li,S.off,S.hist.length,S.auto,S.pauseParty,S.evMin,S.evMax,S.fp,S.levels,S.entry,S.rebuy,S.bonus,S.unit,S.rebuyLvl,S.min,S.stack,S.start,S.canUndo,S.seats,S.bday,S.bdayDone]);
@@ -344,7 +342,7 @@ function render(){
   document.querySelectorAll("[data-k]").forEach(function(i){ if(document.activeElement!==i) i.value=S[i.dataset.k]; });
   var res=$("res"), places=P.places(S), po2=P.payout(S), rows=S.players.slice().sort(function(a,b){ return (places[a.id]||0)-(places[b.id]||0); });
   res.innerHTML= rows.length? "<table><tr><th>Platz</th><th>Name</th><th>Einsatz</th><th>Gewinn</th></tr>"+rows.map(function(p){ var pl2=places[p.id]; var won=pl2&&pl2<=po2.length? po2[pl2-1]:0;
-    return "<tr><td>"+(pl2?pl2+".":"–")+"</td><td>"+esc(p.name)+"</td><td>"+(p.buys*S.entry)+" "+esc(S.unit)+"</td><td>"+(won? num(won)+" "+esc(S.unit) : "")+"</td></tr>"; }).join("")+"</table><div class='note mt'>Plätze werden aus der Raus-Reihenfolge berechnet. Alex' "+S.bonus+" "+esc(S.unit)+" sind im Preisgeld.</div>" : '<div class="note">Noch keine Spieler.</div>';
+    return "<tr><td>"+(pl2?pl2+".":"–")+"</td><td>"+esc(p.name)+"</td><td>"+(p.buys*S.entry)+" "+esc(S.unit)+"</td><td>"+(won? num(won)+" "+esc(S.unit) : "")+"</td></tr>"; }).join("")+"</table><div class='note mt'>Plätze werden aus der Raus-Reihenfolge berechnet. Die Entries hat Alex bezahlt.</div>" : '<div class="note">Noch keine Spieler.</div>';
   var tb=$("lvT"); tb.innerHTML="";
   S.levels.forEach(function(lv,i){ var tr=document.createElement("tr"); if(i===S.li) tr.className="cur";
     var c0=document.createElement("td"); c0.textContent= lv.brk? "☕" : P.playNo(S,i); tr.appendChild(c0);
