@@ -615,6 +615,9 @@ function loop(){
     cl=curLeft(); if(cl<=10&&cl>0&&Math.ceil(cl)!==lastBeep){ lastBeep=Math.ceil(cl); sfx("beep"); }
     if(!S.ev&&Date.now()-lastShow>9*60*1000) showPhoto();
   }
+  /* Mission schließt sich von selbst (Tim 21.11.): Poker 25 s, Party 40 s nach dem Start – auch bei pausierter Uhr */
+  if(S.ev&&!bdOn){ var lim=(S.ev.k==="party"?40:25)*1000, rest=Math.ceil((S.ev.ts+lim-Date.now())/1000);
+    if(rest<=0){ doneEvent(); save(); broadcast(); } else if(Date.now()-S.ev.ts>4500) $("evHint").textContent="Schließt sich in "+rest+" s von selbst"; }
   render();
 }
 
