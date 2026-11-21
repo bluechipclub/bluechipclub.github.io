@@ -69,6 +69,65 @@
 .acct-pop[hidden] { display: none; }
 .acct-m { font-size: 13px; color: rgb(232 238 255 / .8); word-break: break-all; }
 .acct-pop button { height: 40px; border-radius: 999px; border: 1px solid rgb(143 176 255 / .45); background: transparent; color: #fff; font-weight: 600; cursor: pointer; }
+
+/* Turnier-Fenster v5 (21.11.2026): Poster-Kopf im Nacht-Glas-Look */
+.evm { width: min(820px, 100%); border-color: rgb(226 184 87 / .28); box-shadow: 0 40px 120px -20px rgb(0 0 0 / .9), 0 0 0 1px rgb(226 184 87 / .08) inset; }
+.evm .top.ev5 { position: relative; overflow: hidden; padding: 30px 32px 28px; display: grid; grid-template-columns: 1fr auto; grid-template-areas: "head ticket" "fan fan" "cd cd" "stats stats" "seats seats" "cta cta" "tags tags"; gap: 18px 20px; border-bottom: 1px solid rgb(226 184 87 / .22); background: #04070e; isolation: isolate; }
+.ev5 .ev5bg { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(4 7 14 / .35) 0%, rgb(4 7 14 / .72) 45%, rgb(4 7 14 / .96) 100%), radial-gradient(70% 60% at 85% 0%, rgb(226 184 87 / .28), transparent 65%), radial-gradient(60% 60% at 0% 60%, rgb(61 123 255 / .2), transparent 70%), url(img/bg-casino-regen.webp) 60% 25% / cover no-repeat; }
+.ev5 .ev5bg::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold2), transparent); opacity: .7; }
+.ev5 .x { z-index: 3; background: rgb(4 7 14 / .55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.ev5head { grid-area: head; display: grid; gap: 12px; align-content: start; padding-right: 8px; }
+.ev5pill { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgb(226 184 87 / .4); background: rgb(226 184 87 / .1); color: var(--gold2); font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+.ev5pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+.ev5title { margin: 0; font-size: clamp(44px, 9vw, 84px) !important; line-height: .9 !important; letter-spacing: -.05em !important; font-weight: 700; color: #fff; text-shadow: 0 6px 40px rgb(0 0 0 / .6); }
+.ev5title em { display: block; font-style: normal; background: linear-gradient(180deg, #fff3cf 0%, var(--gold2) 35%, var(--gold) 65%, var(--gold3) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ev5sub { margin: 0; color: var(--fg); opacity: .8; font-size: 15px; letter-spacing: .01em; }
+.ev5ticket { grid-area: ticket; align-self: start; margin-top: 34px; min-width: 112px; display: grid; justify-items: center; gap: 2px; padding: 14px 16px 12px; border-radius: 18px; background: linear-gradient(180deg, rgb(226 184 87 / .2), rgb(226 184 87 / .05)); border: 1px solid rgb(226 184 87 / .5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 50px -20px rgb(226 184 87 / .45); text-align: center; }
+.ev5ticket span { font: 600 12px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--gold2); }
+.ev5ticket b { font-size: 52px; line-height: 1; font-weight: 700; color: #fff; letter-spacing: -.04em; }
+.ev5ticket hr { width: 100%; border: 0; border-top: 1px dashed rgb(226 184 87 / .5); margin: 8px 0 6px; }
+.ev5ticket strong { font: 700 22px/1 var(--mono); color: #fff; }
+.ev5ticket small { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey); margin-top: 4px; }
+.ev5fan { grid-area: fan; }
+.ev5fan .fan { transform: scale(.82); transform-origin: left center; margin: -6px 0; }
+.ev5cd { grid-area: cd; }
+.ev5 .cd { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0; border-radius: 18px; border: 1px solid var(--line2); background: rgb(12 18 32 / .55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); overflow: hidden; }
+.ev5 .cd > div { background: none !important; border: 0 !important; border-radius: 0 !important; padding: 14px 10px 12px !important; display: grid; justify-items: center; gap: 4px; position: relative; }
+.ev5 .cd > div + div::before { content: ":"; position: absolute; left: -4px; top: 10px; font: 700 34px/1 var(--mono); color: var(--gold); opacity: .7; }
+.ev5 .cd b { font: 700 clamp(34px, 7vw, 48px)/1 var(--mono) !important; color: #fff; letter-spacing: -.02em; }
+.ev5 .cd span { font-size: 10px !important; letter-spacing: .2em; text-transform: uppercase; color: var(--grey); }
+.ev5stats { grid-area: stats; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); border-top: 1px solid rgb(226 184 87 / .25); border-bottom: 1px solid rgb(226 184 87 / .25); }
+.ev5stats div { display: grid; gap: 4px; padding: 14px 12px; text-align: center; }
+.ev5stats div + div { border-left: 1px solid var(--line); }
+.ev5stats b { font: 700 26px/1.1 var(--mono); color: var(--gold2); }
+.ev5stats span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); }
+.ev5seats { grid-area: seats; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.ev5chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ev5chips i { width: 26px; height: 26px; border-radius: 50%; border: 2px dashed rgb(170 195 255 / .3); background: rgb(12 18 32 / .5); }
+.ev5chips i.on { border: 0; background: url(img/chip-top.webp) center / cover no-repeat, var(--blue); box-shadow: 0 4px 12px -2px rgb(61 123 255 / .7); }
+.ev5seats p { margin: 0; color: var(--grey); font-size: 14px; }
+.ev5seats p b { color: #fff; }
+.ev5cta { grid-area: cta; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 20px; border-radius: 14px; background: linear-gradient(180deg, var(--gold2), var(--gold) 55%, #c99a3a); color: #1a1205 !important; font-weight: 700; font-size: 17px; letter-spacing: .01em; text-decoration: none; box-shadow: 0 18px 40px -16px rgb(226 184 87 / .8), inset 0 1px 0 rgb(255 255 255 / .5); }
+.ev5cta span { font-size: 20px; }
+.ev5tags { grid-area: tags; display: flex; flex-wrap: wrap; gap: 8px; }
+.ev5tags span { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line2); background: rgb(12 18 32 / .55); color: var(--grey); font-size: 13px; }
+.ev5tags b { color: var(--fg); font-family: var(--mono); }
+@media (max-width: 560px) {
+  .evm .top.ev5 { padding: 22px 16px 20px; grid-template-columns: 1fr; grid-template-areas: "head" "ticket" "cd" "stats" "seats" "cta" "tags"; gap: 14px; }
+  .ev5head { padding-right: 44px; }
+  .ev5pill { font-size: 10px; letter-spacing: .1em; }
+  .ev5ticket { margin-top: 0; min-width: 0; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 8px; padding: 10px 14px; justify-self: stretch; }
+  .ev5ticket b { font-size: 30px; }
+  .ev5ticket hr { width: 1px; height: 22px; border: 0; border-left: 1px dashed rgb(226 184 87 / .5); margin: 0 6px; align-self: center; }
+  .ev5ticket strong { font-size: 20px; }
+  .ev5ticket small { margin: 0; }
+  .ev5fan { display: none; }
+  .ev5stats { grid-template-columns: repeat(3, 1fr); }
+  .ev5stats b { font-size: 18px; }
+  .ev5stats span { font-size: 9px; letter-spacing: .08em; }
+  .ev5stats div { padding: 12px 4px; }
+  .ev5chips i { width: 22px; height: 22px; }
+}
 </style></head><body><title>Blue Chip Club</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3599,10 +3658,23 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const prog = (n.program || []).filter(x => x.t || x.l);
     const paras = t => String(t || '').split(/\n\s*\n/).filter(Boolean).map(x => '<p>' + esc(x).replace(/\n/g, '<br>') + '</p>').join('');
     const facts = [vTimes(n).length ? [vTimes(n).map(x => x.v.replace(':00', '')).join(' · ') + ' Uhr', 'Startzeit per Abstimmung'] : [hhmm(d) + ' Uhr', n.timeLabel || 'Treffpunkt'], [eur(n.buyin), 'Buy-in']].concat(n.rebuy ? [[eur(n.rebuy), 'Jeder Rebuy']] : []).concat((n.facts || []).map(f => [f.v, f.l]));
-    $('#evm').innerHTML = '<div class="top"><button class="x" id="evX" aria-label="Schließen">×</button><span class="eyebrow gold">Nächstes Turnier · The Void</span>' +
-      (n.cards ? fanOf(parseCards(n.cards), true) : '') +
-      '<h2 class="silvertext" id="evTitle">' + esc(n.title) + '</h2><p class="sub">' + (n.tbd ? 'Termin folgt' : esc(wd)) + (n.sub ? ' · ' + esc(n.sub) : '') + '</p>' + cdHtml(n) + '</div>' +
-      '<div class="body"><div class="facts">' + facts.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
+    const tw = String(n.title || '').trim().split(' '), tLast = tw.length > 1 ? tw.pop() : '', tFirst = tw.join(' ');
+    const ev5k = signups(n).length, ev5m = noLimit(n) ? 0 : seatsOf(n), ev5free = Math.max(0, ev5m - ev5k);
+    const ev5stats = [[eur(n.buyin), 'Buy-in'], n.rebuy ? [eur(n.rebuy), n.maxRe ? 'Rebuy · max. ' + n.maxRe : 'Rebuy'] : null, ...(n.facts || []).filter(f => /startstack/i.test(f.l)).slice(0, 1).map(f => [f.v.replace(' Chips', ''), 'Chips Startstack'])].filter(Boolean);
+    const ev5tags = (n.facts || []).filter(f => !/startstack/i.test(f.l) && !/pl[aä]tze/i.test(f.v));
+    $('#evm').innerHTML = '<div class="top ev5"><div class="ev5bg" aria-hidden="true"></div><button class="x" id="evX" aria-label="Schließen">×</button>' +
+      '<div class="ev5head"><span class="ev5pill"><i></i>Nächstes Turnier · The Void</span>' +
+      '<h2 id="evTitle" class="ev5title">' + esc(tFirst) + (tLast ? '<em>' + esc(tLast) + '</em>' : '') + '</h2>' +
+      '<p class="ev5sub">' + (n.tbd ? 'Termin folgt' : esc(wd)) + '</p></div>' +
+      (n.tbd ? '' : '<div class="ev5ticket" aria-hidden="true"><span>' + esc(d.toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', '')) + '</span><b>' + d.getDate() + '</b><span>' + esc(d.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '')) + '</span><hr><strong>' + hhmm(d) + '</strong><small>' + esc(n.timeLabel ? n.timeLabel.split('·')[0].trim() : 'Uhr') + '</small></div>') +
+      (n.cards ? '<div class="ev5fan">' + fanOf(parseCards(n.cards), true) + '</div>' : '') +
+      '<div class="ev5cd">' + cdHtml(n) + '</div>' +
+      '<div class="ev5stats">' + ev5stats.map(([v, l]) => '<div><b>' + esc(v) + '</b><span>' + esc(l) + '</span></div>').join('') + '</div>' +
+      (ev5m ? '<div class="ev5seats"><div class="ev5chips">' + Array.from({ length: ev5m }, (_, i) => '<i class="' + (i < ev5k ? 'on' : '') + '"></i>').join('') + '</div><p><b>' + (ev5free ? ev5free + ' von ' + ev5m : 'Alle ' + ev5m) + '</b> ' + (ev5free ? 'Plätzen frei' : 'Plätze vergeben, Warteliste offen') + '</p></div>' : '') +
+      '<a class="ev5cta" href="#resv" id="ev5go">' + (isFull(n) ? 'Auf die Warteliste' : 'Platz reservieren') + ' <span>→</span></a>' +
+      (ev5tags.length ? '<div class="ev5tags">' + ev5tags.map(f => '<span><b>' + esc(f.v) + '</b> ' + esc(f.l) + '</span>').join('') + '</div>' : '') +
+      '</div>' +
+      '<div class="body">' +
       '<div class="resv" id="resv"><div class="head" style="margin:0"><h2>Platz reservieren</h2><span class="eyebrow">' + signups(n).length + (noLimit(n) ? '' : ' / ' + seatsOf(n)) + ' zugesagt</span></div>' + seatbar(n) +
       (signups(n).length ? '<div class="who">' + signups(n).slice(0, seatsOf(n)).map(x => '<span>' + esc(x) + '</span>').join('') + '</div>' : '<p class="sub" style="font-size:14px">Noch keine Zusagen. Sei der Erste.</p>') +
       (signups(n).length > seatsOf(n) ? '<span class="eyebrow">Warteliste</span><div class="who">' + signups(n).slice(seatsOf(n)).map(x => '<span class="g">' + esc(x) + '</span>').join('') + '</div>' : '') +
@@ -3625,7 +3697,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
       (n.trophy ? '<div class="trophy">' + TROPHY + '<div><h3>' + esc(n.trophyTitle || 'Wanderpokal') + '</h3>' + paras(n.trophy) + '</div></div>' : '') +
       (n.info ? '<div class="txt">' + head('Was dich erwartet', '') + paras(n.info) + '</div>' : '') + '</div>';
     $('#evov').hidden = false; document.body.style.overflow = 'hidden'; tickCd();
-    $('#evX').onclick = closeEvent;
+    $('#evX').onclick = closeEvent; if ($('#ev5go')) $('#ev5go').onclick = e => { e.preventDefault(); const r = $('#resv'); if (r) $('#evm').scrollTo({ top: r.offsetTop - 12 }); };
     $('#rP').onchange = () => { $('#rGW').hidden = $('#rP').value !== '__g'; };
     const resvText = () => {
       const st = $('#rStatus'); let nm = $('#rP').value === '__g' ? $('#rG').value.trim() : $('#rP').value;
