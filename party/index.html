@@ -272,7 +272,7 @@ body.nocur,body.nocur *{cursor:none!important}
 <div id="toast"></div>
 <div id="tapHint">🔊 Einmal hier klicken, damit Ton + Video gehen</div>
 
-<script src="core.js?v=6"></script>
+<script src="core.js?v=7"></script>
 <script>
 (function(){
 "use strict";
@@ -331,7 +331,7 @@ function op(o){
   if(o._id){ if(seen[o._id]) return ack(o._id,true); seen[o._id]=1; }
   var msg=null, okm="", p=o.id!=null? byId(o.id):null;
   /* Spieler-Befehle: Name hat Vorrang vor der Nummer (Tim 21.11.: Rebuy kam bei zwei Spielern nicht an) */
-  if(o.name&&/^(rebuy|unbuy|out|back)$/.test(o.op)){ var nm=String(o.name).trim().toLowerCase(), q=S.players.filter(function(x){ return String(x.name).trim().toLowerCase()===nm; })[0]; if(q) p=q; }
+  if(o.name&&/^(rebuy|unbuy|out|back|setbuys)$/.test(o.op)){ var nm=String(o.name).trim().toLowerCase(), q=S.players.filter(function(x){ return String(x.name).trim().toLowerCase()===nm; })[0]; if(q) p=q; }
   switch(o.op){
     case "play": setRun(true); break;
     case "pause": setRun(false); break;
@@ -357,6 +357,7 @@ function op(o){
     case "rebuy": if(!p){ msg="Spieler "+(o.name||"")+" nicht gefunden – Tafel neu laden"; break; } if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
         snap(p.name+" Rebuy"); p.buys++; p.out=false; p.outTs=0; if(!p.seat||(seatHolder(p.seat)&&seatHolder(p.seat)!==p)) p.seat=freeSeat();
         potPop(); fx("respawn","REBUY","PLATZ "+p.seat+" IST ZURÜCK"); sfx("rebuy"); okm="Rebuy "+p.name+" · jetzt "+P.rebuys(S)+" Rebuys gesamt"; } break;
+    case "setbuys": if(!p){ msg="Spieler "+(o.name||"")+" nicht gefunden"; break; } snap(p.name+" Rebuys gesetzt"); p.buys=1+Math.max(0,Math.min(20,+o.r||0)); okm=p.name+": "+(p.buys-1)+" Rebuys · gesamt "+P.rebuys(S)+" · Pot "+P.pot(S)+" "+S.unit; break;
     case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy zurückgenommen"); } break;
     case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast("Name geändert"); } break;
     case "seat": if(p&&o.seat>=1&&o.seat<=S.seats){ snap("Platz geändert"); var h=seatHolder(o.seat); if(h&&h!==p){ h.seat=p.seat; } p.seat=o.seat; toast("Platz geändert"); } break;
@@ -679,7 +680,7 @@ var SY=P.sync("tafel",function(ev,p){
   else if(ev==="hello") broadcast();
 },function(ok){ $("conn").classList.toggle("ok",ok); });
 SY.onUp=broadcast;
-function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
+function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.ver="21.11 20:15"; o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
 function ack(id,dup,msg,okm){ SY.send("ack",{id:id,msg:msg||"",ok:okm||""}); }
 setInterval(broadcast,5000);
 

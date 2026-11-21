@@ -127,6 +127,8 @@ nav button.on{color:var(--sun)}
   <div class="g2 mt"><button class="btn" data-op="lvl" data-d="-1">◀ Level</button><button class="btn" data-op="lvl" data-d="1">Level ▶</button></div>
   <div class="g2 mt"><button class="btn" data-op="time" data-d="-60">− 1 Min</button><button class="btn" data-op="time" data-d="60">+ 1 Min</button></div>
   <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn pri" id="bRb">♻️ Rebuy</button></div>
+  <button class="btn mt" id="bRbFix" style="width:100%">✏️ Rebuys korrigieren</button>
+  <div class="note mt" id="tVer" style="text-align:center;opacity:.6"></div>
   <button class="btn mt" id="bSlide" style="width:100%">🖼 Alex Dia-Show</button>
   <div class="card mt"><label class="fl">🔊 Lautstärke Tafel: <b id="volL">100 %</b><input type="range" id="vol" min="0" max="100" step="5" value="100" style="padding:0;height:36px;accent-color:#ff2e88"></label></div>
   <div class="g2 mt"><button class="btn sun" id="bBd">🎂 Geburtstagsvideo</button><button class="btn" id="bBdS">⏹ Video stoppen</button></div>
@@ -191,7 +193,7 @@ nav button.on{color:var(--sun)}
 <div id="sh"><div id="shc"></div></div>
 <div id="toast"></div>
 
-<script src="core.js?v=6"></script>
+<script src="core.js?v=7"></script>
 <script>
 (function(){
 "use strict";
@@ -201,7 +203,7 @@ function buzz(){ try{ navigator.vibrate&&navigator.vibrate(10); }catch(e){} }
 var tt; function toast(m,cls){ var t=$("toast"); t.textContent=m; t.className="on "+(cls||""); clearTimeout(tt); tt=setTimeout(function(){ t.className=""; },2400); }
 
 var SY=P.sync("fb",function(ev,p){
-  if(ev==="state"&&p){ off=Date.now()-p.now; S=p; lastState=Date.now(); render(); }
+  if(ev==="state"&&p){ off=Date.now()-p.now; S=p; lastState=Date.now(); render(); var tv=$("tVer"); if(tv) tv.textContent="Tafel-Version: "+(p.ver||"alt – Tafel neu laden (Strg+Shift+R)")+" · "+P.entries(p)+" Entries · "+P.rebuys(p)+" Rebuys · Pot "+P.pot(p)+" "+p.unit; }
   else if(ev==="ack"&&p&&pending[p.id]){ var l=pending[p.id]; delete pending[p.id]; clearTimeout(l.t); if(p.msg) toast(p.msg,"err"); else toast("✓ "+(p.ok||l.l),"ok"); }
 },function(ok){ status(); });
 SY.onUp=function(){ SY.send("hello",{from:SY.dev}); };
@@ -263,6 +265,22 @@ $("bRb").onclick=function(){
     list.sort(function(a,b){ return ((b.out?1:0)-(a.out?1:0))||a.name.localeCompare(b.name); }).forEach(function(p){
       var b=B(g,(p.out?"💀 ":"")+p.name+(p.buys>1?" ★"+(p.buys-1):""),"",function(){ pick=p; g.querySelectorAll("button").forEach(function(x){ x.classList.remove("pri"); }); b.classList.add("pri"); ok.textContent="OK · Rebuy "+p.name; }); });
     var g2=grid(c); B(g2,"Abbrechen","",close); var ok=B(g2,"Name antippen","pri",function(){ if(!pick) return; send({op:"rebuy",id:pick.id,name:pick.name,force:true},"Rebuy "+pick.name); close(); });
+  });
+};
+/* Rebuys direkt setzen (Tim 21.11.): pro Spieler − Zahl +, ohne Show auf der Tafel */
+$("bRbFix").onclick=function(){
+  if(!S||!S.players){ toast("Tafel noch nicht verbunden","err"); return; }
+  sheet("Rebuys korrigieren", "Zahl = Rebuys pro Spieler. Wird sofort auf der Tafel gesetzt.", function(c){
+    S.players.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(p){
+      var r=Math.max(0,(p.buys||1)-1), row=document.createElement("div"); row.className="g3 mt"; c.appendChild(row);
+      var lab=document.createElement("div"); lab.style.cssText="display:flex;align-items:center;font-weight:700"; row.appendChild(lab);
+      function upd(){ lab.textContent=p.name+": "+r; }
+      var g=document.createElement("div"); g.className="g2"; row.appendChild(g); row.style.gridTemplateColumns="1fr 1fr";
+      B(g,"−","",function(){ if(r>0){ r--; upd(); send({op:"setbuys",id:p.id,name:p.name,r:r},p.name+": "+r+" Rebuys"); } });
+      B(g,"+","pri",function(){ r++; upd(); send({op:"setbuys",id:p.id,name:p.name,r:r},p.name+": "+r+" Rebuys"); });
+      upd();
+    });
+    var g2=grid(c); B(g2,"Fertig","pri",close).style.gridColumn="1 / -1";
   });
 };
 var volT=null; $("vol").oninput=function(){ var v=+this.value; $("volL").textContent=v+" %"; clearTimeout(volT); volT=setTimeout(function(){ send({op:"vol",v:v},"Lautstärke "+v+" %"); setTimeout(function(){ volT=null; },2500); },250); };
