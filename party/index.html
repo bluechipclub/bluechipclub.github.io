@@ -32,6 +32,11 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @keyframes gridmv{to{background-position:0 0,0 0,0 30px}}
 .palm{position:fixed;bottom:-2vh;z-index:-1;height:62vh;fill:#0b0114;opacity:.95}
 .palm.l{left:-4vw}.palm.r{right:-4vw;transform:scaleX(-1)}
+#bgph{position:fixed;inset:0;z-index:-2;overflow:hidden}
+#bgph i{position:absolute;inset:-4%;background-size:cover;background-position:center;filter:blur(10px) brightness(.5) saturate(1.25);opacity:0;transition:opacity 3s}
+#bgph i.on{opacity:1}
+#bgph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,3,31,.35),rgba(18,3,31,.15) 40%,rgba(18,3,31,.6))}
+.palm{display:none}
 #scan{position:fixed;inset:0;z-index:90;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
 
 /* ---------- Layout ---------- */
@@ -179,7 +184,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 </style>
 </head>
 <body>
-<div id="sky"></div><div id="sun"></div><div id="grid"></div>
+<div id="sky"></div><div id="bgph"><i class="on" style="background-image:url(img/gta-cabrio.jpg)"></i><i style="background-image:url(img/gta-strasse.jpg)"></i><i style="background-image:url(img/gta-yacht-torte.jpg)"></i></div>
 <svg class="palm l" viewBox="0 0 300 600" aria-hidden="true"><path d="M150 600 C150 450 160 330 175 230 L183 230 C170 330 162 450 166 600Z"/><path d="M178 232 C130 170 60 160 0 190 C60 150 140 150 178 220Z"/><path d="M178 232 C150 150 100 100 30 90 C110 70 170 120 182 222Z"/><path d="M180 228 C200 150 250 110 300 110 C250 140 210 180 186 232Z"/><path d="M180 230 C230 190 290 200 300 250 C260 220 220 220 184 236Z"/><path d="M178 230 C120 220 70 250 50 300 C90 250 140 238 180 238Z"/><path d="M180 226 C190 160 180 90 150 40 C200 90 205 170 186 230Z"/></svg>
 <svg class="palm r" viewBox="0 0 300 600" aria-hidden="true"><path d="M150 600 C150 450 160 330 175 230 L183 230 C170 330 162 450 166 600Z"/><path d="M178 232 C130 170 60 160 0 190 C60 150 140 150 178 220Z"/><path d="M178 232 C150 150 100 100 30 90 C110 70 170 120 182 222Z"/><path d="M180 228 C200 150 250 110 300 110 C250 140 210 180 186 232Z"/><path d="M180 230 C230 190 290 200 300 250 C260 220 220 220 184 236Z"/><path d="M178 230 C120 220 70 250 50 300 C90 250 140 238 180 238Z"/></svg>
 <div id="scan"></div>
@@ -262,6 +267,7 @@ function load(){
   var s=null; try{ s=JSON.parse(localStorage.getItem(P.KEY)||"null"); }catch(e){}
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
+  if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
   return o;
 }
 function save(){ try{ localStorage.setItem(P.KEY,JSON.stringify(S)); }catch(e){} }
@@ -438,6 +444,7 @@ var phIdx=0, phEls=[];
 (function(){ var ph=$("photo"); P.IMGS.forEach(function(src,i){ var d=document.createElement("div"); d.className="im"+(i===0?" on":""); d.style.backgroundImage="url("+src+")"; d.style.animationDelay=(-i*3)+"s"; ph.insertBefore(d,ph.firstChild); phEls.push(d); }); })();
 function nextPhoto(){ phEls[phIdx].classList.remove("on"); phIdx=(phIdx+1)%phEls.length; phEls[phIdx].classList.add("on"); var c=CAPS[phIdx%CAPS.length]; $("pcB").textContent=c[0]; $("pcS").textContent=c[1]; }
 setInterval(nextPhoto,11000);
+var bgI=0; setInterval(function(){ var b=document.querySelectorAll("#bgph i"); b[bgI].classList.remove("on"); bgI=(bgI+1)%b.length; b[bgI].classList.add("on"); },60000);
 var showT=null, lastShow=Date.now();
 function showPhoto(){
   if(S.ev) return; var i=Math.floor(Math.random()*P.IMGS.length), c=CAPS[Math.floor(Math.random()*CAPS.length)];
