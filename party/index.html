@@ -485,12 +485,15 @@ function startBday(auto){
   $("show").classList.remove("on"); clearInterval(bdT); clearTimeout(bdCel);
   bdTarget= bdAuto? nextMidnight() : 0;
   bdTxt("★ GLEICH IST ES SOWEIT ★","▶","Happy Birthday Alex");
-  playBday();
+  if(bdAuto){ $("bd").className="ov on"; var w=bdTarget-30000-Date.now(); clearTimeout(bdCel); bdCel=setTimeout(playBday,Math.max(0,w)); }
+  else playBday();
 }
+/* Auto: Video so nachführen, dass es exakt um 00:00:00 endet */
+function bdSync(){ if(!bdOn||!bdAuto) return; var v=$("bdV"), want=(Date.now()-(bdTarget-30000))/1000; if(want>0&&want<29.5&&Math.abs(v.currentTime-want)>0.25){ try{ v.currentTime=want; }catch(e){} } }
 function playBday(){
   var o=$("bd"), v=$("bdV"); v.muted=false; v.volume=1; try{ v.currentTime=0; }catch(e){}
   var pr=v.play();
-  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; }).catch(function(){ o.className="ov on needtap"; }); }
+  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; bdSync(); setTimeout(bdSync,1500); setTimeout(bdSync,10000); }).catch(function(){ o.className="ov on needtap"; }); }
   else o.className="ov on play";
 }
 function countdown(){
