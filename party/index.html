@@ -326,7 +326,7 @@ function uniqName(n){ n=String(n||"").trim().slice(0,24)||"Spieler"; var base=n,
 var seen={};
 function op(o){
   if(o._id){ if(seen[o._id]) return ack(o._id,true); seen[o._id]=1; }
-  var msg=null, p=o.id!=null? byId(o.id):null;
+  var msg=null, p=o.id!=null? byId(o.id):null; if(!p&&o.name&&o.op==="rebuy") p=S.players.filter(function(x){ return x.name.toLowerCase()===String(o.name).toLowerCase(); })[0]||null;
   switch(o.op){
     case "play": setRun(true); break;
     case "pause": setRun(false); break;

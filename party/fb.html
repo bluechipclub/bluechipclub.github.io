@@ -255,12 +255,14 @@ function addSheet(seat){
 }
 $("bAdd").onclick=function(){ if(S) addSheet(0); };
 /* Rebuy: wer? dann OK oder Abbrechen */
-$("bRb").onclick=function(){ if(!S) return; var ro=P.rebuyOpen(S), pick=null;
-  sheet("Rebuy – wer?", S.rebuy+" "+S.unit+" in den Pot", function(c){
+$("bRb").onclick=function(){
+  /* Immer alle Spieler zeigen (Tim 21.11.): aus der Tafel, sonst aus der Gästeliste */
+  var list= S&&S.players&&S.players.length? S.players.slice() : P.SEED.map(function(n,i){ return {id:null,name:n,out:false,buys:1}; }), pick=null;
+  sheet("Rebuy – wer?", (S? S.rebuy+" "+S.unit+" in den Pot" : "Tafel noch nicht verbunden – wird gesendet, sobald sie da ist"), function(c){
     var g=document.createElement("div"); g.className="g2 mt"; c.appendChild(g);
-    S.players.slice().sort(function(a,b){ return (b.out-a.out)||a.name.localeCompare(b.name); }).forEach(function(p){
-      var b=B(g,(p.out?"💀 ":"")+p.name+(p.buys>1?" ★"+(p.buys-1):""),"",function(){ pick=p; g.querySelectorAll("button").forEach(function(x){ x.classList.remove("pri"); }); b.classList.add("pri"); ok.textContent="OK · "+p.name; }); });
-    var g2=grid(c); B(g2,"Abbrechen","",close); var ok=B(g2,"OK","pri",function(){ if(!pick) return; send({op:"rebuy",id:pick.id,force:!ro},"Rebuy "+pick.name); close(); });
+    list.sort(function(a,b){ return ((b.out?1:0)-(a.out?1:0))||a.name.localeCompare(b.name); }).forEach(function(p){
+      var b=B(g,(p.out?"💀 ":"")+p.name+(p.buys>1?" ★"+(p.buys-1):""),"",function(){ pick=p; g.querySelectorAll("button").forEach(function(x){ x.classList.remove("pri"); }); b.classList.add("pri"); ok.textContent="OK · Rebuy "+p.name; }); });
+    var g2=grid(c); B(g2,"Abbrechen","",close); var ok=B(g2,"Name antippen","pri",function(){ if(!pick) return; send({op:"rebuy",id:pick.id,name:pick.name,force:true},"Rebuy "+pick.name); close(); });
   });
 };
 var volT=null; $("vol").oninput=function(){ var v=+this.value; $("volL").textContent=v+" %"; clearTimeout(volT); volT=setTimeout(function(){ send({op:"vol",v:v},"Lautstärke "+v+" %"); setTimeout(function(){ volT=null; },2500); },250); };
