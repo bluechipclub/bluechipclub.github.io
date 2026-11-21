@@ -146,6 +146,17 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 #show::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.7),transparent 60%)}
 #show .cap{z-index:2}
 
+/* Geburtstagsvideo */
+#bd{z-index:75;background:#000;padding:0}
+#bd .cd{font-family:Anton;font-size:clamp(140px,26vw,520px);line-height:1;color:#fff;text-shadow:8px 8px 0 var(--pink),16px 16px 0 rgba(0,0,0,.5);animation:pop .9s ease infinite}
+#bd .ct{font-family:Anton;letter-spacing:.3em;font-size:clamp(20px,2.6vw,52px);color:var(--sun);margin-bottom:2vh}
+#bd .cs{font-family:Yellowtail;font-size:clamp(30px,4vw,80px);color:var(--pink2);margin-top:2vh}
+#bd video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}
+#bd.play video{display:block}
+#bd.play .cw{display:none}
+#bd .tap{display:none;margin-top:4vh;font-family:Anton;letter-spacing:.1em;font-size:clamp(22px,2.4vw,46px);background:var(--pink);padding:1.4vh 3vw;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
+#bd.needtap .tap{display:inline-block}
+#bd .x{position:absolute;right:2vw;top:2vh;z-index:3;font-size:28px;opacity:.35;padding:10px}
 /* Laptop-Leiste */
 #ctl{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:70;
   background:rgba(18,3,31,.94);border:2px solid var(--pink);padding:10px;transition:opacity .3s;max-width:calc(100vw - 24px)}
@@ -227,6 +238,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <div id="evHint">Fernbedienung oder Leertaste: Mission erledigt</div>
 </div>
 <div class="ov" id="show"><div class="im" id="showIm"></div><div class="cap"><b id="showB"></b><span id="showS"></span></div></div>
+<div class="ov" id="bd"><div class="cw"><div class="ct">★ ES IST MITTERNACHT ★</div><div class="cd" id="bdN">10</div><div class="cs">Happy Birthday Alex</div><button class="tap" id="bdTap">▶ ANTIPPEN ZUM ABSPIELEN</button></div><video id="bdV" src="vid/happy-birthday-alex.mp4" preload="auto" playsinline></video><button class="x" id="bdX">✕</button></div>
 <div class="ov" id="fx"><div class="big" id="fxB"></div><div class="small" id="fxS"></div></div>
 
 <div id="ctl">
@@ -234,6 +246,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <button id="bEv">🎰 Mission jetzt</button>
   <button id="bDone">✓ Mission erledigt</button>
   <button id="bPh">📸 Alex-Foto</button>
+  <button id="bBd">🎂 Geburtstagsvideo</button>
   <button id="bFs">⛶ Vollbild</button>
   <a href="fb.html" target="_blank" rel="noopener">📱 Fernbedienung</a>
 </div>
@@ -320,6 +333,9 @@ function op(o){
     case "draw": drawSeats(); break;
     case "undo": { var L=S.log.pop(); if(L){ S.players=JSON.parse(L.pl); S.nextId=L.n; toast("↶ Rückgängig: "+L.l); } else msg="Nichts zum Zurücknehmen"; break; }
     case "photo": showPhoto(); break;
+    case "bday": startBday(); break;
+    case "bdaystop": endBday(); break;
+    case "bdayauto": S.bday=S.bday||{}; S.bday.auto=S.bday.auto===0?1:0; break;
     case "set": {
       var allow={entry:1,rebuy:1,bonus:1,unit:1,rebuyLvl:1,min:1,evMin:1,evMax:1,auto:1,pauseParty:1,title:1,sub:1,start:1,stack:1};
       if(allow[o.k]){ var v=o.v; if(typeof DEF_NUM[o.k]==="number"){ v=parseFloat(v); if(isNaN(v)||v<0) break; }
@@ -429,6 +445,37 @@ function showPhoto(){
   clearTimeout(showT); showT=setTimeout(function(){ $("show").classList.remove("on"); },8000);
 }
 
+/* ---------- Geburtstagsvideo (um 00:00 einmal automatisch) ---------- */
+var bdT=null, bdWasRun=false, bdOn=false;
+function bdKey(){ try{ return localStorage.getItem(P.KEY+"-bday-done")==="1"; }catch(e){ return false; } }
+function startBday(){
+  if(bdOn) return; bdOn=true; S.bday=S.bday||{auto:1}; S.bday.on=true;
+  try{ localStorage.setItem(P.KEY+"-bday-done","1"); }catch(e){}
+  bdWasRun=S.running; setRun(false); save(); broadcast();
+  var o=$("bd"), v=$("bdV"); o.querySelector(".ct").textContent= new Date().getHours()===0? "★ ES IST MITTERNACHT ★" : "★ GEBURTSTAGS-ÜBERRASCHUNG ★"; o.className="ov on"; $("show").classList.remove("on");
+  v.pause(); v.currentTime=0; try{ v.load(); }catch(e){}
+  var n=10; $("bdN").textContent=n; sfx("beep");
+  clearInterval(bdT); bdT=setInterval(function(){ n--; if(n>0){ $("bdN").textContent=n; sfx("beep"); } else { clearInterval(bdT); playBday(); } },1000);
+}
+function playBday(){
+  var o=$("bd"), v=$("bdV"); v.muted=false; v.volume=1;
+  var pr=v.play();
+  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; confetti(); }).catch(function(){ $("bdN").textContent="0"; o.className="ov on needtap"; }); }
+  else o.className="ov on play";
+}
+function endBday(){
+  if(!bdOn) return; bdOn=false; clearInterval(bdT); var v=$("bdV"); try{ v.pause(); }catch(e){}
+  $("bd").className="ov"; S.bday.on=false; if(bdWasRun) setRun(true); save(); render(); broadcast();
+  fx("passed","HAPPY BIRTHDAY","ALEX ★★★★★"); confetti(); sfx("tada");
+}
+$("bdTap").onclick=function(){ playBday(); };
+$("bdV").addEventListener("ended",endBday);
+$("bdX").onclick=endBday;
+setInterval(function(){
+  var d=new Date(); S.bday=S.bday||{auto:1};
+  if(S.bday.auto!==0&&!bdOn&&!bdKey()&&d.getHours()===0&&d.getMinutes()<15&&d.getDate()===22&&d.getMonth()===10) startBday();
+},1000);
+
 /* ---------- Render ---------- */
 function render(){
   $("ttl").textContent=S.title.replace(/\s*PARTY\s*$/i,"")||"BLUE CHIP"; $("subt").textContent=String(S.sub).toUpperCase();
@@ -517,7 +564,7 @@ var SY=P.sync("tafel",function(ev,p){
   else if(ev==="hello") broadcast();
 },function(ok){ $("conn").classList.toggle("ok",ok); });
 SY.onUp=broadcast;
-function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
+function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.bdayDone=bdKey(); o.bdayOn=bdOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
 function ack(id,dup,msg){ SY.send("ack",{id:id,msg:msg||""}); }
 setInterval(broadcast,5000);
 
@@ -526,6 +573,7 @@ $("bPlay").onclick=function(){ op({op:"toggle"}); };
 $("bEv").onclick=function(){ op({op:"ev"}); };
 $("bDone").onclick=function(){ op({op:"evdone"}); };
 $("bPh").onclick=function(){ showPhoto(); };
+$("bBd").onclick=function(){ op({op:"bday"}); };
 $("bFs").onclick=fs;
 function fs(){ try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }catch(e){} }
 var ctl=$("ctl"), hT; function ah(){ ctl.classList.remove("hide"); clearTimeout(hT); hT=setTimeout(function(){ ctl.classList.add("hide"); },5000); }
@@ -534,7 +582,7 @@ document.addEventListener("keydown",function(e){ var k=e.key.toLowerCase();
   if(k===" "){ e.preventDefault(); if(S.ev){ if(Date.now()-S.ev.ts>4000) op({op:"evdone"}); } else op({op:"toggle"}); }
   else if(k==="arrowright") op({op:"lvl",d:1}); else if(k==="arrowleft") op({op:"lvl",d:-1});
   else if(k==="e") op({op:"ev"}); else if(k==="f") fs(); else if(k==="p") showPhoto();
-  else if(k==="escape"){ $("show").classList.remove("on"); }
+  else if(k==="escape"){ $("show").classList.remove("on"); if(bdOn) endBday(); }
 });
 $("show").onclick=function(){ $("show").classList.remove("on"); };
 
