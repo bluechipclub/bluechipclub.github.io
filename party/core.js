@@ -39,7 +39,7 @@ P.FULLPORT = {id:"fullport",k:"poker",e:"🚀",t:"FULLPORT-RUNDE",d:"Nächste Ha
 P.IMGS = ["img/gta-portrait.jpg","img/gta-strasse.jpg","img/gta-thron.jpg","img/gta-collage.jpg","img/gta-karten.jpg","img/gta-yacht-torte.jpg","img/gta-allin.jpg","img/gta-cabrio.jpg","img/gta-jetski.jpg","img/gta-villa-party.jpg","img/gta-sportwagen.jpg","img/gta-rooftop-sieg.jpg"];
 
 /* Zusagen 21.11. (Tim, nur Vornamen). Einer kommt noch, wird per Fernbedienung nachgetragen. */
-P.SEED = ["Alex","Jonas","Dirk","Göki","Hannah","Jan","Lenka","Noce","Tim"];
+P.SEED = ["Alex","Jonas","Dirk","Göki","Hannah","Jan","Lenka","Noce","Tim","Finn"];
 
 P.defaults = function(){
   return {

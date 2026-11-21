@@ -281,6 +281,7 @@ function load(){
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
   var re13=false; if(!o.ev13){ o.ev13=1; o.evMin=12; o.evMax=14; re13=true; } o._re13=re13;
+  if(!o.finn){ o.finn=1; if(o.players.length<10&&!o.players.some(function(p){return /^finn$/i.test(p.name)})){ var used={}; o.players.forEach(function(p){ used[p.seat]=1; }); var st=1; while(used[st]) st++; o.players.push({id:o.nextId++,name:"Finn",seat:st,buys:1,out:false,outTs:0}); } }
   if(!o.rebuy8){ o.rebuy8=1; if(o.rebuyLvl===6) o.rebuyLvl=8; }
   if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
   return o;
