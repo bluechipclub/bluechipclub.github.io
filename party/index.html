@@ -73,9 +73,10 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 .clock{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2vh 1vw}
 .lvl{font-family:Anton;font-size:clamp(20px,2.2vw,44px);letter-spacing:.14em;color:var(--sun)}
 .time{font-family:Anton;font-size:clamp(80px,10.5vw,210px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em;
-  color:#fff;text-shadow:4px 4px 0 var(--pink),8px 8px 0 rgba(0,0,0,.45)}
-.time.paused{animation:blink 1.4s steps(2) infinite}
-.time.warn{color:var(--sun)}
+  color:#fff;text-shadow:3px 3px 0 rgba(0,0,0,.55)}
+.time.paused{opacity:.6}
+.time.warn{color:var(--sun);text-shadow:3px 3px 0 var(--pink),0 0 40px rgba(255,211,92,.55);animation:warnp 1s ease-in-out infinite}
+@keyframes warnp{50%{transform:scale(1.04)}}
 @keyframes blink{50%{opacity:.35}}
 .bl{font-family:Anton;font-size:clamp(40px,4.8vw,96px);line-height:1;margin-top:1vh}
 .bl small{display:block;font-family:Anton;font-size:clamp(12px,1vw,19px);letter-spacing:.3em;color:var(--pink2);margin-bottom:.5vh}
@@ -171,8 +172,8 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 #seatGrid span.done{color:#fff;animation:pop .4s}
 /* Laptop-Leiste */
 #ctl{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:70;
-  background:rgba(18,3,31,.94);border:2px solid var(--pink);padding:10px;transition:opacity .3s;max-width:calc(100vw - 24px)}
-#ctl.hide{opacity:0;pointer-events:none}
+  background:rgba(18,3,31,.94);border:2px solid var(--pink);padding:10px;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;max-width:calc(100vw - 24px)}
+#ctl.hide{transform:translate(-50%,160%);opacity:0;pointer-events:none}
 #ctl button{background:rgba(255,255,255,.08);padding:9px 14px;font-weight:700;border:1px solid rgba(255,255,255,.15)}
 #ctl button.hot{background:var(--pink);border-color:var(--pink)}
 #ctl a{color:var(--cyan);padding:9px 6px;font-weight:700;text-decoration:none}
@@ -259,10 +260,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <button class="hot" id="bPlay">▶ Start</button>
   <button id="bEv">🎰 Mission jetzt</button>
   <button id="bDone">✓ Mission erledigt</button>
-  <button id="bPh">📸 Alex-Foto</button>
-  <button id="bBd">🎂 Geburtstagsvideo</button>
-  <button id="bFs">⛶ Vollbild</button>
-  <a href="fb.html" target="_blank" rel="noopener">📱 Fernbedienung</a>
+  <button id="bSkip">⏭ Mission skip</button>
 </div>
 <div id="toast"></div>
 
@@ -327,6 +325,7 @@ function op(o){
     case "ev": if(!S.ev) startEvent(); else msg="Mission läuft schon"; break;
     case "fullport": if(!S.ev){ startEvent(P.FULLPORT); } break;
     case "evdone": doneEvent(); break;
+    case "evskip": if(S.ev){ var rs=S.ev.resume; undoPlayed(); S.ev=null; var rn=S.running; setRun(false); rollEv(); setRun(rn||rs); toast("Mission übersprungen"); } else msg="Gerade läuft keine Mission"; break;
     case "evagain": if(S.ev){ var keep=S.ev.resume; undoPlayed(); S.ev=null; startEvent(null,keep); } break;
     case "add": {
       if(S.players.filter(function(x){return !x.out||P.rebuyOpen(S)}).length>=S.seats && !o.seat){ msg="Tisch ist voll"; break; }
@@ -534,7 +533,7 @@ $("seatov").onclick=function(){ $("seatov").classList.remove("on"); };
 function render(){
   $("ttl").textContent=S.title.replace(/\s*PARTY\s*$/i,"")||"BLUE CHIP"; $("subt").textContent=String(S.sub).toUpperCase();
   var l=lv(S.li), left=curLeft(), t=$("time");
-  t.textContent=fmt(left); t.classList.toggle("paused",!S.running); t.classList.toggle("warn",S.running&&left<=60);
+  t.textContent=fmt(left); t.classList.toggle("paused",!S.running); t.classList.toggle("warn",S.running&&left<=30);
   if(l.brk){ $("lvl").textContent="PAUSE"; $("bl").textContent="CHILL & DRINKS"; $("ante").textContent=""; }
   else { $("lvl").textContent="LEVEL "+P.playNo(S,S.li); $("bl").textContent=num(l.sb)+" / "+num(l.bb); $("ante").textContent=l.a? "BIG BLIND ANTE "+num(l.a):""; }
   var nx=lv(S.li+1);
@@ -629,9 +628,7 @@ setInterval(broadcast,5000);
 $("bPlay").onclick=function(){ op({op:"toggle"}); };
 $("bEv").onclick=function(){ op({op:"ev"}); };
 $("bDone").onclick=function(){ op({op:"evdone"}); };
-$("bPh").onclick=function(){ showPhoto(); };
-$("bBd").onclick=function(){ op({op:"bday"}); };
-$("bFs").onclick=fs;
+$("bSkip").onclick=function(){ op({op:"evskip"}); };
 function fs(){ try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }catch(e){} }
 var ctl=$("ctl"), hT; function ah(){ ctl.classList.remove("hide"); clearTimeout(hT); hT=setTimeout(function(){ ctl.classList.add("hide"); },5000); }
 document.addEventListener("mousemove",ah); document.addEventListener("touchstart",ah,{passive:true});
