@@ -128,6 +128,7 @@ nav button.on{color:var(--sun)}
   <div class="g2 mt"><button class="btn" data-op="time" data-d="-60">− 1 Min</button><button class="btn" data-op="time" data-d="60">+ 1 Min</button></div>
   <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn pri" id="bRb">♻️ Rebuy</button></div>
   <button class="btn mt" id="bSlide" style="width:100%">🖼 Alex Dia-Show</button>
+  <div class="card mt"><label class="fl">🔊 Lautstärke Tafel: <b id="volL">100 %</b><input type="range" id="vol" min="0" max="100" step="5" value="100" style="padding:0;height:36px;accent-color:#ff2e88"></label></div>
   <div class="g2 mt"><button class="btn sun" id="bBd">🎂 Geburtstagsvideo</button><button class="btn" id="bBdS">⏹ Video stoppen</button></div>
   <button class="btn red mt" id="bFp" style="width:100%">🚀 Fullport-Runde jetzt (nur 1×)</button>
   <div class="card mt">
@@ -262,6 +263,7 @@ $("bRb").onclick=function(){ if(!S) return; var ro=P.rebuyOpen(S), pick=null;
     var g2=grid(c); B(g2,"Abbrechen","",close); var ok=B(g2,"OK","pri",function(){ if(!pick) return; send({op:"rebuy",id:pick.id,force:!ro},"Rebuy "+pick.name); close(); });
   });
 };
+var volT=null; $("vol").oninput=function(){ var v=+this.value; $("volL").textContent=v+" %"; clearTimeout(volT); volT=setTimeout(function(){ send({op:"vol",v:v},"Lautstärke "+v+" %"); setTimeout(function(){ volT=null; },2500); },250); };
 $("bSlide").onclick=function(){ send({op:S&&S.slideOn?"slidestop":"slide"},S&&S.slideOn?"Dia-Show aus":"Dia-Show an"); };
 function playerSheet(p){
   var stars=p.buys>1? " · "+(p.buys-1)+" Rebuy"+(p.buys>2?"s":"") : "";
@@ -298,6 +300,7 @@ function render(){
   var nx=S.levels[S.li+1];
   $("cM").textContent=(nx? (nx.brk? "Danach Pause" : "Nächstes: "+num(nx.sb)+" / "+num(nx.bb)) : "Letztes Level")+" · Mission in "+(S.auto? fmt(curEv()) : "– (aus)");
   $("bPlay").textContent= S.running? "⏸ Pause" : "▶ Start";
+  if(document.activeElement!==$("vol")&&!volT){ var vv=S.vol==null?100:S.vol; $("vol").value=vv; $("volL").textContent=vv+" %"; }
   $("bSlide").textContent= S.slideOn? "⏹ Dia-Show beenden" : "🖼 Alex Dia-Show";
   $("bFp").disabled=!!(S.fp&&S.fp.done);
   if(S.ev){ $("evCard").hidden=false; $("evT").textContent=S.ev.e+" "+S.ev.t; $("evD").textContent=S.ev.d.replace(/[\u0001\u0002]/g,""); } else $("evCard").hidden=true;
