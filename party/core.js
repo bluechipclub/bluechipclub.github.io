@@ -36,7 +36,10 @@ P.EVENTS = [
 /* Fullport: genau EINMAL, früh (Level 2 bis 4), solange Rebuys noch lohnen. */
 P.FULLPORT = {id:"fullport",k:"poker",e:"🚀",t:"FULLPORT-RUNDE",d:"Nächste Hand gehen ALLE automatisch all-in. Keiner darf folden. Rebuy ist ja noch offen!"};
 
-P.IMGS = ["img/gta-portrait.jpg","img/gta-strasse.jpg","img/gta-thron.jpg","img/gta-collage.jpg","img/gta-karten.jpg","img/gta-yacht-torte.jpg","img/gta-allin.jpg","img/gta-cabrio.jpg","img/ki-allin.jpg","img/ki-pokal.jpg","img/ki-headsup-jonny.jpg","img/ki-torte.jpg","img/ki-vegas-jonny.jpg","img/ki-jubel-jonny.jpg","img/ki-fold.jpg","img/karte.jpg"];
+P.IMGS = ["img/gta-portrait.jpg","img/gta-strasse.jpg","img/gta-thron.jpg","img/gta-collage.jpg","img/gta-karten.jpg","img/gta-yacht-torte.jpg","img/gta-allin.jpg","img/gta-cabrio.jpg"];
+
+/* Zusagen 21.11. (Tim, nur Vornamen). Einer kommt noch, wird per Fernbedienung nachgetragen. */
+P.SEED = ["Alex","Jonas","Dirk","Göki","Hannah","Jan","Lenka","Noce","Tim"];
 
 P.defaults = function(){
   return {
@@ -47,7 +50,7 @@ P.defaults = function(){
     li:0, left:20*60, running:false, endsAt:0,
     evLeft:15*60, evAt:0, played:{}, hist:[], ev:null,
     fp:{done:false, lvl:2+Math.floor(Math.random()*3), frac:.15+Math.random()*.6},
-    players:[], nextId:1, log:[], fx:null
+    players:P.SEED.map(function(n,i){ return {id:i+1,name:n,seat:n==="Tim"?10:i+1,buys:1,out:false,outTs:0}; }), nextId:P.SEED.length+1, seeded:1, log:[], fx:null
   };
 };
 

@@ -32,6 +32,11 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @keyframes gridmv{to{background-position:0 0,0 0,0 30px}}
 .palm{position:fixed;bottom:-2vh;z-index:-1;height:62vh;fill:#0b0114;opacity:.95}
 .palm.l{left:-4vw}.palm.r{right:-4vw;transform:scaleX(-1)}
+#bgph{position:fixed;inset:0;z-index:-2;overflow:hidden}
+#bgph i{position:absolute;inset:-4%;background-size:cover;background-position:center;filter:blur(10px) brightness(.5) saturate(1.25);opacity:0;transition:opacity 3s}
+#bgph i.on{opacity:1}
+#bgph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,3,31,.35),rgba(18,3,31,.15) 40%,rgba(18,3,31,.6))}
+.palm{display:none}
 #scan{position:fixed;inset:0;z-index:90;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
 
 /* ---------- Layout ---------- */
@@ -179,7 +184,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 </style>
 </head>
 <body>
-<div id="sky"></div><div id="sun"></div><div id="grid"></div>
+<div id="sky"></div><div id="bgph"><i class="on" style="background-image:url(img/gta-cabrio.jpg)"></i><i style="background-image:url(img/gta-strasse.jpg)"></i><i style="background-image:url(img/gta-yacht-torte.jpg)"></i></div>
 <svg class="palm l" viewBox="0 0 300 600" aria-hidden="true"><path d="M150 600 C150 450 160 330 175 230 L183 230 C170 330 162 450 166 600Z"/><path d="M178 232 C130 170 60 160 0 190 C60 150 140 150 178 220Z"/><path d="M178 232 C150 150 100 100 30 90 C110 70 170 120 182 222Z"/><path d="M180 228 C200 150 250 110 300 110 C250 140 210 180 186 232Z"/><path d="M180 230 C230 190 290 200 300 250 C260 220 220 220 184 236Z"/><path d="M178 230 C120 220 70 250 50 300 C90 250 140 238 180 238Z"/><path d="M180 226 C190 160 180 90 150 40 C200 90 205 170 186 230Z"/></svg>
 <svg class="palm r" viewBox="0 0 300 600" aria-hidden="true"><path d="M150 600 C150 450 160 330 175 230 L183 230 C170 330 162 450 166 600Z"/><path d="M178 232 C130 170 60 160 0 190 C60 150 140 150 178 220Z"/><path d="M178 232 C150 150 100 100 30 90 C110 70 170 120 182 222Z"/><path d="M180 228 C200 150 250 110 300 110 C250 140 210 180 186 232Z"/><path d="M180 230 C230 190 290 200 300 250 C260 220 220 220 184 236Z"/><path d="M178 230 C120 220 70 250 50 300 C90 250 140 238 180 238Z"/></svg>
 <div id="scan"></div>
@@ -262,6 +267,7 @@ function load(){
   var s=null; try{ s=JSON.parse(localStorage.getItem(P.KEY)||"null"); }catch(e){}
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
+  if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
   return o;
 }
 function save(){ try{ localStorage.setItem(P.KEY,JSON.stringify(S)); }catch(e){} }
@@ -334,7 +340,7 @@ function op(o){
     case "draw": drawSeats(); break;
     case "undo": { var L=S.log.pop(); if(L){ S.players=JSON.parse(L.pl); S.nextId=L.n; toast("↶ Rückgängig: "+L.l); } else msg="Nichts zum Zurücknehmen"; break; }
     case "photo": showPhoto(); break;
-    case "bday": startBday(); break;
+    case "bday": startBday(false); break;
     case "bdaystop": endBday(); break;
     case "bdayauto": S.bday=S.bday||{}; S.bday.auto=S.bday.auto===0?1:0; break;
     case "set": {
@@ -438,6 +444,7 @@ var phIdx=0, phEls=[];
 (function(){ var ph=$("photo"); P.IMGS.forEach(function(src,i){ var d=document.createElement("div"); d.className="im"+(i===0?" on":""); d.style.backgroundImage="url("+src+")"; d.style.animationDelay=(-i*3)+"s"; ph.insertBefore(d,ph.firstChild); phEls.push(d); }); })();
 function nextPhoto(){ phEls[phIdx].classList.remove("on"); phIdx=(phIdx+1)%phEls.length; phEls[phIdx].classList.add("on"); var c=CAPS[phIdx%CAPS.length]; $("pcB").textContent=c[0]; $("pcS").textContent=c[1]; }
 setInterval(nextPhoto,11000);
+var bgI=0; setInterval(function(){ var b=document.querySelectorAll("#bgph i"); b[bgI].classList.remove("on"); bgI=(bgI+1)%b.length; b[bgI].classList.add("on"); },60000);
 var showT=null, lastShow=Date.now();
 function showPhoto(){
   if(S.ev) return; var i=Math.floor(Math.random()*P.IMGS.length), c=CAPS[Math.floor(Math.random()*CAPS.length)];
@@ -446,37 +453,56 @@ function showPhoto(){
   clearTimeout(showT); showT=setTimeout(function(){ $("show").classList.remove("on"); },8000);
 }
 
-/* ---------- Geburtstagsvideo (um 00:00 einmal automatisch) ---------- */
-var bdT=null, bdWasRun=false, bdOn=false;
+/* ---------- Geburtstagsvideo: startet 23:59:00, danach Countdown bis exakt 00:00 ---------- */
+var bdT=null, bdWasRun=false, bdOn=false, bdTarget=0, bdAuto=false, bdCel=null;
 function bdKey(){ try{ return localStorage.getItem(P.KEY+"-bday-done")==="1"; }catch(e){ return false; } }
-function startBday(){
-  if(bdOn) return; bdOn=true; S.bday=S.bday||{auto:1}; S.bday.on=true;
+function nextMidnight(){ var d=new Date(); d.setHours(24,0,0,0); return d.getTime(); }
+function bdTxt(ct,cd,cs){ var o=$("bd"); o.querySelector(".ct").textContent=ct; $("bdN").textContent=cd; o.querySelector(".cs").textContent=cs; }
+function startBday(auto){
+  if(bdOn) return; bdOn=true; bdAuto=!!auto; S.bday=S.bday||{auto:1}; S.bday.on=true;
   try{ localStorage.setItem(P.KEY+"-bday-done","1"); }catch(e){}
   bdWasRun=S.running; setRun(false); save(); broadcast();
-  var o=$("bd"), v=$("bdV"); o.querySelector(".ct").textContent= new Date().getHours()===0? "★ ES IST MITTERNACHT ★" : "★ GEBURTSTAGS-ÜBERRASCHUNG ★"; o.className="ov on"; $("show").classList.remove("on");
-  v.pause(); v.currentTime=0; try{ v.load(); }catch(e){}
-  var n=10; $("bdN").textContent=n; sfx("beep");
-  clearInterval(bdT); bdT=setInterval(function(){ n--; if(n>0){ $("bdN").textContent=n; sfx("beep"); } else { clearInterval(bdT); playBday(); } },1000);
+  $("show").classList.remove("on"); clearInterval(bdT); clearTimeout(bdCel);
+  bdTarget= bdAuto? nextMidnight() : 0;
+  bdTxt("★ GLEICH IST ES SOWEIT ★","▶","Happy Birthday Alex");
+  playBday();
 }
 function playBday(){
-  var o=$("bd"), v=$("bdV"); v.muted=false; v.volume=1;
+  var o=$("bd"), v=$("bdV"); v.muted=false; v.volume=1; try{ v.currentTime=0; }catch(e){}
   var pr=v.play();
-  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; confetti(); }).catch(function(){ $("bdN").textContent="0"; o.className="ov on needtap"; }); }
+  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; }).catch(function(){ o.className="ov on needtap"; }); }
   else o.className="ov on play";
 }
+function countdown(){
+  if(!bdOn) return;
+  if(!bdTarget) bdTarget=Date.now()+10000;
+  var o=$("bd"); o.className="ov on";
+  bdTxt(bdAuto? "★ COUNTDOWN BIS MITTERNACHT ★" : "★ COUNTDOWN ★","","Happy Birthday Alex");
+  var last=-1;
+  clearInterval(bdT); bdT=setInterval(function(){
+    var s=Math.ceil((bdTarget-Date.now())/1000);
+    if(s<=0){ clearInterval(bdT); celebrate(); return; }
+    if(s!==last){ last=s; $("bdN").textContent=s; if(s<=10) sfx("beep"); }
+  },100);
+}
+function celebrate(){
+  var o=$("bd"); o.className="ov on";
+  bdTxt("★★★★★ 00:00 ★★★★★","HAPPY BIRTHDAY","Alex");
+  confetti(); sfx("tada"); setTimeout(confetti,1500); setTimeout(function(){ confetti(); sfx("tada"); },3000); setTimeout(confetti,6000);
+  clearTimeout(bdCel); bdCel=setTimeout(endBday,20000);
+}
 function endBday(){
-  if(!bdOn) return; bdOn=false; clearInterval(bdT); var v=$("bdV"); try{ v.pause(); }catch(e){}
+  if(!bdOn) return; bdOn=false; clearInterval(bdT); clearTimeout(bdCel); var v=$("bdV"); try{ v.pause(); }catch(e){}
   $("bd").className="ov"; S.bday.on=false; if(bdWasRun) setRun(true); save(); render(); broadcast();
-  fx("passed","HAPPY BIRTHDAY","ALEX ★★★★★"); confetti(); sfx("tada");
 }
 $("bdTap").onclick=function(){ playBday(); };
-$("bdV").addEventListener("ended",endBday);
+$("bdV").addEventListener("ended",countdown);
 $("bdX").onclick=endBday;
 setInterval(function(){
   var d=new Date(); S.bday=S.bday||{auto:1};
-  if(S.bday.auto!==0&&!bdOn&&!bdKey()&&d.getHours()===0&&d.getMinutes()<15&&d.getDate()===22&&d.getMonth()===10) startBday();
-},1000);
-
+  if(S.bday.auto===0||bdOn||bdKey()) return;
+  if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()<25) startBday(true);
+},500);
 /* ---------- Render ---------- */
 function render(){
   $("ttl").textContent=S.title.replace(/\s*PARTY\s*$/i,"")||"BLUE CHIP"; $("subt").textContent=String(S.sub).toUpperCase();
