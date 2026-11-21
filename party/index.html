@@ -272,7 +272,7 @@ body.nocur,body.nocur *{cursor:none!important}
 <div id="toast"></div>
 <div id="tapHint">🔊 Einmal hier klicken, damit Ton + Video gehen</div>
 
-<script src="core.js?v=5"></script>
+<script src="core.js?v=6"></script>
 <script>
 (function(){
 "use strict";
@@ -283,6 +283,9 @@ function load(){
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
   var re13=false; if(!o.ev13){ o.ev13=1; o.evMin=12; o.evMax=14; re13=true; } o._re13=re13;
+  /* Tim 21.11. ~21:00: richtiger Stand = 3 Rebuys (Jonny, Tim, Dirk), sonst keine. Einmalig, nur bis 21:30 */
+  if(!o.fixRb1&&Date.now()<Date.UTC(2026,10,21,20,30)){ o.fixRb1=1; var hasJonny=o.players.some(function(p){return /^jo(h)?nny$/i.test(String(p.name).trim())});
+    o.players.forEach(function(p){ var n=String(p.name).trim().toLowerCase(); var r= n==="tim"||n==="dirk"||/^jo(h)?nny$/.test(n)||(!hasJonny&&n==="jonas"); p.buys=r?2:1; }); }
   if(!o.finn){ o.finn=1; if(o.players.length<10&&!o.players.some(function(p){return /^finn$/i.test(p.name)})){ var used={}; o.players.forEach(function(p){ used[p.seat]=1; }); var st=1; while(used[st]) st++; o.players.push({id:o.nextId++,name:"Finn",seat:st,buys:1,out:false,outTs:0}); } }
   if(!o.rebuy8){ o.rebuy8=1; if(o.rebuyLvl===6) o.rebuyLvl=8; }
   if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
@@ -326,7 +329,9 @@ function uniqName(n){ n=String(n||"").trim().slice(0,24)||"Spieler"; var base=n,
 var seen={};
 function op(o){
   if(o._id){ if(seen[o._id]) return ack(o._id,true); seen[o._id]=1; }
-  var msg=null, p=o.id!=null? byId(o.id):null; if(!p&&o.name&&o.op==="rebuy") p=S.players.filter(function(x){ return x.name.toLowerCase()===String(o.name).toLowerCase(); })[0]||null;
+  var msg=null, okm="", p=o.id!=null? byId(o.id):null;
+  /* Spieler-Befehle: Name hat Vorrang vor der Nummer (Tim 21.11.: Rebuy kam bei zwei Spielern nicht an) */
+  if(o.name&&/^(rebuy|unbuy|out|back)$/.test(o.op)){ var nm=String(o.name).trim().toLowerCase(), q=S.players.filter(function(x){ return String(x.name).trim().toLowerCase()===nm; })[0]; if(q) p=q; }
   switch(o.op){
     case "play": setRun(true); break;
     case "pause": setRun(false); break;
@@ -349,9 +354,9 @@ function op(o){
         if(al.length===1) setTimeout(function(){ fx("passed","CHAMPION","PLATZ "+al[0].seat); confetti(); sfx("tada"); setTimeout(function(){ P.download(S); },6000); },3600);
       } break;
     case "back": if(p&&p.out){ snap(p.name+" doch nicht raus"); p.out=false; p.outTs=0; if(!p.seat||seatHolder(p.seat)&&seatHolder(p.seat)!==p) p.seat=freeSeat(); toast("Platz "+p.seat+" ist wieder drin"); } break;
-    case "rebuy": if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
+    case "rebuy": if(!p){ msg="Spieler "+(o.name||"")+" nicht gefunden – Tafel neu laden"; break; } if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
         snap(p.name+" Rebuy"); p.buys++; p.out=false; p.outTs=0; if(!p.seat||(seatHolder(p.seat)&&seatHolder(p.seat)!==p)) p.seat=freeSeat();
-        potPop(); fx("respawn","REBUY","PLATZ "+p.seat+" IST ZURÜCK"); sfx("rebuy"); } break;
+        potPop(); fx("respawn","REBUY","PLATZ "+p.seat+" IST ZURÜCK"); sfx("rebuy"); okm="Rebuy "+p.name+" · jetzt "+P.rebuys(S)+" Rebuys gesamt"; } break;
     case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy zurückgenommen"); } break;
     case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast("Name geändert"); } break;
     case "seat": if(p&&o.seat>=1&&o.seat<=S.seats){ snap("Platz geändert"); var h=seatHolder(o.seat); if(h&&h!==p){ h.seat=p.seat; } p.seat=o.seat; toast("Platz geändert"); } break;
@@ -380,7 +385,7 @@ function op(o){
         S=P.defaults(); for(var k in keep2) S[k]=keep2[k]; S.players=pl; S.nextId=pl.reduce(function(a,x){return Math.max(a,x.id+1)},1); S.left=P.lvlLen(S,0); rollEv(); toast("Neues Turnier bereit"); break; }
   }
   save(); render(); broadcast();
-  if(o._id) ack(o._id,false,msg);
+  if(o._id) ack(o._id,false,msg,okm);
   else if(msg) toast(msg);
 }
 var DEF_NUM=P.defaults();
@@ -571,7 +576,7 @@ function render(){
   var al=P.alive(S).length;
   $("hPl").textContent= al+" / "+S.players.length+" IM SPIEL";
   $("potv").textContent=num(P.pot(S))+" "+S.unit;
-  $("potr").textContent=P.entries(S)+" Entries · "+P.rebuys(S)+" Rebuys · Alex legt "+S.bonus+" "+S.unit+" drauf";
+  $("potr").textContent=P.entries(S)+" Entries · "+P.rebuys(S)+" Rebuys · Entries zahlt Alex";
   var po=P.payout(S), md=["1.","2.","3."];
   $("pay").innerHTML= S.players.length? po.map(function(v,i){return "<span>"+md[i]+" "+num(v)+" "+esc(S.unit)+"</span>"}).join("") : "<span>ENTRY "+S.entry+" "+esc(S.unit)+"</span>";
   $("bPlay").textContent= S.running? "⏸ Pause" : "▶ Start";
@@ -587,7 +592,7 @@ function render(){
   if(S.drawTs&&S.drawTs!==seatShown){ seatShown=S.drawTs; if(Date.now()-S.drawTs<10000){ toast("🎲 Plätze neu ausgelost"); sfx("chip"); } }
 }
 function ticker(){
-  $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX LEGT "+S.bonus+" "+S.unit+" IN DEN POT",
+  $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX ZAHLT DIE ENTRIES",
     num(S.stack)+" CHIPS · "+S.min+"-MINUTEN-LEVEL","JEDERZEIT KANN EINE MISSION KOMMEN","EINMAL HEUTE KOMMT DIE FULLPORT-RUNDE 🚀","REBUY BIS ENDE LEVEL "+S.rebuyLvl+" (VERLÄNGERUNG MÖGLICH)","★ = REBUYS · WANTED-LEVEL"].join("        ✦        ");
   setTimeout(function(){ var t=$("tick"), w=t.scrollWidth||t.offsetWidth; t.style.animationDuration=Math.max(60,Math.round(w/(innerWidth/40)))+"s"; },50);
 }
@@ -675,7 +680,7 @@ var SY=P.sync("tafel",function(ev,p){
 },function(ok){ $("conn").classList.toggle("ok",ok); });
 SY.onUp=broadcast;
 function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
-function ack(id,dup,msg){ SY.send("ack",{id:id,msg:msg||""}); }
+function ack(id,dup,msg,okm){ SY.send("ack",{id:id,msg:msg||"",ok:okm||""}); }
 setInterval(broadcast,5000);
 
 /* ---------- Laptop-Steuerung ---------- */

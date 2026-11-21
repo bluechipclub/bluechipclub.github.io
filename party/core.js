@@ -63,7 +63,8 @@ P.rebuyPlanned = function(S){ return !S.levels[S.li].brk ? P.playNo(S,S.li)<=S.r
 P.buys = function(S){ return S.players.reduce(function(a,p){return a+p.buys},0); };
 P.entries = function(S){ return S.players.length; };
 P.rebuys = function(S){ return P.buys(S)-P.entries(S); };
-P.pot = function(S){ return S.bonus + P.entries(S)*S.entry + P.rebuys(S)*S.rebuy; };
+/* Tim 21.11.: Alex zahlt die 10 Entries, kein Extra obendrauf. Pot = Entries + Rebuys */
+P.pot = function(S){ return P.entries(S)*S.entry + P.rebuys(S)*S.rebuy; };
 P.alive = function(S){ return S.players.filter(function(p){return !p.out}); };
 P.payout = function(S){
   var p=P.pot(S), n=P.entries(S), sp;
@@ -87,7 +88,7 @@ P.report = function(S){
   var h='<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Auswertung Blue Chip Party</title>'+
   '<style>body{font-family:system-ui,sans-serif;background:#12031f;color:#fff;max-width:760px;margin:0 auto;padding:20px}h1{color:#ff2e88;margin:0}h2{color:#ffd35c;margin-top:28px}table{width:100%;border-collapse:collapse}td,th{padding:7px 6px;border-bottom:1px solid #3a2050;text-align:left}th{color:#ffd35c}.s{color:#aaa}</style></head><body>';
   h+='<h1>'+e(S.title)+'</h1><div class="s">'+e(S.sub)+' · erstellt '+d.toLocaleString("de-DE")+'</div>';
-  h+='<h2>Zahlen</h2><table><tr><td>Spieler</td><td>'+P.entries(S)+'</td></tr><tr><td>Rebuys</td><td>'+P.rebuys(S)+'</td></tr><tr><td>Pot</td><td>'+P.pot(S)+' '+e(S.unit)+' (inkl. '+S.bonus+' von Alex)</td></tr><tr><td>Level erreicht</td><td>'+P.playNo(S,S.li)+'</td></tr><tr><td>Missionen gespielt</td><td>'+S.hist.length+'</td></tr></table>';
+  h+='<h2>Zahlen</h2><table><tr><td>Spieler</td><td>'+P.entries(S)+'</td></tr><tr><td>Rebuys</td><td>'+P.rebuys(S)+'</td></tr><tr><td>Pot</td><td>'+P.pot(S)+' '+e(S.unit)+' (Entries zahlt Alex)</td></tr><tr><td>Level erreicht</td><td>'+P.playNo(S,S.li)+'</td></tr><tr><td>Missionen gespielt</td><td>'+S.hist.length+'</td></tr></table>';
   h+='<h2>Ergebnis</h2><table><tr><th>Platz</th><th>Name</th><th>Buy-ins</th><th>Einsatz</th><th>Gewinn</th></tr>';
   rows.forEach(function(p){ var x=pl[p.id], w=x&&x<=po.length? po[x-1]:0; h+='<tr><td>'+(x? x+'.' : 'im Spiel')+'</td><td>'+e(p.name)+'</td><td>'+p.buys+'</td><td>'+(p.buys*S.entry)+' '+e(S.unit)+'</td><td>'+(w? w+' '+e(S.unit) : '')+'</td></tr>'; });
   h+='</table><h2>Missionen</h2><table>'+(S.hist.length? S.hist.map(function(m){ return '<tr><td>'+e(m.at)+'</td><td>'+m.e+' '+e(m.t)+'</td></tr>'; }).join('') : '<tr><td>keine</td></tr>')+'</table></body></html>';
