@@ -505,7 +505,7 @@ function countdown(){
 function celebrate(){
   var o=$("bd"); o.className="ov on";
   bdTxt("★★★★★ 00:00 ★★★★★","HAPPY BIRTHDAY","Alex");
-  confetti(); sfx("tada"); setTimeout(confetti,1500); setTimeout(function(){ confetti(); sfx("tada"); },3000); setTimeout(confetti,6000);
+  confetti(); sfx("tada"); setTimeout(confetti,1500); setTimeout(function(){ confetti(); if(!song) sfx("tada"); },3000); setTimeout(confetti,6000);
   clearTimeout(bdCel); bdCel=setTimeout(endBday,20000);
 }
 function endBday(){
@@ -534,7 +534,7 @@ function showDraw(){
       if(el>1200+i*350){ if(sp.className!=="done"){ sp.className="done"; sp.textContent=act[i].name; sfx("chip"); } }
       else sp.textContent=names[Math.floor(Math.random()*names.length)];
     });
-    if(el>1400+act.length*350){ clearInterval(seatT); confetti(); sfx("tada"); clearTimeout(showDraw.c); showDraw.c=setTimeout(function(){ o.classList.remove("on"); },15000); }
+    if(el>1400+act.length*350){ clearInterval(seatT); confetti(); if(!song) sfx("tada"); clearTimeout(showDraw.c); showDraw.c=setTimeout(function(){ o.classList.remove("on"); },15000); }
   },80);
 }
 $("seatov").onclick=function(){ $("seatov").classList.remove("on"); };
@@ -615,7 +615,7 @@ function dc(){ cx.clearRect(0,0,cv.width,cv.height); parts=parts.filter(function
   anim=parts.length? requestAnimationFrame(dc):null; }
 var AC=null;
 /* GTA-Song: nur lokal auf diesem Laptop (IndexedDB), wird nie hochgeladen. Ausschnitte in Sekunden [von, bis]. */
-var song=null, songSrc=null, CLIP={spin:[44.8,53.5],spin2:[44.8,51],done:[163.3,168],level:[60.4,64.6],wasted:[139.2,143.5],rebuy:[75.4,79],tada:[163.3,168]};
+var song=null, songSrc=null, CLIP={spin:[43.6,52.5],spin2:[43.4,52],done:[162.8,168],level:[60.4,64.6],wasted:[139.2,143.5],rebuy:[75.4,79],tada:[162.8,168]};
 function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
 function playClip(c){ var a=ac(), n=a.currentTime, d=c[1]-c[0]; try{ if(songSrc) songSrc.stop(); }catch(e){}
   var src=a.createBufferSource(), g=a.createGain(); src.buffer=song; g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(.9,n+.08); g.gain.setValueAtTime(.9,n+d-.7); g.gain.linearRampToValueAtTime(0,n+d);
