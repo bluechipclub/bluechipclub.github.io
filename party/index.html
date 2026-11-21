@@ -163,6 +163,12 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 #bd .tap{display:none;margin-top:4vh;font-family:Anton;letter-spacing:.1em;font-size:clamp(22px,2.4vw,46px);background:var(--pink);padding:1.4vh 3vw;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
 #bd.needtap .tap{display:inline-block}
 #bd .x{position:absolute;right:2vw;top:2vh;z-index:3;font-size:28px;opacity:.35;padding:10px}
+#seatov{z-index:58;background:#12031f radial-gradient(70% 70% at 50% 50%,#4a0f6b,#0a0114);cursor:pointer}
+#seatGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4vh 3vw;margin-top:3vh;width:min(1300px,90vw)}
+#seatGrid div{display:flex;align-items:center;gap:1.4vw;background:rgba(0,0,0,.4);padding:1.2vh 1.6vw;font-family:Anton;font-size:clamp(24px,3vw,58px);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+#seatGrid b{color:var(--pink2);width:1.6em;text-align:center;font-weight:400}
+#seatGrid span.spin{color:var(--dim);filter:blur(1px)}
+#seatGrid span.done{color:#fff;animation:pop .4s}
 /* Laptop-Leiste */
 #ctl{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:70;
   background:rgba(18,3,31,.94);border:2px solid var(--pink);padding:10px;transition:opacity .3s;max-width:calc(100vw - 24px)}
@@ -246,6 +252,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 </div>
 <div class="ov" id="show"><div class="im" id="showIm"></div><div class="cap"><b id="showB"></b><span id="showS"></span></div></div>
 <div class="ov" id="bd"><div class="cw"><div class="ct">★ ES IST MITTERNACHT ★</div><div class="cd" id="bdN">10</div><div class="cs">Happy Birthday Alex</div><button class="tap" id="bdTap">▶ ANTIPPEN ZUM ABSPIELEN</button></div><video id="bdV" src="vid/happy-birthday-alex.mp4" preload="auto" playsinline></video><button class="x" id="bdX">✕</button></div>
+<div class="ov" id="seatov"><div class="tag" style="font-family:Anton;letter-spacing:.3em;font-size:clamp(18px,2vw,40px);color:var(--sun)">★ PLÄTZE AUSGELOST ★</div><div id="seatGrid"></div><div style="margin-top:3vh;color:var(--dim);font-size:clamp(13px,1.1vw,20px)">Antippen zum Schließen</div></div>
 <div class="ov" id="fx"><div class="big" id="fxB"></div><div class="small" id="fxS"></div></div>
 
 <div id="ctl">
@@ -369,13 +376,12 @@ function drawSeats(){
   var act=S.players.filter(function(p){return !p.out});
   if(!act.length){ toast("Noch keine Spieler"); return; }
   snap("Plätze ausgelost");
-  var seats=[]; for(var s=1;s<=S.seats;s++) seats.push(s);
-  var tim=act.filter(function(p){return p.name.toLowerCase()==="tim"})[0];
-  if(tim){ tim.seat=S.seats; seats.pop(); }
+  var seats=[]; for(var s=1;s<=Math.min(S.seats,act.length);s++) seats.push(s);
+  var tim=null;
   for(var i=seats.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=seats[i]; seats[i]=seats[j]; seats[j]=t; }
   act.filter(function(p){return p!==tim}).forEach(function(p,i){ p.seat=seats[i]||0; });
   S.players.forEach(function(p){ if(p.out) p.seat=0; });
-  fx("level","PLÄTZE","NEU AUSGELOST"); sfx("level");
+  S.drawTs=Date.now();
 }
 
 /* ---------- Missionen ---------- */
@@ -505,6 +511,25 @@ setInterval(function(){
   if(S.bday.auto===0||bdOn||bdKey()) return;
   if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()<25) startBday(true);
 },500);
+/* ---------- Auslosungs-Show ---------- */
+var seatShown=0, seatT=null;
+function showDraw(){
+  var o=$("seatov"), g=$("seatGrid"), act=S.players.filter(function(p){return !p.out&&p.seat}).sort(function(a,b){return a.seat-b.seat});
+  var names=act.map(function(p){return p.name}); g.innerHTML="";
+  act.forEach(function(p){ var d=document.createElement("div"); d.innerHTML="<b></b><span class='spin'></span>"; d.children[0].textContent=p.seat; g.appendChild(d); });
+  o.classList.add("on"); sfx("spin");
+  var spans=g.querySelectorAll("span"), t0=Date.now();
+  clearInterval(seatT); seatT=setInterval(function(){
+    var el=Date.now()-t0;
+    spans.forEach(function(sp,i){
+      if(el>1200+i*350){ if(sp.className!=="done"){ sp.className="done"; sp.textContent=act[i].name; sfx("chip"); } }
+      else sp.textContent=names[Math.floor(Math.random()*names.length)];
+    });
+    if(el>1400+act.length*350){ clearInterval(seatT); confetti(); sfx("tada"); clearTimeout(showDraw.c); showDraw.c=setTimeout(function(){ o.classList.remove("on"); },15000); }
+  },80);
+}
+$("seatov").onclick=function(){ $("seatov").classList.remove("on"); };
+
 /* ---------- Render ---------- */
 function render(){
   $("ttl").textContent=S.title.replace(/\s*PARTY\s*$/i,"")||"BLUE CHIP"; $("subt").textContent=String(S.sub).toUpperCase();
@@ -536,6 +561,7 @@ function render(){
   }
   if(ul.innerHTML!==h) ul.innerHTML=h;
   renderEvent();
+  if(S.drawTs&&S.drawTs!==seatShown){ seatShown=S.drawTs; if(Date.now()-S.drawTs<10000) showDraw(); }
 }
 function ticker(){
   $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX LEGT "+S.bonus+" "+S.unit+" IN DEN POT",

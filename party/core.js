@@ -50,7 +50,7 @@ P.defaults = function(){
     li:0, left:20*60, running:false, endsAt:0,
     evLeft:15*60, evAt:0, played:{}, hist:[], ev:null,
     fp:{done:false, lvl:2+Math.floor(Math.random()*3), frac:.15+Math.random()*.6},
-    players:P.SEED.map(function(n,i){ return {id:i+1,name:n,seat:n==="Tim"?10:i+1,buys:1,out:false,outTs:0}; }), nextId:P.SEED.length+1, seeded:1, log:[], fx:null
+    players:P.SEED.map(function(n,i){ return {id:i+1,name:n,seat:i+1,buys:1,out:false,outTs:0}; }), nextId:P.SEED.length+1, seeded:1, log:[], fx:null
   };
 };
 
