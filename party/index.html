@@ -280,6 +280,7 @@ function load(){
   var s=null; try{ s=JSON.parse(localStorage.getItem(P.KEY)||"null"); }catch(e){}
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
+  var re13=false; if(!o.ev13){ o.ev13=1; o.evMin=12; o.evMax=14; re13=true; } o._re13=re13;
   if(!o.rebuy8){ o.rebuy8=1; if(o.rebuyLvl===6) o.rebuyLvl=8; }
   if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
   return o;
@@ -687,7 +688,7 @@ document.addEventListener("keydown",function(e){ var k=e.key.toLowerCase();
 });
 $("show").onclick=function(){ slideStop(); };
 
-if(!S.evAt&&!S.running) rollEv();
+if((!S.evAt&&!S.running)||S._re13) rollEv(); delete S._re13;
 if(S.running&&S.endsAt<Date.now()-8*3600*1000) S.running=false;
 save(); ticker(); render(); broadcast();
 setInterval(loop,250);
