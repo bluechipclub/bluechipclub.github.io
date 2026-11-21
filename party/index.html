@@ -48,6 +48,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:2vw}
 .sub{font-family:Anton;letter-spacing:.3em;font-size:clamp(11px,1vw,19px);color:var(--pink2);margin-top:.6vh}
 .hr{display:flex;gap:1.2vw;align-items:center}
 .chip{font-family:Anton;letter-spacing:.08em;font-size:clamp(13px,1.3vw,25px);padding:.5vh 1vw;background:rgba(0,0,0,.45);border:2px solid var(--pink);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.chip.bdc{border-color:var(--sun);color:#fff;background:linear-gradient(90deg,rgba(255,46,136,.55),rgba(255,138,31,.45));font-variant-numeric:tabular-nums}
 .chip.c{border-color:var(--cyan);color:var(--cyan)}
 .chip.g{border-color:var(--sun);color:var(--sun)}
 #conn{width:12px;height:12px;border-radius:50%;background:#777;box-shadow:0 0 8px currentColor}
@@ -197,6 +198,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
       <div class="sub" id="subt">ALEX' BIRTHDAY EDITION</div>
     </div>
     <div class="hr">
+      <div class="chip bdc" id="hBd">🎂 --:--:--</div>
       <div class="chip c" id="hPl">0 / 10 SPIELER</div>
       <div class="chip g" id="hRb">REBUY OFFEN</div>
       <div class="chip" id="hClock">--:--</div>
@@ -543,7 +545,9 @@ function ticker(){
 /* ---------- Loop ---------- */
 var lastBeep=-1;
 function loop(){
-  var d=new Date(); $("hClock").textContent=(d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes();
+  var d=new Date(), mid=new Date(2026,10,22,0,0,0).getTime(), rs=Math.ceil((mid-Date.now())/1000);
+  $("hBd").textContent= rs>0? "🎂 NOCH "+fmt(rs)+" BIS ALEX' GEBURTSTAG" : (rs>-86400? "🎂 ALEX HAT GEBURTSTAG!" : "🎂 HAPPY BIRTHDAY ALEX");
+  $("hClock").textContent=(d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes();
   if(S.running){
     var cl=curLeft();
     if(cl<=0){
