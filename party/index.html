@@ -473,7 +473,7 @@ function showPhoto(){
   clearTimeout(showT); showT=setTimeout(function(){ $("show").classList.remove("on"); },8000);
 }
 
-/* ---------- Geburtstagsvideo: startet 23:59:00, danach Countdown bis exakt 00:00 ---------- */
+/* ---------- Geburtstagsvideo: startet 23:59:28 (30 s Video), danach Countdown bis exakt 00:00 ---------- */
 var bdT=null, bdWasRun=false, bdOn=false, bdTarget=0, bdAuto=false, bdCel=null;
 function bdKey(){ try{ return localStorage.getItem(P.KEY+"-bday-done")==="1"; }catch(e){ return false; } }
 function nextMidnight(){ var d=new Date(); d.setHours(24,0,0,0); return d.getTime(); }
@@ -521,7 +521,7 @@ $("bdX").onclick=endBday;
 setInterval(function(){
   var d=new Date(); S.bday=S.bday||{auto:1};
   if(S.bday.auto===0||bdOn||bdKey()) return;
-  if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()<25) startBday(true);
+  if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()>=28&&d.getSeconds()<50) startBday(true);
 },500);
 /* ---------- Auslosungs-Show ---------- */
 var seatShown=0, seatT=null;
