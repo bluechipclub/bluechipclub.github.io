@@ -289,8 +289,11 @@ function load(){
   if(!o.finn){ o.finn=1; if(o.players.length<10&&!o.players.some(function(p){return /^finn$/i.test(p.name)})){ var used={}; o.players.forEach(function(p){ used[p.seat]=1; }); var st=1; while(used[st]) st++; o.players.push({id:o.nextId++,name:"Finn",seat:st,buys:1,out:false,outTs:0}); } }
   if(!o.rebuy8){ o.rebuy8=1; if(o.rebuyLvl===6) o.rebuyLvl=8; }
   if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
+  /* Tim 21.11. 21:13: Liste war leer → Gästeliste mit Rebuys Jonas/Jonny, Dirk, Tim zurückholen */
+  if(!o.players.length&&!o.restore1){ o.restore1=1; o.players=restorePl(); o.nextId=o.players.length+1; }
   return o;
 }
+function restorePl(){ return P.SEED.map(function(n,i){ return {id:i+1,name:n,seat:i+1,buys:(n==="Jonas"||n==="Dirk"||n==="Tim")?2:1,out:false,outTs:0}; }); }
 function save(){ try{ localStorage.setItem(P.KEY,JSON.stringify(S)); }catch(e){} }
 var lv=function(i){return S.levels[i]};
 
@@ -357,6 +360,9 @@ function op(o){
     case "rebuy": if(!p){ msg="Spieler "+(o.name||"")+" nicht gefunden – Tafel neu laden"; break; } if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
         snap(p.name+" Rebuy"); p.buys++; p.out=false; p.outTs=0; if(!p.seat||(seatHolder(p.seat)&&seatHolder(p.seat)!==p)) p.seat=freeSeat();
         potPop(); fx("respawn","REBUY","PLATZ "+p.seat+" IST ZURÜCK"); sfx("rebuy"); okm="Rebuy "+p.name+" · jetzt "+P.rebuys(S)+" Rebuys gesamt"; } break;
+    case "restore": { snap("Gästeliste zurück"); var have={}; S.players.forEach(function(x){ have[String(x.name).trim().toLowerCase()]=1; }); var add=0;
+        restorePl().forEach(function(x){ if(have[x.name.toLowerCase()]) return; x.id=S.nextId++; x.seat=freeSeat(); S.players.push(x); add++; });
+        okm=add? add+" Spieler zurück · "+P.entries(S)+" Entries · "+P.rebuys(S)+" Rebuys · Pot "+P.pot(S)+" "+S.unit : "Alle Spieler sind schon da"; break; }
     case "setbuys": if(!p){ msg="Spieler "+(o.name||"")+" nicht gefunden"; break; } snap(p.name+" Rebuys gesetzt"); p.buys=1+Math.max(0,Math.min(20,+o.r||0)); okm=p.name+": "+(p.buys-1)+" Rebuys · gesamt "+P.rebuys(S)+" · Pot "+P.pot(S)+" "+S.unit; break;
     case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy zurückgenommen"); } break;
     case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast("Name geändert"); } break;
@@ -680,7 +686,7 @@ var SY=P.sync("tafel",function(ev,p){
   else if(ev==="hello") broadcast();
 },function(ok){ $("conn").classList.toggle("ok",ok); });
 SY.onUp=broadcast;
-function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.ver="21.11 20:15"; o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
+function broadcast(){ var o={}; for(var k in S) if(k!=="log") o[k]=S[k]; o.now=Date.now(); o.ver="21.11 21:15"; o.bdayDone=bdKey(); o.bdayOn=bdOn; o.slideOn=slideOn; o.canUndo=S.log.length? S.log[S.log.length-1].l : ""; SY.send("state",o); }
 function ack(id,dup,msg,okm){ SY.send("ack",{id:id,msg:msg||"",ok:okm||""}); }
 setInterval(broadcast,5000);
 
