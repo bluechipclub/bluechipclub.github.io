@@ -343,21 +343,21 @@ function op(o){
       var seat=o.seat&&!seatHolder(o.seat)? o.seat : freeSeat(); if(!seat){ msg="Kein Platz frei"; break; }
       S.players.forEach(function(x){ if(x.seat===seat&&x.out) x.seat=0; });
       snap("Neuer Spieler"); var np={id:S.nextId++,name:uniqName(o.name),seat:seat,buys:1,out:false,outTs:0};
-      S.players.push(np); potPop(); toast("+ "+np.name+" (Platz "+seat+")"); sfx("chip"); break; }
+      S.players.push(np); potPop(); toast("+ Neuer Spieler auf Platz "+seat); sfx("chip"); break; }
     case "out": if(p&&!p.out){ snap(p.name+" raus"); p.out=true; p.outTs=Date.now();
-        var al=P.alive(S); fx("wasted","WASTED",p.name.toUpperCase()+(al.length===1?" · "+al[0].name.toUpperCase()+" GEWINNT!":"")); sfx("wasted");
-        if(al.length===1) setTimeout(function(){ fx("passed","CHAMPION",al[0].name.toUpperCase()); confetti(); sfx("tada"); setTimeout(function(){ P.download(S); },6000); },3600);
+        var al=P.alive(S); fx("wasted","WASTED","PLATZ "+p.seat+(al.length===1?" · PLATZ "+al[0].seat+" GEWINNT!":"")); sfx("wasted");
+        if(al.length===1) setTimeout(function(){ fx("passed","CHAMPION","PLATZ "+al[0].seat); confetti(); sfx("tada"); setTimeout(function(){ P.download(S); },6000); },3600);
       } break;
-    case "back": if(p&&p.out){ snap(p.name+" doch nicht raus"); p.out=false; p.outTs=0; if(!p.seat||seatHolder(p.seat)&&seatHolder(p.seat)!==p) p.seat=freeSeat(); toast(p.name+" ist wieder drin"); } break;
+    case "back": if(p&&p.out){ snap(p.name+" doch nicht raus"); p.out=false; p.outTs=0; if(!p.seat||seatHolder(p.seat)&&seatHolder(p.seat)!==p) p.seat=freeSeat(); toast("Platz "+p.seat+" ist wieder drin"); } break;
     case "rebuy": if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
         snap(p.name+" Rebuy"); p.buys++; p.out=false; p.outTs=0; if(!p.seat||(seatHolder(p.seat)&&seatHolder(p.seat)!==p)) p.seat=freeSeat();
-        potPop(); fx("respawn","REBUY",p.name.toUpperCase()+" IST ZURÜCK"); sfx("rebuy"); } break;
-    case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy von "+p.name+" zurückgenommen"); } break;
-    case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast(old+" → "+p.name); } break;
-    case "seat": if(p&&o.seat>=1&&o.seat<=S.seats){ snap("Platz geändert"); var h=seatHolder(o.seat); if(h&&h!==p){ h.seat=p.seat; } p.seat=o.seat; toast(p.name+" → Platz "+o.seat); } break;
-    case "del": if(p){ snap(p.name+" gelöscht"); S.players=S.players.filter(function(x){return x!==p}); toast(p.name+" entfernt"); } break;
+        potPop(); fx("respawn","REBUY","PLATZ "+p.seat+" IST ZURÜCK"); sfx("rebuy"); } break;
+    case "unbuy": if(p&&p.buys>1){ snap(p.name+" Rebuy weg"); p.buys--; toast("Rebuy zurückgenommen"); } break;
+    case "rename": if(p&&o.name){ snap("Umbenannt"); var old=p.name; p.name=""; p.name=uniqName(o.name); toast("Name geändert"); } break;
+    case "seat": if(p&&o.seat>=1&&o.seat<=S.seats){ snap("Platz geändert"); var h=seatHolder(o.seat); if(h&&h!==p){ h.seat=p.seat; } p.seat=o.seat; toast("Platz geändert"); } break;
+    case "del": if(p){ snap(p.name+" gelöscht"); S.players=S.players.filter(function(x){return x!==p}); toast("Spieler entfernt"); } break;
     case "draw": drawSeats(); break;
-    case "undo": { var L=S.log.pop(); if(L){ S.players=JSON.parse(L.pl); S.nextId=L.n; toast("↶ Rückgängig: "+L.l); } else msg="Nichts zum Zurücknehmen"; break; }
+    case "undo": { var L=S.log.pop(); if(L){ S.players=JSON.parse(L.pl); S.nextId=L.n; toast("↶ Rückgängig gemacht"); } else msg="Nichts zum Zurücknehmen"; break; }
     case "photo": showPhoto(); break;
     case "vol": S.vol=Math.max(0,Math.min(100,Math.round(+o.v||0))); applyVol(); toast("🔊 Lautstärke "+S.vol+" %"); break;
     case "slide": slideStart(); break;
@@ -407,7 +407,7 @@ function pick(){
   for(var i=0;i<a.length;i++){ r-=w[i]; if(r<=0) return a[i]; } return a[a.length-1];
 }
 function fillWho(d){
-  var names=P.alive(S).map(function(p){return p.name}); if(names.length<2) names=names.concat(["Spieler A","Spieler B","Spieler C","Spieler D"]);
+  var names=P.alive(S).map(function(p){return "Platz "+p.seat}); if(names.length<4) names=names.concat(["Platz 1","Platz 2","Platz 3","Platz 4"]).slice(0,Math.max(4,names.length));
   for(var i=names.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=names[i]; names[i]=names[j]; names[j]=t; }
   return d.replace(/\{(\d)\}/g,function(_,n){ return "\u0001"+(names[(+n-1)%names.length])+"\u0002"; });
 }
@@ -580,11 +580,11 @@ function render(){
     var p=seatHolder(s);
     if(!p){ h+='<li class="empty"><span class="s">'+s+'</span><span class="n">frei</span></li>'; continue; }
     var st=""; for(var k=1;k<p.buys&&k<=6;k++) st+="★"; if(p.buys>7) st+="+"+(p.buys-7);
-    h+='<li class="'+(p.out?"out ":"")+(/^alex/i.test(p.name)?"alex":"")+'"><span class="s">'+s+'</span><span class="n">'+esc(p.name)+(/^alex/i.test(p.name)?" 🎂":"")+'</span><span class="st">'+st+'</span></li>';
+    h+='<li class="'+(p.out?"out":"")+'"><span class="s">'+s+'</span><span class="n">'+(p.out?"raus":"im Spiel")+'</span><span class="st">'+st+'</span></li>';
   }
   if(ul.innerHTML!==h) ul.innerHTML=h;
   renderEvent();
-  if(S.drawTs&&S.drawTs!==seatShown){ seatShown=S.drawTs; if(Date.now()-S.drawTs<10000) showDraw(); }
+  if(S.drawTs&&S.drawTs!==seatShown){ seatShown=S.drawTs; if(Date.now()-S.drawTs<10000){ toast("🎲 Plätze neu ausgelost"); sfx("chip"); } }
 }
 function ticker(){
   $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX LEGT "+S.bonus+" "+S.unit+" IN DEN POT",
