@@ -127,7 +127,7 @@ nav button.on{color:var(--sun)}
   <div class="g2 mt"><button class="btn" data-op="lvl" data-d="-1">◀ Level</button><button class="btn" data-op="lvl" data-d="1">Level ▶</button></div>
   <div class="g2 mt"><button class="btn" data-op="time" data-d="-60">− 1 Min</button><button class="btn" data-op="time" data-d="60">+ 1 Min</button></div>
   <div class="g2 mt"><button class="btn sun" data-op="ev">🎰 Mission jetzt</button><button class="btn pri" id="bRb">♻️ Rebuy</button></div>
-  <button class="btn mt" id="bRbFix" style="width:100%">✏️ Rebuys korrigieren</button>
+  <div class="g2 mt"><button class="btn" id="bRbFix">✏️ Rebuys korrigieren</button><button class="btn sun" id="bRestore2">🔄 Namen zurückholen</button></div>
   <div class="note mt" id="tVer" style="text-align:center;opacity:.6"></div>
   <button class="btn mt" id="bSlide" style="width:100%">🖼 Alex Dia-Show</button>
   <div class="card mt"><label class="fl">🔊 Lautstärke Tafel: <b id="volL">100 %</b><input type="range" id="vol" min="0" max="100" step="5" value="100" style="padding:0;height:36px;accent-color:#ff2e88"></label></div>
@@ -143,6 +143,7 @@ nav button.on{color:var(--sun)}
 <section class="page" id="p1">
   <div class="g2"><button class="btn pri" id="bAdd">+ Spieler</button><button class="btn" data-op="draw">🎲 Plätze auslosen</button></div>
   <button class="btn mt" id="bUndo" style="width:100%" disabled>↶ Rückgängig</button>
+  <button class="btn sun mt" id="bRestore" style="width:100%">🔄 Alle 10 Namen zurückholen</button>
   <div class="note mt" id="crewInfo"></div>
   <div id="seatList" class="mt"></div>
   <div class="card mt" id="outCard" hidden><h4>Ausgeschieden (Reihenfolge)</h4><div id="outList"></div></div>
@@ -283,6 +284,7 @@ $("bRbFix").onclick=function(){
     var g2=grid(c); B(g2,"Fertig","pri",close).style.gridColumn="1 / -1";
   });
 };
+$("bRestore").onclick=$("bRestore2").onclick=function(){ send({op:"restore"},"Namen zurück"); };
 var volT=null; $("vol").oninput=function(){ var v=+this.value; $("volL").textContent=v+" %"; clearTimeout(volT); volT=setTimeout(function(){ send({op:"vol",v:v},"Lautstärke "+v+" %"); setTimeout(function(){ volT=null; },2500); },250); };
 $("bSlide").onclick=function(){ send({op:S&&S.slideOn?"slidestop":"slide"},S&&S.slideOn?"Dia-Show aus":"Dia-Show an"); };
 function playerSheet(p){
