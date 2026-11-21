@@ -175,6 +175,8 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 #ctl{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:70;
   background:rgba(18,3,31,.94);border:2px solid var(--pink);padding:10px;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;max-width:calc(100vw - 24px)}
 #ctl.hide{transform:translate(-50%,160%);opacity:0;pointer-events:none}
+body.nocur,body.nocur *{cursor:none!important}
+#tapHint{position:fixed;right:14px;bottom:14px;z-index:71;background:rgba(255,46,136,.9);color:#fff;font-weight:800;padding:8px 14px;border-radius:999px;font-size:14px;cursor:pointer}
 #ctl button{background:rgba(255,255,255,.08);padding:9px 14px;font-weight:700;border:1px solid rgba(255,255,255,.15)}
 #ctl button.hot{background:var(--pink);border-color:var(--pink)}
 #ctl a{color:var(--cyan);padding:9px 6px;font-weight:700;text-decoration:none}
@@ -261,13 +263,14 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <button class="hot" id="bPlay">▶ Start</button>
   <button id="bEv">🎰 Mission jetzt</button>
   <button id="bDone">✓ Mission erledigt</button>
-  <button id="bSkip">⏭ Mission skip</button>
-  <button id="bSong" title="GTA-Song nur auf diesem Laptop laden">🎵 GTA-Song + Video laden</button>
+  <button id="bSkip">⏭ Nächste Mission</button>
+  <button id="bFs">⛶ Vollbild</button>
 </div>
 <input type="file" id="songIn" accept="audio/*,video/*" multiple style="display:none">
 <div id="toast"></div>
+<div id="tapHint">🔊 Einmal hier klicken, damit Ton + Video gehen</div>
 
-<script src="core.js"></script>
+<script src="core.js?v=5"></script>
 <script>
 (function(){
 "use strict";
@@ -339,7 +342,7 @@ function op(o){
       S.players.push(np); potPop(); toast("+ "+np.name+" (Platz "+seat+")"); sfx("chip"); break; }
     case "out": if(p&&!p.out){ snap(p.name+" raus"); p.out=true; p.outTs=Date.now();
         var al=P.alive(S); fx("wasted","WASTED",p.name.toUpperCase()+(al.length===1?" · "+al[0].name.toUpperCase()+" GEWINNT!":"")); sfx("wasted");
-        if(al.length===1) setTimeout(function(){ fx("passed","CHAMPION",al[0].name.toUpperCase()); confetti(); sfx("tada"); },3600);
+        if(al.length===1) setTimeout(function(){ fx("passed","CHAMPION",al[0].name.toUpperCase()); confetti(); sfx("tada"); setTimeout(function(){ P.download(S); },6000); },3600);
       } break;
     case "back": if(p&&p.out){ snap(p.name+" doch nicht raus"); p.out=false; p.outTs=0; if(!p.seat||seatHolder(p.seat)&&seatHolder(p.seat)!==p) p.seat=freeSeat(); toast(p.name+" ist wieder drin"); } break;
     case "rebuy": if(p){ if(!P.rebuyOpen(S)&&!o.force){ msg="Rebuy-Phase ist vorbei"; break; }
@@ -581,6 +584,7 @@ function render(){
 function ticker(){
   $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX LEGT "+S.bonus+" "+S.unit+" IN DEN POT",
     num(S.stack)+" CHIPS · "+S.min+"-MINUTEN-LEVEL","JEDERZEIT KANN EINE MISSION KOMMEN","EINMAL HEUTE KOMMT DIE FULLPORT-RUNDE 🚀","REBUY BIS ENDE LEVEL "+S.rebuyLvl+" (VERLÄNGERUNG MÖGLICH)","★ = REBUYS · WANTED-LEVEL"].join("        ✦        ");
+  setTimeout(function(){ var t=$("tick"), w=t.scrollWidth||t.offsetWidth; t.style.animationDuration=Math.max(60,Math.round(w/(innerWidth/40)))+"s"; },50);
 }
 
 /* ---------- Loop ---------- */
@@ -621,22 +625,23 @@ function dc(){ cx.clearRect(0,0,cv.width,cv.height); parts=parts.filter(function
   anim=parts.length? requestAnimationFrame(dc):null; }
 var AC=null;
 /* GTA-Song: nur lokal auf diesem Laptop (IndexedDB), wird nie hochgeladen. Ausschnitte in Sekunden [von, bis]. */
-var song=null, songSrc=null, CLIP={spin:[43.6,52.5],spin2:[43.4,52],done:[162.8,168],level:[60.4,64.6],wasted:[139.2,143.5],rebuy:[75.4,79],tada:[162.8,168]};
+var song=null, songSrc=null, CLIP={spin:[43.6,52.5],spin2:[43.4,52],done:[162.8,168],level:[60.4,64.6],wasted:[139.2,143.5],rebuy:[75.4,79],tada:[162.8,168]}, HCLIP={spin:[0,8.9],spin2:[0,8.4],done:[9.9,15.1],tada:[9.9,15.1],level:[16.1,20.3],wasted:[21.3,25.6],rebuy:[26.6,30.2]}, CL=CLIP, localSong=false;
 function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
 function playClip(c){ var a=ac(), n=a.currentTime, d=c[1]-c[0]; try{ if(songSrc) songSrc.stop(); }catch(e){}
   var src=a.createBufferSource(), g=a.createGain(); src.buffer=song; g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(.9,n+.08); g.gain.setValueAtTime(.9,n+d-.7); g.gain.linearRampToValueAtTime(0,n+d);
   src.connect(g); g.connect(a.destination); src.start(n,c[0],d); songSrc=src; }
 function idb(fn){ try{ var r=indexedDB.open("bcparty-song",1); r.onupgradeneeded=function(){ r.result.createObjectStore("f"); }; r.onsuccess=function(){ fn(r.result); }; }catch(e){} }
-function useSong(ab,silent){ ac().decodeAudioData(ab.slice(0),function(b){ song=b; $("bSong").style.display="none"; if(!silent) toast("🎵 GTA-Sound aktiv (nur auf diesem Laptop)"); },function(){ toast("Datei ging nicht"); }); }
+function useSong(ab,silent){ ac().decodeAudioData(ab.slice(0),function(b){ song=b; CL=CLIP; localSong=true; if(!silent) toast("🎵 GTA-Sound aktiv (nur auf diesem Laptop)"); },function(){ toast("Datei ging nicht"); }); }
 function useVid(blob,silent){ try{ var v=$("bdV"); v.src=URL.createObjectURL(blob); v.load(); if(!silent) toast("🎂 Geburtstagsvideo vom Laptop aktiv"); }catch(e){} }
 function loadFiles(fs){ for(var i=0;i<fs.length;i++){ var f=fs[i]; if(/^video|\.mp4$/i.test(f.type||f.name)||/\.mp4$/i.test(f.name)){ useVid(f); (function(f){ idb(function(db){ try{ db.transaction("f","readwrite").objectStore("f").put(f,"video"); }catch(e){} }); })(f); } else loadSongFile(f); } }
 function loadSongFile(f){ if(!f) return; f.arrayBuffer().then(function(ab){ useSong(ab); idb(function(db){ try{ db.transaction("f","readwrite").objectStore("f").put(ab,"song"); }catch(e){} }); }); }
 $("songIn").onchange=function(){ loadFiles(this.files); this.value=""; };
-$("bSong").onclick=function(){ $("songIn").click(); };
+/* GTA-Stellen fest auf der Seite (Tim 21.11.) */
+fetch("snd/hooks.mp3").then(function(r){ return r.arrayBuffer(); }).then(function(ab){ ac().decodeAudioData(ab,function(b){ if(!localSong){ song=b; CL=HCLIP; } }); }).catch(function(){});
 document.addEventListener("dragover",function(e){ e.preventDefault(); });
 document.addEventListener("drop",function(e){ e.preventDefault(); loadFiles(e.dataTransfer.files); });
 idb(function(db){ try{ var q=db.transaction("f").objectStore("f").get("song"); q.onsuccess=function(){ if(q.result) useSong(q.result,true); }; var w=db.transaction("f").objectStore("f").get("video"); w.onsuccess=function(){ if(w.result) useVid(w.result,true); }; }catch(e){} });
-function sfx(k){ try{ if(song&&CLIP[k]){ playClip(CLIP[k]); return; } if(k==="done"||k==="rebuy") k=k==="done"?"tada":"chip"; if(k==="spin2") k="spin"; ac(); var n=AC.currentTime;
+function sfx(k){ try{ if(song&&CL[k]){ playClip(CL[k]); return; } if(k==="done"||k==="rebuy") k=k==="done"?"tada":"chip"; if(k==="spin2") k="spin"; ac(); var n=AC.currentTime;
   var T=function(f,t,d,ty,v){ var o=AC.createOscillator(),g=AC.createGain(); o.type=ty||"sine"; o.frequency.value=f; g.gain.setValueAtTime(0,n+t); g.gain.linearRampToValueAtTime(v||.16,n+t+.02); g.gain.exponentialRampToValueAtTime(.001,n+t+d); o.connect(g); g.connect(AC.destination); o.start(n+t); o.stop(n+t+d+.05); };
   if(k==="beep") T(880,0,.15,"square",.05);
   else if(k==="chip"){ T(1400,0,.06,"triangle",.12); T(1900,.05,.08,"triangle",.1); }
@@ -661,21 +666,30 @@ $("bPlay").onclick=function(){ op({op:"toggle"}); };
 $("bEv").onclick=function(){ op({op:"ev"}); };
 $("bDone").onclick=function(){ op({op:"evdone"}); };
 $("bSkip").onclick=function(){ op({op:"evskip"}); };
+$("bFs").onclick=function(){ fs(); };
+/* Ton freischalten: Brave/Chrome erlauben Ton erst nach einem Klick auf der Seite */
+var unlocked=false;
+function unlock(){ if(unlocked) return; unlocked=true; $("tapHint").style.display="none";
+  try{ ac(); }catch(e){}
+  var v=$("bdV"); if(!bdOn){ try{ v.muted=true; var pr=v.play(); if(pr&&pr.then) pr.then(function(){ if(!bdOn){ v.pause(); v.currentTime=0; } v.muted=false; }).catch(function(){ v.muted=false; }); }catch(e){ v.muted=false; } } }
+document.addEventListener("pointerdown",unlock,true); document.addEventListener("keydown",unlock,true);
 function fs(){ try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }catch(e){} }
-var ctl=$("ctl"), hT; function ah(){ ctl.classList.remove("hide"); clearTimeout(hT); hT=setTimeout(function(){ ctl.classList.add("hide"); },5000); }
-document.addEventListener("mousemove",ah); document.addEventListener("touchstart",ah,{passive:true});
+var ctl=$("ctl"), hT; function hideCtl(){ ctl.classList.add("hide"); document.body.classList.add("nocur"); }
+function ah(){ ctl.classList.remove("hide"); document.body.classList.remove("nocur"); clearTimeout(hT); hT=setTimeout(hideCtl,3000); }
+ctl.classList.add("hide"); document.body.classList.add("nocur");
+document.addEventListener("mousemove",ah); document.addEventListener("touchstart",ah,{passive:true}); document.documentElement.addEventListener("mouseleave",function(){ clearTimeout(hT); hideCtl(); });
 document.addEventListener("keydown",function(e){ var k=e.key.toLowerCase();
   if(k===" "){ e.preventDefault(); if(S.ev){ if(Date.now()-S.ev.ts>4000) op({op:"evdone"}); } else op({op:"toggle"}); }
   else if(k==="arrowright") op({op:"lvl",d:1}); else if(k==="arrowleft") op({op:"lvl",d:-1});
   else if(k==="e") op({op:"ev"}); else if(k==="f") fs(); else if(k==="p") showPhoto();
-  else if(k==="m") $("songIn").click();
+  else if(k==="m") $("songIn").click(); else if(k==="a") P.download(S);
   else if(k==="escape"){ slideStop(); if(bdOn) endBday(); }
 });
 $("show").onclick=function(){ slideStop(); };
 
 if(!S.evAt&&!S.running) rollEv();
 if(S.running&&S.endsAt<Date.now()-8*3600*1000) S.running=false;
-save(); ticker(); render(); ah(); broadcast();
+save(); ticker(); render(); broadcast();
 setInterval(loop,250);
 window.__party={op:op,S:function(){return S}};
 })();

@@ -80,6 +80,25 @@ P.places = function(S){
   if(alive.length===1) res[alive[0].id]=1;
   return res;
 };
+/* Auswertung als eigenständige HTML-Datei (Tim 21.11.: "am Ende eine Auswertungsdatei") */
+P.report = function(S){
+  var e=P.esc, pl=P.places(S), po=P.payout(S), d=new Date();
+  var rows=S.players.slice().sort(function(a,b){ return (pl[a.id]||99)-(pl[b.id]||99); });
+  var h='<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Auswertung Blue Chip Party</title>'+
+  '<style>body{font-family:system-ui,sans-serif;background:#12031f;color:#fff;max-width:760px;margin:0 auto;padding:20px}h1{color:#ff2e88;margin:0}h2{color:#ffd35c;margin-top:28px}table{width:100%;border-collapse:collapse}td,th{padding:7px 6px;border-bottom:1px solid #3a2050;text-align:left}th{color:#ffd35c}.s{color:#aaa}</style></head><body>';
+  h+='<h1>'+e(S.title)+'</h1><div class="s">'+e(S.sub)+' · erstellt '+d.toLocaleString("de-DE")+'</div>';
+  h+='<h2>Zahlen</h2><table><tr><td>Spieler</td><td>'+P.entries(S)+'</td></tr><tr><td>Rebuys</td><td>'+P.rebuys(S)+'</td></tr><tr><td>Pot</td><td>'+P.pot(S)+' '+e(S.unit)+' (inkl. '+S.bonus+' von Alex)</td></tr><tr><td>Level erreicht</td><td>'+P.playNo(S,S.li)+'</td></tr><tr><td>Missionen gespielt</td><td>'+S.hist.length+'</td></tr></table>';
+  h+='<h2>Ergebnis</h2><table><tr><th>Platz</th><th>Name</th><th>Buy-ins</th><th>Einsatz</th><th>Gewinn</th></tr>';
+  rows.forEach(function(p){ var x=pl[p.id], w=x&&x<=po.length? po[x-1]:0; h+='<tr><td>'+(x? x+'.' : 'im Spiel')+'</td><td>'+e(p.name)+'</td><td>'+p.buys+'</td><td>'+(p.buys*S.entry)+' '+e(S.unit)+'</td><td>'+(w? w+' '+e(S.unit) : '')+'</td></tr>'; });
+  h+='</table><h2>Missionen</h2><table>'+(S.hist.length? S.hist.map(function(m){ return '<tr><td>'+e(m.at)+'</td><td>'+m.e+' '+e(m.t)+'</td></tr>'; }).join('') : '<tr><td>keine</td></tr>')+'</table></body></html>';
+  return h;
+};
+P.download = function(S){
+  var name="auswertung-blue-chip-party-"+new Date().toISOString().slice(0,10)+".html";
+  var blob=new Blob([P.report(S)],{type:"text/html"}), url=URL.createObjectURL(blob);
+  try{ var f=new File([blob],name,{type:"text/html"}); if(navigator.canShare&&navigator.canShare({files:[f]})&&/iPhone|iPad|Android/i.test(navigator.userAgent)){ navigator.share({files:[f],title:"Auswertung"}).catch(function(){}); return; } }catch(e){}
+  var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); },3000);
+};
 P.num = function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,"."); };
 P.fmt = function(sec){ sec=Math.max(0,Math.ceil(sec)); var h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60; return (h? h+":"+(m<10?"0":""):"")+(m<10&&!h?"0":"")+m+":"+(s<10?"0":"")+s; };
 P.esc = function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]}); };

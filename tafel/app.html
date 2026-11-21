@@ -517,7 +517,7 @@ $("shBk").onclick=()=>{const a=shStack.pop();if(!a)return;sheet.back=1;sheet(...
 
 /* ---------- tabs ---------- */
 function page(i){document.querySelectorAll(".page").forEach((p,k)=>p.classList.toggle("on",k===i));document.querySelectorAll("nav.tb button").forEach((b,k)=>b.classList.toggle("on",k===i));
-  if(i===5){const f=document.getElementById("partyFr");if(f&&!f.src)f.src="../party/fb.html";}
+  if(i===5){const f=document.getElementById("partyFr");if(f&&!f.src)f.src="../party/fb.html?v="+Date.now();}
   try{localStorage.setItem("bcc-app-page",i);}catch(e){}scrollTo(0,0);buzz(6);}
 document.querySelectorAll("nav.tb button").forEach(b=>b.onclick=()=>page(+b.dataset.p));
 try{const i=+localStorage.getItem("bcc-app-page");if(i>0&&i<6)page(i);}catch(e){}
