@@ -261,9 +261,9 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <button id="bEv">🎰 Mission jetzt</button>
   <button id="bDone">✓ Mission erledigt</button>
   <button id="bSkip">⏭ Mission skip</button>
-  <button id="bSong" title="GTA-Song nur auf diesem Laptop laden">🎵 GTA-Sound laden</button>
+  <button id="bSong" title="GTA-Song nur auf diesem Laptop laden">🎵 GTA-Song + Video laden</button>
 </div>
-<input type="file" id="songIn" accept="audio/*" style="display:none">
+<input type="file" id="songIn" accept="audio/*,video/*" multiple style="display:none">
 <div id="toast"></div>
 
 <script src="core.js"></script>
@@ -622,12 +622,14 @@ function playClip(c){ var a=ac(), n=a.currentTime, d=c[1]-c[0]; try{ if(songSrc)
   src.connect(g); g.connect(a.destination); src.start(n,c[0],d); songSrc=src; }
 function idb(fn){ try{ var r=indexedDB.open("bcparty-song",1); r.onupgradeneeded=function(){ r.result.createObjectStore("f"); }; r.onsuccess=function(){ fn(r.result); }; }catch(e){} }
 function useSong(ab,silent){ ac().decodeAudioData(ab.slice(0),function(b){ song=b; $("bSong").style.display="none"; if(!silent) toast("🎵 GTA-Sound aktiv (nur auf diesem Laptop)"); },function(){ toast("Datei ging nicht"); }); }
+function useVid(blob,silent){ try{ var v=$("bdV"); v.src=URL.createObjectURL(blob); v.load(); if(!silent) toast("🎂 Geburtstagsvideo vom Laptop aktiv"); }catch(e){} }
+function loadFiles(fs){ for(var i=0;i<fs.length;i++){ var f=fs[i]; if(/^video|\.mp4$/i.test(f.type||f.name)||/\.mp4$/i.test(f.name)){ useVid(f); (function(f){ idb(function(db){ try{ db.transaction("f","readwrite").objectStore("f").put(f,"video"); }catch(e){} }); })(f); } else loadSongFile(f); } }
 function loadSongFile(f){ if(!f) return; f.arrayBuffer().then(function(ab){ useSong(ab); idb(function(db){ try{ db.transaction("f","readwrite").objectStore("f").put(ab,"song"); }catch(e){} }); }); }
-$("songIn").onchange=function(){ loadSongFile(this.files[0]); this.value=""; };
+$("songIn").onchange=function(){ loadFiles(this.files); this.value=""; };
 $("bSong").onclick=function(){ $("songIn").click(); };
 document.addEventListener("dragover",function(e){ e.preventDefault(); });
-document.addEventListener("drop",function(e){ e.preventDefault(); var f=e.dataTransfer.files[0]; if(f&&/audio|mp3/.test(f.type+f.name)) loadSongFile(f); });
-idb(function(db){ try{ var q=db.transaction("f").objectStore("f").get("song"); q.onsuccess=function(){ if(q.result) useSong(q.result,true); }; }catch(e){} });
+document.addEventListener("drop",function(e){ e.preventDefault(); loadFiles(e.dataTransfer.files); });
+idb(function(db){ try{ var q=db.transaction("f").objectStore("f").get("song"); q.onsuccess=function(){ if(q.result) useSong(q.result,true); }; var w=db.transaction("f").objectStore("f").get("video"); w.onsuccess=function(){ if(w.result) useVid(w.result,true); }; }catch(e){} });
 function sfx(k){ try{ if(song&&CLIP[k]){ playClip(CLIP[k]); return; } if(k==="done"||k==="rebuy") k=k==="done"?"tada":"chip"; if(k==="spin2") k="spin"; ac(); var n=AC.currentTime;
   var T=function(f,t,d,ty,v){ var o=AC.createOscillator(),g=AC.createGain(); o.type=ty||"sine"; o.frequency.value=f; g.gain.setValueAtTime(0,n+t); g.gain.linearRampToValueAtTime(v||.16,n+t+.02); g.gain.exponentialRampToValueAtTime(.001,n+t+d); o.connect(g); g.connect(AC.destination); o.start(n+t); o.stop(n+t+d+.05); };
   if(k==="beep") T(880,0,.15,"square",.05);
