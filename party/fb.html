@@ -255,7 +255,7 @@ function addSheet(seat){
 $("bAdd").onclick=function(){ if(S) addSheet(0); };
 /* Rebuy: wer? dann OK oder Abbrechen */
 $("bRb").onclick=function(){ if(!S) return; var ro=P.rebuyOpen(S), pick=null;
-  sheet("Rebuy – wer?", ro? S.rebuy+" "+S.unit+" in den Pot" : "Achtung: Rebuy-Phase ist eigentlich vorbei", function(c){
+  sheet("Rebuy – wer?", S.rebuy+" "+S.unit+" in den Pot", function(c){
     var g=document.createElement("div"); g.className="g2 mt"; c.appendChild(g);
     S.players.slice().sort(function(a,b){ return (b.out-a.out)||a.name.localeCompare(b.name); }).forEach(function(p){
       var b=B(g,(p.out?"💀 ":"")+p.name+(p.buys>1?" ★"+(p.buys-1):""),"",function(){ pick=p; g.querySelectorAll("button").forEach(function(x){ x.classList.remove("pri"); }); b.classList.add("pri"); ok.textContent="OK · "+p.name; }); });
@@ -309,7 +309,7 @@ function render(){
   if(sig===lastSig) return; lastSig=sig;
   /* Crew */
   var ro=P.rebuyOpen(S), al=P.alive(S).length, h="";
-  $("crewInfo").textContent=al+" im Spiel · "+S.players.length+" Spieler · Rebuy "+(ro?"offen bis Ende Level "+S.rebuyLvl:"geschlossen");
+  $("crewInfo").textContent=al+" im Spiel · "+S.players.length+" Spieler · Rebuy "+(P.rebuyPlanned(S)?"bis Ende Level "+S.rebuyLvl:"läuft weiter (verlängert)");
   for(var s=1;s<=S.seats;s++){
     var p=holder(s);
     if(!p){ h+='<div class="seat empty" data-seat="'+s+'"><span class="n">'+s+'</span><span class="nm">frei · antippen</span></div>'; continue; }

@@ -61,7 +61,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 
 /* Foto */
 .photo{padding:0}
-.photo .im{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.4s;animation:kb 14s ease-in-out infinite alternate}
+.photo .im{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 3s ease-in-out;animation:kb 40s ease-in-out infinite alternate}
 .photo .im.on{opacity:1}
 @keyframes kb{from{transform:scale(1.03)}to{transform:scale(1.14) translate(-2%,-1%)}}
 .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(18,3,31,.92));pointer-events:none}
@@ -110,7 +110,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 .seats li.alex .n{color:var(--sun)}
 
 .ticker{overflow:hidden;white-space:nowrap;background:rgba(0,0,0,.55);border-top:2px solid var(--pink);border-bottom:2px solid var(--pink);padding:.6vh 0;font-family:Anton;letter-spacing:.1em;font-size:clamp(13px,1.2vw,23px)}
-.ticker span{display:inline-block;padding-left:100%;animation:tk 50s linear infinite}
+.ticker span{display:inline-block;padding-left:100%;animation:tk 150s linear infinite}
 @keyframes tk{to{transform:translateX(-100%)}}
 
 /* ---------- Overlays ---------- */
@@ -146,7 +146,8 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
 @keyframes fxin{0%{opacity:0;transform:scale(1.4)}12%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:0}}
 
 #show{z-index:55;background:#000;padding:0}
-#show .im{position:absolute;inset:0;background-size:cover;background-position:center;animation:kb 9s ease-out forwards}
+#show .im{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 3s ease-in-out}
+#show .im.on{opacity:1;animation:kb 50s ease-out forwards}
 #show .cap{position:absolute;left:5vw;bottom:8vh;text-align:left}
 #show .cap b{display:block;font-family:Anton;font-size:clamp(40px,6vw,120px);text-shadow:5px 5px 0 var(--pink)}
 #show .cap span{font-family:Yellowtail;font-size:clamp(30px,3.6vw,72px);color:var(--sun)}
@@ -251,7 +252,7 @@ main{display:grid;grid-template-columns:1.05fr 1.25fr 1fr;gap:1.6vw;min-height:0
   <div id="evDesc"></div>
   <div id="evHint">Fernbedienung oder Leertaste: Mission erledigt</div>
 </div>
-<div class="ov" id="show"><div class="im" id="showIm"></div><div class="cap"><b id="showB"></b><span id="showS"></span></div></div>
+<div class="ov" id="show"><div class="im" id="showIm2"></div><div class="im" id="showIm"></div><div class="cap"><b id="showB"></b><span id="showS"></span></div></div>
 <div class="ov" id="bd"><div class="cw"><div class="ct">★ ES IST MITTERNACHT ★</div><div class="cd" id="bdN">10</div><div class="cs">Happy Birthday Alex</div><button class="tap" id="bdTap">▶ ANTIPPEN ZUM ABSPIELEN</button></div><video id="bdV" src="vid/happy-birthday-alex.mp4" preload="auto" playsinline></video><button class="x" id="bdX">✕</button></div>
 <div class="ov" id="seatov"><div class="tag" style="font-family:Anton;letter-spacing:.3em;font-size:clamp(18px,2vw,40px);color:var(--sun)">★ PLÄTZE AUSGELOST ★</div><div id="seatGrid"></div><div style="margin-top:3vh;color:var(--dim);font-size:clamp(13px,1.1vw,20px)">Antippen zum Schließen</div></div>
 <div class="ov" id="fx"><div class="big" id="fxB"></div><div class="small" id="fxS"></div></div>
@@ -276,6 +277,7 @@ function load(){
   var s=null; try{ s=JSON.parse(localStorage.getItem(P.KEY)||"null"); }catch(e){}
   var o=P.defaults(); if(s&&s.v===1) for(var k in s) o[k]=s[k];
   if(o.evMin===12&&o.evMax===20){ o.evMin=15; o.evMax=25; }
+  if(!o.rebuy8){ o.rebuy8=1; if(o.rebuyLvl===6) o.rebuyLvl=8; }
   if(!o.seeded){ o.seeded=1; if(!o.players.length){ var sd=P.defaults(); o.players=sd.players; o.nextId=sd.nextId; } }
   return o;
 }
@@ -454,23 +456,24 @@ var CAPS=[["HAPPY BIRTHDAY","Alex"],["DER FULLPORT-EXPERTE","all-in ohne Angst"]
 var phIdx=0, phEls=[];
 (function(){ var ph=$("photo"); P.IMGS.forEach(function(src,i){ var d=document.createElement("div"); d.className="im"+(i===0?" on":""); d.style.backgroundImage="url("+src+")"; d.style.animationDelay=(-i*3)+"s"; ph.insertBefore(d,ph.firstChild); phEls.push(d); }); })();
 function nextPhoto(){ phEls[phIdx].classList.remove("on"); phIdx=(phIdx+1)%phEls.length; phEls[phIdx].classList.add("on"); var c=CAPS[phIdx%CAPS.length]; $("pcB").textContent=c[0]; $("pcS").textContent=c[1]; }
-setInterval(nextPhoto,11000);
+setInterval(nextPhoto,40000);
 var bgI=0; setInterval(function(){ var b=document.querySelectorAll("#bgph i"); b[bgI].classList.remove("on"); bgI=(bgI+1)%b.length; b[bgI].classList.add("on"); },60000);
 var showT=null, lastShow=Date.now();
 var slideOn=false, slideT=null, slideLast=-1;
 function slideStep(){ var i; do{ i=Math.floor(Math.random()*P.IMGS.length); }while(P.IMGS.length>1&&i===slideLast); slideLast=i;
-  var c=CAPS[Math.floor(Math.random()*CAPS.length)], im=$("showIm"); im.style.animation="none"; void im.offsetWidth; im.style.animation=""; im.style.backgroundImage="url("+P.IMGS[i]+")";
+  var c=CAPS[Math.floor(Math.random()*CAPS.length)], a=$("showIm"), b=$("showIm2"), im=a.classList.contains("on")? b : a, old=im===a? b : a;
+  im.style.backgroundImage="url("+P.IMGS[i]+")"; im.classList.add("on"); old.classList.remove("on");
   $("showB").textContent=c[0]; $("showS").textContent=c[1]; }
-function slideStart(){ if(S.ev) return; clearTimeout(showT); slideOn=true; slideStep(); $("show").classList.add("on"); clearInterval(slideT); slideT=setInterval(slideStep,7000); lastShow=Date.now(); broadcast(); }
+function slideStart(){ if(S.ev) return; clearTimeout(showT); slideOn=true; slideStep(); $("show").classList.add("on"); clearInterval(slideT); slideT=setInterval(slideStep,40000); lastShow=Date.now(); broadcast(); }
 function slideStop(){ var w=slideOn; slideOn=false; clearInterval(slideT); clearTimeout(showT); $("show").classList.remove("on"); lastShow=Date.now(); if(w) broadcast(); }
 function showPhoto(){
   if(S.ev||slideOn) return; var i=Math.floor(Math.random()*P.IMGS.length), c=CAPS[Math.floor(Math.random()*CAPS.length)];
-  var im=$("showIm"); im.style.animation="none"; void im.offsetWidth; im.style.animation=""; im.style.backgroundImage="url("+P.IMGS[i]+")";
+  $("showIm2").classList.remove("on"); var im=$("showIm"); im.classList.remove("on"); void im.offsetWidth; im.style.backgroundImage="url("+P.IMGS[i]+")"; im.classList.add("on");
   $("showB").textContent=c[0]; $("showS").textContent=c[1]; $("show").classList.add("on"); lastShow=Date.now();
   clearTimeout(showT); showT=setTimeout(function(){ $("show").classList.remove("on"); },8000);
 }
 
-/* ---------- Geburtstagsvideo: startet 23:59:00, danach Countdown bis exakt 00:00 ---------- */
+/* ---------- Geburtstagsvideo: startet 23:59:28 (30 s Video), danach Countdown bis exakt 00:00 ---------- */
 var bdT=null, bdWasRun=false, bdOn=false, bdTarget=0, bdAuto=false, bdCel=null;
 function bdKey(){ try{ return localStorage.getItem(P.KEY+"-bday-done")==="1"; }catch(e){ return false; } }
 function nextMidnight(){ var d=new Date(); d.setHours(24,0,0,0); return d.getTime(); }
@@ -482,12 +485,15 @@ function startBday(auto){
   $("show").classList.remove("on"); clearInterval(bdT); clearTimeout(bdCel);
   bdTarget= bdAuto? nextMidnight() : 0;
   bdTxt("★ GLEICH IST ES SOWEIT ★","▶","Happy Birthday Alex");
-  playBday();
+  if(bdAuto){ $("bd").className="ov on"; var w=bdTarget-30000-Date.now(); clearTimeout(bdCel); bdCel=setTimeout(playBday,Math.max(0,w)); }
+  else playBday();
 }
+/* Auto: Video so nachführen, dass es exakt um 00:00:00 endet */
+function bdSync(){ if(!bdOn||!bdAuto) return; var v=$("bdV"), want=(Date.now()-(bdTarget-30000))/1000; if(want>0&&want<29.5&&Math.abs(v.currentTime-want)>0.25){ try{ v.currentTime=want; }catch(e){} } }
 function playBday(){
   var o=$("bd"), v=$("bdV"); v.muted=false; v.volume=1; try{ v.currentTime=0; }catch(e){}
   var pr=v.play();
-  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; }).catch(function(){ o.className="ov on needtap"; }); }
+  if(pr&&pr.then){ pr.then(function(){ o.className="ov on play"; bdSync(); setTimeout(bdSync,1500); setTimeout(bdSync,10000); }).catch(function(){ o.className="ov on needtap"; }); }
   else o.className="ov on play";
 }
 function countdown(){
@@ -518,7 +524,7 @@ $("bdX").onclick=endBday;
 setInterval(function(){
   var d=new Date(); S.bday=S.bday||{auto:1};
   if(S.bday.auto===0||bdOn||bdKey()) return;
-  if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()<25) startBday(true);
+  if(d.getMonth()===10&&d.getDate()===21&&d.getHours()===23&&d.getMinutes()===59&&d.getSeconds()>=28&&d.getSeconds()<50) startBday(true);
 },500);
 /* ---------- Auslosungs-Show ---------- */
 var seatShown=0, seatT=null;
@@ -553,7 +559,7 @@ function render(){
   $("startat").textContent= fresh? "Start um "+S.start+" Uhr · "+num(S.stack)+" Chips" : "";
   $("evc").textContent= !S.auto? "per Knopf" : l.brk? "nach der Pause" : fmt(curEv())+(S.running?"":" ⏸");
   var ro=P.rebuyOpen(S);
-  $("hRb").textContent= ro? "REBUY BIS LEVEL "+S.rebuyLvl : "REBUY ZU"; $("hRb").style.opacity= ro?1:.5;
+  $("hRb").textContent= P.rebuyPlanned(S)? "REBUY BIS LEVEL "+S.rebuyLvl : "REBUY OFFEN"; $("hRb").style.opacity=1;
   var al=P.alive(S).length;
   $("hPl").textContent= al+" / "+S.players.length+" IM SPIEL";
   $("potv").textContent=num(P.pot(S))+" "+S.unit;
@@ -574,7 +580,7 @@ function render(){
 }
 function ticker(){
   $("tick").textContent=["★ HAPPY BIRTHDAY ALEX ★","ENTRY "+S.entry+" "+S.unit+" · REBUY "+S.rebuy+" "+S.unit+" · ALEX LEGT "+S.bonus+" "+S.unit+" IN DEN POT",
-    num(S.stack)+" CHIPS · "+S.min+"-MINUTEN-LEVEL","JEDERZEIT KANN EINE MISSION KOMMEN","EINMAL HEUTE KOMMT DIE FULLPORT-RUNDE 🚀","REBUY OFFEN BIS ENDE LEVEL "+S.rebuyLvl,"★ = REBUYS · WANTED-LEVEL"].join("        ✦        ");
+    num(S.stack)+" CHIPS · "+S.min+"-MINUTEN-LEVEL","JEDERZEIT KANN EINE MISSION KOMMEN","EINMAL HEUTE KOMMT DIE FULLPORT-RUNDE 🚀","REBUY BIS ENDE LEVEL "+S.rebuyLvl+" (VERLÄNGERUNG MÖGLICH)","★ = REBUYS · WANTED-LEVEL"].join("        ✦        ");
 }
 
 /* ---------- Loop ---------- */

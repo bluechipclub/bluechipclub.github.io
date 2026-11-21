@@ -44,7 +44,7 @@ P.SEED = ["Alex","Jonas","Dirk","Göki","Hannah","Jan","Lenka","Noce","Tim"];
 P.defaults = function(){
   return {
     v:1, title:"BLUE CHIP PARTY", sub:"Alex' Birthday Edition", start:"19:00",
-    entry:5, rebuy:5, bonus:50, unit:"P", stack:20000, rebuyLvl:6, min:20, seats:10,
+    entry:5, rebuy:5, bonus:50, unit:"P", stack:20000, rebuyLvl:8, min:20, seats:10,
     evMin:15, evMax:25, auto:1, pauseParty:1, off:{muenze:1},
     levels:JSON.parse(JSON.stringify(P.LEVELS)),
     li:0, left:20*60, running:false, endsAt:0,
@@ -57,7 +57,9 @@ P.defaults = function(){
 /* --- Rechnungen --- */
 P.playNo = function(S,i){ var n=0; for(var j=0;j<=i&&j<S.levels.length;j++) if(!S.levels[j].brk) n++; return n; };
 P.lvlLen = function(S,i){ var l=S.levels[i]; return l&&l.brk? l.brk*60 : S.min*60; };
-P.rebuyOpen = function(S){ return !S.levels[S.li].brk ? P.playNo(S,S.li)<=S.rebuyLvl : P.playNo(S,S.li)<S.rebuyLvl; };
+/* Rebuy ist nie gesperrt (Tim 21.11.): rebuyPlanned = geplante Phase nur zur Anzeige. */
+P.rebuyOpen = function(S){ return true; };
+P.rebuyPlanned = function(S){ return !S.levels[S.li].brk ? P.playNo(S,S.li)<=S.rebuyLvl : P.playNo(S,S.li)<S.rebuyLvl; };
 P.buys = function(S){ return S.players.reduce(function(a,p){return a+p.buys},0); };
 P.entries = function(S){ return S.players.length; };
 P.rebuys = function(S){ return P.buys(S)-P.entries(S); };
