@@ -1342,8 +1342,8 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
  "title": "Monday Classic",
  "event": "Monday Classic 23.11.",
  "sub": "25.000 Chips · 25-Minuten-Level · nur 10 Plätze",
- "buyin": 20,
- "rebuy": 20,
+ "buyin": 15,
+ "rebuy": 15,
  "fee": 0,
  "cards": "A♠ K♠ Q♥ J♦ T♣",
  "facts": [
@@ -1362,6 +1362,14 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   {
    "v": "10 Plätze",
    "l": "Ein Tisch, danach Warteliste"
+  },
+  {
+   "v": "Rebuys unbegrenzt",
+   "l": "bis Ende Level 8"
+  },
+  {
+   "v": "+5 P Anwesenheit",
+   "l": "einmal beim ersten Entry"
   }
  ],
  "program": [
@@ -1378,7 +1386,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
   {
    "t": "Level 8",
    "l": "Letzte Chance auf den Rebuy",
-   "s": "Maximal 2 Rebuys pro Spieler, möglich bis Ende Level 8 (ungefähr 21:30)"
+   "s": "Rebuys unbegrenzt, je 15 P, möglich bis Ende Level 8 (ungefähr 21:30)"
   },
   {
    "t": "Am Ende",
@@ -1388,7 +1396,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
  ],
  "trophyTitle": "Monday Classic",
  "trophy": "Der Klassiker zum Wochenstart: ein Tisch, 10 Plätze, 25.000 Chips und 25-Minuten-Level. Diesmal mit neuen Gesichtern aus einem anderen Freundeskreis.",
- "info": "Monday Classic mit 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die Blinds starten bei 100/100, ab Level 3 gibt es eine Big-Blind-Ante.\n\nPreise: Der Buy-in kostet 20 P und geht komplett in den Pot. Jeder darf maximal 2 Rebuys machen, bis Ende Level 8, also ungefähr bis 21:30. Ein Rebuy kostet ebenfalls 20 P und geht komplett in den Pot. Dazu kommen wie immer 5 P Anwesenheit pro Person.\n\nBargeldregel: Der erste Buy-in wird bar bezahlt, direkt beim Hinsetzen. Rebuys am besten auch bar. Alles wird an der Tafel mitgeschrieben, damit die Abrechnung am Ende genau aufgeht.\n\nMontag, 23.11.: Die erste Hand wird pünktlich um 18:00 Uhr ausgeteilt. Early Bird: Wer bei der ersten Hand am Tisch sitzt, startet mit 27.000 statt 25.000 Chips. Wer später kommt, bekommt den Bonus nicht und steigt mit dem laufenden Level ein.\n\nDiesmal gibt es nur einen Tisch mit 10 Plätzen. Wer zuerst reserviert, sitzt. Danach geht es auf die Warteliste.",
+ "info": "Monday Classic mit 25.000 Chips Startstack und durchgehend 25-Minuten-Level. Die Blinds starten bei 100/100, ab Level 3 gibt es eine Big-Blind-Ante.\n\nPreise: Der erste Entry kostet 20 P: 15 P gehen in den Pot, 5 P sind die Anwesenheit. Danach kostet jeder Rebuy 15 P und geht komplett in den Pot. Rebuys sind unbegrenzt, bis Ende Level 8, also ungefähr bis 21:30.\n\nBargeldregel: Der erste Buy-in wird bar bezahlt, direkt beim Hinsetzen. Rebuys am besten auch bar. Alles wird an der Tafel mitgeschrieben, damit die Abrechnung am Ende genau aufgeht.\n\nMontag, 23.11.: Die erste Hand wird pünktlich um 18:00 Uhr ausgeteilt. Early Bird: Wer bei der ersten Hand am Tisch sitzt, startet mit 27.000 statt 25.000 Chips. Wer später kommt, bekommt den Bonus nicht und steigt mit dem laufenden Level ein.\n\nDiesmal gibt es nur einen Tisch mit 10 Plätzen. Wer zuerst reserviert, sitzt. Danach geht es auf die Warteliste.",
  "blinds": [
   {
    "sb": 100,
@@ -1498,7 +1506,6 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
  "dvotes": {},
  "timeLabel": "Erste Hand · pünktlich",
  "hand0": 0,
- "maxRe": 2,
  "hidden": false
 },
   "extraRecords": [
@@ -3243,7 +3250,7 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     const nx = nextOk();
     h += '<section class="scene nextsc" id="nextbox"><img class="nx-bg" src="img/tisch-spieler.webp" alt="" loading="lazy" decoding="async"><div class="sc-head"><span class="sc-kick">Nächstes Turnier</span><h2>' + (nx ? esc(nx.title) + '<em>.</em>' : 'Termin <em>folgt.</em>') + '</h2></div><p class="sc-sub">' + (nx ? (nx.tbd ? esc(nx.tbd) : esc(new Date(nx.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })) + ' · ' + priceLine(nx)) : 'Der neue Termin kommt in die WhatsApp-Gruppe und hierher.') + '</p>' + (nx ? '<button class="btn-cream big" type="button" data-reserve>Platz reservieren <span aria-hidden="true">→</span></button>' : '') + '</section>';
     h += '<section class="voidband" aria-label="Der Tisch"><img src="img/tisch-oben.webp" srcset="img/tisch-oben-960.webp 960w, img/tisch-oben.webp 1920w" sizes="100vw" alt="Unser Pokertisch im The Void von oben, Ge-man-Logo in der Mitte, zehn leere Stühle" loading="lazy"><div class="vb-copy"><span class="eyebrow">The Void</span><h2>Ein Tisch. Zehn <em>Plätze.</em></h2></div></section>';
-    const STEPS = [['tafel', 'Plätze auslosen', 'Die Tafel auf dem Fernseher lost die Sitze aus.'], ['chips', 'Blinds erhöhen', 'Alle 30 Minuten steigt das Level. Rebuys bis Ende Level 6.'], ['minigame', 'Minigames spielen', 'Ohne Ankündigung: Omaha, Crazy Pineapple oder Bomb Pot.'], ['sieger', 'Sieger krönen', 'Die ersten drei teilen den Pot 50, 30 und 20 Prozent.']];
+    const STEPS = [['tafel', 'Plätze auslosen', 'Die Tafel auf dem Fernseher lost die Sitze aus.'], ['chips', 'Blinds erhöhen', 'Jedes Level dauert 25 Minuten. Rebuys bis Ende Level 8.'], ['minigame', 'Minigames spielen', 'Ohne Ankündigung: Omaha, Crazy Pineapple oder Bomb Pot.'], ['sieger', 'Sieger krönen', 'Die ersten drei teilen den Pot 50, 30 und 20 Prozent.']];
     h += '<section class="scene abend"><div class="sc-head"><span class="sc-kick">Treffpunkt 18 Uhr</span><h2>So läuft ein <em>Abend.</em></h2></div><div class="tiles swipe">' + STEPS.map(([img, t1, t2], k) => '<article class="tile"><img src="img/v3/' + img + '.webp" alt="' + esc(t1) + '" loading="lazy"><div class="tile-in"><span class="tn">' + (k + 1) + '</span><h3>' + esc(t1) + '</h3><p>' + esc(t2) + '</p></div></article>').join('') + '</div></section>';
     const PICS = ['benno', 'chris', 'domi-c', 'magg', 'manu', 'niklas', 'oli', 'tim'], slug = n => n.toLowerCase().trim().replace(/\s+/g, '-');
     const withPic = st.filter(s => PICS.includes(slug(s.name)));

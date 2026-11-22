@@ -658,9 +658,9 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Friday Classic",sub:"Blue Chip Club · 20.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:10,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:20000,reLvl:8,maxRe:2,
-  buyin:20,fee:0,rebuy:20,feeRe:0,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
+const fresh=()=>({v:1,title:"Monday Classic",mc15:1,fee20:1,fc20k:1,brk5:1,pko20:1,sub:"Blue Chip Club · 20.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:20000,reLvl:8,maxRe:null,
+  buyin:15,fee:0,rebuy:15,feeRe:0,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -668,7 +668,8 @@ let HAD_LOCAL=false;
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Object.assign(fresh(),s);HAD_LOCAL=true;if(!S.fee20){S.fee20=1;if(S.buyin===25&&S.fee===5){S.buyin=20;S.fee=0;}}if(!S.fc20k){S.fc20k=1;if(!S.started){S.levels=DEFAULT_LEVELS.map(l=>Object.assign({},l));S.stack=20000;S.reLvl=8;S.sub=String(S.sub||"").replace("25.000","20.000");}}if(!S.brk5){S.brk5=1;if(!S.started){S.levels=DEFAULT_LEVELS.map(l=>Object.assign({},l));}}if(!S.pko20){S.pko20=1;if(!S.started&&!S.bounty){S.bounty=10;S.mystery=0;}}}}catch(e){}
 if(!AUTO_GAMES){S.games=[];}
 /* 12.11.: Rebuy kostet heute 15 P (nicht 25) */
-function fixRebuy(){if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;return true;}return false;}
+/* 22.11. Monday Classic: Entry 15 P in den Pot (+5 P Anwesenheit separat an Tim, nie im Pot), jeder Rebuy 15 P, unbegrenzt bis Ende Level 8, kein Bounty */
+function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=15;S.fee=0;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Monday Classic";}}return ch;}
 const LOCAL_AT=S.savedAt||0; /* when this device last saved, before this page load changes anything */
 if(fixRebuy()){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 let LEVELS=S.levels;
