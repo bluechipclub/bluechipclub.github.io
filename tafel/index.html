@@ -1525,11 +1525,11 @@ function cardHtml(c){
 }
 let intro=null;
 /* 23.11. Tim: bei der Vorstellung zuerst der Clip des Spielers (aus clips/clips.json, erster eigener Clip, max. INTRO_CLIP_MAX s), danach kurz die Karte mit Ansage */
-let INTRO_CLIPS={};const INTRO_CLIP_MAX=8;
+let INTRO_CLIPS={};const INTRO_CLIP_MAX=9;
 fetch("clips/clips.json?v="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(j=>{const m={};(j.clips||[]).forEach(c=>{if(typeof c.p!=="string"||c.p==="Alle"||!c.src)return;const k=canonName(c.p);if(!m[k])m[k]=c.src;});INTRO_CLIPS=m;}).catch(()=>{});
 const introClip=n=>INTRO_CLIPS[canonName(n)]||null;
 /* 23.11. Tim: Musik unter Severins Vorstellung (Big Yahu, 20 s). Läuft ab seinem Schritt (Clip oder Karte) bis zum nächsten Spieler; Karte bleibt dann etwas länger. */
-const INTRO_MUSIC={"severin":"ansagen/mc23/severin-musik.mp3?v=1"};
+const INTRO_MUSIC={}; /* 23.11. 17:50 Tim: Severin hat jetzt seinen Torjubel-Clip mit Big Yahu, keine Extra-Musik mehr */
 function introShow(list,done,o){o=o||{};
   const box=$("intro");let k=0,clipK=-1,inClip=false,musK=-1,mus=null;
   const musStop=()=>{if(mus){const m=mus;mus=null;let v=m.volume;const t=setInterval(()=>{v-=.08;if(v<=0){clearInterval(t);try{m.pause();}catch(e){}}else m.volume=v;},60);}};
