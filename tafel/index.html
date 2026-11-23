@@ -2121,9 +2121,9 @@ function onState(p){
 function onCmd(p){if(!isHaupt()||!p||!p.c)return;const c=p.c;if(c._id&&seenCmd(c._id)){bc("ack",{id:c._id});return;}/* 20.11.: schon über ntfy gekommen → trotzdem bestätigen, sonst meldet die App „Keine Bestätigung“ */runCmd(Object.assign({src:p.src||"app"},c));if(c._id)bc("ack",{id:c._id});if(c._u&&c._l)bc("fx",{k:"done",u:c._u,l:c._l,dev:p.from});}
 /* 20.11. (Tim): Shot Clock 30 s – großer Countdown auf beiden Fernsehern, ändert nichts am Turnierstand */
 function shotShow(sec){let o=$("shotO");if(!o){o=document.createElement("div");o.id="shotO";o.style.cssText="position:fixed;inset:0;z-index:9990;display:grid;place-items:center;background:rgba(0,0,0,.82);pointer-events:auto;cursor:pointer";o.innerHTML='<div style="text-align:center"><div style="font:600 3vh var(--mono,monospace);letter-spacing:.4em;color:#e2b857;text-transform:uppercase">Shot Clock</div><div id="shotN" style="font:800 38vh/1 Geist,system-ui,sans-serif;color:#f4f4f2;text-shadow:0 0 6vh rgba(226,184,87,.35)"></div></div>';o.onclick=()=>shotStop();document.body.appendChild(o);}
-  clearInterval(shotShow.t);const end=Date.now()+sec*1000;o.hidden=false;const n=$("shotN");
-  const tick=()=>{const r=Math.max(0,Math.ceil((end-Date.now())/1000));n.textContent=r;n.style.color=r<=5?"#e5675c":"#f4f4f2";if(r<=0){clearInterval(shotShow.t);n.textContent="TIME";setTimeout(()=>{if(Date.now()>=end)shotStop(true);},2500);}};tick();shotShow.t=setInterval(tick,200);}
-function shotStop(local){clearInterval(shotShow.t);const o=$("shotO");if(o)o.hidden=true;if(!local&&isHaupt()&&typeof fx==="function")fx("shotstop",{});}
+  clearInterval(shotShow.t);clearTimeout(shotShow.h);const end=Date.now()+sec*1000;o.hidden=false;o.style.display="grid";const n=$("shotN");
+  const tick=()=>{const r=Math.max(0,Math.ceil((end-Date.now())/1000));n.textContent=r;n.style.color=r<=5?"#e5675c":"#f4f4f2";if(r<=0){clearInterval(shotShow.t);n.textContent="TIME";shotShow.h=setTimeout(()=>shotStop(true),2000);}};tick();shotShow.t=setInterval(tick,200);}
+function shotStop(local){clearInterval(shotShow.t);clearTimeout(shotShow.h);const o=$("shotO");if(o){o.hidden=true;o.style.display="none";} /* 23.11. Fix: inline display:grid hat hidden überstimmt, Shot Clock blieb nach 0 stehen */if(!local&&isHaupt()&&typeof fx==="function")fx("shotstop",{});}
 function onFx(p){if(isHaupt()||p.from===DEV)return;lastHauptAt=Date.now();
   if(p.k==="ann"){announceLocal(p.o);}
   if(p.k==="bvid"){bvidShow(true,null);}
