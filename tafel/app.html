@@ -524,7 +524,7 @@ try{const i=+localStorage.getItem("bcc-app-page");if(i>0&&i<6)page(i);}catch(e){
 addEventListener("scroll",()=>$("hdr").classList.toggle("sc",scrollY>40),{passive:true});
 
 /* ---------- avatars ---------- */
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","jonny":"jonny","jonas":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","alex":"p-diddy","dede":"dede","max":"max","tobi":"tobi"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","jonny":"jonny","jonas":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","alex":"p-diddy","dede":"dede","max":"max","severin":"severin","tobi":"tobi"};
 const avHtml=(n,cls)=>{const a=AV[lc(n)];return '<div class="av'+(cls?" "+cls:"")+'">'+(a?'<img src="karten/av/'+a+'.jpg?v=13" alt="" loading="lazy">':esc(String(n||"?").charAt(0).toUpperCase()))+'</div>';};
 
 /* ---------- state ---------- */
