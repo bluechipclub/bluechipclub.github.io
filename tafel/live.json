@@ -1027,6 +1027,11 @@
    "id": 142,
    "op": "reload",
    "note": "23.11. 18:05: Karte Patrick „Schröder“"
+  },
+  {
+   "id": 143,
+   "op": "reload",
+   "note": "23.11. 18:05: Ansage Schröder"
   }
  ]
 }
