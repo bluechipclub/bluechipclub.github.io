@@ -305,6 +305,8 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .annBox .b{margin-top:3vh;font-size:max(13px,1vw);padding:1vh 1.6vw}
 .intro{position:fixed;inset:0;z-index:33;display:flex;align-items:center;justify-content:center;gap:5vw;background:radial-gradient(ellipse at 35% 50%,rgba(143,29,29,.45),rgba(0,0,0,.94) 60%);backdrop-filter:blur(10px)}
 .intro[hidden]{display:none}
+.inSkip{position:fixed;right:2.2vw;bottom:2.6vh;z-index:40;font:600 max(15px,1.15vw)/1 inherit;color:#f4f4f2;background:rgba(17,17,17,.72);border:1px solid rgba(226,184,87,.55);border-radius:999px;padding:.8em 1.3em;cursor:pointer;letter-spacing:.02em}.inSkip:hover{background:rgba(226,184,87,.22)}
+.inTap{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:40;font:500 max(12px,.85vw)/1 inherit;color:rgba(244,244,242,.45);pointer-events:none;letter-spacing:.08em;text-transform:uppercase}
 .inC{height:84vh;aspect-ratio:378/1024;border-radius:1.2vw;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 0 0 6px #0b0b0b,0 0 0 7px rgba(226,184,87,.4),0 4vh 10vh rgba(0,0,0,.9),0 0 8vw rgba(226,184,87,.18)}
 .inC{position:relative}
 .inC img{width:100%;height:100%;object-fit:cover;display:block}
@@ -610,6 +612,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div class="modal" id="mAsk" hidden style="z-index:9000"><div class="sheet" style="width:min(560px,92vw);text-align:center"><p id="askT" style="font-size:20px;line-height:1.45;white-space:pre-wrap;margin-bottom:20px;user-select:text"></p><div class="row" style="justify-content:center;gap:12px"><button class="b pri" id="askOk">OK</button><button class="b" id="askNo">Abbrechen</button></div></div></div>
 <div class="ann" id="ann" hidden><div class="annBox" id="annBox"></div></div>
 <div class="intro" id="intro" hidden></div>
+<button class="inSkip" id="inSkip" type="button" hidden>Überspringen ✕</button><div class="inTap" id="inTap" hidden>Tippen oder Pfeiltaste = weiter · Esc = alles überspringen</div>
 <div class="count" id="count" hidden></div>
 <div class="toast" id="toast" hidden></div>
 <div class="seatop" id="seatop" hidden></div>
@@ -1996,9 +1999,14 @@ $("gameDone").onclick=()=>{S.active=null;save();render();};
 let hideT;
 function showCtrl(){$("ctrl").classList.remove("hide");document.body.style.cursor="";clearTimeout(hideT);hideT=setTimeout(()=>{if(!$("ctrl").matches(":hover")){$("ctrl").classList.add("hide");document.body.style.cursor="none";}},4000);}
 addEventListener("mousemove",showCtrl);addEventListener("touchstart",showCtrl,{passive:true});
+/* 23.11. (Tim): nach „Plätze auslosen“ war das Bild gesperrt. Jetzt kommt man immer raus: Tippen/Klicken = nächste Karte, „Überspringen ✕“ oder Esc = Show beenden. Gilt auch auf einem Spiegel (nur lokal). */
+function introKill(){if(intro){intro.stop();}else{$("intro").hidden=true;}stopAnn();}
+$("intro").addEventListener("click",()=>{if(intro)intro.next();else $("intro").hidden=true;});
+$("inSkip").onclick=e=>{e.stopPropagation();introKill();};
+new MutationObserver(()=>{const h=$("intro").hidden;$("inSkip").hidden=h;$("inTap").hidden=h;}).observe($("intro"),{attributes:true,attributeFilter:["hidden"]});
 addEventListener("keydown",e=>{
   if(e.target.matches("input,textarea,select"))return;
-  if(!isHaupt()){if(e.key==="f"||e.key==="F")$("bFull").click();return;}
+  if(!isHaupt()){if(intro||!$("intro").hidden){if(e.key==="Escape")introKill();else if(intro)intro.next();e.preventDefault();return;}if(e.key==="Escape"&&!$("ann").hidden){$("ann").hidden=true;return;}if(e.key==="f"||e.key==="F")$("bFull").click();return;}
   const anyOpen=[...document.querySelectorAll(".modal")].some(m=>!m.hidden)||!$("ann").hidden;
   const skipK=/^(arrow(left|right|up|down)|[wasd]| |enter)$/i.test(e.key);if(skipK&&Date.now()<skipGuard){e.preventDefault();return;}
   if(annSkip&&/^(arrow(left|right|up|down)|[wasd]| |enter)$/i.test(e.key)){const f=annSkip;annSkip=null;f();e.preventDefault();return;}
