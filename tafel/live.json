@@ -998,6 +998,11 @@
    "op": "out",
    "name": "Zeno",
    "by": "Niklas"
+  },
+  {
+   "id": 137,
+   "op": "reload",
+   "note": "23.11.: alte Friday-Tafel lädt neu → Monday Classic"
   }
  ]
 }
