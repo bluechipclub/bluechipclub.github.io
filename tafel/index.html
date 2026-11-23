@@ -621,7 +621,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 "use strict";
 /* VORSCHAU (19.11.): eigener Speicher und eigener Kanal, damit nichts mit der Live-Tafel durcheinanderkommt. Beim finalen Update KEY/TOPIC auf die Live-Werte setzen. */
 const PREVIEW=false;
-const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-fc-2026-11-20";
+const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-mc-2026-11-23"; /* 23.11. Monday Classic: frischer Speicher (Friday-Stand bleibt unter bcc-tafel-fc-2026-11-20 im App-Archiv) */
 /* Rolle dieses Geräts: "haupt" = Haupttafel (rechnet, speichert, führt Befehle aus) · "spiegel" = zeigt nur an, was die Haupttafel schickt */
 let ROLE=(()=>{try{const q=new URLSearchParams(location.search).get("rolle");if(q==="haupt"||q==="spiegel"){localStorage.setItem("bcc-tafel-role",q);return q;}return localStorage.getItem("bcc-tafel-role")||"haupt";}catch(e){return "haupt";}})();
 const isHaupt=()=>ROLE==="haupt";
@@ -637,10 +637,10 @@ const fmt=n=>Math.round(n).toLocaleString("de-DE");
 const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-const DEFAULT_LEVELS=[ /* Tim 20.11.: 20.000 Stack, BB-Ante ab Level 3 (Ante = BB), Rebuys bis Ende Level 8 */
- {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{sb:300,bb:600,ante:600},{brk:10,note:"Tischwechsel · Rebuys an der Kasse"},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
+const DEFAULT_LEVELS=[ /* 23.11. Monday Classic (wie Website): 25.000 Stack, BB-Ante ab Level 3 (Ante = BB), Pausen nach Level 4 und Level 8, Rebuys bis Ende Level 8 */
+ {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{brk:10,note:"Pause · Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
-const NAMES=["Tim"]; /* rest comes automatically from the sign-ups on the website (syncSignups) */
+const NAMES=["Tim","Severin","Anonym","Zeno","Domi C","Manu","Magg","Benno","Nico"]; /* 23.11.: Zusagen aus der Google-Tabelle („Monday Classic 23.11.“), Anonym = Severins Gast. Neue Zusagen kommen weiter per syncSignups dazu. */
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -658,9 +658,9 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Monday Classic",mc15:1,fee20:1,fc20k:1,brk5:1,pko20:1,sub:"Blue Chip Club · 20.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
-  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:20000,reLvl:8,maxRe:null,
-  buyin:15,fee:0,rebuy:15,feeRe:0,notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
+const fresh=()=>({v:1,title:"Monday Classic",mc15:1,fee20:1,fc20k:1,brk5:1,pko20:1,sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+  levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:8,maxRe:null,
+  buyin:20,fee:5,rebuy:15,feeRe:0, /* Tim 22.11.: erster Entry 20 P = 15 P Pot + 5 P Anwesenheit an Tim (nie im Pot), Rebuy 15 P komplett Pot; Tim zahlt sich selbst keine 5 P */notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
   outOrder:[],dealer:0,rot:1,games:DEFAULT_GAMES.slice(),fired:{},active:null,msgs:[],log:[],started:null,ended:null});
 let S=fresh();
@@ -669,7 +669,7 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Objec
 if(!AUTO_GAMES){S.games=[];}
 /* 12.11.: Rebuy kostet heute 15 P (nicht 25) */
 /* 22.11. Monday Classic: Entry 15 P in den Pot (+5 P Anwesenheit separat an Tim, nie im Pot), jeder Rebuy 15 P, unbegrenzt bis Ende Level 8, kein Bounty */
-function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=15;S.fee=0;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Monday Classic";}}return ch;}
+function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=20;S.fee=5;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Monday Classic";}}return ch;}
 const LOCAL_AT=S.savedAt||0; /* when this device last saved, before this page load changes anything */
 if(fixRebuy()){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 let LEVELS=S.levels;
@@ -1440,10 +1440,10 @@ function drawShow(){if(isHaupt()&&!S.bvidOff&&!S.bvidDone&&S.bounty&&!S.mystery)
 function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
   const grid='<div class="draw'+(a.length>10?' two':'')+'">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
   announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
-  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>drawOverview(S.players),twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
+  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);if(VOICE_SET&&!NO_VOICE)setTimeout(()=>{if(!$("ann").hidden)playAnn(VOICE_DIR+"finale.mp3?v=1",null);},2200);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
   const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
-const ANNS_INTRO_NOW=()=>"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
+const ANNS_INTRO_NOW=()=>VOICE_SET?VOICE_DIR+"intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a,o){o=o||{};
   const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
   if(twoT()){const t1=seatOrder(1),t2=seatOrder(2),lb=t=>'<p style="margin:1.6vh 0 .8vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+t+'</p>';
@@ -1458,7 +1458,7 @@ const CA=(a,b)=>b?{img:"karten/"+a,fg:"karten/"+b}:"karten/"+a;
 const C_NIK=[{img:"karten/v2/niklas.jpg",ar:"2/3"},CA("niklas.jpg"),{img:"karten/niklas-foto-kevin.jpg",ar:"3/4"}],C_MAGG=[{img:"karten/v2/magg.jpg?v=2",ar:"2/3"},CA("magg.jpg")],C_OLI=[{img:"karten/v2/oli.jpg",ar:"2/3"}],C_PHIL=[{img:"karten/v2/philipp.jpg",ar:"2/3"}],C_JON=[{img:"karten/v2/jonny.jpg?v=2",ar:"2/3"}];
 /* a list = several pictures; the board always shows the first (main) card, the others live in the profile gallery */
 const C_PD=[{img:"karten/v2/p-diddy.jpg",ar:"2/3"}];
-const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}],"pasi":[{img:"karten/v2/pasi.jpg",ar:"2/3"}],"p. diddy":C_PD,"pdiddy":C_PD,"p diddy":C_PD,"p.diddy":C_PD,"dede":[{img:"karten/v2/dede.jpg",ar:"2/3"}],"max":[{img:"karten/v2/max.jpg",ar:"2/3"}],"severin":[{img:"karten/v2/severin.jpg",ar:"2/3"}],"der freigeist":[{img:"karten/pasi-freigeist.jpg",ar:"3/4"}],"rip magg":[{img:"karten/magg-rip.jpg",ar:"3/4"}]};
+const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}],"pasi":[{img:"karten/v2/pasi.jpg",ar:"2/3"}],"p. diddy":C_PD,"pdiddy":C_PD,"p diddy":C_PD,"p.diddy":C_PD,"dede":[{img:"karten/v2/dede.jpg",ar:"2/3"}],"max":[{img:"karten/v2/max.jpg",ar:"2/3"}],"severin":[{img:"karten/v2/severin.jpg",ar:"2/3"}],"anonym":[{img:"karten/v2/anonym.jpg",ar:"2/3"}],"mystery guest":[{img:"karten/v2/anonym.jpg",ar:"2/3"}],"der freigeist":[{img:"karten/pasi-freigeist.jpg",ar:"3/4"}],"rip magg":[{img:"karten/magg-rip.jpg",ar:"3/4"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
 const ANN_INTRO="ansagen/intro.mp3?v=1";
@@ -1471,7 +1471,10 @@ const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heut
  "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","max":"Zum ersten Mal im Blue Chip Club. Maaax!","severin":"The Sire ist am Tisch. Severiiin!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
-const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+/* 23.11. Tim: neues ElevenLabs-Intro bei „Plätze auslosen“ mit einer komplett neuen Stimme (Dateien ansagen/mc23/). Wer keine eigene Datei hat, bekommt „neu.mp3“ (Erstes Mal im Club). VOICE_SET="" = wieder ohne Stimme. */
+const VOICE_SET="mc23",VOICE_DIR="ansagen/"+VOICE_SET+"/";
+const VOICE_FILES={"tim":"tim","severin":"severin","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico"};
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 /* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
@@ -1481,8 +1484,8 @@ function speakAnn(text,cb){let done=false;const f=()=>{if(done)return;done=true;
 let annAudio=null;
 let annSkip=null,skipGuard=0;
 /* 14.11. Tim: bei der Auslosung keine Ringansager-Stimme mehr, Karten nur ohne Voice */
-const NO_VOICE=true;
-function playAnn(u,cb){if(NO_VOICE)u=null;if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
+const NO_VOICE=!VOICE_SET; /* 14.11.: ohne Stimme · 23.11.: mit neuer ElevenLabs-Stimme (nur MP3, nie Browser-Stimme) */
+function playAnn(u,cb){if(NO_VOICE)u=null;if(VOICE_SET&&u&&u.startsWith("tts:"))u=null;if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
   try{if(annAudio)annAudio.pause();}catch(e){}
   if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
 /* background music: Nico's song starts with his video on place 1, then continues under the draw until the clock starts (?musik=0 switches it off) */
@@ -1496,7 +1499,7 @@ function stopAnn(){try{if(annAudio)annAudio.pause();}catch(e){}annAudio=null;try
 const VIDS={"nico":"karten/nico.mp4?v=1","niklas":"karten/niklas.mp4?v=2","niki":"karten/niklas.mp4?v=2"};
 /* birthday boy gets a special announcement in the seat draw */
 const BDAY_NAMES=[];   /* Nikis Geburtstag war am 02.11. */
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","pdiddy":"p-diddy","p diddy":"p-diddy","p.diddy":"p-diddy","dede":"dede","max":"max","severin":"severin","tobi":"tobi","tobias":"tobi"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","phillip":"philipp","phil":"philipp","jonny":"jonny","jonas":"jonny","johnny":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","pdiddy":"p-diddy","p diddy":"p-diddy","p.diddy":"p-diddy","dede":"dede","max":"max","severin":"severin","tobi":"tobi","tobias":"tobi","anonym":"anonym","mystery guest":"anonym"};
 function avOf(n){const k=n.toLowerCase(),o=S.avatars&&S.avatars[k];if(o)return o;if(AV[k])return "karten/av/"+AV[k]+".jpg?v=13";const c=cardOf(n);return null;}
 function avHtml(n,cls){const u=avOf(n);return '<span class="'+(cls||"av")+(u?"":" none")+'">'+(u?'<img src="'+u+'" alt="">':esc((n||"?").trim().charAt(0).toUpperCase()))+'</span>';}
 Object.values(AV).forEach(x=>{const i=new Image();i.src="karten/av/"+x+".jpg";});
@@ -1644,7 +1647,7 @@ function runCmd(c){
     case "txd":{S.txd=S.txd||{};if(c.v)S.txd[c.k]=Date.now();else delete S.txd[c.k];break;}
     case "add":if(addPlayer(c.name,c.paid,c.to))potPop(S.buyin-S.fee-(S.bounty||0));buildSeats();if(twoT())setTimeout(()=>checkTables(true),300);break;
     case "remove":{const p=pl(c.name);if(p){S.players=S.players.filter(x=>x!==p);S.outOrder=S.outOrder.filter(n=>n!==p.name);S.t2=(S.t2||[]).filter(n=>lcn(n)!==lcn(p.name));buildSeats();}break;}
-    case "rename":{const p=pl(c.from);if(p){S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);if(S.t2)S.t2=S.t2.map(n=>lcn(n)===lcn(p.name)?c.to:n);if(S.dn)for(const k in S.dn)if(lcn(S.dn[k])===lcn(p.name))S.dn[k]=c.to;p.name=c.to;}break;}
+    case "rename":{const p=pl(c.from);if(p){if(lcn(p.name)==="anonym"&&c.to){const nk=String(c.to).toLowerCase().trim();if(!CARDS[nk]&&!(S.cards&&S.cards[nk])){S.cards=S.cards||{};S.cards[nk]=CARDS.anonym;}if(!AV[nk]&&!(S.avatars&&S.avatars[nk])){S.avatars=S.avatars||{};S.avatars[nk]="karten/av/anonym.jpg?v=13";}} /* 23.11.: Mystery Guest behält Karte + Bild, wenn Tim den echten Namen einträgt */S.outOrder=S.outOrder.map(n=>n===p.name?c.to:n);if(S.t2)S.t2=S.t2.map(n=>lcn(n)===lcn(p.name)?c.to:n);if(S.dn)for(const k in S.dn)if(lcn(S.dn[k])===lcn(p.name))S.dn[k]=c.to;p.name=c.to;}break;}
     /* zwei Tische: move = Spieler an Tisch 1/2 setzen, merge = Final Table, dealernext {t:2}, tables = Ausgleich prüfen */
     case "move":moveP(c.name,c.to===2?2:1);break;
     case "eb":{const p=pl(c.name);if(p)p.eb=c.v?1:0;break;}
@@ -1870,7 +1873,7 @@ async function bdayShow(){if(isHaupt()&&typeof fx==="function")fx("cmd",{c:{op:"
 }
 function bdayClose(){if(isHaupt()&&!$("bday").hidden&&typeof fx==="function")fx("cmd",{c:{op:"bdayclose"}});clearTimeout(bdayT);$("bday").hidden=true;$("bday").innerHTML="";if(bdayPaused){bdayPaused=false;if(!S.running&&!S.ended)toggle();}}
 /* ---------- lobby screensaver: runs before the first hand while people arrive ---------- */
-const LOBBY_AT="2026-11-20T18:00";
+const LOBBY_AT="2026-11-23T18:00";
 /* spot photos from earlier tournaments + Tim's extra pictures (tafel/lobby/) */
 const LOBBY_PICS=[
  {u:"lobby/schrift-c-silber-3d.webp",ey:"Blue Chip Club",t:"Der Blue Chip",p:""},
@@ -1948,9 +1951,9 @@ $("bLobby").onclick=lobbyShow;
    first sync replaces the default list; later syncs only add NEW names, so players Tim removes by hand stay removed */
 async function syncSignups(){
   if(S.started||!isHaupt())return;const L=await ligaLoad();if(!L||S.started)return;const n=L.settings.next;if(!n||!n.title)return;
-  let names=(n.signups||[]).map(x=>String(typeof x==="string"?x:x.name||"").trim());
-  if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){/* Google-Tabelle nicht erreichbar: mit den Zusagen von der Website weitermachen */}}
-  const DISP={"niklas":"Niklas","p. diddy":"P. Diddy","jonny":"Jonny","philipp":"Philipp","tobi":"Tobi","magg":"Magg","oli":"Oli"};names=names.map(x=>DISP[canonName(x)]||x);
+  let names=NAMES.concat(n.signups||[]).map(x=>String(typeof x==="string"?x:x.name||"").trim()); /* 23.11.: feste Liste (NAMES) bleibt immer drin, auch wenn die Google-Tabelle nicht antwortet */
+  if(L.settings.api){try{const j=await (await fetch(L.settings.api+"?event="+encodeURIComponent(n.event||n.title),{credentials:"omit"})).json();if(j.ok)(j.signups||[]).forEach(x=>names.push(String(x.name||"").trim()));}catch(e){/* Google-Tabelle nicht erreichbar: mit den Zusagen von der Website weitermachen */}}
+  const DISP={"niklas":"Niklas","p. diddy":"P. Diddy","jonny":"Jonny","philipp":"Philipp","tobi":"Tobi","magg":"Magg","oli":"Oli","anonym":"Anonym","domi c":"Domi C"};names=names.map(x=>DISP[canonName(x)]||x);
   names=names.filter(x=>x&&!NOT_AT_TABLE.includes(x.toLowerCase()));if(!names.length)return;
   const seen=S.syncSeen||[],lc=a=>a.map(x=>x.toLowerCase()),uniq=[];names.forEach(x=>{if(!lc(uniq).includes(x.toLowerCase()))uniq.push(x);});
   if(!lc(uniq).includes("tim"))uniq.unshift("Tim");

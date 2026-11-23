@@ -446,7 +446,7 @@ input,select,textarea{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 .5
 /* Blue Chip Fernbedienung v2 (19.11.2026): iPhone-Stil, 5 Bereiche unten. Spricht mit der Haupttafel über Supabase Realtime, Fallback ntfy.
    VORSCHAU: Kanal/Topic der Vorschau-Tafel (vorschau.html). Beim finalen Update PREVIEW=false. */
 const PREVIEW=false;
-const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-fc-2026-11-20";
+const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-mc-2026-11-23";
 const SB_URL="https://zquwffzeracrvpemlgtc.supabase.co",SB_KEY="sb_publishable_ExDEeB9yQOHJIOBF4zuBJA_nunxEoMK";
 const SYNC_CH="tafel-"+KEY.replace(/[^a-z0-9-]/gi,"");
 const RELAY="https://ntfy.sh/",TOPIC=PREVIEW?"bcc-8db9b61c4d84441f-vs":"bcc-8db9b61c4d84441f";
@@ -524,7 +524,7 @@ try{const i=+localStorage.getItem("bcc-app-page");if(i>0&&i<6)page(i);}catch(e){
 addEventListener("scroll",()=>$("hdr").classList.toggle("sc",scrollY>40),{passive:true});
 
 /* ---------- avatars ---------- */
-const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","jonny":"jonny","jonas":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","alex":"p-diddy","dede":"dede","max":"max","severin":"severin","tobi":"tobi"};
+const AV={"tim":"tim","niklas":"niklas","niki":"niklas","nico":"nico","manu":"manu","domi m":"magg","magg":"magg","domi c":"domi-c","oli":"oli","olli":"oli","philipp":"philipp","jonny":"jonny","jonas":"jonny","benno":"benno","chris":"chris","kevin":"kevin","jan":"jan","zeno":"zeno","pasi":"pasi","p. diddy":"p-diddy","alex":"p-diddy","dede":"dede","max":"max","severin":"severin","anonym":"anonym","mystery guest":"anonym","tobi":"tobi"};
 const avHtml=(n,cls)=>{const a=AV[lc(n)];return '<div class="av'+(cls?" "+cls:"")+'">'+(a?'<img src="karten/av/'+a+'.jpg?v=13" alt="" loading="lazy">':esc(String(n||"?").charAt(0).toUpperCase()))+'</div>';};
 
 /* ---------- state ---------- */
