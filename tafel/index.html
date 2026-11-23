@@ -1526,10 +1526,16 @@ let intro=null;
 let INTRO_CLIPS={};const INTRO_CLIP_MAX=8;
 fetch("clips/clips.json?v="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(j=>{const m={};(j.clips||[]).forEach(c=>{if(typeof c.p!=="string"||c.p==="Alle"||!c.src)return;const k=canonName(c.p);if(!m[k])m[k]=c.src;});INTRO_CLIPS=m;}).catch(()=>{});
 const introClip=n=>INTRO_CLIPS[canonName(n)]||null;
+/* 23.11. Tim: Musik unter Severins Vorstellung (Big Yahu, 20 s). Läuft ab seinem Schritt (Clip oder Karte) bis zum nächsten Spieler; Karte bleibt dann etwas länger. */
+const INTRO_MUSIC={"severin":"ansagen/mc23/severin-musik.mp3?v=1"};
 function introShow(list,done,o){o=o||{};
-  const box=$("intro");let k=0,clipK=-1,inClip=false;const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);if(inClip){inClip=false;}else k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
+  const box=$("intro");let k=0,clipK=-1,inClip=false,musK=-1,mus=null;
+  const musStop=()=>{if(mus){const m=mus;mus=null;let v=m.volume;const t=setInterval(()=>{v-=.08;if(v<=0){clearInterval(t);try{m.pause();}catch(e){}}else m.volume=v;},60);}};
+  const musFor=()=>{if(k===musK)return;musStop();musK=k;const p=list[k],u=p&&!o.label&&!o.mute?INTRO_MUSIC[canonName(p.name)]:null;if(u&&!NO_VOICE){try{mus=new Audio(u);mus.volume=.55;mus.loop=true;mus.play().catch(()=>{});}catch(e){}}};
+  const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);if(inClip){inClip=false;}else k++;step();},stop:()=>{sv();musStop();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
-    sv();inClip=false;if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
+    sv();inClip=false;if(k>=list.length){musStop();box.hidden=true;intro=null;done&&done();return;}
+    musFor();
     const cl=!o.label&&!o.noClips?introClip(list[k].name):null;
     if(cl&&clipK!==k){clipK=k;inClip=true;const p=list[k],me=k,lastC=k===list.length-1;
       const plc=o.placeFn?esc(o.placeFn(p,k)):lastC?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
@@ -1537,7 +1543,7 @@ function introShow(list,done,o){o=o||{};
       box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
       const v=box.querySelector("video");const fin=()=>{if(!intro||k!==me||!inClip)return;clearTimeout(intro.t);inClip=false;step();};
       intro.stopVid=()=>{try{v.pause();}catch(e){}};v.onended=fin;v.onerror=fin;intro.t=setTimeout(fin,INTRO_CLIP_MAX*1000);
-      if(bg&&!bg.paused)bg.pause();v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(fin);});return;}
+      if(bg&&!bg.paused)bg.pause();v.volume=1;if(mus)v.muted=true;v.play().catch(()=>{v.muted=true;v.play().catch(fin);});return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&clipK!==k&&VIDS[p.name.toLowerCase()];
     const last=k===list.length-1,bd=!o.label&&BDAY_NAMES.includes(p.name.toLowerCase());
     const place=o.placeFn?esc(o.placeFn(p,k)):o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:last?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
@@ -1559,7 +1565,7 @@ function introShow(list,done,o){o=o||{};
         else if(BG_ON&&bg&&!bg.paused){v.muted=true;}
         v.volume=1;try{v.playbackRate=SPEED;}catch(e){}if(v.muted){v.play().catch(()=>{});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);return;}v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
       if(annU)playAnn(annU,startVid);else startVid();return;}
-    if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1000,(o.sec||7)*1000/SPEED-(Date.now()-t0)));});return;}
+    if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1000,(mus?12:(o.sec||7))*1000/SPEED-(Date.now()-t0)));});return;}
     if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
     intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000/SPEED);
   }
