@@ -305,6 +305,7 @@ label.f textarea{min-height:150px;font-family:var(--mono);font-size:13px}
 .annBox .b{margin-top:3vh;font-size:max(13px,1vw);padding:1vh 1.6vw}
 .intro{position:fixed;inset:0;z-index:33;display:flex;align-items:center;justify-content:center;gap:5vw;background:radial-gradient(ellipse at 35% 50%,rgba(143,29,29,.45),rgba(0,0,0,.94) 60%);backdrop-filter:blur(10px)}
 .intro[hidden]{display:none}
+.inClip{display:flex;align-items:center;justify-content:center;max-width:62vw;max-height:86vh}.inClip video{display:block;max-width:62vw;max-height:86vh;border-radius:1.2vw;border:2px solid rgba(226,184,87,.55);box-shadow:0 3vh 8vh rgba(0,0,0,.8);background:#000}
 .inSkip{position:fixed;right:2.2vw;bottom:2.6vh;z-index:40;font:600 max(15px,1.15vw)/1 inherit;color:#f4f4f2;background:rgba(17,17,17,.72);border:1px solid rgba(226,184,87,.55);border-radius:999px;padding:.8em 1.3em;cursor:pointer;letter-spacing:.02em}.inSkip:hover{background:rgba(226,184,87,.22)}
 .inTap{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:40;font:500 max(12px,.85vw)/1 inherit;color:rgba(244,244,242,.45);pointer-events:none;letter-spacing:.08em;text-transform:uppercase}
 .inC{height:84vh;aspect-ratio:378/1024;border-radius:1.2vw;overflow:hidden;box-shadow:0 0 0 2px var(--gold3),0 0 0 6px #0b0b0b,0 0 0 7px rgba(226,184,87,.4),0 4vh 10vh rgba(0,0,0,.9),0 0 8vw rgba(226,184,87,.18)}
@@ -643,7 +644,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const DEFAULT_LEVELS=[ /* 23.11. Monday Classic (wie Website): 25.000 Stack, BB-Ante ab Level 3 (Ante = BB), Pausen nach Level 4 und Level 8, Rebuys bis Ende Level 8 */
  {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{brk:10,note:"Pause · Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
-const NAMES=["Tim","Severin","Anonym","Zeno","Domi C","Manu","Magg","Benno","Nico"]; /* 23.11.: Zusagen aus der Google-Tabelle („Monday Classic 23.11.“), Anonym = Severins Gast. Neue Zusagen kommen weiter per syncSignups dazu. */
+const NAMES=["Severin","Anonym","Zeno","Domi C","Magg","Benno","Nico","Niklas","Manu","Tim"]; /* 23.11. 15:57 Tim: Niki kommt dazu (10 Spieler). Reihenfolge = Platz 1 … 10 vor dem Auslosen: Severin links neben Tim, dann Anonym, Manu direkt rechts neben Tim, Tim zuletzt = Dealerplatz an der Chip-Ablage */ /* 23.11.: Zusagen aus der Google-Tabelle („Monday Classic 23.11.“), Anonym = Severins Gast. Neue Zusagen kommen weiter per syncSignups dazu. */
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -675,6 +676,7 @@ if(!AUTO_GAMES){S.games=[];}
 function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=20;S.fee=5;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Monday Classic";}}return ch;}
 const LOCAL_AT=S.savedAt||0; /* when this device last saved, before this page load changes anything */
 if(fixRebuy()){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
 let LEVELS=S.levels;
 const save=()=>{if(!isHaupt())return;S.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushState==="function")pushState();if(typeof pushBackup==="function")pushBackup();if(typeof syncState==="function")syncState();};
 function log(type,data){S.log.push(Object.assign({t:new Date().toISOString(),lvl:playNum(S.i),type},data||{}));if(S.log.length>2000)S.log.shift();}
@@ -685,6 +687,11 @@ const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-nowMs())/1000):(S.left=
 /* Spitznamen: „Niki“ findet Niklas, „Alex“/„PDiddy“ findet P. Diddy usw. */
 const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","olli":"oli"};
 const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS[k]||k;};
+/* 23.11. 15:57: laufende Tafel (noch nicht gestartet) einmal auf die neue Startordnung bringen: Niklas dazu, Tim ans Ende (= Dealerplatz an der Chip-Ablage), Manu direkt davor */
+function mig23(){if(!S.mc23b){S.mc23b=1;if(!S.started&&!S.mt){const lc=x=>String(x).toLowerCase().trim(),old=S.players;
+  ["Niklas"].forEach(nm=>{if(!old.some(p=>lc(p.name)===lc(nm)||canonName(p.name)===canonName(nm)))old.push({name:nm,entries:[{t:null,lvl:0,paid:"bar"}],out:null});});
+  const rank=p=>{const i=NAMES.findIndex(nm=>lc(nm)===lc(p.name)||canonName(nm)===canonName(p.name));return i<0?NAMES.length-2.5:i;};
+  S.players=old.slice().sort((a,b)=>rank(a)-rank(b));S.syncSeen=Array.from(new Set((S.syncSeen||[]).concat(NAMES)));S.dealer=S.players.length-1;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}}}mig23();
 let REAL=null;const allP=()=>REAL||S.players; /* REAL: full player list while only one table is being drawn (inView) */
 const pl=n=>allP().find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||allP().find(p=>canonName(p.name)===canonName(n));
 const alive=()=>allP().filter(p=>!p.out);
@@ -856,7 +863,7 @@ function swapTables(){if(!twoT())return;$("ann").hidden=true;
 function seatRules(a){a=shuf(a);const tim=a.find(isTim);if(tim)a=[...a.filter(p=>p!==tim),tim];
   const n=a.length,jo=null,ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
   const slots=new Array(n).fill(null);if(tim)slots[n-1]=tim;
-  if(ma)slots[0]=ma; /* Tim 23.11.: Manu immer Platz 1 (links von Tim), nicht mehr 50/50 */
+  if(ma)slots[n-2]=ma; /* Tim 23.11. 15:56: Manu immer direkt neben Tim auf dem letzten Platz vor dem Dealerplatz (bei 10 Spielern Platz 9) */
   const rest=a.filter(x=>x!==tim&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];return slots;}
 /* draw only one table: S.players = the active players of table t, S.dealer = index of its dealer (restored afterwards) */
 function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.dealer;REAL=keep;
@@ -916,7 +923,7 @@ function checkTables(quiet,auto){
   if(S.pend&&S.pend.op==="swap"&&seatedAt(1).length+seatedAt(2).length>CAP1)return;
   const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
   if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
-    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf Platz 10 (Dealerplatz), Manu auf Platz 1, alle anderen zufällig.",btn:"Plätze für den Final Table auslosen"});
+    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf Platz 10 (Dealerplatz), Manu direkt rechts neben Tim, alle anderen zufällig.",btn:"Plätze für den Final Table auslosen"});
     $("annOk").onclick=()=>{$("ann").hidden=true;mergeTables();};fanfare();return;}
   /* 20.11. (Tim): fair = gleich viele an beiden Tischen. Von Hand „Tische prüfen“ zählt nur, wer wirklich spielt (Ausgeschiedene in der Rebuy-Phase nicht). */
   const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
@@ -1407,7 +1414,7 @@ function drawSeats(){
   /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Rest zufällig (20.11.: Jonny nicht mehr fest). */
   if(anc&&a.length>=3){const n=a.length,jo=null,ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
-    if(ma)slots[0]=ma; /* Tim 23.11.: Manu immer Platz 1 (links von Tim), nicht mehr 50/50 */
+    if(ma)slots[n-2]=ma; /* Tim 23.11. 15:56: Manu immer direkt neben Tim auf dem letzten Platz vor dem Dealerplatz (bei 10 Spielern Platz 9) */
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
@@ -1443,9 +1450,9 @@ function drawShow(){if(isHaupt()&&!S.bvidOff&&!S.bvidDone&&S.bounty&&!S.mystery)
 function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
   const grid='<div class="draw'+(a.length>10?' two':'')+'">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
   announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
-  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);if(VOICE_SET&&!NO_VOICE)setTimeout(()=>{if(!$("ann").hidden)playAnn(VOICE_DIR+"finale.mp3?v=1",null);},2200);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
+  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);if(VOICE_SET&&!NO_VOICE)setTimeout(()=>{if(!$("ann").hidden)playAnn(VOICE_DIR+"finale.mp3?v=1",null);},1500);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
-  const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
+  const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1000,9000/SPEED-(Date.now()-t0))));}
 const ANNS_INTRO_NOW=()=>VOICE_SET?VOICE_DIR+"intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a,o){o=o||{};
   const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
@@ -1475,8 +1482,9 @@ const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heut
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
 /* 23.11. Tim: neues ElevenLabs-Intro bei „Plätze auslosen“ mit einer komplett neuen Stimme (Dateien ansagen/mc23/). Wer keine eigene Datei hat, bekommt „neu.mp3“ (Erstes Mal im Club). VOICE_SET="" = wieder ohne Stimme. */
+const SPEED=1.5; /* Tim 23.11.: Auslosung + Ansagen 1,5-mal so schnell */
 const VOICE_SET="mc23",VOICE_DIR="ansagen/"+VOICE_SET+"/";
-const VOICE_FILES={"tim":"tim","severin":"severin","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico"};
+const VOICE_FILES={"tim":"tim","severin":"severin","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico","niklas":"niklas","niki":"niklas"};
 const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
@@ -1490,7 +1498,7 @@ let annSkip=null,skipGuard=0;
 const NO_VOICE=!VOICE_SET; /* 14.11.: ohne Stimme · 23.11.: mit neuer ElevenLabs-Stimme (nur MP3, nie Browser-Stimme) */
 function playAnn(u,cb){if(NO_VOICE)u=null;if(VOICE_SET&&u&&u.startsWith("tts:"))u=null;if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
   try{if(annAudio)annAudio.pause();}catch(e){}
-  if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
+  if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;try{a.preservesPitch=true;a.playbackRate=SPEED;}catch(e){}a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
 /* background music: Nico's song starts with his video on place 1, then continues under the draw until the clock starts (?musik=0 switches it off) */
 const BG_ON=!/[?&]musik=0/.test(location.search);let bg=null,bgActive=false,bgFade=null;
 function bgVol(v){if(bg){clearInterval(bgFade);bg.volume=v;}}
@@ -1514,11 +1522,23 @@ function cardHtml(c){
   const V=/^karten\//.test(o.img)?"?v=10":"";return '<img src="'+o.img+V+'" alt="">'+(o.fg?'<div class="anim">'+bokeh+'<b class="smk"></b></div><img class="fg" src="'+o.fg+V+'" alt="">':'')+'<span class="shine"></span>';
 }
 let intro=null;
+/* 23.11. Tim: bei der Vorstellung zuerst der Clip des Spielers (aus clips/clips.json, erster eigener Clip, max. INTRO_CLIP_MAX s), danach kurz die Karte mit Ansage */
+let INTRO_CLIPS={};const INTRO_CLIP_MAX=8;
+fetch("clips/clips.json?v="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(j=>{const m={};(j.clips||[]).forEach(c=>{if(typeof c.p!=="string"||c.p==="Alle"||!c.src)return;const k=canonName(c.p);if(!m[k])m[k]=c.src;});INTRO_CLIPS=m;}).catch(()=>{});
+const introClip=n=>INTRO_CLIPS[canonName(n)]||null;
 function introShow(list,done,o){o=o||{};
-  const box=$("intro");let k=0;const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
+  const box=$("intro");let k=0,clipK=-1,inClip=false;const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);if(inClip){inClip=false;}else k++;step();},stop:()=>{sv();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
   function step(){
-    sv();if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
-    const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&VIDS[p.name.toLowerCase()];
+    sv();inClip=false;if(k>=list.length){box.hidden=true;intro=null;done&&done();return;}
+    const cl=!o.label&&!o.noClips?introClip(list[k].name):null;
+    if(cl&&clipK!==k){clipK=k;inClip=true;const p=list[k],me=k,lastC=k===list.length-1;
+      const plc=o.placeFn?esc(o.placeFn(p,k)):lastC?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
+      box.classList.remove("bd");box.innerHTML='<div class="inClip"><video src="'+cl+'" playsinline preload="auto"></video></div><div class="inT"><div class="eyebrow">'+plc+'</div><h3>'+esc(p.name)+'</h3><div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
+      box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
+      const v=box.querySelector("video");const fin=()=>{if(!intro||k!==me||!inClip)return;clearTimeout(intro.t);inClip=false;step();};
+      intro.stopVid=()=>{try{v.pause();}catch(e){}};v.onended=fin;v.onerror=fin;intro.t=setTimeout(fin,INTRO_CLIP_MAX*1000);
+      if(bg&&!bg.paused)bg.pause();v.volume=1;v.play().catch(()=>{v.muted=true;v.play().catch(fin);});return;}
+    const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&clipK!==k&&VIDS[p.name.toLowerCase()];
     const last=k===list.length-1,bd=!o.label&&BDAY_NAMES.includes(p.name.toLowerCase());
     const place=o.placeFn?esc(o.placeFn(p,k)):o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:last?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
     const cardEl='<div class="inC"'+(img&&img.ar?' style="aspect-ratio:'+img.ar+'"':'')+'>'+(img?cardHtml(img):'<div class="inPh"><b>'+suit+'</b><span>'+esc(p.name)+'</span></div>')+'</div>';
@@ -1532,16 +1552,16 @@ function introShow(list,done,o){o=o||{};
     const annU=!o.label&&annFor(p.name),me=k;
     const isNico=p.name.toLowerCase()==="nico";
     if(!vid&&bgActive&&bg)bgResume();
-    if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)+1)*1000);};
+    if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)/SPEED+1)*1000);};
       intro.stopVid=()=>{try{v.pause();}catch(e){}};intro.t=setTimeout(()=>{k++;step();},50000);
       const startVid=()=>{if(!intro||k!==me)return;
         if(BG_ON&&isNico){if(bg)bg.pause();v.addEventListener("ended",()=>bgStart(v.currentTime));v.addEventListener("pause",()=>{if(bgActive&&(!bg||bg.paused))bgStart(v.currentTime);});}
         else if(BG_ON&&bg&&!bg.paused){v.muted=true;}
-        v.volume=1;if(v.muted){v.play().catch(()=>{});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);return;}v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
+        v.volume=1;try{v.playbackRate=SPEED;}catch(e){}if(v.muted){v.play().catch(()=>{});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);return;}v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});if(v.readyState>=1)go();else v.addEventListener("loadedmetadata",go);};
       if(annU)playAnn(annU,startVid);else startVid();return;}
-    if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1500,(o.sec||7)*1000-(Date.now()-t0)));});return;}
+    if(annU){const t0=Date.now();intro.t=setTimeout(()=>{k++;step();},25000);playAnn(annU,()=>{if(!intro||k!==me)return;clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},Math.max(1000,(o.sec||7)*1000/SPEED-(Date.now()-t0)));});return;}
     if(!o.mute){tone(392,0,.25,.5,"triangle");tone(587,.12,.4,.5,"triangle");}
-    intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000);
+    intro.t=setTimeout(()=>{k++;step();},(o.sec||7)*1000/SPEED);
   }
   step();
 }
@@ -1779,7 +1799,7 @@ async function fetchBackup(){
   for(let i=ms.length-1;i>=0;i--){const m=ms[i];
     try{const raw=m.attachment&&m.attachment.url?await (await fetch(m.attachment.url)).text():m.message;const b=JSON.parse(raw);if(b&&b.k===KEY&&b.S&&b.S.v===1)return b;}catch(e){}}
   return null;}
-function applyBackup(b){S=Object.assign(fresh(),b.S);fixRebuy();LEVELS=S.levels;if(dropNotAtTable())log("table",{removed:NOT_AT_TABLE});try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}buildSeats();render();pushState();autoSeat();}
+function applyBackup(b){S=Object.assign(fresh(),b.S);fixRebuy();mig23();LEVELS=S.levels;if(dropNotAtTable())log("table",{removed:NOT_AT_TABLE});try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}buildSeats();render();pushState();autoSeat();}
 const hm=t=>new Date(t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
 function bkInfo(){const e=$("sCloudInfo");if(e)e.textContent=bkLast?"Letzte Cloud-Sicherung: "+hm(bkLast)+" Uhr":"Noch keine Cloud-Sicherung in dieser Sitzung";}
 (async()=>{
@@ -1962,7 +1982,7 @@ async function syncSignups(){
   if(!lc(uniq).includes("tim"))uniq.unshift("Tim");
   const mk=nm=>({name:nm,entries:[{t:null,lvl:0,paid:"bar"}],out:null});let changed=false;
   if(!S.syncSeen){const old=S.players;S.players=uniq.map(nm=>old.find(p=>p.name.toLowerCase()===nm.toLowerCase())||mk(nm));changed=true;}
-  else uniq.forEach(nm=>{if(lc(seen).includes(nm.toLowerCase())||S.players.some(p=>p.name.toLowerCase()===nm.toLowerCase()))return;const p=mk(nm);S.players.push(p);seatNew(p);changed=true;});
+  else uniq.forEach(nm=>{if(lc(seen).includes(nm.toLowerCase())||S.players.some(p=>p.name.toLowerCase()===nm.toLowerCase()))return;const p=mk(nm);const ti=S.players.length-1;if(!S.started&&ti>=0&&/^tim$/i.test(String(S.players[ti].name).trim()))S.players.splice(ti,0,p);else S.players.push(p);seatNew(p);changed=true; /* 23.11.: Tim bleibt zuletzt (Dealerplatz) */});
   S.syncSeen=Array.from(new Set(seen.concat(uniq)));
   if(changed){log("signups",{names:S.players.map(p=>p.name)});buildSeats();render();}save();autoSeat();}
 setTimeout(syncSignups,1500);setInterval(syncSignups,180000);
