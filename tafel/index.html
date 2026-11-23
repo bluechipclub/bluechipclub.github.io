@@ -853,7 +853,7 @@ function swapTables(){if(!twoT())return;$("ann").hidden=true;
 function seatRules(a){a=shuf(a);const tim=a.find(isTim);if(tim)a=[...a.filter(p=>p!==tim),tim];
   const n=a.length,jo=null,ma=tim?a.find(p=>canonName(p.name)==="manu"):null;if(n<3)return a;
   const slots=new Array(n).fill(null);if(tim)slots[n-1]=tim;
-  if(ma)slots[Math.random()<.5?0:n-2]=ma;
+  if(ma)slots[0]=ma; /* 23.11. Tim: Manu immer Platz 1 */
   const rest=a.filter(x=>x!==tim&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];return slots;}
 /* draw only one table: S.players = the active players of table t, S.dealer = index of its dealer (restored afterwards) */
 function inView(t,fn){if(!S.mt||REAL)return fn();const keep=S.players,kd=S.dealer;REAL=keep;
@@ -913,7 +913,7 @@ function checkTables(quiet,auto){
   if(S.pend&&S.pend.op==="swap"&&seatedAt(1).length+seatedAt(2).length>CAP1)return;
   const a1=seatedAt(1),a2=seatedAt(2),N=a1.length+a2.length;
   if(N<=CAP1||!atTbl(1).length||!atTbl(2).length){const was=S.pend&&S.pend.op==="merge";S.pend={op:"merge"};save();render();if(was&&quiet)return;
-    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf Platz 10 (Dealerplatz), Manu 50/50 auf Platz 9 oder Platz 1, alle anderen zufällig.",btn:"Plätze für den Final Table auslosen"});
+    announce({eyebrow:"Final Table",title:"Final Table · "+N+" Spieler",text:"Alle setzen sich an den großen Tisch. Die Plätze werden neu ausgelost: Tim auf Platz 10 (Dealerplatz), Manu auf Platz 1, alle anderen zufällig.",btn:"Plätze für den Final Table auslosen"});
     $("annOk").onclick=()=>{$("ann").hidden=true;mergeTables();};fanfare();return;}
   /* 20.11. (Tim): fair = gleich viele an beiden Tischen. Von Hand „Tische prüfen“ zählt nur, wer wirklich spielt (Ausgeschiedene in der Rebuy-Phase nicht). */
   const c1=quiet?a1.length:atTbl(1).filter(p=>!p.out).length,c2=quiet?a2.length:atTbl(2).filter(p=>!p.out).length;
@@ -1404,7 +1404,7 @@ function drawSeats(){
   /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Rest zufällig (20.11.: Jonny nicht mehr fest). */
   if(anc&&a.length>=3){const n=a.length,jo=null,ma=a.find(p=>canonName(p.name)==="manu");
     const slots=new Array(n).fill(null);slots[n-1]=anc;
-    if(ma)slots[Math.random()<.5?0:n-2]=ma;
+    if(ma)slots[0]=ma; /* 23.11. Tim: Manu immer Platz 1 */
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
@@ -1440,9 +1440,9 @@ function drawShow(){if(isHaupt()&&!S.bvidOff&&!S.bvidDone&&S.bounty&&!S.mystery)
 function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();const a=twoT()?[...seatOrder(1),...seatOrder(2)]:S.players.slice();
   const grid='<div class="draw'+(a.length>10?' two':'')+'">'+a.map((p,k)=>{const c=cardOf(p.name),u=c?(typeof c==="string"?c:c.img):null;return '<div class="dcard" style="--k:'+k+'">'+(u?'<span class="dav"><img src="'+u+(/^karten\//.test(u)&&!/\?/.test(u)?"?v=10":"")+'" alt="" style="object-fit:cover;object-position:50% 20%"></span>':avHtml(p.name,"dav"))+'<div class="n">'+esc(p.name)+'</div></div>';}).join("")+'</div>';
   announce({eyebrow:"Blue Chip Club · "+(S.title||""),title:"Ladies and Gentlemen",html:grid,btn:"Weiter"});
-  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>drawOverview(S.players),twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
+  let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);setTimeout(()=>playAnn(ANN_FINALE),1000);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
-  const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
+  const t0=Date.now();playAnn(ANN_INTRO,()=>setTimeout(go,Math.max(1500,9000-(Date.now()-t0))));}
 const ANNS_INTRO_NOW=()=>"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a,o){o=o||{};
   const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
@@ -1461,8 +1461,10 @@ const C_PD=[{img:"karten/v2/p-diddy.jpg",ar:"2/3"}];
 const CARDS={"tobi":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tobias":[{img:"karten/v2/tobi.jpg",ar:"2/3"}],"tim":[{img:"karten/v2/tim.jpg",ar:"2/3"},CA("tim.jpg"),CA("tim-2.jpg")],"niklas":C_NIK,"niki":C_NIK,"nico":[{img:"karten/v2/nico.jpg",ar:"2/3"},CA("nico.jpg")],"manu":[{img:"karten/manu-v2.jpg",ar:"2/3"},CA("manu-2.jpg")],"domi m":C_MAGG,"magg":C_MAGG,"domi c":[{img:"karten/v2/domi-c.jpg",ar:"2/3"}],"oli":C_OLI,"olli":C_OLI,"philipp":C_PHIL,"phillip":C_PHIL,"phil":C_PHIL,"jonny":C_JON,"jonas":C_JON,"johnny":C_JON,"benno":[{img:"karten/v2/benno.jpg",ar:"2/3"},CA("benno.jpg")],"chris":[{img:"karten/v2/chris.jpg?v=2",ar:"2/3"}],"jan":[{img:"karten/v2/jan.jpg",ar:"2/3"}],"kevin":[{img:"karten/v2/kevin.jpg",ar:"2/3"}],"zeno":[{img:"karten/v2/zeno.jpg",ar:"2/3"}],"pasi":[{img:"karten/v2/pasi.jpg",ar:"2/3"}],"p. diddy":C_PD,"pdiddy":C_PD,"p diddy":C_PD,"p.diddy":C_PD,"dede":[{img:"karten/v2/dede.jpg",ar:"2/3"}],"max":[{img:"karten/v2/max.jpg",ar:"2/3"}],"severin":[{img:"karten/v2/severin.jpg",ar:"2/3"}],"der freigeist":[{img:"karten/pasi-freigeist.jpg",ar:"3/4"}],"rip magg":[{img:"karten/magg-rip.jpg",ar:"3/4"}]};
 /* video that plays with sound when this player's card comes up in the seat draw */
 /* ring-announcer clips (ElevenLabs), files in tafel/ansagen/ — key = player name in lower case; empty = no announcer */
-const ANN_INTRO="ansagen/intro.mp3?v=1";
+const ANN_INTRO="ansagen/mc23/intro.mp3?v=1",ANN_FINALE="ansagen/mc23/finale.mp3?v=1",ANN_NEU="ansagen/mc23/neu.mp3?v=1";
 const ANNS=Object.fromEntries([["tim","tim"],["niklas","niklas"],["niki","niklas"],["benno","benno"],["nico","nico"],["chris","chris"],["jan","jan"],["domi c","domi-c"],["manu","manu"],["zeno","zeno"],["kevin","kevin"]].map(([k,f])=>[k,"ansagen/"+f+".mp3?v=1"]));
+/* 23.11. Monday Classic: neue Ringansager-Stimme (ElevenLabs, Helmut Trailer), Dateien in ansagen/mc23/. Unbekannte Namen bekommen neu.mp3 */
+Object.assign(ANNS,Object.fromEntries([["tim","tim"],["severin","severin"],["anonym","anonym"],["mystery guest","anonym"],["mystery","anonym"],["zeno","zeno"],["domi c","domi-c"],["manu","manu"],["magg","magg"],["domi m","magg"],["benno","benno"],["benno boss","benno"],["nico","nico"]].map(([k,f])=>[k,"ansagen/mc23/"+f+".mp3?v=1"])));
 /* 12.11.: Ansagen ohne passende MP3 spricht der Browser (Stimme des Geräts). Eine MP3 mit gleichem Namen in ansagen/ hat Vorrang (z. B. ansagen/jonny.mp3), dann hier eintragen. */
 const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heute Abend: der Friday Classic. Neun Spieler. Ein Sieger. Die Plätze sind ausgelost. Hier ist eure Sitzordnung!",
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
@@ -1471,7 +1473,7 @@ const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heut
  "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","max":"Zum ersten Mal im Blue Chip Club. Maaax!","severin":"The Sire ist am Tisch. Severiiin!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
-const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:ANN_NEU);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 /* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
@@ -1481,7 +1483,7 @@ function speakAnn(text,cb){let done=false;const f=()=>{if(done)return;done=true;
 let annAudio=null;
 let annSkip=null,skipGuard=0;
 /* 14.11. Tim: bei der Auslosung keine Ringansager-Stimme mehr, Karten nur ohne Voice */
-const NO_VOICE=true;
+const NO_VOICE=false; /* 23.11. Tim: Ansagen bei der Auslosung wieder an */
 function playAnn(u,cb){if(NO_VOICE)u=null;if(u&&u.startsWith("tts:"))return speakAnn(u.slice(4),cb);let done=false;const f=()=>{if(done)return;done=true;try{if(annAudio)annAudio.pause();}catch(e){}if(bgActive)bgVol(.35);cb&&cb();};if(!u){f();return f;}
   try{if(annAudio)annAudio.pause();}catch(e){}
   if(bgActive)bgVol(.12);const a=new Audio(u);annAudio=a;a.volume=1;a.onended=f;a.onerror=f;a.play().catch(f);setTimeout(f,25000);return f;}
