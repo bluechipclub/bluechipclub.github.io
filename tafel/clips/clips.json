@@ -81,6 +81,12 @@
    "src": "clips/magg-4.mp4"
   },
   {
+   "id": "magg-5",
+   "p": "Magg",
+   "t": "🚬 Der Raucher",
+   "src": "clips/magg-5.mp4"
+  },
+  {
    "id": "jonny-3",
    "p": "Jonny",
    "t": "Der Kick",
@@ -109,6 +115,12 @@
    "p": "Chris",
    "t": "Der Top-Raiser",
    "src": "clips/chris-1.mp4"
+  },
+  {
+   "id": "severin-1",
+   "p": "Severin",
+   "t": "⚽ Torjubel",
+   "src": "clips/severin-1.mp4"
   }
  ],
  "archiv": [
