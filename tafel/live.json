@@ -1032,6 +1032,11 @@
    "id": 143,
    "op": "reload",
    "note": "23.11. 18:05: Ansage Schröder"
+  },
+  {
+   "id": 144,
+   "op": "reload",
+   "note": "23.11. 19:25: Shot Clock verschwindet nach 0"
   }
  ]
 }
