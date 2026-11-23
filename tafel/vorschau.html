@@ -1467,7 +1467,7 @@ const ANN_TTS={"intro":"Ladies and Gentlemen! Willkommen im Blue Chip Club! Heut
  "niklas":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!","niki":"Der Vizemeister vom Monday Classic. The Bluffer. Nikiii!",
  "jonny":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!","jonas":"Er kommt mit dem Cabrio vorgefahren. Jonnyyy!",
  "dede":"Zum ersten Mal im Blue Chip Club. Dedeee!","p. diddy":"Er bringt die Party an den Tisch. P. Diddyyy!","alex":"Er bringt die Party an den Tisch. P. Diddyyy!",
- "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","max":"Zum ersten Mal im Blue Chip Club. Maaax!","severin":"The Ranger ist am Tisch. Severiiin!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
+ "philipp":"Ruhig, geduldig, gefährlich. Philippp!","linus":"Zum ersten Mal im Blue Chip Club. Linuuus!","max":"Zum ersten Mal im Blue Chip Club. Maaax!","severin":"The Sire ist am Tisch. Severiiin!","tobi":"Der Vizemeister vom zweiten Weekly Standard ist zurück. Tobiii!",
  "magg":"Der Champion vom Monday Classic. The Poet. Maggg!","oli":"Two Pair Oli!","domi c":"The Ace Factory. Domiii!"};
 const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburtstags-Ansage vom 01.11. */
 const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
