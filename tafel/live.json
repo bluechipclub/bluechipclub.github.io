@@ -1067,6 +1067,30 @@
    "id": 149,
    "op": "reload",
    "note": "26.11. 20:40 Magg<->Manu, Jonny<->Tim"
+  },
+  {
+   "id": 150,
+   "op": "paid",
+   "name": "Manu",
+   "entry": 1,
+   "paid": "offen",
+   "note": "26.11. Tim: erster Entry offen"
+  },
+  {
+   "id": 151,
+   "op": "paid",
+   "name": "Jonny",
+   "entry": 1,
+   "paid": "offen",
+   "note": "26.11. Tim: erster Entry offen"
+  },
+  {
+   "id": 152,
+   "op": "paid",
+   "name": "Magg",
+   "entry": 1,
+   "paid": "offen",
+   "note": "26.11. Tim: erster Entry offen"
   }
  ]
 }
