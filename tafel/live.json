@@ -1135,6 +1135,9 @@
    "id": 157,
    "op": "reload",
    "note": "outbefore laden"
-  }
+  },
+  {"id": 158, "op": "outbefore", "name": "Nico", "before": "Manu", "add": 1, "paid": "offen", "note": "Nico war vor Manu raus, Entry offen"},
+  {"id": 159, "op": "note", "text": "Kevin: 55 P Preisgeld, 40 P offene Beträge verrechnet, 15 P bar von Tim bekommen. Kevin komplett abgerechnet."},
+  {"id": 160, "op": "note", "text": "Nico: Entry offen, noch nicht bezahlt."}
  ]
 }
