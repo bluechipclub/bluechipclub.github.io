@@ -1101,6 +1101,25 @@
     "Jonny"
    ],
    "note": "26.11. 21:00 Tim: Manu sitzt zwischen Niki und Jonny"
+  },
+  {
+   "id": 154,
+   "op": "set",
+   "v": {
+    "pay": {
+     "auto": true,
+     "places": 3,
+     "third": 25,
+     "split": 60,
+     "round": 5,
+     "pcts": [
+      60,
+      25,
+      15
+     ]
+    }
+   },
+   "note": "Auszahlung auto"
   }
  ]
 }
