@@ -1057,6 +1057,11 @@
     "feeRe": 5
    },
    "note": "26.11. 18:35 Tim: Entry 25 (20 Pot + 5 Tim), Rebuy 20 (15 Pot + 5 Tim)"
+  },
+  {
+   "id": 148,
+   "op": "reload",
+   "note": "26.11. 18:40 Magg auf Dealerplatz"
   }
  ]
 }
