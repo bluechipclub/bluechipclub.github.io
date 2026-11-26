@@ -1455,7 +1455,7 @@ function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();cons
   let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);if(VOICE_SET&&!NO_VOICE)setTimeout(()=>{if(!$("ann").hidden)playAnn(VOICE_DIR+"finale.mp3?v=1",null);},1500);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
   const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1000,9000/SPEED-(Date.now()-t0))));}
-const ANNS_INTRO_NOW=()=>VOICE_SET?VOICE_DIR+"intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
+const ANNS_INTRO_NOW=()=>VOICE_SET?"ansagen/td26/intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a,o){o=o||{};
   const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
   if(twoT()){const t1=seatOrder(1),t2=seatOrder(2),lb=t=>'<p style="margin:1.6vh 0 .8vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+t+'</p>';
@@ -1487,7 +1487,9 @@ const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburts
 const SPEED=1.5; /* Tim 23.11.: Auslosung + Ansagen 1,5-mal so schnell */
 const VOICE_SET="mc23",VOICE_DIR="ansagen/"+VOICE_SET+"/";
 const VOICE_FILES={"tim":"tim","severin":"severin","schröder":"schroeder","patrick":"schroeder","schroeder":"schroeder","schroder":"schroeder","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico","niklas":"niklas","niki":"niklas"};
-const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+/* 26.11. Thursday Deep Stack: neue Helmut-Ansagen in ansagen/td26/ (Intro, Jonny, Max, Niklas, Manu), alle anderen weiter aus mc23 */
+const TD26_DIR="ansagen/td26/",TD26={"jonny":"jonny","jonas":"jonny","max":"max","niklas":"niklas","niki":"niklas","manu":"manu"};
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();const t=TD26[k]||TD26[canonName(k)];if(VOICE_SET&&t)return TD26_DIR+t+".mp3?v=1";if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 /* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
