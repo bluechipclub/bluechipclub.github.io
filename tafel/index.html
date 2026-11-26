@@ -625,7 +625,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 "use strict";
 /* VORSCHAU (19.11.): eigener Speicher und eigener Kanal, damit nichts mit der Live-Tafel durcheinanderkommt. Beim finalen Update KEY/TOPIC auf die Live-Werte setzen. */
 const PREVIEW=false;
-const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-mc-2026-11-23"; /* 23.11. Monday Classic: frischer Speicher (Friday-Stand bleibt unter bcc-tafel-fc-2026-11-20 im App-Archiv) */
+const KEY=PREVIEW?"bcc-tafel-vorschau-fc":"bcc-tafel-td-2026-11-26"; /* 26.11. Thursday Deep Stack Turbo: frischer Speicher (Monday-Stand bleibt unter bcc-tafel-mc-2026-11-23 im App-Archiv) · 23.11. Monday Classic: frischer Speicher (Friday-Stand bleibt unter bcc-tafel-fc-2026-11-20 im App-Archiv) */
 /* Rolle dieses Geräts: "haupt" = Haupttafel (rechnet, speichert, führt Befehle aus) · "spiegel" = zeigt nur an, was die Haupttafel schickt */
 let ROLE=(()=>{try{const q=new URLSearchParams(location.search).get("rolle");if(q==="haupt"||q==="spiegel"){localStorage.setItem("bcc-tafel-role",q);return q;}return localStorage.getItem("bcc-tafel-role")||"haupt";}catch(e){return "haupt";}})();
 const isHaupt=()=>ROLE==="haupt";
@@ -641,10 +641,10 @@ const fmt=n=>Math.round(n).toLocaleString("de-DE");
 const P=n=>fmt(n)+" P";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-const DEFAULT_LEVELS=[ /* 23.11. Monday Classic (wie Website): 25.000 Stack, BB-Ante ab Level 3 (Ante = BB), Pausen nach Level 4 und Level 8, Rebuys bis Ende Level 8 */
- {sb:100,bb:100},{sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{brk:10,note:"Pause · Rebuys an der Kasse"},{sb:300,bb:600,ante:600},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1000,bb:2000,ante:2000},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
+const DEFAULT_LEVELS=[ /* 26.11. Thursday Deep Stack Turbo (Tim): altes Level 1 (100/100) entfällt, Level 1 = 100/200, BB-Ante ab Level 2, Pausen nach Level 4 und Level 8, Rebuys bis Ende Level 8, 25.000 Stack, 25-Min-Level */
+ {sb:100,bb:200},{sb:200,bb:300,ante:300},{sb:200,bb:400,ante:400},{sb:300,bb:600,ante:600},{brk:10,note:"Pause · Rebuys an der Kasse"},{sb:400,bb:800,ante:800},{sb:500,bb:1000,ante:1000},{sb:600,bb:1200,ante:1200},{sb:1000,bb:2000,ante:2000},{brk:10,note:"Rebuys vorbei, 100er hochtauschen"},{sb:1500,bb:3000,ante:3000},{sb:2000,bb:4000,ante:4000},{sb:2500,bb:5000,ante:5000},{sb:3000,bb:6000,ante:6000},{sb:4000,bb:8000,ante:8000},{sb:5000,bb:10000,ante:10000},{sb:6000,bb:12000,ante:12000},{sb:8000,bb:16000,ante:16000},{sb:10000,bb:20000,ante:20000}
 ];
-const NAMES=["Severin","Schröder","Zeno","Domi C","Magg","Benno","Nico","Niklas","Manu","Tim"]; /* 23.11. 15:57 Tim: Niki kommt dazu (10 Spieler). Reihenfolge = Platz 1 … 10 vor dem Auslosen: Severin links neben Tim, dann Anonym, Manu direkt rechts neben Tim, Tim zuletzt = Dealerplatz an der Chip-Ablage */ /* 23.11.: Zusagen aus der Google-Tabelle („Monday Classic 23.11.“), Anonym = Severins Gast. Neue Zusagen kommen weiter per syncSignups dazu. */
+const NAMES=["Jonny","Max","Zeno","Magg","Niklas","Manu","Tim"]; /* 26.11. Tim: Jonas (=Jonny), Max, Niklas, Magg „The Poet“, Sino (=Zeno), Manu + Tim. Tim zuletzt = Dealerplatz, Manu direkt davor. Weitere Zusagen kommen per syncSignups („Thursday Deep Stack Turbo 26.11.“) dazu. */ /* 23.11. 15:57 Tim: Niki kommt dazu (10 Spieler). Reihenfolge = Platz 1 … 10 vor dem Auslosen: Severin links neben Tim, dann Anonym, Manu direkt rechts neben Tim, Tim zuletzt = Dealerplatz an der Chip-Ablage */ /* 23.11.: Zusagen aus der Google-Tabelle („Monday Classic 23.11.“), Anonym = Severins Gast. Neue Zusagen kommen weiter per syncSignups dazu. */
 // minigames: bb = stake in big blinds of the current level
 const GAMES={
  "Blind Pot":{bb:1,pay:"Jeder legt # in die Mitte",short:"Alle Karten offen · Board komplett · keine Setzrunde",rules:"Nächste Hand ist ein Blind Pot. Jeder legt den Einsatz in die Mitte, alle Karten werden offen ausgeteilt und das Board komplett aufgedeckt. Keine Setzrunde. Die beste Hand gewinnt den ganzen Pot."},
@@ -662,7 +662,7 @@ const DEFAULT_GAMES=[]; /* Monday Classic: no automatic minigames, only by hand 
 const AUTO_GAMES=false;
 const LEVEL_SOUND=false; /* Tim 09.11.: no beeps at level end, countdown only visual (clips keep their sound) */
 
-const fresh=()=>({v:1,title:"Monday Classic",mc15:1,fee20:1,fc20k:1,brk5:1,pko20:1,sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
+const fresh=()=>({v:1,title:"Thursday Deep Stack Turbo",mc15:1,fee20:1,fc20k:1,brk5:1,pko20:1,sub:"Blue Chip Club · 25.000 Chips · 25-Minuten-Level · mit Ante",eb:2000,t2:[],mt:false,dn:null,pend:null,bounty:0,mystery:0,mpaid:0,mdeck:null,champ:"Tim",lostHeads:0,i:0,running:false,endAt:null,left:null,
   levels:DEFAULT_LEVELS.map(l=>Object.assign({},l)),min1:25,min:25,minLate:25,stack:25000,reLvl:8,maxRe:null,
   buyin:20,fee:5,rebuy:15,feeRe:0, /* Tim 22.11.: erster Entry 20 P = 15 P Pot + 5 P Anwesenheit an Tim (nie im Pot), Rebuy 15 P komplett Pot; Tim zahlt sich selbst keine 5 P */notes:[],rb15:1,pay:{auto:true,places:3,third:25,split:65,round:5,pcts:[50,30,20]},bank:"Tim",cash:"Bargeldregel: Buy-in und Rebuys bar an der Kasse",
   players:NAMES.map(n=>({name:n,entries:[{t:null,lvl:0,paid:"bar"}],out:null})),
@@ -673,7 +673,7 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===1){S=Objec
 if(!AUTO_GAMES){S.games=[];}
 /* 12.11.: Rebuy kostet heute 15 P (nicht 25) */
 /* 22.11. Monday Classic: Entry 15 P in den Pot (+5 P Anwesenheit separat an Tim, nie im Pot), jeder Rebuy 15 P, unbegrenzt bis Ende Level 8, kein Bounty */
-function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=20;S.fee=5;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Monday Classic";}}return ch;}
+function fixRebuy(){let ch=false;if(!S.rb15){if(S.rebuy===25)S.rebuy=15;S.rb15=1;ch=true;}if(!S.mc15){S.mc15=1;ch=true;if(!S.started){S.buyin=20;S.fee=5;S.rebuy=15;S.feeRe=0;S.maxRe=null;S.reLvl=8;S.bounty=0;S.mystery=0;S.bchips=0;S.title="Thursday Deep Stack Turbo";}}return ch;}
 const LOCAL_AT=S.savedAt||0; /* when this device last saved, before this page load changes anything */
 if(fixRebuy()){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
@@ -1455,7 +1455,7 @@ function drawShow2(){drawSeats();if(!DRAW_SHOW)return;if(intro)intro.stop();cons
   let went=false;const go=()=>{if(went)return;went=true;$("ann").hidden=true;fx("intro",{names:a.map(p=>p.name)});introShow(a,()=>{drawOverview(S.players);if(VOICE_SET&&!NO_VOICE)setTimeout(()=>{if(!$("ann").hidden)playAnn(VOICE_DIR+"finale.mp3?v=1",null);},1500);},twoT()?{sec:5,placeFn:(p,k)=>seatLabel(p)+(dealerOf(tblOf(p))===p?" · Dealer-Button":""),isDealer:p=>dealerOf(tblOf(p))===p}:{sec:6});};
   $("annOk").onclick=()=>{stopAnn();go();};
   const t0=Date.now();playAnn(ANNS_INTRO_NOW(),()=>setTimeout(go,Math.max(1000,9000/SPEED-(Date.now()-t0))));}
-const ANNS_INTRO_NOW=()=>VOICE_SET?VOICE_DIR+"intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
+const ANNS_INTRO_NOW=()=>VOICE_SET?"ansagen/td26/intro.mp3?v=1":"tts:"+ANN_TTS.intro.replace("Neun Spieler","Neun Spieler".replace("Neun",["","","Zwei","Drei","Vier","Fünf","Sechs","Sieben","Acht","Neun","Zehn","Elf","Zwölf"][S.players.length]||String(S.players.length)));
 function drawOverview(a,o){o=o||{};
   const suits=["♠","♥","♣","♦"],cards=(arr,two)=>'<div class="draw'+(two||arr.length>10?' two':'')+'">'+arr.map((p,k)=>'<div class="dcard" style="--k:'+k+'">'+avHtml(p.name,"dav")+'<div class="s" style="color:'+(k%2?"#c8202a":"#111")+'">Platz '+(k+1)+' '+suits[k%4]+'</div><div class="n">'+esc(p.name)+'</div></div>').join("")+'</div>';
   if(twoT()){const t1=seatOrder(1),t2=seatOrder(2),lb=t=>'<p style="margin:1.6vh 0 .8vh;font-weight:700;letter-spacing:.08em;text-transform:uppercase">'+t+'</p>';
@@ -1487,7 +1487,9 @@ const ANN_FILE={"niklas":null,"niki":null};   /* niklas.mp3 ist noch die Geburts
 const SPEED=1.5; /* Tim 23.11.: Auslosung + Ansagen 1,5-mal so schnell */
 const VOICE_SET="mc23",VOICE_DIR="ansagen/"+VOICE_SET+"/";
 const VOICE_FILES={"tim":"tim","severin":"severin","schröder":"schroeder","patrick":"schroeder","schroeder":"schroeder","schroder":"schroeder","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico","niklas":"niklas","niki":"niklas"};
-const annFor=n=>{const k=String(n||"").toLowerCase().trim();if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+/* 26.11. Thursday Deep Stack: neue Helmut-Ansagen in ansagen/td26/ (Intro, Jonny, Max, Niklas, Manu), alle anderen weiter aus mc23 */
+const TD26_DIR="ansagen/td26/",TD26={"jonny":"jonny","jonas":"jonny","max":"max","niklas":"niklas","niki":"niklas","manu":"manu"};
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();const t=TD26[k]||TD26[canonName(k)];if(VOICE_SET&&t)return TD26_DIR+t+".mp3?v=1";if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 /* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
