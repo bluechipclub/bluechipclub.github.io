@@ -685,7 +685,7 @@ const playNum=i=>LEVELS.slice(0,i+1).filter(l=>!l.brk).length;
 const dur=i=>{const L=LEVELS[i];if(!L)return 0;if(L.brk)return L.brk*60;const n=playNum(i);return (n===1?S.min1:(S.reLvl!=null&&n>S.reLvl?S.minLate:S.min))*60;};
 const leftNow=()=>S.running&&S.endAt?Math.max(0,(S.endAt-nowMs())/1000):(S.left==null?dur(S.i):S.left);
 /* Spitznamen: „Niki“ findet Niklas, „Alex“/„PDiddy“ findet P. Diddy usw. */
-const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","olli":"oli","patrick":"schröder","schroeder":"schröder","schroder":"schröder","anonym":"schröder","mystery guest":"schröder"};
+const NAME_ALIAS={"niki":"niklas","nikki":"niklas","alex":"p. diddy","pdiddy":"p. diddy","p diddy":"p. diddy","p.diddy":"p. diddy","diddy":"p. diddy","jonas":"jonny","johnny":"jonny","jonni":"jonny","phil":"philipp","phillip":"philipp","tobias":"tobi","domi m":"magg","mark":"magg","marc":"magg","mack":"magg","olli":"oli","patrick":"schröder","schroeder":"schröder","schroder":"schröder","anonym":"schröder","mystery guest":"schröder"};
 const canonName=n=>{const k=String(n||"").toLowerCase().trim();return NAME_ALIAS[k]||k;};
 /* 23.11. 15:57: laufende Tafel (noch nicht gestartet) einmal auf die neue Startordnung bringen: Niklas dazu, Tim ans Ende (= Dealerplatz an der Chip-Ablage), Manu direkt davor */
 function mig23(){if(!S.mc23b){S.mc23b=1;if(!S.started&&!S.mt){const lc=x=>String(x).toLowerCase().trim(),old=S.players;
@@ -694,6 +694,8 @@ function mig23(){if(!S.mc23b){S.mc23b=1;if(!S.started&&!S.mt){const lc=x=>String
   S.players=old.slice().sort((a,b)=>rank(a)-rank(b));S.syncSeen=Array.from(new Set((S.syncSeen||[]).concat(NAMES)));S.dealer=S.players.length-1;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}}}mig23();
 /* 23.11. 17:40: Mystery Guest heißt Patrick „Schröder“ – Spieler „Anonym“ einmal umbenennen */
 function migSchroeder(){if(S.schr23)return;S.schr23=1;const p=S.players.find(x=>/^(anonym|mystery guest)$/i.test(String(x.name).trim()));if(p){const o=p.name,to="Schröder";S.outOrder=(S.outOrder||[]).map(n=>n===o?to:n);if(S.t2)S.t2=S.t2.map(n=>n===o?to:n);if(S.dn)for(const k in S.dn)if(S.dn[k]===o)S.dn[k]=to;p.name=to;}["schröder","patrick","schroeder","schroder"].forEach(k=>{if(S.cards)delete S.cards[k];if(S.avatars)delete S.avatars[k];});if(S.syncSeen&&!S.syncSeen.includes("Schröder"))S.syncSeen.push("Schröder");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}migSchroeder();
+/* 26.11. 18:38 Tim: Magg auf der Anzeige auf den Dealerplatz (letzter Platz an der Chip-Ablage). Einmalig: Magg tauscht mit dem, der dort sitzt. */
+function migMaggDealer(){if(S.maggDS)return;S.maggDS=1;if(S.mt)return;const a=S.players,i=a.findIndex(p=>canonName(p.name)==="magg"),L=a.length-1;if(i>=0&&i!==L){const dn=a[S.dealer];[a[i],a[L]]=[a[L],a[i]];if(dn)S.dealer=a.indexOf(dn);a.forEach(p=>{delete p.chair;});}try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}migMaggDealer();
 let REAL=null;const allP=()=>REAL||S.players; /* REAL: full player list while only one table is being drawn (inView) */
 const pl=n=>allP().find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||allP().find(p=>canonName(p.name)===canonName(n));
 const alive=()=>allP().filter(p=>!p.out);
@@ -1393,7 +1395,7 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 const FIXED=[{kevin:1,benno:2,"domi-c":3,magg:4,manu:5,niklas:6,jonny:7},{magg:1,niklas:2,kevin:3,manu:4,benno:5,"domi-c":6,jonny:7}];
 function fixFor(a){const ks=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return FIXED.map((f,i)=>i).filter(i=>Object.keys(FIXED[i]).sort().join()===ks);}
 /* 26.11. Tim (Thursday Deep Stack): heute sitzt MAX fest auf dem Dealerplatz (letzter Platz), alle anderen inkl. Tim und Manu komplett zufällig. Morgen wieder "Tim". */
-const SEAT_ANCHOR="Max";
+const SEAT_ANCHOR="Magg"; /* 26.11. 18:38 Tim: „Mark“ = Magg (The Poet) sitzt auf dem Dealerplatz, nicht Max */
 function drawSeats(){
   closeAll();lobbyClose();S.dealerFree=false;
   S.timV=Math.random()<.5?1:0;
