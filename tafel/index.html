@@ -1489,7 +1489,7 @@ const VOICE_SET="mc23",VOICE_DIR="ansagen/"+VOICE_SET+"/";
 const VOICE_FILES={"tim":"tim","severin":"severin","schröder":"schroeder","patrick":"schroeder","schroeder":"schroeder","schroder":"schroeder","anonym":"anonym","mystery guest":"anonym","zeno":"zeno","domi c":"domi-c","manu":"manu","magg":"magg","domi m":"magg","benno":"benno","nico":"nico","niklas":"niklas","niki":"niklas"};
 /* 26.11. Thursday Deep Stack: neue Helmut-Ansagen in ansagen/td26/ (Intro, Jonny, Max, Niklas, Manu), alle anderen weiter aus mc23 */
 const TD26_DIR="ansagen/td26/",TD26={"jonny":"jonny","jonas":"jonny","max":"max","niklas":"niklas","niki":"niklas","manu":"manu"};
-const annFor=n=>{const k=String(n||"").toLowerCase().trim();const t=TD26[k]||TD26[canonName(k)];if(VOICE_SET&&t)return TD26_DIR+t+".mp3?v=1";if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
+const annFor=n=>{const k=String(n||"").toLowerCase().trim();const t=TD26[k]||TD26[canonName(k)];if(VOICE_SET&&t)return TD26_DIR+t+".mp3?v="+(t==="max"?2:1);if(VOICE_SET)return VOICE_DIR+(VOICE_FILES[k]||VOICE_FILES[canonName(k)]||"neu")+".mp3?v=1";if(k in ANN_FILE&&ANN_FILE[k]===null)return ANN_TTS[k]?"tts:"+ANN_TTS[k]:null;return ANNS[k]||(ANN_TTS[k]?"tts:"+ANN_TTS[k]:null);};
 let ttsVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();ttsVoice=v.find(x=>/^de/i.test(x.lang)&&/male|männ|markus|yannick|hans|conrad|stefan/i.test(x.name))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 /* iPad: Sprache muss einmal per Fingertipp freigeschaltet werden */
@@ -1528,12 +1528,14 @@ function cardHtml(c){
 let intro=null;
 /* 23.11. Tim: bei der Vorstellung zuerst der Clip des Spielers (aus clips/clips.json, erster eigener Clip, max. INTRO_CLIP_MAX s), danach kurz die Karte mit Ansage */
 let INTRO_CLIPS={};const INTRO_CLIP_MAX=9;
+/* 26.11. Tim: bei Max zuerst die Ansage (Champion vom letzten 2-Tische-Turnier), dann sein Clip KOMPLETT (nicht nach 9 s abbrechen). Danach Karte ohne zweite Ansage. */
+const INTRO_FULL={"max":"clips/max-1.mp4"};
 fetch("clips/clips.json?v="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(j=>{const m={};(j.clips||[]).forEach(c=>{if(typeof c.p!=="string"||c.p==="Alle"||!c.src)return;const k=canonName(c.p);if(!m[k])m[k]=c.src;});INTRO_CLIPS=m;}).catch(()=>{});
-const introClip=n=>INTRO_CLIPS[canonName(n)]||null;
+const introClip=n=>INTRO_FULL[canonName(n)]||INTRO_CLIPS[canonName(n)]||null;
 /* 23.11. Tim: Musik unter Severins Vorstellung (Big Yahu, 20 s). Läuft ab seinem Schritt (Clip oder Karte) bis zum nächsten Spieler; Karte bleibt dann etwas länger. */
 const INTRO_MUSIC={}; /* 23.11. 17:50 Tim: Severin hat jetzt seinen Torjubel-Clip mit Big Yahu, keine Extra-Musik mehr */
 function introShow(list,done,o){o=o||{};
-  const box=$("intro");let k=0,clipK=-1,inClip=false,musK=-1,mus=null;
+  const box=$("intro");let k=0,clipK=-1,inClip=false,musK=-1,mus=null,annDone=-1;
   const musStop=()=>{if(mus){const m=mus;mus=null;let v=m.volume;const t=setInterval(()=>{v-=.08;if(v<=0){clearInterval(t);try{m.pause();}catch(e){}}else m.volume=v;},60);}};
   const musFor=()=>{if(k===musK)return;musStop();musK=k;const p=list[k],u=p&&!o.label&&!o.mute?INTRO_MUSIC[canonName(p.name)]:null;if(u&&!NO_VOICE){try{mus=new Audio(u);mus.volume=.55;mus.loop=true;mus.play().catch(()=>{});}catch(e){}}};
   const sv=()=>{stopAnn();if(intro&&intro.stopVid){intro.stopVid();intro.stopVid=null;}};intro={next:()=>{sv();clearTimeout(intro.t);if(inClip){inClip=false;}else k++;step();},stop:()=>{sv();musStop();clearTimeout(intro.t);box.hidden=true;intro=null;done&&done();}};
@@ -1546,8 +1548,10 @@ function introShow(list,done,o){o=o||{};
       box.classList.remove("bd");box.innerHTML='<div class="inClip"><video src="'+cl+'" playsinline preload="auto"></video></div><div class="inT"><div class="eyebrow">'+plc+'</div><h3>'+esc(p.name)+'</h3><div class="dots">'+list.map((_,j)=>'<i class="'+(j<k?"d":j===k?"on":"")+'"></i>').join("")+'</div></div>';
       box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
       const v=box.querySelector("video");const fin=()=>{if(!intro||k!==me||!inClip)return;clearTimeout(intro.t);inClip=false;step();};
-      intro.stopVid=()=>{try{v.pause();}catch(e){}};v.onended=fin;v.onerror=fin;intro.t=setTimeout(fin,INTRO_CLIP_MAX*1000);
-      if(bg&&!bg.paused)bg.pause();v.volume=1;if(mus)v.muted=true;v.play().catch(()=>{v.muted=true;v.play().catch(fin);});return;}
+      intro.stopVid=()=>{try{v.pause();}catch(e){}};v.onended=fin;v.onerror=fin;
+      const full=!!INTRO_FULL[canonName(p.name)],playV=()=>{if(!intro||k!==me||!inClip)return;clearTimeout(intro.t);intro.t=setTimeout(fin,full?90000:INTRO_CLIP_MAX*1000);if(bg&&!bg.paused)bg.pause();v.volume=1;if(mus)v.muted=true;v.play().catch(()=>{v.muted=true;v.play().catch(fin);});};
+      if(full){const aU=annFor(p.name);annDone=me;if(bg&&!bg.paused)bg.pause();intro.t=setTimeout(playV,20000);if(aU)playAnn(aU,playV);else playV();return;}
+      playV();return;}
     const p=list[k],img=cardOf(p.name),suit=["♠","♥","♣","♦"][k%4],vid=!o.label&&clipK!==k&&VIDS[p.name.toLowerCase()];
     const last=k===list.length-1,bd=!o.label&&BDAY_NAMES.includes(p.name.toLowerCase());
     const place=o.placeFn?esc(o.placeFn(p,k)):o.label?esc(o.label)+' · '+(k+1)+' von '+list.length:last?'Platz '+(k+1)+' · Dealer-Platz':'Platz '+(k+1)+' von '+list.length;
@@ -1559,7 +1563,7 @@ function introShow(list,done,o){o=o||{};
     else box.innerHTML=cardEl+vidEl+
       '<div class="inT"><div class="eyebrow">'+place+'</div><h3>'+esc(p.name)+'</h3>'+(!o.label&&p.name.toLowerCase()==="pasi"?'<div class="inD">⭐ Special Guest · Freigeist</div>':'')+(!o.label&&(o.isDealer?o.isDealer(p):k===S.dealer)?'<div class="inD">Startet mit dem Dealer-Button</div>':'')+dots+'</div>';
     box.hidden=false;box.classList.remove("go");void box.offsetWidth;box.classList.add("go");
-    const annU=!o.label&&annFor(p.name),me=k;
+    const annU=!o.label&&annDone!==k&&annFor(p.name),me=k;
     const isNico=p.name.toLowerCase()==="nico";
     if(!vid&&bgActive&&bg)bgResume();
     if(vid){const v=box.querySelector("video");const go=()=>{clearTimeout(intro.t);intro.t=setTimeout(()=>{k++;step();},((isFinite(v.duration)?v.duration:23)/SPEED+1)*1000);};
