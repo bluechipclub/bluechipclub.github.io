@@ -1091,6 +1091,16 @@
    "entry": 1,
    "paid": "offen",
    "note": "26.11. Tim: erster Entry offen"
+  },
+  {
+   "id": 153,
+   "op": "place",
+   "name": "Manu",
+   "between": [
+    "Niklas",
+    "Jonny"
+   ],
+   "note": "26.11. 21:00 Tim: Manu sitzt zwischen Niki und Jonny"
   }
  ]
 }
