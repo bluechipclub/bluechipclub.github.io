@@ -1046,6 +1046,17 @@
    "id": 146,
    "op": "reload",
    "note": "26.11. 18:35: Max fest auf Dealerplatz"
+  },
+  {
+   "id": 147,
+   "op": "set",
+   "v": {
+    "buyin": 25,
+    "fee": 5,
+    "rebuy": 20,
+    "feeRe": 5
+   },
+   "note": "26.11. 18:35 Tim: Entry 25 (20 Pot + 5 Tim), Rebuy 20 (15 Pot + 5 Tim)"
   }
  ]
 }
