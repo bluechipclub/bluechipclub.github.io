@@ -1684,6 +1684,12 @@ function runCmd(c){
         if(!rebuyOpen()){toast("Rebuy-Phase ist vorbei. Rebuy für "+p.name+" nicht gebucht.");break;}}
       doRebuy(c.name,c.paid,c.to);break;}
     case "out":doOut(c.name,c.by);break;
+    case "outbefore":{ /* 26.11.: Ausscheiden nachtragen, ohne Ansage, in der Reihenfolge vor c.before (fehlt der Spieler, wird er mit 1 Entry angelegt) */
+      let p=pl(c.name);if(!p&&c.add){addPlayer(c.name,c.paid||"offen",c.to);p=pl(c.name);}
+      if(p&&!p.out){p.out={t:new Date().toISOString(),lvl:c.lvl||playNum(S.i),late:1};if(S.bounty)p.head=0;delete p.chair;
+        S.outOrder=S.outOrder.filter(n=>n!==p.name);const k=c.before?S.outOrder.findIndex(n=>lcn(n)===lcn(c.before)):-1;S.outOrder.splice(k<0?0:k,0,p.name);
+        log("out",{name:p.name,place:placeOf(p),late:1});buildSeats();}
+      break;}
     case "back":doBack(c.name);break;
     case "paid":{const p=pl(c.name);if(p){const e=p.entries[(c.entry||1)-1];if(e){e.paid=c.paid;e.to=payTo(c.paid,c.to);}}break;}
     case "note":{const t=String(c.text||"").trim().slice(0,300);if(t){S.notes=S.notes||[];S.notes.push({at:Date.now(),text:t});}break;}
