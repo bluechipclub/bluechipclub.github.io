@@ -696,6 +696,9 @@ function mig23(){if(!S.mc23b){S.mc23b=1;if(!S.started&&!S.mt){const lc=x=>String
 function migSchroeder(){if(S.schr23)return;S.schr23=1;const p=S.players.find(x=>/^(anonym|mystery guest)$/i.test(String(x.name).trim()));if(p){const o=p.name,to="Schröder";S.outOrder=(S.outOrder||[]).map(n=>n===o?to:n);if(S.t2)S.t2=S.t2.map(n=>n===o?to:n);if(S.dn)for(const k in S.dn)if(S.dn[k]===o)S.dn[k]=to;p.name=to;}["schröder","patrick","schroeder","schroder"].forEach(k=>{if(S.cards)delete S.cards[k];if(S.avatars)delete S.avatars[k];});if(S.syncSeen&&!S.syncSeen.includes("Schröder"))S.syncSeen.push("Schröder");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}migSchroeder();
 /* 26.11. 18:38 Tim: Magg auf der Anzeige auf den Dealerplatz (letzter Platz an der Chip-Ablage). Einmalig: Magg tauscht mit dem, der dort sitzt. */
 function migMaggDealer(){if(S.maggDS)return;S.maggDS=1;if(S.mt)return;const a=S.players,i=a.findIndex(p=>canonName(p.name)==="magg"),L=a.length-1;if(i>=0&&i!==L){const dn=a[S.dealer];[a[i],a[L]]=[a[L],a[i]];if(dn)S.dealer=a.indexOf(dn);a.forEach(p=>{delete p.chair;});}try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}migMaggDealer();
+/* Plätze tauschen (Tim 26.11. 20:39): zwei Spieler tauschen ihren Platz, Dealer-Button bleibt am Platz. Auch als Live-Befehl {op:"swapseat",a,b}. */
+function swapSeat(x,y){const a=S.players,i=a.findIndex(p=>canonName(p.name)===canonName(x)),j=a.findIndex(p=>canonName(p.name)===canonName(y));if(i<0||j<0||i===j)return false;[a[i],a[j]]=[a[j],a[i]];a.forEach(p=>{delete p.chair;});return true;}
+function migSwap2039(){if(S.sw2039)return;S.sw2039=1;if(S.mt)return;swapSeat("Magg","Manu");swapSeat("Jonny","Tim");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}migSwap2039();
 let REAL=null;const allP=()=>REAL||S.players; /* REAL: full player list while only one table is being drawn (inView) */
 const pl=n=>allP().find(p=>p.name.toLowerCase()===String(n).toLowerCase().trim())||allP().find(p=>canonName(p.name)===canonName(n));
 const alive=()=>allP().filter(p=>!p.out);
@@ -1742,6 +1745,7 @@ function runCmd(c){
     case "cards":if(intro)intro.stop();closeAll();$("ann").hidden=true;introShow(S.players.filter(p=>c.all||!p.out),null,{mute:c.mute!==false,label:c.label||"Die Spieler",sec:c.sec||6});break;
     case "entries":{const te=totalEntries(),re=te-S.players.length;announce({eyebrow:"Heute Abend",title:te+" Entries",text:S.players.length+" Buy-ins + "+re+(re===1?" Rebuy":" Rebuys")+" · Preisgeld "+P(potOf()),sec:c.sec||25});break;}
     case "restart":restartTournament();break;
+    case "swapseat":if(swapSeat(c.a,c.b)){buildSeats();toast(c.a+" ⇄ "+c.b);}break;
     case "undo":{const p=pl(c.name);if(p)undoRebuy(p);break;}
     default:return;
   }}catch(e){console.warn("cmd",c,e);}

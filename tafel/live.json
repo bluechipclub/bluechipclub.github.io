@@ -1062,6 +1062,11 @@
    "id": 148,
    "op": "reload",
    "note": "26.11. 18:40 Magg auf Dealerplatz"
+  },
+  {
+   "id": 149,
+   "op": "reload",
+   "note": "26.11. 20:40 Magg<->Manu, Jonny<->Tim"
   }
  ]
 }
