@@ -1392,12 +1392,14 @@ $("rClose").onclick=()=>$("mResult").hidden=true;
 /* Monday Classic 09.11.: zwei feste, geprüfte Sitzordnungen (Plätze neben Tim frei, kein Stuhl-Fleck) */
 const FIXED=[{kevin:1,benno:2,"domi-c":3,magg:4,manu:5,niklas:6,jonny:7},{magg:1,niklas:2,kevin:3,manu:4,benno:5,"domi-c":6,jonny:7}];
 function fixFor(a){const ks=a.filter(p=>!/^tim$/i.test(String(p.name).trim())).map(p=>pKey(p.name)).sort().join();return FIXED.map((f,i)=>i).filter(i=>Object.keys(FIXED[i]).sort().join()===ks);}
+/* 26.11. Tim (Thursday Deep Stack): heute sitzt MAX fest auf dem Dealerplatz (letzter Platz), alle anderen inkl. Tim und Manu komplett zufällig. Morgen wieder "Tim". */
+const SEAT_ANCHOR="Max";
 function drawSeats(){
   closeAll();lobbyClose();S.dealerFree=false;
   S.timV=Math.random()<.5?1:0;
   let a=S.players.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   // Tim (organiser) always sits on the dealer spot; everyone else is shuffled freely. No announcer, no cards, no music: the board just shows the new seats.
-  const anc=a.find(p=>p.name.toLowerCase()===String((S.seatRule&&S.seatRule.anchor)||"Tim").toLowerCase());
+  const ANCH=String((S.seatRule&&S.seatRule.anchor)||SEAT_ANCHOR).toLowerCase(),anc=a.find(p=>p.name.toLowerCase()===ANCH)||a.find(p=>p.name.toLowerCase()==="tim"),ancTim=!!anc&&anc.name.toLowerCase()==="tim";
   if(anc)a=[...a.filter(p=>p!==anc),anc];
   /* 19.11. Tim: nur EIN echter Pokertisch. Ab 11 Spielern zwei Tische, möglichst gleich groß (großer Tisch bekommt bei ungerader Zahl einen mehr, max. 10).
      Wer an den großen Tisch kommt, wird ausgelost: Tim fest, Manu fest (neben Tim), die ersten 10 Anmeldungen (Reihenfolge der Website-Zusagen) haben doppelte Chance. */
@@ -1414,13 +1416,13 @@ function drawSeats(){
     S.draw0={order:S.players.map(p=>p.name),t2:S.t2.slice(),dn:Object.assign({},S.dn)};
     log("draw",{order:t1.map(p=>p.name),t2:S.t2,dealer:S.dn[1],dealer2:S.dn[2],early:[...early]});save();buildSeats();render();return;}
   /* feste Regeln (Tim 14.11.): Tim immer Dealerplatz (letzter Platz), Manu zu 100 % direkt neben Tim (Platz 1 oder vorletzter Platz, zufällig), Rest zufällig (20.11.: Jonny nicht mehr fest). */
-  if(anc&&a.length>=3){const n=a.length,jo=null,ma=a.find(p=>canonName(p.name)==="manu");
+  if(anc&&a.length>=3){const n=a.length,jo=null,ma=ancTim?a.find(p=>canonName(p.name)==="manu"):null; /* 26.11.: Manu fest nur, wenn Tim auf dem Dealerplatz sitzt */
     const slots=new Array(n).fill(null);slots[n-1]=anc;
     if(ma)slots[n-2]=ma; /* Tim 23.11. 15:56: Manu immer direkt neben Tim auf dem letzten Platz vor dem Dealerplatz (bei 10 Spielern Platz 9) */
     if(jo&&ma!==jo){const want=Math.min(5,n-2);let k=want;if(slots[k]){k=[...Array(n).keys()].find(i=>!slots[i]);}slots[k]=jo;}
     const rest=a.filter(x=>x!==anc&&x!==ma&&x!==jo);let q=0;for(let k=0;k<n;k++)if(!slots[k])slots[k]=rest[q++];a=slots;}
   S.players=a;S.forceOld=false;pickCfg();a=pickPre(a);
-  S.fix=null;{const fi=fixFor(a);if(CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
+  S.fix=null;{const fi=fixFor(a);if(ancTim&&CUR===T10&&a.some(p=>/^tim$/i.test(String(p.name).trim()))&&fi.length&&!S.pre){S.fixN=((S.fixN==null?-1:S.fixN)+1)%fi.length;const f=FIXED[fi[S.fixN]],tim=a.find(p=>/^tim$/i.test(String(p.name).trim()));a=[...a.filter(p=>p!==tim).sort((x,y)=>f[pKey(x.name)]-f[pKey(y.name)]),tim];S.fix=f;S.timV=0;}}
   // without a finished image: backtracking search for a seating where every player has a checked figure on their chair and no neighbour pair is on the bad list; never accept an invalid one
   if(!SIMPLE&&!S.pre&&!S.fix&&CUR.lib&&imgMode()){const r=validSeating(a);if(r)a=r;else if(CUR===T10){S.forceOld=true;toast("Neuer Tisch: noch nicht genug geprüfte Plätze, alter Tisch wird genutzt");}}
   S.players=a;S.dealer=Math.floor(Math.random()*a.length);log("draw",{order:a.map(p=>p.name),dealer:a[S.dealer].name});save();buildSeats();render();
