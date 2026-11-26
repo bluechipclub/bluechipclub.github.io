@@ -736,7 +736,8 @@ const mostWanted=()=>{if(!S.bounty||S.mystery)return null;const a=alive();if(a.l
 const rebuyOpen=()=>S.reLvl==null||playNum(S.i)<=S.reLvl;
 const curBB=()=>{const L=LEVELS[S.i];return L.brk?((LEVELS[S.i+1]||LEVELS[S.i-1]||{}).bb||0):L.bb;};
 /* 19.11.: mehr bezahlte Plätze bei mehr Spielern (S.pay.auto). Stufen nach Spielerzahl (Buy-ins, nicht Entries). */
-const PAY_TIERS=[{min:0,p:[65,35]},{min:8,p:[50,30,20]},{min:13,p:[45,27,17,11]},{min:18,p:[40,25,16,11,8]}];
+const PAY_TIERS_STD=[{min:0,p:[65,35]},{min:8,p:[50,30,20]},{min:13,p:[45,27,17,11]},{min:18,p:[40,25,16,11,8]}];
+const PAY_TIERS=[{min:0,p:[60,25,15]}]; /* 26.11. 23:33 Tim (Thursday Deep Stack): Auszahlung 60/25/15 für Platz 1–3, vom Pot ohne 5-P-Anwesenheit. Danach wieder PAY_TIERS_STD. */
 function payPcts(){const n=allP().filter(p=>p.entries.length).length;let t=PAY_TIERS[0];PAY_TIERS.forEach(x=>{if(n>=x.min)t=x;});return t.p;}
 function payouts(){
   const pot=potOf(),c=S.pay,r=c.round||1;
