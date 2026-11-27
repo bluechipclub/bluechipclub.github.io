@@ -3889,7 +3889,8 @@ em { font-family: var(--sans) !important; font-style: normal !important; font-we
     if (!force) { try { if (sessionStorage.getItem('intro-seen')) return welcome(); sessionStorage.setItem('intro-seen', '1'); } catch (e) {} }
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return welcome();
     // Variante wählbar: ?intro=b (Tims Video als Vorlage, Ende mit allen Spielern), sonst A (rollt, Vogelperspektive)
-    const VB = /[?&]intro=b/.test(location.search), CHIP = VB ? { x: 631, y: 541, r: 24 } : { x: 628, y: 339, r: 45 }, VS = VB ? 'video/chip-intro-v2-b' : 'video/ref-fall-4s';
+    // Standard seit 27.11.: Karten-Intro (Higgsfield nach Blender-Vorlage). Alte Chip-Intros: ?intro=a / ?intro=b
+    const VB = /[?&]intro=b/.test(location.search), VA = /[?&]intro=a/.test(location.search), CHIP = VB ? { x: 631, y: 541, r: 24 } : { x: 628, y: 339, r: 45 }, VS = VB ? 'video/chip-intro-v2-b' : VA ? 'video/ref-fall-4s' : 'video/karten-intro';
     const el = document.createElement('div');
     el.className = 'cintro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Blue Chip Club Intro');
     el.innerHTML = '<div class="cin-cam"><video muted playsinline autoplay preload="auto" poster="' + VS + '-poster.jpg" src="' + VS + '.mp4"></video></div>' +
